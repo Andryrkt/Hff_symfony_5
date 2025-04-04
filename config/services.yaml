@@ -4,7 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-
+  env(LDAP_HOST): "192.168.0.1"
 services:
   # default configuration for services in *this* file
   _defaults:
@@ -27,14 +27,29 @@ services:
     arguments:
       $logger: "@logger"
 
+  App\Security\LdapUserProvider:
+    arguments:
+      $ldap: '@Symfony\Component\Ldap\Ldap'
+      $baseDn: "DC=fraise,DC=hff,DC=mg"
+      $uidKey: "sAMAccountName"
+      $defaultRoles: "ROLE_USER"
+      $searchDn: "%env(resolve:LDAP_SEARCH_DN)%"
+      $searchPassword: "%env(resolve:LDAP_PASSWORD)%"
+
   Symfony\Component\Ldap\Ldap:
     factory: ['Symfony\Component\Ldap\Ldap', "create"]
     arguments:
-      - "ext_ldap" # Utilisation de l'adaptateur ExtLdap
-      - host: "192.168.0.1"
-        port: 389
-        encryption: none # Peut être `ssl` ou `tls` selon votre serveur LDAP
-        options:
-          protocol_version: 3
-          referrals: false
-    tags: ["ldap"]
+      - ext_ldap
+      - {
+          host: "%env(resolve:LDAP_HOST)%",
+          port: 389,
+          encryption: none,
+          options: { protocol_version: 3, referrals: false },
+        }
+
+  App\Security\LdapAuthenticator:
+    arguments:
+      $ldap: '@Symfony\Component\Ldap\Ldap'
+      $router: "@router"
+      $searchDn: "%env(resolve:LDAP_SEARCH_DN)%"
+      $searchPassword: "%env(resolve:LDAP_PASSWORD)%"

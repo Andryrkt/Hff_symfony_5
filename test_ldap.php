@@ -14,23 +14,43 @@ $ldap = Ldap::create('ext_ldap', [
 ]);
 
 try {
-    // Authentification
     $ldap->bind(
-        'CN=Lanto ANDRIANADISON,OU=Informatique,OU=HFF Tana,OU=HFF Users,DC=fraise,DC=hff,DC=mg',
-        '@Andryrkt2971*'
-    );
+                'CN=Lanto ANDRIANADISON,OU=Informatique,OU=HFF Tana,OU=HFF Users,DC=fraise,DC=hff,DC=mg',
+                'Hasina#2025'
+            );
 
-    // Requête LDAP
-    $search = $ldap->query(
-        'OU=HFF Users,DC=fraise,DC=hff,DC=mg',
-        '(objectClass=*)'
+    $query = $ldap->query(
+        'DC=fraise,DC=hff,DC=mg',
+        '(sAMAccountName=lanto)'
     );
-    $results = $search->execute();
+    $results = $query->execute();
+    dd($results);
 
-    // Afficher les résultats
     foreach ($results as $entry) {
-        echo "DN: " . $entry->getDn() . PHP_EOL;
+        dump($entry);	
+        echo "DN: ".$entry->getDn()."\n";
     }
 } catch (\Exception $e) {
-    echo "Erreur : " . $e->getMessage() . PHP_EOL;
+    echo "Erreur LDAP : " . $e->getMessage() . "\n";
 }
+// try {
+//     // Authentification
+//     $ldap->bind(
+//         'CN=Lanto ANDRIANADISON,OU=Informatique,OU=HFF Tana,OU=HFF Users,DC=fraise,DC=hff,DC=mg',
+//         'Hasina#2025'
+//     );
+
+//     // Requête LDAP
+//     $search = $ldap->query(
+//         'OU=HFF Users,DC=fraise,DC=hff,DC=mg',
+//         '(objectClass=*)'
+//     );
+//     $results = $search->execute();
+
+//     // Afficher les résultats
+//     foreach ($results as $entry) {
+//         echo "DN: " . $entry->getDn() . PHP_EOL;
+//     }
+// } catch (\Exception $e) {
+//     echo "Erreur : " . $e->getMessage() . PHP_EOL;
+// }
