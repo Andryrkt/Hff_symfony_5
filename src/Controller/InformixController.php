@@ -17,7 +17,7 @@ class InformixController extends AbstractController
     }
 
     /**
-     * @Route("/", name="hom")
+     * @Route("/test-informix", name="test_informix")
      *
      * @return Response
      */

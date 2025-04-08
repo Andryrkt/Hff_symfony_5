@@ -10,6 +10,7 @@ security:
       lazy: true
       provider: ldap_user_provider
       custom_authenticator: App\Security\LdapAuthenticator
+      entry_point: App\Security\LdapAuthenticator
       logout:
         path: app_logout
         target: /login

@@ -4,16 +4,18 @@ namespace App\Security;
 
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 
-class LdapAuthenticator extends AbstractAuthenticator
+class LdapAuthenticator extends AbstractAuthenticator implements AuthenticationEntryPointInterface
 {
     private $ldap;
     private $router;
@@ -36,6 +38,11 @@ class LdapAuthenticator extends AbstractAuthenticator
         $this->searchPassword = $searchPassword;
     }
 
+    public function start(Request $request, AuthenticationException $authException = null): Response
+    {
+        return new RedirectResponse('/login');
+    }
+    
     public function supports(Request $request): ?bool
     {
         return $request->getPathInfo() === '/login' && $request->isMethod('POST');
@@ -65,11 +72,10 @@ class LdapAuthenticator extends AbstractAuthenticator
             throw new AuthenticationException('Mot de passe incorrect.');
         }
 
-        // ✅ Charger l'utilisateur via UserProvider
+        $user = $this->userProvider->loadUserByIdentifier($username);
+
         return new SelfValidatingPassport(
-            new UserBadge($username, function ($userIdentifier) {
-                return $this->userProvider->loadUserByIdentifier($userIdentifier);
-            })
+            new UserBadge($username, fn() => $user)
         );
     }
 
