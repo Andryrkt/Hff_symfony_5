@@ -24,13 +24,12 @@ class LdapAuthenticator extends AbstractAuthenticator implements AuthenticationE
     private $searchPassword;
 
     public function __construct(
-        LdapInterface $ldap, 
+        LdapInterface $ldap,
         RouterInterface $router,
-        LdapUserProvider $userProvider, 
+        LdapUserProvider $userProvider,
         string $searchDn,
         string $searchPassword
-    )
-    {
+    ) {
         $this->ldap = $ldap;
         $this->router = $router;
         $this->userProvider = $userProvider;
@@ -42,7 +41,7 @@ class LdapAuthenticator extends AbstractAuthenticator implements AuthenticationE
     {
         return new RedirectResponse('/login');
     }
-    
+
     public function supports(Request $request): ?bool
     {
         return $request->getPathInfo() === '/login' && $request->isMethod('POST');
@@ -54,18 +53,18 @@ class LdapAuthenticator extends AbstractAuthenticator implements AuthenticationE
         $password = $request->request->get('_password', '');
         // 🔐 Bind avec le compte technique AVANT la requête
         $this->ldap->bind($this->searchDn, $this->searchPassword);
-        
+
         $query = $this->ldap->query('DC=fraise,DC=hff,DC=mg', sprintf('(sAMAccountName=%s)', $username));
-        
+
         $results = $query->execute();
-        
+
         if (count($results) === 0) {
             throw new AuthenticationException('Utilisateur LDAP non trouvé.');
         }
-        
+
         $dn = $results[0]->getDn();
-        
-        
+
+
         try {
             $this->ldap->bind($dn, $password);
         } catch (\Exception $e) {
@@ -75,7 +74,7 @@ class LdapAuthenticator extends AbstractAuthenticator implements AuthenticationE
         $user = $this->userProvider->loadUserByIdentifier($username);
 
         return new SelfValidatingPassport(
-            new UserBadge($username, fn() => $user)
+            new UserBadge($username)
         );
     }
 
