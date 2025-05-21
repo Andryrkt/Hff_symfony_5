@@ -20,6 +20,7 @@ Application Symfony 5 permettant de dématérialiser .
 - Symfony CLI
 - yarn ou npm (Node js)
 - Serveur web (Apache, Nginx)
+- extension ODBC activer en php.ini tsy apache (pour voir si activer ou non, executer cette commande "php -m" )
 - [Autres prérequis éventuels]
 
 
