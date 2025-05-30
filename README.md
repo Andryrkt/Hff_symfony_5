@@ -1,9 +1,11 @@
 # 📦 Nom du projet Symfony 5
 
 ## 📝 Description
+
 Application Symfony 5 permettant de dématérialiser .
 
 ## 🚀 Technologies
+
 - PHP >= 7.4
 - Symfony 5.4
 - Doctrine ORM
@@ -13,8 +15,8 @@ Application Symfony 5 permettant de dématérialiser .
 - [Autres outils ou bibliothèques]
 - Base de données : SQL Server 2019, Informix
 
-
 ## ⚙️ Prérequis
+
 - PHP installé
 - Composer
 - Symfony CLI
@@ -23,12 +25,11 @@ Application Symfony 5 permettant de dématérialiser .
 - extension ODBC activer en php.ini tsy apache (pour voir si activer ou non, executer cette commande "php -m" )
 - [Autres prérequis éventuels]
 
-
 ## 🛠️ Installation
 
 ```bash
-git clone https://github.com/ton-org/ton-projet.git
-cd ton-projet
+git clone https://github.com/Andryrkt/Hff_symfony_5.git
+cd Hff_symfony_5
 composer install
 yarn install ou npm install
 cp .env .env.local
@@ -37,17 +38,18 @@ php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate
 symfony server:start
 ```
-## 🗂️ Structure du projet
-|Dossier    |	Description                                 |
-|-----------|-----------------------------------------------|
-|src/	    |Code métier (contrôleurs, services, entités…)  |
-|templates/	|Vues Twig                                      |
-|public/	|Fichiers publics (build, index.php)            |
-|config/	|Fichiers de configuration                      |
-|migrations/|Fichiers de migration                          |
-|tests/	    |Tests automatisés                              |
-|assers/    | Fichiers (css, js, images)                    |
 
+## 🗂️ Structure du projet
+
+| Dossier     | Description                                   |
+| ----------- | --------------------------------------------- |
+| src/        | Code métier (contrôleurs, services, entités…) |
+| templates/  | Vues Twig                                     |
+| public/     | Fichiers publics (build, index.php)           |
+| config/     | Fichiers de configuration                     |
+| migrations/ | Fichiers de migration                         |
+| tests/      | Tests automatisés                             |
+| assers/     | Fichiers (css, js, images)                    |
 
 ## 🔐 Authentification et sécurité
 
@@ -57,12 +59,9 @@ symfony server:start
 
 - Accès restreint à certaines routes
 
-
 ## 🧪 Tests
 
 php bin/phpunit
-
-
 
 ## 🚀 Déploiement
 
@@ -71,6 +70,7 @@ php bin/phpunit
 - Cache, logs, et permissions
 
 - Commandes utiles :
+
 ```Bash
     php bin/console cache:clear
     php bin/console doctrine:migrations:migrate
