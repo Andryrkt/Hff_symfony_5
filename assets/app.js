@@ -11,6 +11,10 @@ import ModalController from "./controllers/modal_controller";
 import "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
+// Import complet (icônes + CSS) font awesome
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import "@fortawesome/fontawesome-free/js/all.min.js";
+
 // any CSS you import will output into a single css file (app.css in this case)
 import "./styles/app.css";
 
