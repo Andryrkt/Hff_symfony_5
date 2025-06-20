@@ -79,3 +79,12 @@ php bin/phpunit
 ## 🧰 Commandes personnalisées
 
     php bin/console app:ma-commande
+
+## bibliothèque JS installer
+
+- bootstrap
+- font awesome
+
+## page crée
+
+- login
