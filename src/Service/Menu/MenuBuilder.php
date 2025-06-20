@@ -41,13 +41,13 @@ class MenuBuilder
                 'children' => [
                     [
                         'label' => 'Nouvelle Demande',
-                        'route' => 'mission_new',
+                        'route' => '#',
                         'icon' => 'fas fa-plus-circle',
                         'visible' => true,
                     ],
                     [
                         'label' => 'Consultation',
-                        'route' => 'mission_list',
+                        'route' => '#',
                         'icon' => 'fas fa-list',
                         'visible' => true,
                     ],
