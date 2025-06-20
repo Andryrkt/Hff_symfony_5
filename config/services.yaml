@@ -57,3 +57,10 @@ services:
   # extension twig pour l'asset des images
   App\Twig\WebpackAssetExtension:
     tags: ["twig.extension"]
+
+  # service pour le navigation
+  App\Twig\MenuExtension:
+    arguments:
+      - '@App\Service\Menu\MenuBuilder'
+    tags:
+      - "twig.extension"
