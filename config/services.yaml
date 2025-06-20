@@ -53,3 +53,7 @@ services:
       $router: "@router"
       $searchDn: "%env(resolve:LDAP_SEARCH_DN)%"
       $searchPassword: "%env(resolve:LDAP_PASSWORD)%"
+
+  # extension twig pour l'asset des images
+  App\Twig\WebpackAssetExtension:
+    tags: ["twig.extension"]
