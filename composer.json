@@ -9,6 +9,7 @@
         "ext-iconv": "*",
         "doctrine/annotations": "*",
         "doctrine/doctrine-bundle": "^2.13",
+        "doctrine/doctrine-fixtures-bundle": "^3.7",
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^2.20",
         "phpdocumentor/reflection-docblock": "^5.6",

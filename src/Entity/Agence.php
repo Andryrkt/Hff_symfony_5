@@ -39,9 +39,15 @@ class Agence
      */
     private $agenceServices;
 
+    /**
+     * @ORM\OneToMany(targetEntity=UserAccess::class, mappedBy="agence")
+     */
+    private $userAccesses;
+
     public function __construct()
     {
         $this->agenceServices = new ArrayCollection();
+        $this->userAccesses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -97,6 +103,36 @@ class Agence
             // set the owning side to null (unless already changed)
             if ($agenceService->getAgence() === $this) {
                 $agenceService->setAgence(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserAccess>
+     */
+    public function getUserAccesses(): Collection
+    {
+        return $this->userAccesses;
+    }
+
+    public function addUserAccess(UserAccess $userAccess): self
+    {
+        if (!$this->userAccesses->contains($userAccess)) {
+            $this->userAccesses[] = $userAccess;
+            $userAccess->setAgence($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserAccess(UserAccess $userAccess): self
+    {
+        if ($this->userAccesses->removeElement($userAccess)) {
+            // set the owning side to null (unless already changed)
+            if ($userAccess->getAgence() === $this) {
+                $userAccess->setAgence(null);
             }
         }
 

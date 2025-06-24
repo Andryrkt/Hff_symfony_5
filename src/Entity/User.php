@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use App\Entity\Traits\TimestampableTrait;
@@ -61,6 +63,16 @@ class User implements UserInterface
      * @ORM\OneToOne(targetEntity=Personnel::class, inversedBy="users", cascade={"persist", "remove"})
      */
     private $personnel;
+
+    /**
+     * @ORM\OneToMany(targetEntity=UserAccess::class, mappedBy="users")
+     */
+    private $userAccesses;
+
+    public function __construct()
+    {
+        $this->userAccesses = new ArrayCollection();
+    }
 
 
     public function getId(): ?int
@@ -209,6 +221,36 @@ class User implements UserInterface
     public function setPersonnel(?Personnel $personnel): self
     {
         $this->personnel = $personnel;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserAccess>
+     */
+    public function getUserAccesses(): Collection
+    {
+        return $this->userAccesses;
+    }
+
+    public function addUserAccess(UserAccess $userAccess): self
+    {
+        if (!$this->userAccesses->contains($userAccess)) {
+            $this->userAccesses[] = $userAccess;
+            $userAccess->setUsers($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserAccess(UserAccess $userAccess): self
+    {
+        if ($this->userAccesses->removeElement($userAccess)) {
+            // set the owning side to null (unless already changed)
+            if ($userAccess->getUsers() === $this) {
+                $userAccess->setUsers(null);
+            }
+        }
 
         return $this;
     }
