@@ -2,8 +2,9 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\UserRepository;
+use App\Entity\Traits\TimestampableTrait;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -12,6 +13,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class User implements UserInterface
 {
+    use TimestampableTrait;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -40,7 +43,7 @@ class User implements UserInterface
     private $email;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $matricule;
 
@@ -53,6 +56,12 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $poste;
+
+    /**
+     * @ORM\OneToOne(targetEntity=Personnel::class, inversedBy="users", cascade={"persist", "remove"})
+     */
+    private $personnel;
+
 
     public function getId(): ?int
     {
@@ -161,7 +170,7 @@ class User implements UserInterface
         return $this->matricule;
     }
 
-    public function setMatricule(string $matricule): self
+    public function setMatricule(?string $matricule): self
     {
         $this->matricule = $matricule;
 
@@ -188,6 +197,18 @@ class User implements UserInterface
     public function setPoste(?string $poste): self
     {
         $this->poste = $poste;
+
+        return $this;
+    }
+
+    public function getPersonnel(): ?Personnel
+    {
+        return $this->personnel;
+    }
+
+    public function setPersonnel(?Personnel $personnel): self
+    {
+        $this->personnel = $personnel;
 
         return $this;
     }
