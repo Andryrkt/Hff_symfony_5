@@ -39,6 +39,21 @@ class User implements UserInterface
      */
     private $email;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $matricule;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $numero_telephone;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $poste;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -137,6 +152,42 @@ class User implements UserInterface
     public function setEmail(?string $email): self
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function getMatricule(): ?string
+    {
+        return $this->matricule;
+    }
+
+    public function setMatricule(string $matricule): self
+    {
+        $this->matricule = $matricule;
+
+        return $this;
+    }
+
+    public function getNumeroTelephone(): ?string
+    {
+        return $this->numero_telephone;
+    }
+
+    public function setNumeroTelephone(?string $numero_telephone): self
+    {
+        $this->numero_telephone = $numero_telephone;
+
+        return $this;
+    }
+
+    public function getPoste(): ?string
+    {
+        return $this->poste;
+    }
+
+    public function setPoste(?string $poste): self
+    {
+        $this->poste = $poste;
 
         return $this;
     }

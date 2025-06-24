@@ -35,22 +35,22 @@ class MenuBuilder
                 'visible' => !$isLoggedIn,
             ],
             [
-                'label' => 'Dématérialisation',
+                'label' => 'Paramètre',
                 'icon' => 'fas fa-briefcase',
                 'visible' => $isLoggedIn,
                 'children' => [
                     [
-                        'label' => 'Nouvelle Demande',
+                        'label' => 'user',
                         'route' => '#',
                         'icon' => 'fas fa-plus-circle',
                         'visible' => true,
                     ],
-                    [
-                        'label' => 'Consultation',
-                        'route' => '#',
-                        'icon' => 'fas fa-list',
-                        'visible' => true,
-                    ],
+                    //         [
+                    //             'label' => 'Consultation',
+                    //             'route' => '#',
+                    //             'icon' => 'fas fa-list',
+                    //             'visible' => true,
+                    //         ],
                 ]
             ],
         ];
