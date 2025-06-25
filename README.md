@@ -88,3 +88,9 @@ php bin/phpunit
 ## page crée
 
 - login
+
+## encore à faire
+
+- accéss de l'utilisateur
+- log
+- exception: 404, 500, ...
