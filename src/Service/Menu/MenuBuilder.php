@@ -34,25 +34,25 @@ class MenuBuilder
                 'icon' => 'fas fa-sign-in-alt',
                 'visible' => !$isLoggedIn,
             ],
-            [
-                'label' => 'Paramètre',
-                'icon' => 'fas fa-briefcase',
-                'visible' => $isLoggedIn,
-                'children' => [
-                    [
-                        'label' => 'user',
-                        'route' => '#',
-                        'icon' => 'fas fa-plus-circle',
-                        'visible' => true,
-                    ],
-                    //         [
-                    //             'label' => 'Consultation',
-                    //             'route' => '#',
-                    //             'icon' => 'fas fa-list',
-                    //             'visible' => true,
-                    //         ],
-                ]
-            ],
+            // [
+            //     'label' => 'Paramètre',
+            //     'icon' => 'fas fa-briefcase',
+            //     'visible' => $isLoggedIn,
+            //     'children' => [
+            //         [
+            //             'label' => 'user',
+            //             'route' => '#',
+            //             'icon' => 'fas fa-plus-circle',
+            //             'visible' => true,
+            //         ],
+            //         [
+            //             'label' => 'Consultation',
+            //             'route' => '#',
+            //             'icon' => 'fas fa-list',
+            //             'visible' => true,
+            //         ],
+            //         ]
+            //     ],
         ];
     }
 }
