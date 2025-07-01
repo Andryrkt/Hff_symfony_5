@@ -34,7 +34,7 @@ services:
       $uidKey: "sAMAccountName"
       $defaultRoles: "ROLE_USER"
       $searchDn: "%env(resolve:LDAP_SEARCH_DN)%"
-      $searchPassword: "%env(resolve:LDAP_PASSWORD)%"
+      $searchPassword: "%env(resolve:LDAP_SEARCH_PASSWORD)%"
 
   Symfony\Component\Ldap\Ldap:
     factory: ['Symfony\Component\Ldap\Ldap', "create"]
@@ -47,12 +47,14 @@ services:
           options: { protocol_version: 3, referrals: false },
         }
 
+  Symfony\Component\Ldap\LdapInterface: '@Symfony\Component\Ldap\Ldap'
+
   App\Security\LdapAuthenticator:
     arguments:
       $ldap: '@Symfony\Component\Ldap\Ldap'
       $router: "@router"
       $searchDn: "%env(resolve:LDAP_SEARCH_DN)%"
-      $searchPassword: "%env(resolve:LDAP_PASSWORD)%"
+      $searchPassword: "%env(resolve:LDAP_SEARCH_PASSWORD)%"
 
   # extension twig pour l'asset des images
   App\Twig\WebpackAssetExtension:

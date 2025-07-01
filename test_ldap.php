@@ -16,7 +16,7 @@ $ldap = Ldap::create('ext_ldap', [
 try {
     $ldap->bind(
                 'CN=Lanto ANDRIANADISON,OU=Informatique,OU=HFF Tana,OU=HFF Users,DC=fraise,DC=hff,DC=mg',
-                'Hasina#2025'
+                'Hasina#2025-2'
             );
 
     $query = $ldap->query(
@@ -24,20 +24,21 @@ try {
         '(sAMAccountName=lanto)'
     );
     $results = $query->execute();
-    dd($results);
+    // dd($results);
 
     foreach ($results as $entry) {
         dump($entry);	
-        echo "DN: ".$entry->getDn()."\n";
+        // echo "DN: ".$entry->getDn()."\n";
     }
 } catch (\Exception $e) {
     echo "Erreur LDAP : " . $e->getMessage() . "\n";
 }
+
 // try {
 //     // Authentification
 //     $ldap->bind(
 //         'CN=Lanto ANDRIANADISON,OU=Informatique,OU=HFF Tana,OU=HFF Users,DC=fraise,DC=hff,DC=mg',
-//         'Hasina#2025'
+//         'Hasina#2025-2'
 //     );
 
 //     // Requête LDAP
@@ -49,7 +50,8 @@ try {
 
 //     // Afficher les résultats
 //     foreach ($results as $entry) {
-//         echo "DN: " . $entry->getDn() . PHP_EOL;
+//         // echo "DN: " . $entry->getDn() . PHP_EOL;
+//          dump($entry);
 //     }
 // } catch (\Exception $e) {
 //     echo "Erreur : " . $e->getMessage() . PHP_EOL;

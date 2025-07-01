@@ -54,7 +54,9 @@ class LdapAuthenticator extends AbstractAuthenticator implements AuthenticationE
         // 🔐 Bind avec le compte technique AVANT la requête
         $this->ldap->bind($this->searchDn, $this->searchPassword);
 
-        $query = $this->ldap->query('DC=fraise,DC=hff,DC=mg', sprintf('(sAMAccountName=%s)', $username));
+        // Utilisation de la variable d'environnement pour le base DN
+        $baseDn = $_ENV['LDAP_BASE_DN'] ?? 'OU=HFF Users,DC=fraise,DC=hff,DC=mg';
+        $query = $this->ldap->query($baseDn, sprintf('(sAMAccountName=%s)', $username));
 
         $results = $query->execute();
 
