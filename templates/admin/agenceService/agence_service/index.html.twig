@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}AgenceService index{% endblock %}
+
+{% block body %}
+    <h1>AgenceService index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Code</th>
+                <th>Responsable</th>
+                <th>CreatedAt</th>
+                <th>UpdatedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for agence_service in agence_services %}
+            <tr>
+                <td>{{ agence_service.id }}</td>
+                <td>{{ agence_service.code }}</td>
+                <td>{{ agence_service.responsable }}</td>
+                <td>{{ agence_service.createdAt ? agence_service.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ agence_service.updatedAt ? agence_service.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('admin_agence_service_show', {'id': agence_service.id}) }}">show</a>
+                    <a href="{{ path('admin_agence_service_edit', {'id': agence_service.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('admin_agence_service_new') }}">Create new</a>
+{% endblock %}

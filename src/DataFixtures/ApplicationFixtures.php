@@ -1,0 +1,17 @@
+<?php
+
+namespace App\DataFixtures;
+
+use App\Entity\Admin\ApplicationGroupe\Application;
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Persistence\ObjectManager;
+
+class ApplicationFixtures extends Fixture
+{
+    public function load(ObjectManager $manager): void
+    {
+        $application = new Application();
+        $application->setName('Application');
+        $manager->persist($application);
+    }
+}

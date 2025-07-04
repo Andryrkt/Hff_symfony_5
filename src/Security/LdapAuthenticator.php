@@ -58,6 +58,11 @@ class LdapAuthenticator extends AbstractAuthenticator implements AuthenticationE
         $baseDn = $_ENV['LDAP_BASE_DN'] ?? 'OU=HFF Users,DC=fraise,DC=hff,DC=mg';
         $query = $this->ldap->query($baseDn, sprintf('(sAMAccountName=%s)', $username));
 
+        
+        if (!$query) {
+            throw new AuthenticationException('La requête LDAP est invalide.');
+        }
+        
         $results = $query->execute();
 
         if (count($results) === 0) {

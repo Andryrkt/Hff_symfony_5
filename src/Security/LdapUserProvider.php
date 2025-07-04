@@ -2,8 +2,8 @@
 
 namespace App\Security;
 
-use App\Entity\User;
-use App\Repository\UserRepository;
+use App\Entity\Admin\PersonnelUser\User;
+use App\Repository\Admin\PersonnelUser\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -46,6 +46,11 @@ class LdapUserProvider implements UserProviderInterface
         $this->ldap->bind($this->searchDn, $this->searchPassword);
 
         $query = $this->ldap->query($this->baseDn, sprintf('(%s=%s)', $this->uidKey, $identifier));
+        
+        if (!$query) {
+            throw new UserNotFoundException(sprintf('Requête LDAP invalide pour l\'utilisateur "%s".', $identifier));
+        }
+        
         $results = $query->execute();
 
         if (count($results) === 0) {

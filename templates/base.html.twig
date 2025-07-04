@@ -19,7 +19,9 @@
 		{% block navbar %}
 			{% include 'partials/_navbar.html.twig' %}
 		{% endblock %}
+		<div class="container">
 		{% block body %}{% endblock %}
+		</div>
 		{% block javascripts %}
 			{{ encore_entry_script_tags('app') }}
 		{% endblock %}

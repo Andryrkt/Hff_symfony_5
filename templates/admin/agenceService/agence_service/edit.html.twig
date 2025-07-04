@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit AgenceService{% endblock %}
+
+{% block body %}
+    <h1>Edit AgenceService</h1>
+
+    {{ include('agence_service/shared/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('admin_agence_service_index') }}">back to list</a>
+
+    {{ include('agence_service/shared/_delete_form.html.twig') }}
+{% endblock %}

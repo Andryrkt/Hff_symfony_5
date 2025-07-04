@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}AgenceService{% endblock %}
+
+{% block body %}
+    <h1>AgenceService</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ agence_service.id }}</td>
+            </tr>
+            <tr>
+                <th>Code</th>
+                <td>{{ agence_service.code }}</td>
+            </tr>
+            <tr>
+                <th>Responsable</th>
+                <td>{{ agence_service.responsable }}</td>
+            </tr>
+            <tr>
+                <th>CreatedAt</th>
+                <td>{{ agence_service.createdAt ? agence_service.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ agence_service.updatedAt ? agence_service.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('admin_agence_service_index') }}">back to list</a>
+
+    <a href="{{ path('admin_agence_service_edit', {'id': agence_service.id}) }}">edit</a>
+
+    {{ include('agence_service/shared/_delete_form.html.twig') }}
+{% endblock %}
