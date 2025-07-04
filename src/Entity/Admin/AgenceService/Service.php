@@ -9,7 +9,7 @@ use Symfony\UX\Turbo\Attribute\Broadcast;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Admin\PersonnelUser\UserAccess;
-use App\Entity\Admin\AgenceService\AgenceService;
+use App\Entity\Admin\AgenceService\AgenceServiceIrium;
 
 /**
  * @Broadcast()
@@ -38,9 +38,9 @@ class Service
     private $nom;
 
     /**
-     * @ORM\OneToMany(targetEntity=AgenceService::class, mappedBy="service")
+     * @ORM\OneToMany(targetEntity=AgenceServiceIrium::class, mappedBy="service")
      */
-    private $agenceServices;
+    private $agenceServiceIriums;
 
     /**
      * @ORM\OneToMany(targetEntity=UserAccess::class, mappedBy="service")
@@ -49,7 +49,7 @@ class Service
 
     public function __construct()
     {
-        $this->agenceServices = new ArrayCollection();
+        $this->agenceServiceIriums = new ArrayCollection();
         $this->userAccesses = new ArrayCollection();
     }
 
@@ -83,29 +83,29 @@ class Service
     }
 
     /**
-     * @return Collection<int, AgenceService>
+     * @return Collection<int, AgenceServiceIrium>
      */
-    public function getAgenceServices(): Collection
+    public function getAgenceServiceIriums(): Collection
     {
-        return $this->agenceServices;
+        return $this->agenceServiceIriums;
     }
 
-    public function addAgenceService(AgenceService $agenceService): self
+    public function addAgenceServiceIrium(AgenceServiceIrium $agenceServiceIrium): self
     {
-        if (!$this->agenceServices->contains($agenceService)) {
-            $this->agenceServices[] = $agenceService;
-            $agenceService->setService($this);
+        if (!$this->agenceServiceIriums->contains($agenceServiceIrium)) {
+            $this->agenceServiceIriums[] = $agenceServiceIrium;
+            $agenceServiceIrium->setService($this);
         }
 
         return $this;
     }
 
-    public function removeAgenceService(AgenceService $agenceService): self
+    public function removeAgenceServiceIrium(AgenceServiceIrium $agenceServiceIrium): self
     {
-        if ($this->agenceServices->removeElement($agenceService)) {
+        if ($this->agenceServiceIriums->removeElement($agenceServiceIrium)) {
             // set the owning side to null (unless already changed)
-            if ($agenceService->getService() === $this) {
-                $agenceService->setService(null);
+            if ($agenceServiceIrium->getService() === $this) {
+                $agenceServiceIrium->setService(null);
             }
         }
 

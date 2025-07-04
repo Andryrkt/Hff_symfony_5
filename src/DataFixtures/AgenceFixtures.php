@@ -2,7 +2,7 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Agence;
+use App\Entity\Admin\AgenceService\Agence;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
@@ -60,31 +60,31 @@ class AgenceFixtures extends Fixture
 
         // Agence administration
         $administration = new Agence();
-        $administration->setCode('80'); 
+        $administration->setCode('80');
         $administration->setNom('ADMINISTRATION');
         $manager->persist($administration);
 
         // Agence comm energie
         $commEnergie = new Agence();
-        $commEnergie->setCode('90'); 
+        $commEnergie->setCode('90');
         $commEnergie->setNom('COMM ENERGIE');
         $manager->persist($commEnergie);
 
         // Agence energie durable
         $energieDurable = new Agence();
-        $energieDurable->setCode('91'); 
+        $energieDurable->setCode('91');
         $energieDurable->setNom('ENERGIE DURABLE');
         $manager->persist($energieDurable);
 
         // Agence energie jirama
         $energieJirama = new Agence();
-        $energieJirama->setCode('92'); 
+        $energieJirama->setCode('92');
         $energieJirama->setNom('ENERGIE JIRAMA');
         $manager->persist($energieJirama);
 
         // Agence travel airways
         $travelAirways = new Agence();
-        $travelAirways->setCode('C1'); 
+        $travelAirways->setCode('C1');
         $travelAirways->setNom('TRAVEL AIRWAYS');
         $manager->persist($travelAirways);
 

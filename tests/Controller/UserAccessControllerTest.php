@@ -61,10 +61,10 @@ class UserAccessControllerTest extends WebTestCase
         $this->markTestIncomplete();
         $fixture = new UserAccess();
         $fixture->setAccessType('My Title');
-        $fixture->setUsers('My Title');
-        $fixture->setAgence('My Title');
-        $fixture->setService('My Title');
-        $fixture->setApplication('My Title');
+        $fixture->setUsers(new \App\Entity\Admin\PersonnelUser\User());
+        $fixture->setAgence(new \App\Entity\Admin\AgenceService\Agence());
+        $fixture->setService(new \App\Entity\Admin\AgenceService\Service());
+        $fixture->setApplication(new \App\Entity\Admin\ApplicationGroupe\Application());
 
         $this->repository->add($fixture, true);
 
@@ -81,10 +81,10 @@ class UserAccessControllerTest extends WebTestCase
         $this->markTestIncomplete();
         $fixture = new UserAccess();
         $fixture->setAccessType('My Title');
-        $fixture->setUsers('My Title');
-        $fixture->setAgence('My Title');
-        $fixture->setService('My Title');
-        $fixture->setApplication('My Title');
+        $fixture->setUsers(new \App\Entity\Admin\PersonnelUser\User());
+        $fixture->setAgence(new \App\Entity\Admin\AgenceService\Agence());
+        $fixture->setService(new \App\Entity\Admin\AgenceService\Service());
+        $fixture->setApplication(new \App\Entity\Admin\ApplicationGroupe\Application());
 
         $this->repository->add($fixture, true);
 
@@ -117,10 +117,10 @@ class UserAccessControllerTest extends WebTestCase
 
         $fixture = new UserAccess();
         $fixture->setAccessType('My Title');
-        $fixture->setUsers('My Title');
-        $fixture->setAgence('My Title');
-        $fixture->setService('My Title');
-        $fixture->setApplication('My Title');
+        $fixture->setUsers(new \App\Entity\Admin\PersonnelUser\User());
+        $fixture->setAgence(new \App\Entity\Admin\AgenceService\Agence());
+        $fixture->setService(new \App\Entity\Admin\AgenceService\Service());
+        $fixture->setApplication(new \App\Entity\Admin\ApplicationGroupe\Application());
 
         $this->repository->add($fixture, true);
 

@@ -1,4 +1,6 @@
 {# Learn how to use Turbo Streams: https://github.com/symfony/ux-turbo#broadcast-doctrine-entities-update #}
+{% set entity = 'AgenceServiceIrium' %}
+
 {% block create %}
 <turbo-stream action="append" target="agence_services">
     <template>

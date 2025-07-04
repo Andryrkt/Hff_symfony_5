@@ -11,7 +11,8 @@ class ApplicationFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         $application = new Application();
-        $application->setName('Application');
+        $application->setName('DEMANDE D\'ORDRE DE MISSION');
+        $application->setCode('DOM');
         $manager->persist($application);
     }
 }

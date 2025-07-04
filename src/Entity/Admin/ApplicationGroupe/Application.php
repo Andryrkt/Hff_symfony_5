@@ -35,6 +35,11 @@ class Application
      */
     private $userAccesses;
 
+    /**
+     * @ORM\Column(type="string", length=10, nullable=true)
+     */
+    private $code;
+
     public function __construct()
     {
         $this->userAccesses = new ArrayCollection();
@@ -95,6 +100,18 @@ class Application
                 $userAccess->setApplication(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(?string $code): self
+    {
+        $this->code = $code;
 
         return $this;
     }

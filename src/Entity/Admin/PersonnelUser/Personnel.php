@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\Admin\PersonnelUser\PersonnelRepository;
 use App\Entity\Traits\TimestampableTrait;
 use Symfony\UX\Turbo\Attribute\Broadcast;
-use App\Entity\Admin\AgenceService\AgenceService;
+use App\Entity\Admin\AgenceService\AgenceServiceIrium;
 use App\Entity\Admin\PersonnelUser\User;
 
 /**
@@ -36,7 +36,7 @@ class Personnel
     private $prenom;
 
     /**
-     * @ORM\ManyToOne(targetEntity=AgenceService::class, inversedBy="personnels")
+     * @ORM\ManyToOne(targetEntity=AgenceServiceIrium::class, inversedBy="personnels")
      */
     private $agenceService;
 
@@ -74,12 +74,12 @@ class Personnel
         return $this;
     }
 
-    public function getAgenceService(): ?AgenceService
+    public function getAgenceService(): ?AgenceServiceIrium
     {
         return $this->agenceService;
     }
 
-    public function setAgenceService(?AgenceService $agenceService): self
+    public function setAgenceService(?AgenceServiceIrium $agenceService): self
     {
         $this->agenceService = $agenceService;
 

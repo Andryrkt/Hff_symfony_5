@@ -7,25 +7,23 @@ use App\Security\LdapUserProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Ldap\LdapInterface;
-use Symfony\Component\Ldap\Query;
-use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Psr\Log\LoggerInterface;
+
 
 class LdapAuthenticatorTest extends TestCase
 {
     private $ldap;
     private $router;
     private $userProvider;
-    private $logger;
     private $authenticator;
 
     protected function setUp(): void
     {
         $this->ldap = $this->createMock(LdapInterface::class);
         $this->router = $this->createMock(RouterInterface::class);
-        $this->userProvider = $this->createMock(LdapUserProvider::class);
+        $this->userProvider = $this->getMockBuilder(LdapUserProvider::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->authenticator = new LdapAuthenticator(
             $this->ldap,
@@ -106,4 +104,4 @@ class LdapAuthenticatorTest extends TestCase
     //     $passport = $this->authenticator->authenticate($request);
     //     $this->assertNotNull($passport);
     // }
-} 
+}

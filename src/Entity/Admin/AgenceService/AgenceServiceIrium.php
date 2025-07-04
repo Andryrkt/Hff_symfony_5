@@ -5,7 +5,7 @@ namespace App\Entity\Admin\AgenceService;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Traits\TimestampableTrait;
 use Symfony\UX\Turbo\Attribute\Broadcast;
-use App\Repository\Admin\AgenceService\AgenceServiceRepository;
+use App\Repository\Admin\AgenceService\AgenceServiceIriumRepository;
 use Doctrine\Common\Collections\Collection;
 use App\Entity\Admin\PersonnelUser\Personnel;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -14,10 +14,11 @@ use App\Entity\Admin\AgenceService\Service;
 
 /**
  * @Broadcast()
- * @ORM\Entity(repositoryClass=AgenceServiceRepository::class)
+ * @ORM\Entity(repositoryClass=AgenceServiceIriumRepository::class)
+ * @ORM\Table(name="agence_service_irium")
  * @ORM\HasLifecycleCallbacks
  */
-class AgenceService
+class AgenceServiceIrium
 {
     use TimestampableTrait;
 
