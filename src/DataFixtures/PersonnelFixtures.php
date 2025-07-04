@@ -2,7 +2,7 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Personnel;
+use App\Entity\Admin\PersonnelUser\Personnel;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;

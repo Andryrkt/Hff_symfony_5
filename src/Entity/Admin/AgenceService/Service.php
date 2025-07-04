@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Admin\PersonnelUser\UserAccess;
 use App\Entity\Admin\AgenceService\AgenceServiceIrium;
+use App\Entity\Admin\AgenceService\Agence;
 
 /**
  * @Broadcast()
@@ -47,10 +48,16 @@ class Service
      */
     private $userAccesses;
 
+    /**
+     * @ORM\ManyToMany(targetEntity=Agence::class, mappedBy="services")
+     */
+    private $agences;
+
     public function __construct()
     {
         $this->agenceServiceIriums = new ArrayCollection();
         $this->userAccesses = new ArrayCollection();
+        $this->agences = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -139,6 +146,28 @@ class Service
             }
         }
 
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Agence>
+     */
+    public function getAgences(): Collection
+    {
+        return $this->agences;
+    }
+
+    public function addAgence(Agence $agence): self
+    {
+        if (!$this->agences->contains($agence)) {
+            $this->agences[] = $agence;
+        }
+        return $this;
+    }
+
+    public function removeAgence(Agence $agence): self
+    {
+        $this->agences->removeElement($agence);
         return $this;
     }
 }

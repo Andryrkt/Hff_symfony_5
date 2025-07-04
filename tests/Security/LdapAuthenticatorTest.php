@@ -19,11 +19,9 @@ class LdapAuthenticatorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->ldap = $this->createMock(LdapInterface::class);
-        $this->router = $this->createMock(RouterInterface::class);
-        $this->userProvider = $this->getMockBuilder(LdapUserProvider::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->ldap = $this->createMock(\Symfony\Component\Ldap\LdapInterface::class);
+        $this->router = $this->createMock(\Symfony\Component\Routing\RouterInterface::class);
+        $this->userProvider = $this->createMock(\App\Security\LdapUserProvider::class);
 
         $this->authenticator = new LdapAuthenticator(
             $this->ldap,

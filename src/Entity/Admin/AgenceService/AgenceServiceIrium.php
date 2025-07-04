@@ -54,6 +54,16 @@ class AgenceServiceIrium
      */
     private $personnels;
 
+    /**
+     * @ORM\Column(type="string", length=4, nullable=true)
+     */
+    private $societe;
+
+    /**
+     * @ORM\Column(type="string", length=6, nullable=true)
+     */
+    private $codeSage;
+
     public function __construct()
     {
         $this->personnels = new ArrayCollection();
@@ -138,6 +148,30 @@ class AgenceServiceIrium
                 $personnel->setAgenceService(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSociete(): ?string
+    {
+        return $this->societe;
+    }
+
+    public function setSociete(?string $societe): self
+    {
+        $this->societe = $societe;
+
+        return $this;
+    }
+
+    public function getCodeSage(): ?string
+    {
+        return $this->codeSage;
+    }
+
+    public function setCodeSage(?string $codeSage): self
+    {
+        $this->codeSage = $codeSage;
 
         return $this;
     }
