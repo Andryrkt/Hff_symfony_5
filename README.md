@@ -1,8 +1,8 @@
-# 📦 Nom du projet Symfony 5
+# 📦 HFF INTRANET
 
 ## 📝 Description
 
-Application Symfony 5 permettant de dématérialiser .
+Application Symfony 5 permettant de faire une dématérialisation .
 
 ## 🚀 Technologies
 
@@ -94,3 +94,29 @@ php bin/phpunit
 - accéss de l'utilisateur
 - log
 - exception: 404, 500, ...
+
+
+### Reglè de permission de l'utilisateur
+- un utilisateur peut avoir un ou plusieurs role
+- un utilisateur peut avoir un ou plusieurs application
+- un utilisateur peut avoir un ou plusieurs permission sur l'agence et service
+    - un utilisateur peut avoir plusieurs agence et service
+    - un utilisateur peut avoir un seul agence et plusieur service
+    - un utilisateur peut avoir un seul agence et les services qui correspond à cette agence
+    - un utilisateur peut avoir plusieurs agence et une seul service
+    - un utilisateur peut avoit une seul agence et une seul service
+- un utilisateur peut avoir un ou plusieurs goupe
+
+
+### Les groupes
+- goupe Atelier
+- groupe magasin
+- groupe Rh
+- groupe Appro
+- groupe rentale
+
+### Les permissions
+- Creation de nouveau demnade (CREATE)
+- visualisation de liste des demande (LISTE)
+    - l'utilisateur connecter ne peut voir que selon la règle de permission donnée à lui
+    - faire des soumissions OR, Facture, RI, ... selon les permissions

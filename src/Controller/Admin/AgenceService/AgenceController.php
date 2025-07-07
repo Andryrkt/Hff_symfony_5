@@ -2,9 +2,9 @@
 
 namespace App\Controller\Admin\AgenceService;
 
-use App\Entity\Agence;
-use App\Form\AgenceType;
-use App\Repository\AgenceRepository;
+use App\Entity\Admin\AgenceService\Agence;
+use App\Form\Admin\AgenceService\AgenceType;
+use App\Repository\Admin\AgenceService\AgenceRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -81,7 +81,7 @@ class AgenceController extends AbstractController
      */
     public function delete(Request $request, Agence $agence, AgenceRepository $agenceRepository): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$agence->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $agence->getId(), $request->request->get('_token'))) {
             $agenceRepository->remove($agence, true);
         }
 

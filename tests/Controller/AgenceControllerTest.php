@@ -2,8 +2,8 @@
 
 namespace App\Test\Controller;
 
-use App\Entity\Agence;
-use App\Repository\AgenceRepository;
+use App\Entity\Admin\AgenceService\Agence;
+use App\Repository\Admin\AgenceService\AgenceRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -61,8 +61,8 @@ class AgenceControllerTest extends WebTestCase
         $fixture = new Agence();
         $fixture->setCode('My Title');
         $fixture->setNom('My Title');
-        $fixture->setCreatedAt('My Title');
-        $fixture->setUpdatedAt('My Title');
+        $fixture->setCreatedAt(new \DateTimeImmutable());
+        $fixture->setUpdatedAt(new \DateTimeImmutable());
 
         $this->repository->add($fixture, true);
 
@@ -80,8 +80,8 @@ class AgenceControllerTest extends WebTestCase
         $fixture = new Agence();
         $fixture->setCode('My Title');
         $fixture->setNom('My Title');
-        $fixture->setCreatedAt('My Title');
-        $fixture->setUpdatedAt('My Title');
+        $fixture->setCreatedAt(new \DateTimeImmutable());
+        $fixture->setUpdatedAt(new \DateTimeImmutable());
 
         $this->repository->add($fixture, true);
 
@@ -113,8 +113,8 @@ class AgenceControllerTest extends WebTestCase
         $fixture = new Agence();
         $fixture->setCode('My Title');
         $fixture->setNom('My Title');
-        $fixture->setCreatedAt('My Title');
-        $fixture->setUpdatedAt('My Title');
+        $fixture->setCreatedAt(new \DateTimeImmutable());
+        $fixture->setUpdatedAt(new \DateTimeImmutable());
 
         $this->repository->add($fixture, true);
 
