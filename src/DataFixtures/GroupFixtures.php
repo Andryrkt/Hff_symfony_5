@@ -35,13 +35,19 @@ class GroupFixtures extends Fixture
         $groupRentale->setName('RENTAL')->setDescription('Groupe Rentale');
         $manager->persist($groupRentale);
 
+        // Groupe Energie
+        $groupEnergie = new Group();
+        $groupEnergie->setName('ENERGIE')->setDescription('Groupe Energie');
+        $manager->persist($groupEnergie);
+
         // Ajout de références pour d'autres fixtures
         $this->addReference('group_rh', $groupRh);
         $this->addReference('group_magasin', $groupMagasin);
         $this->addReference('group_atelier', $groupAtelier);
         $this->addReference('group_appro', $groupAppro);
         $this->addReference('group_rentale', $groupRentale);
+        $this->addReference('group_energie', $groupEnergie);
 
         $manager->flush();
     }
-} 
+}

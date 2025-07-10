@@ -25,7 +25,8 @@ class PersonnelFixtures extends Fixture implements DependentFixtureInterface
     public function getDependencies(): array
     {
         return [
-            AgenceServiceFixtures::class,
+            AgenceServiceIriumFixtures::class,
+            GroupFixtures::class,
         ];
     }
 }

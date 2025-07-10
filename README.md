@@ -89,6 +89,11 @@ php bin/phpunit
 
 - login
 
+## pour tester la page d'erreur 
+- throw new NotFoundHttpException('Page non trouvée');
+- throw new AccessDeniedHttpException('Accès interdit');
+- throw new \Exception('Erreur interne du serveur');
+
 ## encore à faire
 
 - accéss de l'utilisateur
@@ -113,10 +118,17 @@ php bin/phpunit
 - groupe magasin
 - groupe Rh
 - groupe Appro
-- groupe rentale
+- groupe Rentale
+- groupe Energie
 
 ### Les permissions
 - Creation de nouveau demande (CREATE)
 - visualisation de liste des demande (READ)
     - l'utilisateur connecter ne peut voir que selon la règle de permission donnée à lui
     - faire des soumissions OR, Facture, RI, ... selon les conditions de statut et autres de l'application (SOUMISSION)
+
+### Rôle
+- ROLE_USER
+- ROLE_ADMIN
+- ROLE_SUPPER_ADMIN
+- ROLE_CHEF_SERVICE

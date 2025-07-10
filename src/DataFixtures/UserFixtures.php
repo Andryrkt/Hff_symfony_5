@@ -19,10 +19,12 @@ class UserFixtures extends Fixture
         $user->setFullname('Utilisateur Test');
         $user->setEmail('test@hff.mg');
         $user->setRoles(['ROLE_USER']);
-        
+        $user->addGroup($this->getReference('group_energie'));
+        $user->setPersonnel($this->getReference('personnel_jean'));
+
         $manager->persist($user);
         $manager->flush();
 
         $this->addReference('user_test', $user);
     }
-} 
+}
