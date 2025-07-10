@@ -3,7 +3,7 @@
 namespace App\Controller\Admin\AgenceService;
 
 use App\Entity\Admin\AgenceService\AgenceServiceIrium;
-use App\Form\Admin\AgenceService\AgenceServiceType;
+use App\Form\Admin\AgenceService\AgenceServiceIriumType;
 use App\Repository\Admin\AgenceService\AgenceServiceIriumRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 /**
  * @Route("/admin/agence/service")
  */
-class AgenceServiceController extends AbstractController
+class AgenceServiceIriumController extends AbstractController
 {
     /**
      * @Route("/", name="admin_agence_service_index", methods={"GET"})
@@ -31,7 +31,7 @@ class AgenceServiceController extends AbstractController
     public function new(Request $request, AgenceServiceIriumRepository $agenceServiceIriumRepository): Response
     {
         $agenceServiceIrium = new AgenceServiceIrium();
-        $form = $this->createForm(AgenceServiceType::class, $agenceServiceIrium);
+        $form = $this->createForm(AgenceServiceIriumType::class, $agenceServiceIrium);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -61,7 +61,7 @@ class AgenceServiceController extends AbstractController
      */
     public function edit(Request $request, AgenceServiceIrium $agenceServiceIrium, AgenceServiceIriumRepository $agenceServiceIriumRepository): Response
     {
-        $form = $this->createForm(AgenceServiceType::class, $agenceServiceIrium);
+        $form = $this->createForm(AgenceServiceIriumType::class, $agenceServiceIrium);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

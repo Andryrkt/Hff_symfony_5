@@ -55,10 +55,10 @@ Encore
   // })
 
   // enables and configure @babel/preset-env polyfills
-  .configureBabelPresetEnv((config) => {
-    config.useBuiltIns = "usage";
-    config.corejs = "3.23";
-  })
+  // .configureBabelPresetEnv((config) => {
+  //   config.useBuiltIns = "usage";
+  //   config.corejs = "3.23";
+  // })
   //pour copier les fichiers images
   .copyFiles({
     from: "./assets/images",

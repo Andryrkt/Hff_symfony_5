@@ -5,6 +5,9 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
   env(LDAP_HOST): "192.168.0.1"
+  env(LDAP_SEARCH_DN): "%env(resolve:LDAP_SEARCH_DN)%"
+  env(LDAP_SEARCH_PASSWORD): "%env(resolve:LDAP_SEARCH_PASSWORD)%"
+
 services:
   # default configuration for services in *this* file
   _defaults:
@@ -66,3 +69,8 @@ services:
       - '@App\Service\Menu\MenuBuilder'
     tags:
       - "twig.extension"
+
+  App\Service\LdapService:
+    arguments:
+      $searchDn: "%env(resolve:LDAP_SEARCH_DN)%"
+      $searchPassword: "%env(resolve:LDAP_SEARCH_PASSWORD)%"

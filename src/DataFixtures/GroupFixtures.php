@@ -10,17 +10,37 @@ class GroupFixtures extends Fixture
 {
     public function load(ObjectManager $manager)
     {
+        // Groupe RH
         $groupRh = new Group();
         $groupRh->setName('RH')->setDescription('Groupe Ressources Humaines');
         $manager->persist($groupRh);
 
-        $groupGestion = new Group();
-        $groupGestion->setName('GESTION')->setDescription('Groupe Gestion');
-        $manager->persist($groupGestion);
+        // Groupe Magasin
+        $groupMagasin = new Group();
+        $groupMagasin->setName('MAGASIN')->setDescription('Groupe Magasin');
+        $manager->persist($groupMagasin);
+
+        // Groupe Atelier
+        $groupAtelier = new Group();
+        $groupAtelier->setName('ATELIER')->setDescription('Groupe Atelier');
+        $manager->persist($groupAtelier);
+
+        // Groupe Appro
+        $groupAppro = new Group();
+        $groupAppro->setName('APPRO')->setDescription('Groupe Appro');
+        $manager->persist($groupAppro);
+
+        // Groupe Rentale
+        $groupRentale = new Group();
+        $groupRentale->setName('RENTAL')->setDescription('Groupe Rentale');
+        $manager->persist($groupRentale);
 
         // Ajout de références pour d'autres fixtures
         $this->addReference('group_rh', $groupRh);
-        $this->addReference('group_gestion', $groupGestion);
+        $this->addReference('group_magasin', $groupMagasin);
+        $this->addReference('group_atelier', $groupAtelier);
+        $this->addReference('group_appro', $groupAppro);
+        $this->addReference('group_rentale', $groupRentale);
 
         $manager->flush();
     }

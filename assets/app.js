@@ -24,3 +24,5 @@ import "./bootstrap";
 const application = Application.start();
 application.register("hello", HelloController);
 application.register("modal", ModalController); //modal controller stimulus
+
+

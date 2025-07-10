@@ -116,7 +116,7 @@ php bin/phpunit
 - groupe rentale
 
 ### Les permissions
-- Creation de nouveau demnade (CREATE)
-- visualisation de liste des demande (LISTE)
+- Creation de nouveau demande (CREATE)
+- visualisation de liste des demande (READ)
     - l'utilisateur connecter ne peut voir que selon la règle de permission donnée à lui
-    - faire des soumissions OR, Facture, RI, ... selon les permissions
+    - faire des soumissions OR, Facture, RI, ... selon les conditions de statut et autres de l'application (SOUMISSION)
