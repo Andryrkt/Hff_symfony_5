@@ -34,6 +34,12 @@ class MenuBuilder
                 'icon' => 'fas fa-sign-in-alt',
                 'visible' => !$isLoggedIn,
             ],
+            [
+                'label' => 'Déconnexion',
+                'route' => 'app_logout',
+                'icon' => 'fas fa-sign-out-alt',
+                'visible' => $isLoggedIn,
+            ],
             // [
             //     'label' => 'Paramètre',
             //     'icon' => 'fas fa-briefcase',

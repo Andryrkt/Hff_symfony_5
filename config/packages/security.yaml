@@ -13,7 +13,7 @@ security:
       entry_point: App\Security\LdapAuthenticator
       logout:
         path: app_logout
-        target: /login
+        target: app_login
 
   access_control:
     - { path: ^/login, roles: PUBLIC_ACCESS }
