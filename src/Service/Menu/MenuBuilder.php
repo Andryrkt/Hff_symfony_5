@@ -23,23 +23,25 @@ class MenuBuilder
 
         return [
             [
-                'label' => 'Accueil',
-                'route' => 'app_home',
-                'icon' => 'fas fa-home',
-                'visible' => true,
-            ],
-            [
                 'label' => 'Connexion',
                 'route' => 'app_login',
                 'icon' => 'fas fa-sign-in-alt',
                 'visible' => !$isLoggedIn,
             ],
             [
-                'label' => 'Déconnexion',
-                'route' => 'app_logout',
-                'icon' => 'fas fa-sign-out-alt',
-                'visible' => $isLoggedIn,
-            ],
+                'label' => $user->getUserIdentifier(),
+                'icon' => 'fa-solid fa-user-astronaut',
+                'visible' => true,
+                'children' => [
+                    [
+                        'label' => 'Déconnexion',
+                        'route' => 'app_logout',
+                        'icon' => 'fas fa-sign-out-alt',
+                        'visible' => $isLoggedIn,
+                    ],
+                ]
+            ]
+
             // [
             //     'label' => 'Paramètre',
             //     'icon' => 'fas fa-briefcase',
