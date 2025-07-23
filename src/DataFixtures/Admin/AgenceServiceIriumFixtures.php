@@ -11,205 +11,119 @@ class AgenceServiceIriumFixtures extends Fixture implements DependentFixtureInte
 {
     public function load(ObjectManager $manager): void
     {
-        //tana - neg 1
-        $asNeg1 = new AgenceServiceIrium();
-        $asNeg1->setAgence($this->getReference('agence_antanarivo'));
-        $asNeg1->setService($this->getReference('service_neg'));
-        $asNeg1->setCode('01-NEG');
-        $asNeg1->setSociete('HF');
-        $asNeg1->setCodeSage('AB11');
-        $asNeg1->setResponsable('Prisca');
-        $manager->persist($asNeg1);
-        $this->addReference('agence_service_tananeg1', $asNeg1);
+        $agenceServices = [
+            // Antananarivo 01
+            ['agence' => 'agence_antanarivo', 'service' => 'service_neg', 'code' => '01-NEG', 'societe' => 'HF', 'codeSage' => 'AB11', 'responsable' => 'Prisca'],
+            ['agence' => 'agence_antanarivo', 'service' => 'service_neg', 'code' => '01-NEG', 'societe' => 'HF', 'codeSage' => 'AB21', 'responsable' => 'Prisca'],
+            ['agence' => 'agence_antanarivo', 'service' => 'service_com', 'code' => '01-COM', 'societe' => 'HF', 'codeSage' => 'AB51', 'responsable' => 'Paul'],
+            ['agence' => 'agence_antanarivo', 'service' => 'service_ate', 'code' => '01-ATE', 'societe' => 'HF', 'codeSage' => 'AC11', 'responsable' => 'Jaona'],
+            ['agence' => 'agence_antanarivo', 'service' => 'service_csp', 'code' => '01-CSP', 'societe' => 'HF', 'codeSage' => 'AC12', 'responsable' => 'Jaona'],
+            ['agence' => 'agence_antanarivo', 'service' => 'service_gar', 'code' => '01-GAR', 'societe' => 'HF', 'codeSage' => 'AC14', 'responsable' => 'Jaona'],
+            ['agence' => 'agence_antanarivo', 'service' => 'service_for', 'code' => '01-FOR', 'societe' => 'HF', 'codeSage' => 'AC16', 'responsable' => ''],
+            ['agence' => 'agence_antanarivo', 'service' => 'service_ass', 'code' => '01-ASS', 'societe' => 'HF', 'codeSage' => 'AG11', 'responsable' => 'Olivier'],
+            ['agence' => 'agence_antanarivo', 'service' => 'service_fle', 'code' => '01-FLE', 'societe' => 'HF', 'codeSage' => 'AB41', 'responsable' => ''],
+            ['agence' => 'agence_antanarivo', 'service' => 'service_mas', 'code' => '01-MAS', 'societe' => 'HF', 'codeSage' => 'AC17', 'responsable' => ''],
+            ['agence' => 'agence_antanarivo', 'service' => 'service_map', 'code' => '01-MAP', 'societe' => 'HF', 'codeSage' => 'AB71', 'responsable' => ''],
 
-        //tana - neg 2
-        $asNeg2 = new AgenceServiceIrium();
-        $asNeg2->setAgence($this->getReference('agence_antanarivo'));
-        $asNeg2->setService($this->getReference('service_neg'));
-        $asNeg2->setCode('01-NEG');
-        $asNeg2->setSociete('HF');
-        $asNeg2->setCodeSage('AB21');
-        $asNeg2->setResponsable('Prisca');
-        $manager->persist($asNeg2);
-        $this->addReference('agence_service_tana_neg2', $asNeg2);
+            // Cessna Ivato 02
+            ['agence' => 'agence_cessna_ivato', 'service' => 'service_neg', 'code' => '02-NEG', 'societe' => 'HF', 'codeSage' => 'CB21', 'responsable' => 'Daniel'],
+            ['agence' => 'agence_cessna_ivato', 'service' => 'service_ate', 'code' => '02-ATE', 'societe' => 'HF', 'codeSage' => 'CC11', 'responsable' => 'Daniel'],
+            ['agence' => 'agence_cessna_ivato', 'service' => 'service_lcd', 'code' => '02-LCD', 'societe' => 'HF', 'codeSage' => 'CC121', 'responsable' => 'Daniel'],
 
-        //tana - com
-        $asCom = new AgenceServiceIrium();
-        $asCom->setAgence($this->getReference('agence_antanarivo'));
-        $asCom->setService($this->getReference('service_com'));
-        $asCom->setCode('01-COM');
-        $asCom->setSociete('HF');
-        $asCom->setCodeSage('AB51');
-        $asCom->setResponsable('Paul');
-        $manager->persist($asCom);
-        $this->addReference('agence_service_tanacom', $asCom);
+            // Fort dauphin 20
+            ['agence' => 'agence_fort_dauphin', 'service' => 'service_neg', 'code' => '20-NEG', 'societe' => 'HF', 'codeSage' => 'FB21', 'responsable' => ''],
+            ['agence' => 'agence_fort_dauphin', 'service' => 'service_ate', 'code' => '20-ATE', 'societe' => 'HF', 'codeSage' => 'FC11', 'responsable' => ''],
 
-        //tana - ate
-        $asAte = new AgenceServiceIrium();
-        $asAte->setAgence($this->getReference('agence_antanarivo'));
-        $asAte->setService($this->getReference('service_ate'));
-        $asAte->setCode('01-ATE');
-        $asAte->setSociete('HF');
-        $asAte->setCodeSage('AC11');
-        $asAte->setResponsable('Jaona');
-        $manager->persist($asAte);
-        $this->addReference('agence_service_tana_ate', $asAte);
+            // Ambatovy 30
+            ['agence' => 'agence_ambatovy', 'service' => 'service_neg', 'code' => '30-NEG', 'societe' => 'HF', 'codeSage' => 'BB21', 'responsable' => 'Prisca'],
+            ['agence' => 'agence_ambatovy', 'service' => 'service_ate', 'code' => '30-ATE', 'societe' => 'HF', 'codeSage' => 'BC11', 'responsable' => 'Njara'],
+            ['agence' => 'agence_ambatovy', 'service' => 'service_man', 'code' => '30-MAN', 'societe' => 'HF', 'codeSage' => 'BC15', 'responsable' => 'Njara'],
+            ['agence' => 'agence_ambatovy', 'service' => 'service_fle', 'code' => '30-FLE', 'societe' => 'HF', 'codeSage' => 'BB41', 'responsable' => ''],
 
-        //tana - csp
-        $asCsp = new AgenceServiceIrium();
-        $asCsp->setAgence($this->getReference('agence_antanarivo'));
-        $asCsp->setService($this->getReference('service_csp'));
-        $asCsp->setCode('01-CSP');
-        $asCsp->setSociete('HF');
-        $asCsp->setCodeSage('AC12');
-        $asCsp->setResponsable('Jaona');
-        $manager->persist($asCsp);
-        $this->addReference('agence_service_tana_csp', $asCsp);
+            // Tamatave 40
+            ['agence' => 'agence_tamatave', 'service' => 'service_neg', 'code' => '40-NEG', 'societe' => 'HF', 'codeSage' => 'MB21', 'responsable' => ''],
+            ['agence' => 'agence_tamatave', 'service' => 'service_ate', 'code' => '40-ATE', 'societe' => 'HF', 'codeSage' => 'MC11', 'responsable' => ''],
+            ['agence' => 'agence_tamatave', 'service' => 'service_tho', 'code' => '40-THO', 'societe' => 'HF', 'codeSage' => 'MC13', 'responsable' => ''],
+            ['agence' => 'agence_tamatave', 'service' => 'service_lcd', 'code' => '40-LCD', 'societe' => 'HF', 'codeSage' => 'MC121', 'responsable' => ''],
+            ['agence' => 'agence_tamatave', 'service' => 'service_fle', 'code' => '40-FLE', 'societe' => 'HF', 'codeSage' => 'MB41', 'responsable' => ''],
+            ['agence' => 'agence_tamatave', 'service' => 'service_lev', 'code' => '40-LEV', 'societe' => 'HF', 'codeSage' => 'MC14', 'responsable' => ''],
 
-        //tana - gar
-        $asGar = new AgenceServiceIrium();
-        $asGar->setAgence($this->getReference('agence_antanarivo'));
-        $asGar->setService($this->getReference('service_gar'));
-        $asGar->setCode('01-GAR');
-        $asGar->setSociete('HF');
-        $asGar->setCodeSage('AC14');
-        $asGar->setResponsable('Jaona');
-        $manager->persist($asGar);
-        $this->addReference('agence_service_tana_gar', $asGar);
+            // rental 50
+            ['agence' => 'agence_rental', 'service' => 'service_neg', 'code' => '50-NEG', 'societe' => 'HF', 'codeSage' => 'RB21', 'responsable' => ''],
+            ['agence' => 'agence_rental', 'service' => 'service_com', 'code' => '50-COM', 'societe' => 'HF', 'codeSage' => 'RB51', 'responsable' => ''],
+            ['agence' => 'agence_rental', 'service' => 'service_ate', 'code' => '50-ATE', 'societe' => 'HF', 'codeSage' => 'RC11', 'responsable' => ''],
+            ['agence' => 'agence_rental', 'service' => 'service_lcd', 'code' => '50-LCD', 'societe' => 'HF', 'codeSage' => 'RC21', 'responsable' => ''],
+            ['agence' => 'agence_rental', 'service' => 'service_ltv', 'code' => '50-LTV', 'societe' => 'HF', 'codeSage' => 'RC22', 'responsable' => ''],
+            ['agence' => 'agence_rental', 'service' => 'service_lfd', 'code' => '50-LFD', 'societe' => 'HF', 'codeSage' => 'RC23', 'responsable' => ''],
+            ['agence' => 'agence_rental', 'service' => 'service_lbv', 'code' => '50-LBV', 'societe' => 'HF', 'codeSage' => 'RC24', 'responsable' => ''],
+            ['agence' => 'agence_rental', 'service' => 'service_lr6', 'code' => '50-LR6', 'societe' => 'HF', 'codeSage' => 'RC25', 'responsable' => ''],
+            ['agence' => 'agence_rental', 'service' => 'service_lst', 'code' => '50-LST', 'societe' => 'HF', 'codeSage' => 'RC26', 'responsable' => ''],
+            ['agence' => 'agence_rental', 'service' => 'service_lsc', 'code' => '50-LSC', 'societe' => 'HF', 'codeSage' => 'RC27', 'responsable' => ''],
 
-        //tana - for
-        $asFor = new AgenceServiceIrium();
-        $asFor->setAgence($this->getReference('agence_antanarivo'));
-        $asFor->setService($this->getReference('service_for'));
-        $asFor->setCode('01-FOR');
-        $asFor->setSociete('HF');
-        $asFor->setCodeSage('AC16');
-        $asFor->setResponsable('');
-        $manager->persist($asFor);
-        $this->addReference('agence_service_tana_for', $asFor);
-
-        //tana - ass
-        $asAss = new AgenceServiceIrium();
-        $asAss->setAgence($this->getReference('agence_antanarivo'));
-        $asAss->setService($this->getReference('service_ass'));
-        $asAss->setCode('01-ASS');
-        $asAss->setSociete('HF');
-        $asAss->setCodeSage('AG11');
-        $asAss->setResponsable('Olivier');
-        $manager->persist($asAss);
-        $this->addReference('agence_service_tana_ass', $asAss);
-
-        //Ambatovy - neg
-        $asNeg = new AgenceServiceIrium();
-        $asNeg->setAgence($this->getReference('agence_ambatovy'));
-        $asNeg->setService($this->getReference('service_neg'));
-        $asNeg->setCode('30-NEG');
-        $asNeg->setSociete('HF');
-        $asNeg->setCodeSage('BB21');
-        $asNeg->setResponsable('Prisca');
-        $manager->persist($asNeg);
-        $this->addReference('agence_service_ambatovy_neg', $asNeg);
-
-        //Ambatovy - ate
-        $asAte = new AgenceServiceIrium();
-        $asAte->setAgence($this->getReference('agence_ambatovy'));
-        $asAte->setService($this->getReference('service_ate'));
-        $asAte->setCode('30-ATE');
-        $asAte->setSociete('HF');
-        $asAte->setCodeSage('BC11');
-        $asAte->setResponsable('Njara');
-        $manager->persist($asAte);
-        $this->addReference('agence_service_ambatovy_ate', $asAte);
-
-        //Ambatovy - man
-        $asMan = new AgenceServiceIrium();
-        $asMan->setAgence($this->getReference('agence_ambatovy'));
-        $asMan->setService($this->getReference('service_man'));
-        $asMan->setCode('30-MAN');
-        $asMan->setSociete('HF');
-        $asMan->setCodeSage('BC15');
-        $asMan->setResponsable('Njara');
-        $manager->persist($asMan);
-        $this->addReference('agence_service_ambatovy_man', $asMan);
-
-        //cessna Ivato- neg
-        $asNeg = new AgenceServiceIrium();
-        $asNeg->setAgence($this->getReference('agence_cessna_ivato'));
-        $asNeg->setService($this->getReference('service_neg'));
-        $asNeg->setCode('02-NEG');
-        $asNeg->setSociete('HF');
-        $asNeg->setCodeSage('CB21');
-        $asNeg->setResponsable('Daniel');
-        $manager->persist($asNeg);
-        $this->addReference('agence_service_cessna_ivato_neg', $asNeg);
+            // pneu - outil - lub 60
+            ['agence' => 'agence_pneu_outil_lub', 'service' => 'service_neg', 'code' => '60-NEG', 'societe' => 'HF', 'codeSage' => 'PB21', 'responsable' => ''],
+            ['agence' => 'agence_pneu_outil_lub', 'service' => 'service_ate', 'code' => '60-ATE', 'societe' => 'HF', 'codeSage' => 'PC11', 'responsable' => ''],
 
 
-        //cessna Ivato- ate
-        $asAte = new AgenceServiceIrium();
-        $asAte->setAgence($this->getReference('agence_cessna_ivato'));
-        $asAte->setService($this->getReference('service_ate'));
-        $asAte->setCode('02-ATE');
-        $asAte->setSociete('HF');
-        $asAte->setCodeSage('CC11');
-        $asAte->setResponsable('Daniel');
-        $manager->persist($asAte);
-        $this->addReference('agence_service_cessna_ivato_ate', $asAte);
+            // Administration 80
+            ['agence' => 'agence_administration', 'service' => 'service_dir', 'code' => '80-DIR', 'societe' => 'HF', 'codeSage' => 'DA11', 'responsable' => 'Charles'],
+            ['agence' => 'agence_administration', 'service' => 'service_fin', 'code' => '80-FIN', 'societe' => 'HF', 'codeSage' => 'DA12', 'responsable' => 'Patrick'],
+            ['agence' => 'agence_administration', 'service' => 'service_per', 'code' => '80-PER', 'societe' => 'HF', 'codeSage' => 'DA13', 'responsable' => 'Tahina'],
+            ['agence' => 'agence_administration', 'service' => 'service_inf', 'code' => '80-INF', 'societe' => 'HF', 'codeSage' => 'DA14', 'responsable' => 'Olivier'],
+            ['agence' => 'agence_administration', 'service' => 'service_imm', 'code' => '80-IMM', 'societe' => 'HF', 'codeSage' => 'DA15', 'responsable' => ''],
+            ['agence' => 'agence_administration', 'service' => 'service_tra', 'code' => '80-TRA', 'societe' => 'HF', 'codeSage' => 'DA16', 'responsable' => ''],
+            ['agence' => 'agence_administration', 'service' => 'service_app', 'code' => '80-APP', 'societe' => 'HF', 'codeSage' => 'DA17', 'responsable' => ''],
+            ['agence' => 'agence_administration', 'service' => 'service_ump', 'code' => '80-UMP', 'societe' => 'HF', 'codeSage' => 'DA18', 'responsable' => ''],
 
-        //cessna Ivato- lcd
-        $asLcd = new AgenceServiceIrium();
-        $asLcd->setAgence($this->getReference('agence_cessna_ivato'));
-        $asLcd->setService($this->getReference('service_lcd'));
-        $asLcd->setCode('02-LCD');
-        $asLcd->setSociete('HF');
-        $asLcd->setCodeSage('CC121');
-        $asLcd->setResponsable('Daniel');
-        $manager->persist($asLcd);
-        $this->addReference('agence_service_cessna_ivato_lcd', $asLcd);
+            //Commercial energie 90
+            ['agence' => 'agence_comm_energie', 'service' => 'service_com', 'code' => '90-COM', 'societe' => 'HF', 'codeSage' => 'EB51', 'responsable' => ''],
+            ['agence' => 'agence_comm_energie', 'service' => 'service_lcd', 'code' => '90-LCD', 'societe' => 'HF', 'codeSage' => 'EC11', 'responsable' => ''],
+            ['agence' => 'agence_comm_energie', 'service' => 'service_eng', 'code' => '90-ENG', 'societe' => 'HF', 'codeSage' => 'ED10', 'responsable' => ''],
 
-        //administration - dir
-        $asDir = new AgenceServiceIrium();
-        $asDir->setAgence($this->getReference('agence_administration'));
-        $asDir->setService($this->getReference('service_dir'));
-        $asDir->setCode('80-DIR');
-        $asDir->setSociete('HF');
-        $asDir->setCodeSage('DA11');
-        $asDir->setResponsable('Charles');
-        $manager->persist($asDir);
-        $this->addReference('agence_service_administration_dir', $asDir);
+            // energie durable 91
+            ['agence' => 'agence_energie_durable', 'service' => 'service_tsi', 'code' => '91-TSI', 'societe' => 'HF', 'codeSage' => 'OD32', 'responsable' => ''],
+            ['agence' => 'agence_energie_durable', 'service' => 'service_tsd', 'code' => '91-TSD', 'societe' => 'HF', 'codeSage' => '', 'responsable' => ''],
+            ['agence' => 'agence_energie_durable', 'service' => 'service_vat', 'code' => '91-VAT', 'societe' => 'HF', 'codeSage' => '', 'responsable' => ''],
+            ['agence' => 'agence_energie_durable', 'service' => 'service_blk', 'code' => '91-BLK', 'societe' => 'HF', 'codeSage' => 'OD33', 'responsable' => ''],
+            ['agence' => 'agence_energie_durable', 'service' => 'service_eng', 'code' => '91-ENG', 'societe' => 'HF', 'codeSage' => 'OD10', 'responsable' => ''],
+            ['agence' => 'agence_energie_durable', 'service' => 'service_slr', 'code' => '91-SLR', 'societe' => 'HF', 'codeSage' => '', 'responsable' => ''],
 
-        //administration - fin
-        $asFin = new AgenceServiceIrium();
-        $asFin->setAgence($this->getReference('agence_administration'));
-        $asFin->setService($this->getReference('service_fin'));
-        $asFin->setCode('80-FIN');
-        $asFin->setSociete('HF');
-        $asFin->setCodeSage('DA12');
-        $asFin->setResponsable('Patrick');
-        $manager->persist($asFin);
-        $this->addReference('agence_service_administration_fin', $asFin);
+            // energie jirama 92
+            ['agence' => 'agence_energie_jirama', 'service' => 'service_mah', 'code' => '92-MAH', 'societe' => 'HF', 'codeSage' => 'TD11', 'responsable' => ''],
+            ['agence' => 'agence_energie_jirama', 'service' => 'service_nos', 'code' => '92-NOS', 'societe' => 'HF', 'codeSage' => 'TD12', 'responsable' => ''],
+            ['agence' => 'agence_energie_jirama', 'service' => 'service_tul', 'code' => '92-TUL', 'societe' => 'HF', 'codeSage' => 'TD16', 'responsable' => ''],
+            ['agence' => 'agence_energie_jirama', 'service' => 'service_amb', 'code' => '92-AMB', 'societe' => 'HF', 'codeSage' => 'TD31', 'responsable' => ''],
+            ['agence' => 'agence_energie_jirama', 'service' => 'service_lcj', 'code' => '92-LCJ', 'societe' => 'HF', 'codeSage' => 'TD32', 'responsable' => ''],
+            ['agence' => 'agence_energie_jirama', 'service' => 'service_tsi', 'code' => '92-TSI', 'societe' => 'HF', 'codeSage' => 'TD33', 'responsable' => ''],
 
-        //administration - per
-        $asPer = new AgenceServiceIrium();
-        $asPer->setAgence($this->getReference('agence_administration'));
-        $asPer->setService($this->getReference('service_per'));
-        $asPer->setCode('80-PER');
-        $asPer->setSociete('HF');
-        $asPer->setCodeSage('DA13');
-        $asPer->setResponsable('tahina');
-        $manager->persist($asPer);
-        $this->addReference('agence_service_administration_per', $asPer);
+            // travel airways c1
+            ['agence' => 'agence_travel_airways', 'service' => 'service_c1', 'code' => 'C1-C1', 'societe' => 'TA', 'codeSage' => '', 'responsable' => ''],
 
-        //administration - inf
-        $asInf = new AgenceServiceIrium();
-        $asInf->setAgence($this->getReference('agence_administration'));
-        $asInf->setService($this->getReference('service_inf'));
-        $asInf->setCode('80-INF');
-        $asInf->setSociete('HF');
-        $asInf->setCodeSage('DA14');
-        $asInf->setResponsable('Olivier');
-        $manager->persist($asInf);
-        $this->addReference('agence_service_administration_inf', $asInf);
 
+            // Ajoutez ici les autres agences/services selon le même modèle...
+        ];
+
+        foreach ($agenceServices as $data) {
+            $agenceService = new AgenceServiceIrium();
+            $agenceService->setAgence($this->getReference($data['agence']))
+                ->setService($this->getReference($data['service']))
+                ->setCode($data['code'])
+                ->setSociete($data['societe'])
+                ->setCodeSage($data['codeSage'])
+                ->setResponsable($data['responsable']);
+
+            $manager->persist($agenceService);
+
+            // Génération de référence unique avec codeSage
+            $referenceKey = sprintf(
+                'agence_service_%s_%s_%s',
+                str_replace('agence_', '', $data['agence']),
+                strtolower(str_replace('service_', '', $data['service'])),
+                $data['codeSage'] // rend la référence unique
+            );
+
+            $this->addReference($referenceKey, $agenceService);
+        }
 
         $manager->flush();
     }

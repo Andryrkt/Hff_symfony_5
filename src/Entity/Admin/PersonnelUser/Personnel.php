@@ -41,7 +41,7 @@ class Personnel
     /**
      * @ORM\ManyToOne(targetEntity=AgenceServiceIrium::class, inversedBy="personnels")
      */
-    private $agenceService;
+    private $agenceServiceIrium;
 
     /**
      * @ORM\OneToOne(targetEntity=User::class, mappedBy="personnel", cascade={"persist", "remove"})
@@ -87,14 +87,14 @@ class Personnel
         return $this;
     }
 
-    public function getAgenceService(): ?AgenceServiceIrium
+    public function getAgenceServiceIrium(): ?AgenceServiceIrium
     {
-        return $this->agenceService;
+        return $this->agenceServiceIrium;
     }
 
-    public function setAgenceService(?AgenceServiceIrium $agenceService): self
+    public function setAgenceServiceIrium(?AgenceServiceIrium $agenceServiceIrium): self
     {
-        $this->agenceService = $agenceService;
+        $this->agenceServiceIrium = $agenceServiceIrium;
 
         return $this;
     }

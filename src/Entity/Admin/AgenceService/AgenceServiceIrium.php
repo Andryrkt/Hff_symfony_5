@@ -40,7 +40,7 @@ class AgenceServiceIrium
     private $service;
 
     /**
-     * @ORM\Column(type="string", length=20, unique=true)
+     * @ORM\Column(type="string", length=20)
      */
     private $code;
 
@@ -134,7 +134,7 @@ class AgenceServiceIrium
     {
         if (!$this->personnels->contains($personnel)) {
             $this->personnels[] = $personnel;
-            $personnel->setAgenceService($this);
+            $personnel->setAgenceServiceIrium($this);
         }
 
         return $this;
@@ -144,8 +144,8 @@ class AgenceServiceIrium
     {
         if ($this->personnels->removeElement($personnel)) {
             // set the owning side to null (unless already changed)
-            if ($personnel->getAgenceService() === $this) {
-                $personnel->setAgenceService(null);
+            if ($personnel->getAgenceServiceIrium() === $this) {
+                $personnel->setAgenceServiceIrium(null);
             }
         }
 

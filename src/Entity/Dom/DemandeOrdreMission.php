@@ -18,6 +18,7 @@ use \App\Entity\Admin\AgenceService\Service;
  *     "this.getDateFinMission() > this.getDateDebutMission()",
  *     message="La date de fin de mission doit être postérieure à la date de début."
  * )
+ * @ORM\HasLifecycleCallbacks
  */
 class DemandeOrdreMission
 {
@@ -626,7 +627,7 @@ class DemandeOrdreMission
 
     /**
      * Get the value of serviceDebiteurId
-     */ 
+     */
     public function getServiceDebiteurId()
     {
         return $this->serviceDebiteurId;
@@ -636,7 +637,7 @@ class DemandeOrdreMission
      * Set the value of serviceDebiteurId
      *
      * @return  self
-     */ 
+     */
     public function setServiceDebiteurId($serviceDebiteurId)
     {
         $this->serviceDebiteurId = $serviceDebiteurId;

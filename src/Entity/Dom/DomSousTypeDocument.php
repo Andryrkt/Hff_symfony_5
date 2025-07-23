@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity(repositoryClass=DomSousTypeDocumentRepository::class)
+ * @ORM\HasLifecycleCallbacks
  */
 class DomSousTypeDocument
 {

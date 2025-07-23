@@ -21,14 +21,17 @@ class MenuBuilder
         $user = $this->tokenStorage->getToken() ? $this->tokenStorage->getToken()->getUser() : null;
         $isLoggedIn = $this->authChecker->isGranted('IS_AUTHENTICATED_FULLY');
 
-        return [
+        $menu = [
             [
                 'label' => 'Connexion',
                 'route' => 'app_login',
                 'icon' => 'fas fa-sign-in-alt',
                 'visible' => !$isLoggedIn,
-            ],
-            [
+            ]
+        ];
+
+        if ($isLoggedIn && $user !== null) {
+            $menu[] = [
                 'label' => $user->getUserIdentifier(),
                 'icon' => 'fa-solid fa-user-astronaut',
                 'visible' => true,
@@ -37,30 +40,12 @@ class MenuBuilder
                         'label' => 'Déconnexion',
                         'route' => 'app_logout',
                         'icon' => 'fas fa-sign-out-alt',
-                        'visible' => $isLoggedIn,
+                        'visible' => true,
                     ],
                 ]
-            ]
+            ];
+        }
 
-            // [
-            //     'label' => 'Paramètre',
-            //     'icon' => 'fas fa-briefcase',
-            //     'visible' => $isLoggedIn,
-            //     'children' => [
-            //         [
-            //             'label' => 'user',
-            //             'route' => '#',
-            //             'icon' => 'fas fa-plus-circle',
-            //             'visible' => true,
-            //         ],
-            //         [
-            //             'label' => 'Consultation',
-            //             'route' => '#',
-            //             'icon' => 'fas fa-list',
-            //             'visible' => true,
-            //         ],
-            //         ]
-            //     ],
-        ];
+        return $menu;
     }
 }
