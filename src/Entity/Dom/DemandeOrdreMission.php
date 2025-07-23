@@ -8,6 +8,9 @@ use App\Repository\Dom\DemandeOrdreMissionRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Expression;
+use \App\Entity\Admin\Statut\StatutDemande;
+use \App\Entity\Admin\AgenceService\Agence;
+use \App\Entity\Admin\AgenceService\Service;
 
 /**
  * @ORM\Entity(repositoryClass=DemandeOrdreMissionRepository::class)
@@ -174,6 +177,31 @@ class DemandeOrdreMission
      * @ORM\Column(type="float", nullable=true)
      */
     private $indemniteChantier;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=StatutDemande::class, inversedBy="demandeOrdreMissions")
+     */
+    private $statutDemande_id;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Agence::class, inversedBy="domEmetteur")
+     */
+    private $agenceEmetteurId;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Service::class, inversedBy="domServiceEmetteur")
+     */
+    private $serviceEmetteurId;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Agence::class, inversedBy="domDebiteur")
+     */
+    private $agenceDebiteurId;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Service::class, inversedBy="domServiceDebiteur")
+     */
+    private $serviceDebiteurId;
 
     public function getId(): ?int
     {
@@ -536,6 +564,82 @@ class DemandeOrdreMission
     public function setIndemniteChantier(?float $indemniteChantier): self
     {
         $this->indemniteChantier = $indemniteChantier;
+
+        return $this;
+    }
+
+    public function getStatutDemandeId(): ?StatutDemande
+    {
+        return $this->statutDemande_id;
+    }
+
+    public function setStatutDemandeId(?StatutDemande $statutDemande_id): self
+    {
+        $this->statutDemande_id = $statutDemande_id;
+
+        return $this;
+    }
+
+    public function getAgenceEmetteurId(): ?Agence
+    {
+        return $this->agenceEmetteurId;
+    }
+
+    public function setAgenceEmetteurId(?Agence $agenceEmetteurId): self
+    {
+        $this->agenceEmetteurId = $agenceEmetteurId;
+
+        return $this;
+    }
+
+    public function getServiceEmetteurId(): ?Service
+    {
+        return $this->serviceEmetteurId;
+    }
+
+    public function setServiceEmetteurId(?Service $serviceEmetteurId): self
+    {
+        $this->serviceEmetteurId = $serviceEmetteurId;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of agenceDebiteurId
+     */
+    public function getAgenceDebiteurId()
+    {
+        return $this->agenceDebiteurId;
+    }
+
+    /**
+     * Set the value of agenceDebiteurId
+     *
+     * @return  self
+     */
+    public function setAgenceDebiteurId($agenceDebiteurId)
+    {
+        $this->agenceDebiteurId = $agenceDebiteurId;
+
+        return $this;
+    }
+
+    /**
+     * Get the value of serviceDebiteurId
+     */ 
+    public function getServiceDebiteurId()
+    {
+        return $this->serviceDebiteurId;
+    }
+
+    /**
+     * Set the value of serviceDebiteurId
+     *
+     * @return  self
+     */ 
+    public function setServiceDebiteurId($serviceDebiteurId)
+    {
+        $this->serviceDebiteurId = $serviceDebiteurId;
 
         return $this;
     }
