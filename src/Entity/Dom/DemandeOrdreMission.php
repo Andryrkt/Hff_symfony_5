@@ -80,6 +80,51 @@ class DemandeOrdreMission
      */
     private $vehiculeSociete;
 
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $motifAutresDepense1;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $montantAutresDepense1;
+
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $motifAutresDepense2;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $montantAutresDepense2;
+
+    /**
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    private $motifAutresDepense3;
+
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $montantAutresDepense3;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $indemniteForfaitaire;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $totalIndemniteForfaitaire;
+
+    /**
+     * @ORM\Column(type="float", nullable=true)
+     */
+    private $totalGeneralPayer;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -213,6 +258,114 @@ class DemandeOrdreMission
     public function setVehiculeSociete(?string $vehiculeSociete): self
     {
         $this->vehiculeSociete = $vehiculeSociete;
+
+        return $this;
+    }
+
+    public function getMotifAutresDepense1(): ?string
+    {
+        return $this->motifAutresDepense1;
+    }
+
+    public function setMotifAutresDepense1(?string $motifAutresDepense1): self
+    {
+        $this->motifAutresDepense1 = $motifAutresDepense1;
+
+        return $this;
+    }
+
+    public function getMontantAutresDepense1(): ?float
+    {
+        return $this->montantAutresDepense1;
+    }
+
+    public function setMontantAutresDepense1(?float $montantAutresDepense1): self
+    {
+        $this->montantAutresDepense1 = $montantAutresDepense1;
+
+        return $this;
+    }
+
+    public function getMotifAutresDepense2(): ?string
+    {
+        return $this->motifAutresDepense2;
+    }
+
+    public function setMotifAutresDepense2(?string $motifAutresDepense2): self
+    {
+        $this->motifAutresDepense2 = $motifAutresDepense2;
+
+        return $this;
+    }
+
+    public function getMontantAutresDepense2(): ?float
+    {
+        return $this->montantAutresDepense2;
+    }
+
+    public function setMontantAutresDepense2(?float $montantAutresDepense2): self
+    {
+        $this->montantAutresDepense2 = $montantAutresDepense2;
+
+        return $this;
+    }
+
+    public function getMotifAutresDepense3(): ?string
+    {
+        return $this->motifAutresDepense3;
+    }
+
+    public function setMotifAutresDepense3(?string $motifAutresDepense3): self
+    {
+        $this->motifAutresDepense3 = $motifAutresDepense3;
+
+        return $this;
+    }
+
+    public function getMontantAutresDepense3(): ?float
+    {
+        return $this->montantAutresDepense3;
+    }
+
+    public function setMontantAutresDepense3(float $montantAutresDepense3): self
+    {
+        $this->montantAutresDepense3 = $montantAutresDepense3;
+
+        return $this;
+    }
+
+    public function getIndemniteForfaitaire(): ?float
+    {
+        return $this->indemniteForfaitaire;
+    }
+
+    public function setIndemniteForfaitaire(?float $indemniteForfaitaire): self
+    {
+        $this->indemniteForfaitaire = $indemniteForfaitaire;
+
+        return $this;
+    }
+
+    public function getTotalIndemniteForfaitaire(): ?float
+    {
+        return $this->totalIndemniteForfaitaire;
+    }
+
+    public function setTotalIndemniteForfaitaire(?float $totalIndemniteForfaitaire): self
+    {
+        $this->totalIndemniteForfaitaire = $totalIndemniteForfaitaire;
+
+        return $this;
+    }
+
+    public function getTotalGeneralPayer(): ?float
+    {
+        return $this->totalGeneralPayer;
+    }
+
+    public function setTotalGeneralPayer(?float $totalGeneralPayer): self
+    {
+        $this->totalGeneralPayer = $totalGeneralPayer;
 
         return $this;
     }
