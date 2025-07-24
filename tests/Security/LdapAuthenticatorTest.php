@@ -2,16 +2,23 @@
 
 namespace App\Tests\Security;
 
-use App\Security\LdapAuthenticator;
-use App\Security\LdapUserProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Ldap\Entry;
+use App\Security\LdapUserProvider;
+use App\Security\LdapAuthenticator;
 use Symfony\Component\Ldap\LdapInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Ldap\Adapter\ExtLdap\Query;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
 
 class LdapAuthenticatorTest extends TestCase
 {
+    private const TEST_DN = 'cn=testuser,dc=example,dc=com';
+    private const ADMIN_DN = 'CN=Lanto ANDRIANADISON,OU=Informatique,OU=HFF Tana,OU=HFF Users,DC=fraise,DC=hff,DC=mg';
+    private const ADMIN_PASSWORD = 'Hasina#2025-3';
+
     private $ldap;
     private $router;
     private $userProvider;
@@ -19,19 +26,24 @@ class LdapAuthenticatorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->ldap = $this->createMock(\Symfony\Component\Ldap\LdapInterface::class);
-        $this->router = $this->createMock(\Symfony\Component\Routing\RouterInterface::class);
-        $this->userProvider = $this->createMock(\App\Security\LdapUserProvider::class);
+        $this->ldap = $this->createMock(LdapInterface::class);
+        $this->router = $this->createMock(RouterInterface::class);
+        $this->userProvider = $this->createMock(LdapUserProvider::class);
 
         $this->authenticator = new LdapAuthenticator(
             $this->ldap,
             $this->router,
             $this->userProvider,
-            'CN=Lanto ANDRIANADISON,OU=Informatique,OU=HFF Tana,OU=HFF Users,DC=fraise,DC=hff,DC=mg',
-            'Hasina#2025-2'
+            self::ADMIN_DN,
+            self::ADMIN_PASSWORD
         );
     }
 
+    /**
+     * test pour une vrai URL (/login)
+     *
+     * @return void
+     */
     public function testSupportsReturnsTrueForLoginPostRequest(): void
     {
         $request = new Request([], [], [], [], [], ['REQUEST_METHOD' => 'POST']);
@@ -40,6 +52,11 @@ class LdapAuthenticatorTest extends TestCase
         $this->assertTrue($this->authenticator->supports($request));
     }
 
+    /**
+     * teste si une faux URL (/other) est ajouter
+     *
+     * @return void
+     */
     public function testSupportsReturnsFalseForNonLoginRequest(): void
     {
         $request = new Request([], [], [], [], [], ['REQUEST_METHOD' => 'POST']);
@@ -48,6 +65,11 @@ class LdapAuthenticatorTest extends TestCase
         $this->assertFalse($this->authenticator->supports($request));
     }
 
+    /**
+     * test si une requet GET est evoyer pendant la soumission
+     *
+     * @return void
+     */
     public function testSupportsReturnsFalseForGetRequest(): void
     {
         $request = new Request([], [], [], [], [], ['REQUEST_METHOD' => 'GET']);
@@ -56,17 +78,22 @@ class LdapAuthenticatorTest extends TestCase
         $this->assertFalse($this->authenticator->supports($request));
     }
 
-    // public function testAuthenticateWithEmptyCredentialsThrowsException(): void
-    // {
-    //     $request = new Request();
-    //     $request->request->set('_username', '');
-    //     $request->request->set('_password', '');
+    /**
+     * test si le nom d'utilisateur et le mot de passe sont vide
+     *
+     * @return void
+     */
+    public function testAuthenticateWithEmptyCredentialsThrowsException(): void
+    {
+        $request = new Request();
+        $request->request->set('_username', '');
+        $request->request->set('_password', '');
 
-    //     $this->expectException(AuthenticationException::class);
-    //     $this->expectExceptionMessage('Nom d\'utilisateur et mot de passe requis.');
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage('Nom d\'utilisateur et mot de passe requis.');
 
-    //     $this->authenticator->authenticate($request);
-    // }
+        $this->authenticator->authenticate($request);
+    }
 
     // public function testAuthenticateWithValidCredentials(): void
     // {

@@ -51,6 +51,11 @@ class LdapAuthenticator extends AbstractAuthenticator implements AuthenticationE
     {
         $username = $request->request->get('_username', '');
         $password = $request->request->get('_password', '');
+
+        if (empty($username) || empty($password)) {
+            throw new AuthenticationException('Nom d\'utilisateur et mot de passe requis.');
+        }
+
         // 🔐 Bind avec le compte technique AVANT la requête
         $this->ldap->bind($this->searchDn, $this->searchPassword);
 
@@ -58,11 +63,11 @@ class LdapAuthenticator extends AbstractAuthenticator implements AuthenticationE
         $baseDn = $_ENV['LDAP_BASE_DN'] ?? 'OU=HFF Users,DC=fraise,DC=hff,DC=mg';
         $query = $this->ldap->query($baseDn, sprintf('(sAMAccountName=%s)', $username));
 
-        
+
         if (!$query) {
             throw new AuthenticationException('La requête LDAP est invalide.');
         }
-        
+
         $results = $query->execute();
 
         if (count($results) === 0) {
