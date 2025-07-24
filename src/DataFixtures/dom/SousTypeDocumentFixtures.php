@@ -10,38 +10,22 @@ class SousTypeDocumentFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
+        $sousTypes = [
+            ['code' => 'MISSION', 'reference' => 'sous_type_mission'],
+            ['code' => 'COMPLEMENT', 'reference' => 'sous_type_complement'],
+            ['code' => 'MUTATION', 'reference' => 'sous_type_mutation'],
+            ['code' => 'FRAIS EXCEPTIONNEL', 'reference' => 'sous_type_frais_exceptionnel'],
+            ['code' => 'TROP PERCU', 'reference' => 'sous_type_trop_percu'],
+            // Ajoutez d'autres sous-types ici si nécessaire
+        ];
 
-        //mission
-        $sousTypeMission = new DomSousTypeDocument();
-        $sousTypeMission->setCodeSousType('MISSION');
-        $manager->persist($sousTypeMission);
-        $this->addReference('sous_type_mission', $sousTypeMission);
+        foreach ($sousTypes as $sousTypeData) {
+            $sousType = new DomSousTypeDocument();
+            $sousType->setCodeSousType($sousTypeData['code']);
 
-        //complement
-        $sousTypeComplement = new DomSousTypeDocument();
-        $sousTypeComplement->setCodeSousType('COMPLEMENT');
-        $manager->persist($sousTypeComplement);
-        $this->addReference('sous_type_complement', $sousTypeComplement);
-
-
-        //mutation
-        $sousTypeMutation = new DomSousTypeDocument();
-        $sousTypeMutation->setCodeSousType('MUTATION');
-        $manager->persist($sousTypeMutation);
-        $this->addReference('sous_type_mutation', $sousTypeMutation);
-
-        //FRAIS EXCEPTIONNEL
-        $sousTypeFraisExceptionnel = new DomSousTypeDocument();
-        $sousTypeFraisExceptionnel->setCodeSousType('FRAIS EXCEPTIONNEL');
-        $manager->persist($sousTypeFraisExceptionnel);
-        $this->addReference('sous_type_frais_exceptionnel', $sousTypeFraisExceptionnel);
-
-        //trop percu
-        $sousTypeTropPercu = new DomSousTypeDocument();
-        $sousTypeTropPercu->setCodeSousType('TROP PERCU');
-        $manager->persist($sousTypeTropPercu);
-        $this->addReference('sous_type_trop_percu', $sousTypeTropPercu);
-
+            $manager->persist($sousType);
+            $this->addReference($sousTypeData['reference'], $sousType);
+        }
 
         $manager->flush();
     }

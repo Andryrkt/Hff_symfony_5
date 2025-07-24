@@ -8,6 +8,7 @@ use \App\Entity\Dom\DomSite;
 use \App\Entity\Dom\DomCategorie;
 use \App\Entity\Dom\DomRmq;
 use App\Entity\Traits\TimestampableTrait;
+use \App\Entity\Dom\DomSousTypeDocument;
 
 /**
  * @ORM\Entity(repositoryClass=DomIndemniteRepository::class)
@@ -43,6 +44,11 @@ class DomIndemnite
      * @ORM\ManyToOne(targetEntity=DomRmq::class, inversedBy="domIndemnites")
      */
     private $domRmqId;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=DomSousTypeDocument::class, inversedBy="domIndemnites")
+     */
+    private $domSousTypeDocumentId;
 
     public function getId(): ?int
     {
@@ -93,6 +99,18 @@ class DomIndemnite
     public function setDomRmqId(?DomRmq $domRmqId): self
     {
         $this->domRmqId = $domRmqId;
+
+        return $this;
+    }
+
+    public function getDomSousTypeDocumentId(): ?DomSousTypeDocument
+    {
+        return $this->domSousTypeDocumentId;
+    }
+
+    public function setDomSousTypeDocumentId(?DomSousTypeDocument $domSousTypeDocumentId): self
+    {
+        $this->domSousTypeDocumentId = $domSousTypeDocumentId;
 
         return $this;
     }

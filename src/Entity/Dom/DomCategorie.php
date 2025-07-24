@@ -27,7 +27,7 @@ class DomCategorie
     /**
      * @ORM\Column(type="string", length=60)
      */
-    private $desctiption;
+    private $description;
 
     /**
      * @ORM\ManyToOne(targetEntity=DomSousTypeDocument::class, inversedBy="domCategories")
@@ -49,14 +49,14 @@ class DomCategorie
         return $this->id;
     }
 
-    public function getDesctiption(): ?string
+    public function getDescription(): ?string
     {
-        return $this->desctiption;
+        return $this->description;
     }
 
-    public function setDesctiption(string $desctiption): self
+    public function setDescription(string $description): self
     {
-        $this->desctiption = $desctiption;
+        $this->description = $description;
 
         return $this;
     }
