@@ -17,4 +17,5 @@ security:
 
   access_control:
     - { path: ^/login, roles: PUBLIC_ACCESS }
-    - { path: ^/, roles: ROLE_USER }
+    - { path: ^/$, roles: IS_AUTHENTICATED_FULLY }
+    - { path: ^/dom, roles: ROLE_DOM }

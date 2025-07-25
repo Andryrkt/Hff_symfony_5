@@ -329,4 +329,37 @@ class User implements UserInterface
 
         return $this;
     }
+
+
+    public function getAgenceEmetteur(): ?string
+    {
+        try {
+            if (!$this->getPersonnel()) {
+                return null;
+            }
+
+            if (!$this->getPersonnel()->getAgenceServiceIrium()) {
+                return null;
+            }
+            return $this->getPersonnel()->getAgenceServiceIrium()->getAgence();
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    public function getServiceEmetteur(): ?string
+    {
+        try {
+            if (!$this->getPersonnel()) {
+                return null;
+            }
+
+            if (!$this->getPersonnel()->getAgenceServiceIrium()) {
+                return null;
+            }
+            return $this->getPersonnel()->getAgenceServiceIrium()->getService();
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
 }

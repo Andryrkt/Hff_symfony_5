@@ -36,7 +36,7 @@ class Personnel
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $prenom;
+    private $prenoms;
 
     /**
      * @ORM\ManyToOne(targetEntity=AgenceServiceIrium::class, inversedBy="personnels")
@@ -52,6 +52,11 @@ class Personnel
      * @ORM\OneToMany(targetEntity=DemandeOrdreMission::class, mappedBy="domPersonnel")
      */
     private $demandeOrdreMissions;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $matricule;
 
     public function __construct()
     {
@@ -75,14 +80,14 @@ class Personnel
         return $this;
     }
 
-    public function getPrenom(): ?string
+    public function getPrenoms(): ?string
     {
-        return $this->prenom;
+        return $this->prenoms;
     }
 
-    public function setPrenom(string $prenom): self
+    public function setPrenoms(string $prenoms): self
     {
-        $this->prenom = $prenom;
+        $this->prenoms = $prenoms;
 
         return $this;
     }
@@ -147,6 +152,18 @@ class Personnel
                 $demandeOrdreMission->setDomPersonnel(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getMatricule(): ?int
+    {
+        return $this->matricule;
+    }
+
+    public function setMatricule(?int $matricule): self
+    {
+        $this->matricule = $matricule;
 
         return $this;
     }
