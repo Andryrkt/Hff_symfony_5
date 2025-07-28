@@ -16,6 +16,9 @@ class DomRmq
 {
     use TimestampableTrait;
 
+    public const DESCRIPTION_50 = '50';
+    public const DESCRIPTION_STD = 'STD';
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue

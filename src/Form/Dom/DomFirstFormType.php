@@ -2,6 +2,7 @@
 
 namespace App\Form\Dom;
 
+use App\Dto\Dom\DomFirstFormData;
 use App\Entity\Dom\DomRmq;
 use App\Entity\Dom\DomCategorie;
 use App\Entity\Dom\DomIndemnite;
@@ -23,7 +24,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
-class DomFirstType extends AbstractType
+class DomFirstFormType extends AbstractType
 {
     private const SALARIE = [
         'PERMANENT' => 'PERMANENT',
@@ -48,7 +49,7 @@ class DomFirstType extends AbstractType
         return function (DomSousTypeDocumentRepository $repo) {
             return $repo->createQueryBuilder('s')
                 ->where('s.codeSousType NOT IN (:excludedCodes)')
-                ->setParameter('excludedcodes', self::EXCLUDED_CODE_SOUS_TYPE_DOC);
+                ->setParameter('excludedCodes', self::EXCLUDED_CODE_SOUS_TYPE_DOC);
         };
     }
 
@@ -103,8 +104,8 @@ class DomFirstType extends AbstractType
             $data = $event->getData();
 
             // Ajout dynamique du champ catégorie
-            if ($data->getSousTypeDocument()) {
-                $this->addCategorieField($form, $data->getSousTypeDocument(), $data->getAgenceEmetteur());
+            if ($data->sousTypeDocument) {
+                $this->addCategorieField($form, $data->sousTypeDocument, $data->getAgenceEmetteur());
             }
 
             // Ajout dynamique du champ matriculeNom
@@ -136,7 +137,7 @@ class DomFirstType extends AbstractType
 
     private function addCategorieField($form, ?DomSousTypeDocument $sousTypeDocument, ?string $agenceEmetteur): void
     {
-        $rmqDescription = str_starts_with($agenceEmetteur, '50') ? '50' : 'STD';
+        $rmqDescription = str_starts_with($agenceEmetteur, '50') ? DomRmq::DESCRIPTION_50 : DomRmq::DESCRIPTION_STD;
         $rmq = $this->entityManager->getRepository(DomRmq::class)->findOneBy(['description' => $rmqDescription]);
 
         if (!$sousTypeDocument || !$rmq) {
@@ -189,7 +190,7 @@ class DomFirstType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => DemandeOrdreMission::class,
+            'data_class' => DomFirstFormData::class,
             'attr' => ['id' => 'dom_form'], // Ajout d'un ID pour faciliter le JavaScript
         ]);
     }

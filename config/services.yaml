@@ -19,9 +19,9 @@ services:
   App\:
     resource: "../src/"
     exclude:
-      - "../src/DependencyInjection/"
-      - "../src/Entity/"
-      - "../src/Kernel.php"
+    - "../src/DependencyInjection/"
+    - "../src/Entity/"
+    - "../src/Kernel.php"
 
   # add more service definitions when explicit configuration is needed
   # please note that last definitions always *replace* previous ones
@@ -40,15 +40,10 @@ services:
       $searchPassword: "%env(resolve:LDAP_SEARCH_PASSWORD)%"
 
   Symfony\Component\Ldap\Ldap:
-    factory: ['Symfony\Component\Ldap\Ldap', "create"]
+    factory: [ 'Symfony\Component\Ldap\Ldap', "create" ]
     arguments:
-      - ext_ldap
-      - {
-          host: "%env(resolve:LDAP_HOST)%",
-          port: 389,
-          encryption: none,
-          options: { protocol_version: 3, referrals: false },
-        }
+    - ext_ldap
+    - { host: "%env(resolve:LDAP_HOST)%", port: 389, encryption: none, options: { protocol_version: 3, referrals: false } }
 
   Symfony\Component\Ldap\LdapInterface: '@Symfony\Component\Ldap\Ldap'
 
@@ -61,16 +56,22 @@ services:
 
   # extension twig pour l'asset des images
   App\Twig\WebpackAssetExtension:
-    tags: ["twig.extension"]
+    tags: [ "twig.extension" ]
 
   # service pour le navigation
   App\Twig\MenuExtension:
     arguments:
-      - '@App\Service\Menu\MenuBuilder'
+    - '@App\Service\Menu\MenuBuilder'
     tags:
-      - "twig.extension"
+    - "twig.extension"
 
   App\Service\LdapService:
     arguments:
       $searchDn: "%env(resolve:LDAP_SEARCH_DN)%"
       $searchPassword: "%env(resolve:LDAP_SEARCH_PASSWORD)%"
+
+  # service pour le wizard de création de DOM
+  App\Service\Dom\DomWizardManager:
+    arguments:
+      $session: '@session'
+      $serializer: '@serializer'

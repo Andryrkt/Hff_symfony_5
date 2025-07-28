@@ -3,7 +3,7 @@
 namespace App\Entity\Dom;
 
 use App\Entity\Traits\TimestampableTrait;
-use App\Repository\DomSousTypeDocumentRepository;
+use App\Repository\Dom\DomSousTypeDocumentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -18,7 +18,7 @@ class DomSousTypeDocument
 
     public const CODE_SOUS_TYPE_MUTATION = 'MUTATION';
     public const CODE_SOUS_TYPE_TROP_PERCU = 'TROP PERCU';
-    
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue

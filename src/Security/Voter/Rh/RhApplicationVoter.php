@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Security\Voter;
+namespace App\Security\Voter\Rh;
 
 use App\Entity\Admin\PersonnelUser\User;
 use App\Entity\Admin\ApplicationGroupe\Application;
@@ -37,4 +37,4 @@ class RhApplicationVoter extends Voter
         }
         return false;
     }
-} 
+}
