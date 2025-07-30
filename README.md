@@ -110,7 +110,7 @@ php bin/phpunit
     - un utilisateur peut avoir un seul agence et les services qui correspond à cette agence
     - un utilisateur peut avoir plusieurs agence et une seul service
     - un utilisateur peut avoit une seul agence et une seul service
-- un utilisateur peut avoir un ou plusieurs goupe
+- un utilisateur peut avoir un ou plusieurs groupe
 
 
 ### Les groupes
@@ -120,6 +120,7 @@ php bin/phpunit
 - groupe Appro
 - groupe Rentale
 - groupe Energie
+- groupe compta
 
 ### Les permissions
 - Creation de nouveau demande (CREATE)
@@ -132,3 +133,4 @@ php bin/phpunit
 - ROLE_ADMIN
 - ROLE_SUPPER_ADMIN
 - ROLE_CHEF_SERVICE
+- ROLE_DOM

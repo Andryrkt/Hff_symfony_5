@@ -2,6 +2,7 @@
 
 namespace App\Entity\Dom;
 
+use App\Contract\AgencyServiceAwareInterface;
 use App\Entity\Admin\PersonnelUser\Personnel;
 use App\Entity\Admin\PersonnelUser\User;
 use App\Repository\Dom\DemandeOrdreMissionRepository;
@@ -20,7 +21,7 @@ use \App\Entity\Admin\AgenceService\Service;
  * )
  * @ORM\HasLifecycleCallbacks
  */
-class DemandeOrdreMission
+class DemandeOrdreMission implements AgencyServiceAwareInterface
 {
     /**
      * @ORM\Id
@@ -643,5 +644,25 @@ class DemandeOrdreMission
         $this->serviceDebiteurId = $serviceDebiteurId;
 
         return $this;
+    }
+
+    public function getEmitterAgence(): ?Agence
+    {
+        return $this->agenceEmetteurId;
+    }
+
+    public function getEmitterService(): ?Service
+    {
+        return $this->serviceEmetteurId;
+    }
+
+    public function getDebtorAgence(): ?Agence
+    {
+        return $this->agenceDebiteurId;
+    }
+
+    public function getDebtorService(): ?Service
+    {
+        return $this->serviceDebiteurId;
     }
 }
