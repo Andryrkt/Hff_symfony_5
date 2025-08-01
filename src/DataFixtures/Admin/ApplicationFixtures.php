@@ -10,9 +10,11 @@ class ApplicationFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        $application = new Application();
-        $application->setName('DEMANDE D\'ORDRE DE MISSION');
-        $application->setCode('DOM');
-        $manager->persist($application);
+        $dom = new Application();
+        $dom->setName('DEMANDE D\'ORDRE DE MISSION');
+        $dom->setCode('DOM');
+        $this->addReference('app_dom', $dom);
+        $manager->persist($dom);
+        $manager->flush();
     }
 }

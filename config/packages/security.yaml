@@ -8,6 +8,7 @@ security:
   firewalls:
     main:
       lazy: true
+      stateless: false
       provider: ldap_user_provider
       custom_authenticator: App\Security\LdapAuthenticator
       entry_point: App\Security\LdapAuthenticator

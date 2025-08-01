@@ -39,28 +39,61 @@ class DomIndemniteRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return DomIndemnite[] Returns an array of DomIndemnite objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('d')
-//            ->andWhere('d.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('d.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    public function findDistinctCategoriesByCriteria(array $criteria): array
+    {
+        $dql = <<<DQL
+        SELECT DISTINCT c
+        FROM App\Entity\Dom\DomCategorie c
+        JOIN c.domIndemnites i
+        WHERE i.domSousTypeDocumentId = :sousTypeDoc
+        AND i.domRmqId = :rmq
+    DQL;
 
-//    public function findOneBySomeField($value): ?DomIndemnite
-//    {
-//        return $this->createQueryBuilder('d')
-//            ->andWhere('d.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        return $this->getEntityManager()->createQuery($dql)
+            ->setParameters([
+                'sousTypeDoc' => $criteria['sousTypeDoc'],
+                'rmq' => $criteria['rmq'],
+            ])
+            ->getResult();
+    }
+
+    public function findIdemnite(array $criteria)
+    {
+        return  $this->createQueryBuilder('i')
+            ->where('i.sousTypeDoc = :sousTypeDoc')
+            ->andWhere('i.rmq = :rmq')
+            ->andWhere('i.categorie = :categorie')
+            ->setParameters([
+                'sousTypeDoc' => $criteria['sousTypeDoc'],
+                'rmq' => $criteria['rmq'],
+                'categorie' => $criteria['categorie']
+            ])
+            ->getQuery()
+            ->getResult();
+    }
+
+    //    /**
+    //     * @return DomIndemnite[] Returns an array of DomIndemnite objects
+    //     */
+    //    public function findByExampleField($value): array
+    //    {
+    //        return $this->createQueryBuilder('d')
+    //            ->andWhere('d.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->orderBy('d.id', 'ASC')
+    //            ->setMaxResults(10)
+    //            ->getQuery()
+    //            ->getResult()
+    //        ;
+    //    }
+
+    //    public function findOneBySomeField($value): ?DomIndemnite
+    //    {
+    //        return $this->createQueryBuilder('d')
+    //            ->andWhere('d.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->getQuery()
+    //            ->getOneOrNullResult()
+    //        ;
+    //    }
 }

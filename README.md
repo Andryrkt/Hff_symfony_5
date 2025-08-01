@@ -134,3 +134,25 @@ php bin/phpunit
 - ROLE_SUPPER_ADMIN
 - ROLE_CHEF_SERVICE
 - ROLE_DOM
+
+
+   1. Relations Clés : L'entité UserAccess est bien le pivot central. Elle relie quatre concepts :
+       * private $users; (Un utilisateur)
+       * private $agence; (Une agence)
+       * private $service; (Un service)
+       * private $application; (Une application, ce qui permet de gérer les droits pour différents modules du projet, par exemple "Ordres de Mission", "Facturation", etc.)
+
+   2. Le champ `accessType` : C'est un détail très important. Le commentaire // ALL, AGENCE, SERVICE, AGENCE_SERVICE suggère une gestion des droits très flexible :
+       * ALL : L'utilisateur a accès à tout, sans restriction.
+       * AGENCE : L'utilisateur a accès à tous les services d'une agence donnée.
+       * SERVICE : L'utilisateur a accès à un service spécifique, mais dans toutes les agences.
+       * AGENCE_SERVICE : C'est le cas le plus restrictif. L'utilisateur n'a accès qu'à un service précis dans une agence précise.
+
+    ┌────────────────┬─────────────────────────────────────────┬───────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ AccessType     │ Paire (Agence, Service)                 │ Signification dans le code                                                                        │
+  ├────────────────┼─────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────┤
+  │ `ALL`            │ (null, null) ou "Non applicable"        │ Aucun filtre. La requête ne contient pas de WHERE sur l'agence ou le service.                     │
+  │ AGENCE         │ (Agence Spécifique, *)                  │ Filtre sur l'agence uniquement : WHERE p.agence = :id_agence                                      │
+  │ SERVICE        │ (*, Service Spécifique)                 │ Filtre sur le service uniquement : WHERE p.service = :id_service                                  │
+  │ AGENCE_SERVICE │ (Agence Spécifique, Service Spécifique) │ Filtre le plus strict sur la paire exacte : WHERE p.agence = :id_agence AND p.service = :id_service │
+  └────────────────┴─────────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────┘

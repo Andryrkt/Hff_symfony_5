@@ -16,6 +16,7 @@ class DomSousTypeDocument
 {
     use TimestampableTrait;
 
+    public const CODE_SOUS_TYPE_MISSION = 'MISSION';
     public const CODE_SOUS_TYPE_MUTATION = 'MUTATION';
     public const CODE_SOUS_TYPE_TROP_PERCU = 'TROP PERCU';
 

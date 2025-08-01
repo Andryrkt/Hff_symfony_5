@@ -2,27 +2,28 @@
 
 namespace App\Form\Dom;
 
+use App\DataFixtures\dom\SousTypeDocumentFixtures;
 use App\Dto\Dom\DomFirstFormData;
-use App\Entity\Dom\DomRmq;
+use App\Entity\Admin\PersonnelUser\Personnel;
+use App\Entity\Admin\PersonnelUser\UserAccess;
 use App\Entity\Dom\DomCategorie;
 use App\Entity\Dom\DomIndemnite;
-use Doctrine\ORM\EntityRepository;
+use App\Entity\Dom\DomRmq;
+use App\Entity\Dom\DomSousTypeDocument;
+use App\Form\Shared\AgenceServiceEmetteurType;
+use App\Repository\Admin\PersonnelUser\UserAccessRepository;
+use App\Repository\Dom\DomSousTypeDocumentRepository;
+use App\Repository\Admin\PersonnelUser\PersonnelRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use App\Entity\Dom\DemandeOrdreMission;
-use App\Entity\Dom\DomSousTypeDocument;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Form\AbstractType;
-use App\Entity\Admin\PersonnelUser\Personnel;
-use Symfony\Component\Security\Core\Security;
-use App\Form\Shared\AgenceServiceEmetteurType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use App\Repository\Dom\DomSousTypeDocumentRepository;
-use App\Entity\Admin\AgenceService\AgenceServiceIrium;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Security\Core\Security;
 
 class DomFirstFormType extends AbstractType
 {
@@ -37,20 +38,20 @@ class DomFirstFormType extends AbstractType
     ];
 
     private $entityManager;
+    private $security;
+    private $userAccessRepository;
+    private $sousTypeDocumentRepository;
 
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        Security $security,
+        UserAccessRepository $userAccessRepository,
+        DomSousTypeDocumentRepository $sousTypeDocumentRepository
+    ) {
         $this->entityManager = $entityManager;
-    }
-
-    public function findAllowedTypesQueryBuilder()
-    {
-        return function (DomSousTypeDocumentRepository $repo) {
-            return $repo->createQueryBuilder('s')
-                ->where('s.codeSousType NOT IN (:excludedCodes)')
-                ->setParameter('excludedCodes', self::EXCLUDED_CODE_SOUS_TYPE_DOC);
-        };
+        $this->security = $security;
+        $this->userAccessRepository = $userAccessRepository;
+        $this->sousTypeDocumentRepository = $sousTypeDocumentRepository;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -72,7 +73,7 @@ class DomFirstFormType extends AbstractType
                 'label' => 'Salarié',
                 'choices' => self::SALARIE,
                 'data' => 'PERMANENT',
-                'expanded' => true, // Pour afficher comme des boutons radio
+                'expanded' => false,
             ])
             ->add('matricule', TextType::class, [
                 'label' => 'Matricule',
@@ -92,34 +93,39 @@ class DomFirstFormType extends AbstractType
                 'required' => true,
             ]);
 
-        // Gestion des événements
         $this->setupEventListeners($builder);
     }
 
     private function setupEventListeners(FormBuilderInterface $builder): void
     {
-        // PRE_SET_DATA
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
             $form = $event->getForm();
             $data = $event->getData();
+            /** @var User */
+            $user = $this->security->getUser();
 
-            // Ajout dynamique du champ catégorie
-            if ($data->sousTypeDocument) {
-                $this->addCategorieField($form, $data->sousTypeDocument, $data->getAgenceEmetteur());
+            if (!$user) {
+                return;
             }
 
-            // Ajout dynamique du champ matriculeNom
-            if ($data->getCodeAgenceAutoriser() && $data->getCodeSreviceAutoriser()) {
-                $this->addMatriculeNomField($form, $data->getCodeAgenceAutoriser(), $data->getCodeSreviceAutoriser());
+            $this->addMatriculeNomField($form, $user);
+
+            if ($data->sousTypeDocument) {
+                $this->addCategorieField($form, $data->sousTypeDocument, $user->getAgenceEmetteur());
             }
         });
 
-        // PRE_SUBMIT
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
             $form = $event->getForm();
             $data = $event->getData();
+            $user = $this->security->getUser();
 
-            // Mise à jour dynamique du champ catégorie
+            if (!$user) {
+                return;
+            }
+
+            $this->addMatriculeNomField($form, $user);
+
             if (isset($data['sousTypeDocument']) && isset($data['agenceEmetteur'])) {
                 $sousTypeDocument = $this->entityManager
                     ->getRepository(DomSousTypeDocument::class)
@@ -127,45 +133,11 @@ class DomFirstFormType extends AbstractType
 
                 $this->addCategorieField($form, $sousTypeDocument, $data['agenceEmetteur']);
             }
-
-            // Gestion du champ matriculeNom pour les salariés permanents
-            if (isset($data['salarie']) && $data['salarie'] === 'PERMANENT') {
-                $this->addMatriculeNomField($form, $data['codeAgenceAutoriser'] ?? null, $data['codeSreviceAutoriser'] ?? null);
-            }
         });
     }
 
-    private function addCategorieField($form, ?DomSousTypeDocument $sousTypeDocument, ?string $agenceEmetteur): void
+    private function addMatriculeNomField($form, $user): void
     {
-        $rmqDescription = str_starts_with($agenceEmetteur, '50') ? DomRmq::DESCRIPTION_50 : DomRmq::DESCRIPTION_STD;
-        $rmq = $this->entityManager->getRepository(DomRmq::class)->findOneBy(['description' => $rmqDescription]);
-
-        if (!$sousTypeDocument || !$rmq) {
-            return;
-        }
-
-        $categories = $this->entityManager->getRepository(DomIndemnite::class)
-            ->findDistinctCategoriesByCriteria($sousTypeDocument, $rmq);
-
-        $form->add('categorie', EntityType::class, [
-            'label' => 'Catégorie',
-            'class' => DomCategorie::class,
-            'choice_label' => 'description',
-            'choices' => $categories,
-            'placeholder' => 'Sélectionnez une catégorie',
-        ]);
-    }
-
-    private function addMatriculeNomField($form, ?string $codeAgence, ?string $codeService): void
-    {
-        if (!$codeAgence || !$codeService) {
-            return;
-        }
-
-        $agenceServiceIriumIds = $this->entityManager
-            ->getRepository(AgenceServiceIrium::class)
-            ->findIdsByCodes($codeAgence, $codeService);
-
         $form->add('matriculeNom', EntityType::class, [
             'mapped' => false,
             'label' => 'Matricule et nom',
@@ -178,20 +150,81 @@ class DomFirstFormType extends AbstractType
                 $personnel->getPrenoms()
             ),
             'required' => true,
-            'query_builder' => function (EntityRepository $repository) use ($agenceServiceIriumIds) {
-                return $repository->createQueryBuilder('p')
-                    ->where('p.agenceServiceIriumId IN (:agenceIps)')
-                    ->setParameter('agenceIps', $agenceServiceIriumIds)
-                    ->orderBy('p.Matricule', 'ASC');
+            'query_builder' => function (PersonnelRepository $personnelRepository) use ($user) {
+                $accesses = $this->userAccessRepository->findBy(['users' => $user]);
+
+                $qb = $personnelRepository->createQueryBuilder('p');
+
+                foreach ($accesses as $access) {
+                    if ($access->getAccessType() === 'ALL') {
+                        return $qb->orderBy('p.matricule', 'ASC');
+                    }
+                }
+
+                $orX = $qb->expr()->orX();
+                foreach ($accesses as $i => $access) {
+                    $andX = $qb->expr()->andX();
+                    if ($access->getAgence()) {
+                        $andX->add($qb->expr()->eq('p.agence', ":agence{$i}"));
+                        $qb->setParameter("agence{$i}", $access->getAgence());
+                    }
+                    if ($access->getService()) {
+                        $andX->add($qb->expr()->eq('p.service', ":service{$i}"));
+                        $qb->setParameter("service{$i}", $access->getService());
+                    }
+                    $orX->add($andX);
+                }
+
+                if ($orX->count() > 0) {
+                    $qb->where($orX);
+                } else {
+                    $qb->where('1 = 0');
+                }
+
+                return $qb->orderBy('p.matricule', 'ASC');
             },
         ]);
+    }
+
+    private function addCategorieField($form, ?DomSousTypeDocument $sousTypeDocument, ?string $agenceEmetteur): void
+    {
+        $rmqDescription = str_starts_with($agenceEmetteur, '50') ? DomRmq::DESCRIPTION_50 : DomRmq::DESCRIPTION_STD;
+        $rmq = $this->entityManager->getRepository(DomRmq::class)->findOneBy(['description' => $rmqDescription]);
+
+        if (!$sousTypeDocument || !$rmq) {
+            return;
+        }
+
+        $criteria = [
+            'sousTypeDoc' => $sousTypeDocument,
+            'rmq' => $rmq,
+        ];
+        $categories = $this->entityManager->getRepository(DomIndemnite::class)
+            ->findDistinctCategoriesByCriteria($criteria);
+
+        $form->add('categorie', EntityType::class, [
+            'label' => 'Catégorie',
+            'class' => DomCategorie::class,
+            'choice_label' => 'description',
+            'choices' => $categories,
+            'placeholder' => false,
+        ]);
+    }
+
+    private function findAllowedTypesQueryBuilder()
+    {
+        return function (DomSousTypeDocumentRepository $repo) {
+            return $repo->createQueryBuilder('s')
+                ->where('s.codeSousType NOT IN (:excludedCodes)')
+                ->setParameter('excludedCodes', self::EXCLUDED_CODE_SOUS_TYPE_DOC);
+        };
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'data_class' => DomFirstFormData::class,
-            'attr' => ['id' => 'dom_form'], // Ajout d'un ID pour faciliter le JavaScript
+            'attr' => ['id' => 'dom_form'],
         ]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Form\Shared;
 
+use App\Entity\Admin\PersonnelUser\User;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\AbstractType;
@@ -21,26 +22,27 @@ class AgenceServiceEmetteurType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $user = $this->security->getUser();
 
         $builder
-            ->add('agence', TextType::class, [
+            ->add('agenceEmetteur', TextType::class, [
                 'label' => 'Agence émettrice',
                 'disabled' => true,
+                'mapped' => false, // Car ce sont des champs affichés mais non liés à l'entité
             ])
-            ->add('service', TextType::class, [
+            ->add('serviceEmetteur', TextType::class, [
                 'label' => 'Service émetteur',
                 'disabled' => true,
+                'mapped' => false, // Car ce sont des champs affichés mais non liés à l'entité
             ]);
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
             $form = $event->getForm();
-            /** @var User */
+            /** @var User $user */
             $user = $this->security->getUser();
-
             if ($user) {
-                $form->get('agence')->setData($user->getAgenceEmetteur());
-                $form->get('service')->setData($user->getServiceEmetteur());
+                // dd($user->getAgenceEmetteur(), $user->getServiceEmetteur());
+                $form->get('agenceEmetteur')->setData($user->getAgenceEmetteur());
+                $form->get('serviceEmetteur')->setData($user->getServiceEmetteur());
             }
         });
     }

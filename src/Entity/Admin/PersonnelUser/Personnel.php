@@ -40,6 +40,7 @@ class Personnel
 
     /**
      * @ORM\ManyToOne(targetEntity=AgenceServiceIrium::class, inversedBy="personnels")
+     * @ORM\JoinColumn(name="agence_service_irium_id", referencedColumnName="id")
      */
     private $agenceServiceIrium;
 

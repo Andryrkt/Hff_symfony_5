@@ -65,7 +65,8 @@ class User implements UserInterface
     private $poste;
 
     /**
-     * @ORM\OneToOne(targetEntity=Personnel::class, inversedBy="users", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity=Personnel::class,  inversedBy="users", cascade={"persist", "remove"})
+     * @ORM\JoinColumn(name="personnel_id", referencedColumnName="id")
      */
     private $personnel;
 
@@ -334,14 +335,9 @@ class User implements UserInterface
     public function getAgenceEmetteur(): ?string
     {
         try {
-            if (!$this->getPersonnel()) {
-                return null;
-            }
-
-            if (!$this->getPersonnel()->getAgenceServiceIrium()) {
-                return null;
-            }
-            return $this->getPersonnel()->getAgenceServiceIrium()->getAgence();
+            $nomAgence = $this->getPersonnel()->getAgenceServiceIrium()->getAgence()->getNom();
+            $codeAgence = $this->getPersonnel()->getAgenceServiceIrium()->getAgence()->getCode();
+            return $codeAgence . ' - ' . $nomAgence;
         } catch (\Exception $e) {
             return null;
         }
@@ -350,14 +346,9 @@ class User implements UserInterface
     public function getServiceEmetteur(): ?string
     {
         try {
-            if (!$this->getPersonnel()) {
-                return null;
-            }
-
-            if (!$this->getPersonnel()->getAgenceServiceIrium()) {
-                return null;
-            }
-            return $this->getPersonnel()->getAgenceServiceIrium()->getService();
+            $nomService = $this->getPersonnel()->getAgenceServiceIrium()->getService()->getNom();
+            $codeService = $this->getPersonnel()->getAgenceServiceIrium()->getService()->getCode();
+            return $codeService . ' - ' . $nomService;
         } catch (\Exception $e) {
             return null;
         }

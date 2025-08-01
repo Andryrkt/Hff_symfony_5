@@ -50,7 +50,7 @@ class AgenceServiceIrium
     private $responsable;
 
     /**
-     * @ORM\OneToMany(targetEntity=Personnel::class, mappedBy="agenceService")
+     * @ORM\OneToMany(targetEntity=Personnel::class, mappedBy="agenceServiceIrium")
      */
     private $personnels;
 

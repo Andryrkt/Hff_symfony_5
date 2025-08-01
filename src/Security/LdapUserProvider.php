@@ -10,6 +10,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+
 class LdapUserProvider implements UserProviderInterface
 {
     private $ldap;
@@ -21,6 +23,8 @@ class LdapUserProvider implements UserProviderInterface
     private $userRepository;
     private $em;
 
+    private $personnelRepository;
+
     public function __construct(
         LdapInterface $ldap,
         string $baseDn,
@@ -29,7 +33,8 @@ class LdapUserProvider implements UserProviderInterface
         string $searchDn,
         string $searchPassword,
         UserRepository $userRepository,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        \App\Repository\Admin\PersonnelUser\PersonnelRepository $personnelRepository
     ) {
         $this->ldap = $ldap;
         $this->baseDn = $baseDn;
@@ -39,6 +44,7 @@ class LdapUserProvider implements UserProviderInterface
         $this->searchPassword = $searchPassword;
         $this->userRepository = $userRepository;
         $this->em = $em;
+        $this->personnelRepository = $personnelRepository;
     }
 
     public function loadUserByIdentifier(string $identifier): UserInterface
@@ -46,11 +52,11 @@ class LdapUserProvider implements UserProviderInterface
         $this->ldap->bind($this->searchDn, $this->searchPassword);
 
         $query = $this->ldap->query($this->baseDn, sprintf('(%s=%s)', $this->uidKey, $identifier));
-        
+
         if (!$query) {
-            throw new UserNotFoundException(sprintf('Requête LDAP invalide pour l\'utilisateur "%s".', $identifier));
+            throw new UserNotFoundException(sprintf("Requête LDAP invalide pour l'utilisateur %s", $identifier));
         }
-        
+
         $results = $query->execute();
 
         if (count($results) === 0) {
@@ -72,6 +78,7 @@ class LdapUserProvider implements UserProviderInterface
         $user->setEmail($entry->getAttribute('mail')[0] ?? null);
         $user->setRoles([$this->defaultRoles]);
 
+
         $this->em->persist($user);
         $this->em->flush();
 
@@ -85,7 +92,19 @@ class LdapUserProvider implements UserProviderInterface
 
     public function refreshUser(UserInterface $user): UserInterface
     {
-        return $user;
+        if (!$user instanceof User) {
+            throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_class($user)));
+        }
+
+        $reloadedUser = $this->userRepository->find($user->getId());
+
+        if (null === $reloadedUser) {
+            $e = new UserNotFoundException('User with id ' . $user->getId() . ' not found.');
+            $e->setUserIdentifier($user->getUserIdentifier());
+            throw $e;
+        }
+
+        return $reloadedUser;
     }
 
     public function supportsClass(string $class): bool

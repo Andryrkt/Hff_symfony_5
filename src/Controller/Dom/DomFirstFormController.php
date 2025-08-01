@@ -8,6 +8,7 @@ use App\Service\Dom\DomWizardManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\Dom\DomSousTypeDocumentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class DomFirstFormController extends AbstractController
@@ -19,10 +20,10 @@ class DomFirstFormController extends AbstractController
      * @param DomWizardManager $wizardManager
      * @return void
      */
-    public function index(Request $request, DomWizardManager $domWizardManager): Response
+    public function index(Request $request, DomWizardManager $domWizardManager, DomSousTypeDocumentRepository $sousTypeDocumentRepository): Response
     {
         // Récupération des données existantes ou nouveau DTO
-        $dto = $domWizardManager->getStep1Data() ?? new DomFirstFormData();
+        $dto = $domWizardManager->getStep1Data() ?? new DomFirstFormData($sousTypeDocumentRepository, $this->getUser());
 
         $form = $this->createForm(DomFirstFormType::class, $dto);
         $form->handleRequest($request);

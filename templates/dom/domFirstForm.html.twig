@@ -12,12 +12,13 @@
 						<h3 class="perso-titre">Demande d'Ordre de Mission</h3>
 					</div>
 				</div>
-
-
 				{{ form_start(form)}}
 				<div class="row">
-					<div class="col-6">
-						{{ form_row(form.emetteur)}}
+					<div class="col-md-6">
+						{{ form_row(form.emetteur.agenceEmetteur) }}
+					</div>
+					<div class="col-md-6">
+						{{ form_row(form.emetteur.serviceEmetteur) }}
 					</div>
 				</div>
 				<div class="row">
@@ -32,7 +33,9 @@
 				</div>
 				<div class="row">
 					<div class="col-12">
-						{{ form_row(form.categorie)}}
+						{% if form.categorie is defined %}
+							{{ form_row(form.categorie)}}
+						{% endif %}
 					</div>
 				</div>
 				<div class="row" id="Interne">
