@@ -24,7 +24,7 @@ Encore
 
   // page login
   .addEntry("login", "./assets/js/login/login.js") // JS
-  .addStyleEntry("login-style", "./assets/styles/login/login.css") // CSS
+  .addStyleEntry("login-style", "./assets/styles/login/login.scss") // CSS
 
   // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
   .enableStimulusBridge("./assets/controllers.json")
@@ -67,21 +67,19 @@ Encore
   .enableVersioning(true)
 
   // uncomment if you're having problems with a jQuery plugin
-  .autoProvidejQuery();
+  .autoProvidejQuery()
 
-// enables Sass/SCSS support
+  // enables Sass/SCSS support
+  .enableSassLoader()
 
-// enables Sass/SCSS support
-//.enableSassLoader()
+  // uncomment if you use TypeScript
+  //.enableTypeScriptLoader()
 
-// uncomment if you use TypeScript
-//.enableTypeScriptLoader()
+  // uncomment if you use React
+  //.enableReactPreset()
 
-// uncomment if you use React
-//.enableReactPreset()
-
-// uncomment to get integrity="..." attributes on your script & link tags
-// requires WebpackEncoreBundle 1.4 or higher
-//.enableIntegrityHashes(Encore.isProduction())
+  // uncomment to get integrity="..." attributes on your script & link tags
+  // requires WebpackEncoreBundle 1.4 or higher
+  //.enableIntegrityHashes(Encore.isProduction());
 
 module.exports = Encore.getWebpackConfig();

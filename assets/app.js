@@ -10,14 +10,13 @@ import ModalController from "./controllers/modal_controller";
 import DomFirstFormController from "./controllers/dom_first_form_controller";
 // imporation du bibliothèque bootstrap
 import "bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
 
 // Import complet (icônes + CSS) font awesome
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "@fortawesome/fontawesome-free/js/all.min.js";
 
 // any CSS you import will output into a single css file (app.css in this case)
-import "./styles/app.css";
+import "./styles/app.scss";
 
 // start the Stimulus application
 import "./bootstrap";
@@ -25,7 +24,7 @@ import "./bootstrap";
 //select 2
 import "select2";
 import "select2/dist/css/select2.css";
-import "@ttskch/select2-bootstrap4-theme/dist/select2-bootstrap4.css";
+import "select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css";
 
 const application = Application.start();
 application.register("hello", HelloController);

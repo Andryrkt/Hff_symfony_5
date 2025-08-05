@@ -1,0 +1,10 @@
+@use "variables";
+@use "base";
+@use "components/title";
+@use "components/select2";
+
+/* ===== IMPORTS ===== */
+@import "~bootstrap/dist/css/bootstrap.min.css";
+@import "~select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css";
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Nandinagari&display=swap");
+

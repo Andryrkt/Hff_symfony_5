@@ -1,0 +1,37 @@
+/* ===== BASE STYLES ===== */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: var(--light-bg);
+  font-family: "Noto Sans Nandinagari", sans-serif;
+  font-size: var(--base-font-size);
+}
+
+a,
+select,
+input,
+button,
+textarea,
+span {
+  font-size: var(--base-font-size) !important;
+}
+
+nav {
+  font-size: 0.6975rem !important;
+}
+
+h2 {
+  font-size: 1.5rem !important;
+}
+
+h3 {
+  font-size: 1rem !important;
+}
+
+label {
+  font-weight: bold;
+  margin-top: 5px;
+}
