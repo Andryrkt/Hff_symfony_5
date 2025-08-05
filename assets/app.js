@@ -7,6 +7,7 @@
 import { Application } from "stimulus";
 import HelloController from "./controllers/hello_controller";
 import ModalController from "./controllers/modal_controller";
+import DomFirstFormController from "./controllers/dom_first_form_controller";
 // imporation du bibliothèque bootstrap
 import "bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -21,8 +22,12 @@ import "./styles/app.css";
 // start the Stimulus application
 import "./bootstrap";
 
+//select 2
+import "select2";
+import "select2/dist/css/select2.css";
+import "@ttskch/select2-bootstrap4-theme/dist/select2-bootstrap4.css";
+
 const application = Application.start();
 application.register("hello", HelloController);
 application.register("modal", ModalController); //modal controller stimulus
-
-
+application.register("dom-first-form", DomFirstFormController);

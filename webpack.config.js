@@ -64,7 +64,12 @@ Encore
     from: "./assets/images",
     to: "images/[name].[hash:8].[ext]",
   })
-  .enableVersioning(true);
+  .enableVersioning(true)
+
+  // uncomment if you're having problems with a jQuery plugin
+  .autoProvidejQuery();
+
+// enables Sass/SCSS support
 
 // enables Sass/SCSS support
 //.enableSassLoader()
@@ -78,8 +83,5 @@ Encore
 // uncomment to get integrity="..." attributes on your script & link tags
 // requires WebpackEncoreBundle 1.4 or higher
 //.enableIntegrityHashes(Encore.isProduction())
-
-// uncomment if you're having problems with a jQuery plugin
-//.autoProvidejQuery()
 
 module.exports = Encore.getWebpackConfig();
