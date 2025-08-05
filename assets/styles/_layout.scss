@@ -1,0 +1,16 @@
+/* Pour un fond noir sur toute la largeur */
+.navbar.bg-dark {
+    background-color: #212529 !important;
+}
+
+/* Suppression des espacements internes si nécessaire */
+.navbar.px-0 {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* Menu déroulant aligné à droite */
+.dropdown-menu-end {
+    right: 0;
+    left: auto;
+}
