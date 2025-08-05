@@ -1,13 +1,23 @@
 /* ===== BASE STYLES ===== */
-html,
+/* Optionnel : si vous n'utilisez pas Bootstrap */
 body {
-  height: 100%;
-}
-
-body {
-  background-color: var(--light-bg);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: var(--light-bg);
   font-family: "Noto Sans Nandinagari", sans-serif;
   font-size: var(--base-font-size);
+}
+
+main {
+    flex: 1; /* Prend tout l'espace disponible */
+}
+
+/* Style de base pour le footer */
+.footer {
+    // background: #f8f9fa;
+    padding: 20px 0;
+    margin-top: auto; /* S'assure qu'il reste en bas */
 }
 
 a,
