@@ -32,6 +32,19 @@ class MenuBuilder
 
         if ($isLoggedIn && $user !== null) {
             $menu[] = [
+                'label' => 'Dematerialisations',
+                'icon' => 'fa-solid fa-file',
+                'visible' => true,
+                'children' => [
+                    [
+                        'label' => 'Nouvelle Demande',
+                        'route' => 'dom_first',
+                        'icon' => 'fas fa-plus',
+                        'visible' => true,
+                    ],
+                ],
+            ];
+            $menu[] = [
                 'label' => $user->getUserIdentifier(),
                 'icon' => 'fa-solid fa-user-astronaut',
                 'visible' => true,
@@ -42,7 +55,7 @@ class MenuBuilder
                         'icon' => 'fas fa-sign-out-alt',
                         'visible' => true,
                     ],
-                ]
+                ],
             ];
         }
 
