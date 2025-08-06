@@ -23,13 +23,28 @@ export default class extends Controller {
   toggleFields() {
     const isTemporary = this.salarieTypeTarget.value === "TEMPORAIRE";
 
-    [this.nomGroupTarget, this.prenomGroupTarget, this.cinGroupTarget].forEach(
-      (el) => {
-        el.style.display = isTemporary ? "block" : "none";
-      }
-    );
+    const temporaryGroups = [this.nomGroupTarget, this.prenomGroupTarget, this.cinGroupTarget];
+    const permanentGroups = [this.matriculeGroupTarget];
 
-    this.matriculeGroupTarget.style.display = isTemporary ? "none" : "block";
+    temporaryGroups.forEach((groupEl) => {
+      groupEl.style.display = isTemporary ? "block" : "none";
+      const inputEl = groupEl.querySelector('input, select, textarea');
+      if (inputEl) {
+        inputEl.disabled = !isTemporary;
+      }
+    });
+
+    permanentGroups.forEach((groupEl) => {
+      groupEl.style.display = isTemporary ? "none" : "block";
+      // Assuming matriculeNomSelectTarget and matriculeInputTarget are direct children or easily queryable within matriculeGroupTarget
+      // If they are Stimulus targets, we can directly access them
+      if (this.hasMatriculeNomSelectTarget) {
+        this.matriculeNomSelectTarget.disabled = isTemporary;
+      }
+      if (this.hasMatriculeInputTarget) {
+        this.matriculeInputTarget.disabled = isTemporary;
+      }
+    });
   }
 
   // Initialisation de Select2 pour le matricule
