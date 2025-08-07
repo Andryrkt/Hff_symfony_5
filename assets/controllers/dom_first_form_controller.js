@@ -17,65 +17,179 @@ export default class extends Controller {
   connect() {
     this.initSelect2();
     this.toggleFields();
+
+    // Ajouter un listener pour debug
+    this.element.addEventListener("submit", this.onSubmit.bind(this));
+  }
+
+  // Debug pour voir si le formulaire se soumet
+  onSubmit(event) {
+    console.log("Form submitting...", event);
+    console.log("Form data:", new FormData(event.target));
+
+    // Vérifier les champs requis avant soumission
+    const requiredFields = this.element.querySelectorAll(
+      "[required]:not([disabled])"
+    );
+    let hasErrors = false;
+
+    requiredFields.forEach((field) => {
+      if (!field.value.trim()) {
+        console.error("Required field empty:", field.name || field.id, field);
+        hasErrors = true;
+      }
+    });
+
+    if (hasErrors) {
+      console.log("Form has validation errors");
+    }
   }
 
   // Gestion des champs selon le type de salarié
   toggleFields() {
     const isTemporary = this.salarieTypeTarget.value === "TEMPORAIRE";
 
-    const temporaryGroups = [this.nomGroupTarget, this.prenomGroupTarget, this.cinGroupTarget];
-    const permanentGroups = [this.matriculeGroupTarget];
+    // Gérer les champs temporaires
+    const temporaryGroups = [
+      this.nomGroupTarget,
+      this.prenomGroupTarget,
+      this.cinGroupTarget,
+    ];
 
     temporaryGroups.forEach((groupEl) => {
-      groupEl.style.display = isTemporary ? "block" : "none";
-      const inputEl = groupEl.querySelector('input, select, textarea');
-      if (inputEl) {
-        inputEl.disabled = !isTemporary;
+      const inputEl = groupEl.querySelector("input, select, textarea");
+
+      if (isTemporary) {
+        // Montrer et activer les champs temporaires
+        groupEl.style.display = "block";
+        if (inputEl) {
+          inputEl.disabled = false;
+          inputEl.required = true; // Rendre requis si nécessaire
+        }
+      } else {
+        // Cacher et vider les champs temporaires (mais ne pas les désactiver)
+        groupEl.style.display = "none";
+        if (inputEl) {
+          inputEl.value = ""; // Vider la valeur
+          inputEl.required = false; // Retirer l'obligation
+          // NE PAS utiliser disabled = true
+        }
       }
     });
 
-    permanentGroups.forEach((groupEl) => {
-      groupEl.style.display = isTemporary ? "none" : "block";
-      // Assuming matriculeNomSelectTarget and matriculeInputTarget are direct children or easily queryable within matriculeGroupTarget
-      // If they are Stimulus targets, we can directly access them
+    // Gérer les champs permanents
+    const matriculeGroup = this.matriculeGroupTarget;
+
+    if (isTemporary) {
+      // Cacher les champs permanents
+      matriculeGroup.style.display = "none";
+
       if (this.hasMatriculeNomSelectTarget) {
-        this.matriculeNomSelectTarget.disabled = isTemporary;
+        // Vider et désélectionner
+        $(this.matriculeNomSelectTarget).val(null).trigger("change");
+        this.matriculeNomSelectTarget.required = false;
       }
+
       if (this.hasMatriculeInputTarget) {
-        this.matriculeInputTarget.disabled = isTemporary;
+        this.matriculeInputTarget.value = "";
+        this.matriculeInputTarget.required = false;
       }
-    });
+    } else {
+      // Montrer les champs permanents
+      matriculeGroup.style.display = "block";
+
+      if (this.hasMatriculeNomSelectTarget) {
+        this.matriculeNomSelectTarget.required = true;
+      }
+
+      if (this.hasMatriculeInputTarget) {
+        this.matriculeInputTarget.required = true;
+      }
+    }
   }
 
   // Initialisation de Select2 pour le matricule
   initSelect2() {
+    if (!this.hasMatriculeNomSelectTarget) return;
+
     $(this.matriculeNomSelectTarget)
       .select2({
         width: "100%",
         placeholder: "-- choisir un personnel --",
+        allowClear: true,
       })
       .on("select2:select", (e) => {
-        this.matriculeInputTarget.value = e.params.data.text.match(/^\w+/)[0]; // Extrait le matricule
+        // Améliorer l'extraction du matricule
+        const text = e.params.data.text;
+        const matriculeMatch = text.match(/^(\w+)/);
+        if (matriculeMatch && this.hasMatriculeInputTarget) {
+          this.matriculeInputTarget.value = matriculeMatch[1];
+        }
+      })
+      .on("select2:unselect", () => {
+        if (this.hasMatriculeInputTarget) {
+          this.matriculeInputTarget.value = "";
+        }
       });
   }
 
   // Gestion dynamique de la catégorie
-  updateCategorie() {
-    const typeDoc = this.sousTypeDocumentTarget.value;
-    const agence = this.element.querySelector(
-      '[name*="[agenceEmetteur]"]'
-    ).value;
+  async updateCategorie() {
+    try {
+      const typeDoc = this.sousTypeDocumentTarget.value;
+      const agenceElement = this.element.querySelector(
+        '[name*="[agenceEmetteur]"]'
+      );
 
-    fetch(`/dom/categories?typeDoc=${typeDoc}&agence=${agence}`)
-      .then((response) => response.json())
-      .then((data) => this.updateCategorieSelect(data))
-      .catch(console.error);
+      if (!agenceElement || !agenceElement.value || !typeDoc) {
+        console.log("Missing required data for category update");
+        this.hideCategorieSelect();
+        return;
+      }
+
+      const agence = agenceElement.value;
+
+      console.log("Fetching categories for:", { typeDoc, agence });
+
+      const response = await fetch(
+        `/dom/categories?typeDoc=${encodeURIComponent(
+          typeDoc
+        )}&agence=${encodeURIComponent(agence)}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      this.updateCategorieSelect(data);
+    } catch (error) {
+      console.error("Error updating categories:", error);
+      this.hideCategorieSelect();
+    }
   }
 
   updateCategorieSelect(categories) {
+    if (!this.hasCategorieGroupTarget) return;
+
     const select = this.categorieGroupTarget.querySelector("select");
+    if (!select) return;
+
+    // Vider les options existantes
     select.innerHTML = "";
 
+    // Ajouter une option par défaut
+    const defaultOption = document.createElement("option");
+    defaultOption.value = "";
+    defaultOption.textContent = "-- Sélectionner une catégorie --";
+    select.appendChild(defaultOption);
+
+    // Ajouter les catégories
     categories.forEach((cat) => {
       const option = document.createElement("option");
       option.value = cat.id;
@@ -83,8 +197,23 @@ export default class extends Controller {
       select.appendChild(option);
     });
 
-    this.categorieGroupTarget.style.display = categories.length
-      ? "block"
-      : "none";
+    // Montrer le groupe si il y a des catégories
+    if (categories.length > 0) {
+      this.categorieGroupTarget.style.display = "block";
+      select.required = true;
+    } else {
+      this.hideCategorieSelect();
+    }
+  }
+
+  hideCategorieSelect() {
+    if (this.hasCategorieGroupTarget) {
+      this.categorieGroupTarget.style.display = "none";
+      const select = this.categorieGroupTarget.querySelector("select");
+      if (select) {
+        select.required = false;
+        select.value = "";
+      }
+    }
   }
 }

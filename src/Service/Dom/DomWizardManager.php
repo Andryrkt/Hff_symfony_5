@@ -1,72 +1,74 @@
 <?php
-
 // src/Service/DomWizardManager.php
-
 namespace App\Service\Dom;
 
-
 use App\Dto\Dom\DomFirstFormData;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class DomWizardManager
 {
     private const SESSION_KEY = 'dom_wizard_data';
-
     private SessionInterface $session;
-    private SerializerInterface $serializer;
 
-    public function __construct(
-        SessionInterface $session,
-        SerializerInterface $serializer
-    ) {
+    public function __construct(SessionInterface $session)
+    {
         $this->session = $session;
-        $this->serializer = $serializer;
     }
 
     /**
      * Sauvegarde les données de l'étape 1
+     * Utilise les données brutes au lieu de sérialiser l'objet complet
      */
     public function saveStep1Data(DomFirstFormData $dto): void
     {
-        $context = [
-            // Exemple de contexte personnalisé si nécessaire
-            'circular_reference_handler' => function ($object) {
-                return $object->getId(); // Ou autre identifiant
-            }
-        ];
+        try {
+            // Extraire uniquement les données nécessaires (pas d'entités Doctrine)
+            $data = [
+                // Replace with the correct method/property for agenceEmetteur
+                'sousTypeDocument' => $dto->getSousTypeDocument() ? $dto->getSousTypeDocument()->getId() : null,
+                'salarie' => $dto->getSalarie(),
+                'categorie' => $dto->getCategorie() ? $dto->getCategorie()->getId() : null,
+                'matriculeNom' => $dto->getMatriculeNom() ? $dto->getMatriculeNom()->getId() : null,
+                'matricule' => $dto->getMatricule(),
+                'nom' => $dto->getNom(),
+                'prenom' => $dto->getPrenom(),
+                'cin' => $dto->getCin(),
+            ];
 
-        $serialized = $this->serializer->serialize($dto, 'json', $context);
-        $this->session->set(self::SESSION_KEY, $serialized);
+            $this->session->set(self::SESSION_KEY, $data);
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Erreur lors de la sauvegarde des données du wizard: ' . $e->getMessage());
+        }
     }
 
     /**
      * Récupère les données de l'étape 1
+     * Retourne un tableau de données brutes
      */
-    public function getStep1Data(): ?DomFirstFormData
+    public function getStep1DataArray(): ?array
     {
         if (!$this->session->has(self::SESSION_KEY)) {
             return null;
         }
 
-        try {
-            return $this->serializer->deserialize(
-                $this->session->get(self::SESSION_KEY),
-                DomFirstFormData::class,
-                'json'
-            );
-        } catch (\Exception $e) {
+        $data = $this->session->get(self::SESSION_KEY);
+
+        // Vérifier la validité des données (optionnel: timeout après 1h)
+        if (isset($data['timestamp']) && (time() - $data['timestamp'] > 3600)) {
             $this->clear();
             return null;
         }
+
+        return $data;
     }
 
     /**
-     * Vérifie si des données d'étape 1 existent
+     * Reconstruit le DTO à partir des données sauvegardées
+     * Cette méthode sera utilisée dans le contrôleur avec les repositories
      */
     public function hasStep1Data(): bool
     {
-        return $this->session->has(self::SESSION_KEY);
+        return $this->session->has(self::SESSION_KEY) && !empty($this->session->get(self::SESSION_KEY));
     }
 
     /**

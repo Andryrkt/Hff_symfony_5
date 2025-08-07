@@ -74,4 +74,3 @@ services:
   App\Service\Dom\DomWizardManager:
     arguments:
       $session: '@session'
-      $serializer: '@serializer'
