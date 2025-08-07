@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Controller\Api;
+namespace App\Controller\Api\Admin;
 
-use App\Entity\Admin\AgenceService\Agence;
-use App\Repository\Admin\AgenceService\AgenceRepository;
+use App\Entity\Admin\AgenceService\Service;
+use App\Repository\Admin\AgenceService\ServiceRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,22 +14,22 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * @Route("/api/agences", name="api_agences_")
+ * @Route("/api/services", name="api_services_")
  */
-class AgenceApiController extends AbstractController
+class ServiceApiController extends AbstractController
 {
-    private $agenceRepository;
+    private $serviceRepository;
     private $entityManager;
     private $serializer;
     private $validator;
 
     public function __construct(
-        AgenceRepository $agenceRepository,
+        ServiceRepository $serviceRepository,
         EntityManagerInterface $entityManager,
         SerializerInterface $serializer,
         ValidatorInterface $validator
     ) {
-        $this->agenceRepository = $agenceRepository;
+        $this->serviceRepository = $serviceRepository;
         $this->entityManager = $entityManager;
         $this->serializer = $serializer;
         $this->validator = $validator;
@@ -40,9 +40,9 @@ class AgenceApiController extends AbstractController
      */
     public function index(): JsonResponse
     {
-        $agences = $this->agenceRepository->findAll();
+        $services = $this->serviceRepository->findAll();
 
-        $data = $this->serializer->serialize($agences, 'json', [
+        $data = $this->serializer->serialize($services, 'json', [
             'circular_reference_handler' => function ($object) {
                 return $object->getId();
             }
@@ -54,9 +54,9 @@ class AgenceApiController extends AbstractController
     /**
      * @Route("/{id}", name="show", methods={"GET"})
      */
-    public function show(Agence $agence): JsonResponse
+    public function show(Service $service): JsonResponse
     {
-        $data = $this->serializer->serialize($agence, 'json', [
+        $data = $this->serializer->serialize($service, 'json', [
             'circular_reference_handler' => function ($object) {
                 return $object->getId();
             }
@@ -72,11 +72,11 @@ class AgenceApiController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        $agence = new Agence();
-        $agence->setCode($data['code'] ?? '');
-        $agence->setNom($data['nom'] ?? '');
+        $service = new Service();
+        $service->setCode($data['code'] ?? '');
+        $service->setNom($data['nom'] ?? '');
 
-        $errors = $this->validator->validate($agence);
+        $errors = $this->validator->validate($service);
         if (count($errors) > 0) {
             $errorMessages = [];
             foreach ($errors as $error) {
@@ -85,10 +85,10 @@ class AgenceApiController extends AbstractController
             return new JsonResponse(['errors' => $errorMessages], Response::HTTP_BAD_REQUEST);
         }
 
-        $this->entityManager->persist($agence);
+        $this->entityManager->persist($service);
         $this->entityManager->flush();
 
-        $responseData = $this->serializer->serialize($agence, 'json', [
+        $responseData = $this->serializer->serialize($service, 'json', [
             'circular_reference_handler' => function ($object) {
                 return $object->getId();
             }
@@ -100,18 +100,18 @@ class AgenceApiController extends AbstractController
     /**
      * @Route("/{id}", name="update", methods={"PUT"})
      */
-    public function update(Request $request, Agence $agence): JsonResponse
+    public function update(Request $request, Service $service): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
         if (isset($data['code'])) {
-            $agence->setCode($data['code']);
+            $service->setCode($data['code']);
         }
         if (isset($data['nom'])) {
-            $agence->setNom($data['nom']);
+            $service->setNom($data['nom']);
         }
 
-        $errors = $this->validator->validate($agence);
+        $errors = $this->validator->validate($service);
         if (count($errors) > 0) {
             $errorMessages = [];
             foreach ($errors as $error) {
@@ -122,7 +122,7 @@ class AgenceApiController extends AbstractController
 
         $this->entityManager->flush();
 
-        $responseData = $this->serializer->serialize($agence, 'json', [
+        $responseData = $this->serializer->serialize($service, 'json', [
             'circular_reference_handler' => function ($object) {
                 return $object->getId();
             }
@@ -134,43 +134,22 @@ class AgenceApiController extends AbstractController
     /**
      * @Route("/{id}", name="delete", methods={"DELETE"})
      */
-    public function delete(Agence $agence): JsonResponse
+    public function delete(Service $service): JsonResponse
     {
-        $this->entityManager->remove($agence);
+        $this->entityManager->remove($service);
         $this->entityManager->flush();
 
-        return new JsonResponse(['message' => 'Agence supprimée avec succès'], Response::HTTP_OK);
+        return new JsonResponse(['message' => 'Service supprimé avec succès'], Response::HTTP_OK);
     }
 
     /**
-     * @Route("/{id}/services", name="services", methods={"GET"})
+     * @Route("/{id}/agences", name="agences", methods={"GET"})
      */
-    public function getServices(Agence $agence): JsonResponse
+    public function getAgences(Service $service): JsonResponse
     {
-        $services = $agence->getServices();
+        $agences = $service->getAgences();
 
-        $data = $this->serializer->serialize($services, 'json', [
-            'circular_reference_handler' => function ($object) {
-                return $object->getId();
-            }
-        ]);
-
-        return new JsonResponse($data, Response::HTTP_OK, [], true);
-    }
-
-    /**
-     * @Route("/{id}/users", name="users", methods={"GET"})
-     */
-    public function getUsers(Agence $agence): JsonResponse
-    {
-        $userAccesses = $agence->getUserAccesses();
-        $users = [];
-
-        foreach ($userAccesses as $userAccess) {
-            $users[] = $userAccess->getUsers();
-        }
-
-        $data = $this->serializer->serialize($users, 'json', [
+        $data = $this->serializer->serialize($agences, 'json', [
             'circular_reference_handler' => function ($object) {
                 return $object->getId();
             }
@@ -185,9 +164,9 @@ class AgenceApiController extends AbstractController
     public function search(Request $request): JsonResponse
     {
         $query = $request->query->get('q', '');
-        $agences = $this->agenceRepository->searchByQuery($query);
+        $services = $this->serviceRepository->searchByQuery($query);
 
-        $data = $this->serializer->serialize($agences, 'json', [
+        $data = $this->serializer->serialize($services, 'json', [
             'circular_reference_handler' => function ($object) {
                 return $object->getId();
             }

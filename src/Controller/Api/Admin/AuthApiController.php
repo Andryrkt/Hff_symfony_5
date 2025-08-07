@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Api;
+namespace App\Controller\Api\Admin;
 
 use App\Service\LdapService;
 use App\Entity\Admin\PersonnelUser\User;

@@ -156,3 +156,9 @@ php bin/phpunit
   │ SERVICE        │ (*, Service Spécifique)                 │ Filtre sur le service uniquement : WHERE p.service = :id_service                                  │
   │ AGENCE_SERVICE │ (Agence Spécifique, Service Spécifique) │ Filtre le plus strict sur la paire exacte : WHERE p.agence = :id_agence AND p.service = :id_service │
   └────────────────┴─────────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+  ENCORE à fair
+  - ajout du type scipte
+  - ajut de rabbitMQ
+  - mettre l'aégence et service debitteur dans une autre ficher

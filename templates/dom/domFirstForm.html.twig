@@ -44,7 +44,11 @@
                         }) }}
 					</div>
 					<div class="col-md-6">
-						{{ form_row(form.emetteur.serviceEmetteur) }}
+						{{ form_row(form.emetteur.serviceEmetteur, {
+							'attr': {
+								'data-agence-selector-target': 'service'
+							}
+						}) }}
 					</div>
 				</div>
 

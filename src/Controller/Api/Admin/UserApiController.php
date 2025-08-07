@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Api;
+namespace App\Controller\Api\Admin;
 
 use App\Entity\Admin\PersonnelUser\User;
 use App\Repository\Admin\PersonnelUser\UserRepository;

@@ -3,11 +3,14 @@
 namespace App\Controller\Dom;
 
 use App\Entity\Dom\DomRmq;
+use Psr\Log\LoggerInterface;
 use App\Entity\Dom\DomCategorie;
 use App\Dto\Dom\DomFirstFormData;
 use App\Form\Dom\DomFirstFormType;
 use App\Service\Dom\DomWizardManager;
+use App\Entity\Dom\DomSousTypeDocument;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Admin\PersonnelUser\Personnel;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\Dom\DomIndemniteRepository;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +18,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\Dom\DomSousTypeDocumentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Psr\Log\LoggerInterface;
 
 class DomFirstFormController extends AbstractController
 {
@@ -49,7 +51,7 @@ class DomFirstFormController extends AbstractController
                         $logger->info('Data saved successfully, redirecting to step2');
 
                         $this->addFlash('success', 'Étape 1 sauvegardée avec succès');
-                        return $this->redirectToRoute('dom_step2');
+                        return $this->redirectToRoute('dom_second');
                     } catch (\Exception $e) {
                         $logger->error('Error saving wizard data: ' . $e->getMessage());
                         $this->addFlash('error', 'Erreur lors de la sauvegarde : ' . $e->getMessage());
@@ -103,21 +105,21 @@ class DomFirstFormController extends AbstractController
         try {
 
             if (isset($savedData['sousTypeDocument']) && $savedData['sousTypeDocument']) {
-                $sousType = $em->find('App\Entity\Dom\DomSousTypeDocument', $savedData['sousTypeDocument']);
+                $sousType = $em->find(DomSousTypeDocument::class, $savedData['sousTypeDocument']);
                 if ($sousType) {
                     $dto->setSousTypeDocument($sousType);
                 }
             }
 
             if (isset($savedData['categorie']) && $savedData['categorie']) {
-                $categorie = $em->find('App\Entity\Dom\DomCategorie', $savedData['categorie']);
+                $categorie = $em->find(DomCategorie::class, $savedData['categorie']);
                 if ($categorie) {
                     $dto->setCategorie($categorie);
                 }
             }
 
             if (isset($savedData['matriculeNom']) && $savedData['matriculeNom']) {
-                $personnel = $em->find('App\Entity\Personnel', $savedData['matriculeNom']);
+                $personnel = $em->find(Personnel::class, $savedData['matriculeNom']);
                 if ($personnel) {
                     $dto->setMatriculeNom($personnel);
                 }
