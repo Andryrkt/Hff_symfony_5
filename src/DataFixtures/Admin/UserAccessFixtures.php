@@ -28,6 +28,7 @@ class UserAccessFixtures extends Fixture implements DependentFixtureInterface
         $userAccess->setAgence($agence);
         $userAccess->setService($service);
         $userAccess->setApplication($application);
+        $userAccess->setAccessType('ALL');
 
         $manager->persist($userAccess);
         $manager->flush();

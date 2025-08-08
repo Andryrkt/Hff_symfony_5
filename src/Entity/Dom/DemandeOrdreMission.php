@@ -191,7 +191,7 @@ class DemandeOrdreMission implements AgencyServiceAwareInterface
     private $agenceEmetteurId;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Service::class, inversedBy="domServiceEmetteur")
+     * @ORM\ManyToOne(targetEntity=Service::class, inversedBy="domEmetteur")
      */
     private $serviceEmetteurId;
 
@@ -201,7 +201,7 @@ class DemandeOrdreMission implements AgencyServiceAwareInterface
     private $agenceDebiteurId;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Service::class, inversedBy="domServiceDebiteur")
+     * @ORM\ManyToOne(targetEntity=Service::class, inversedBy="domDebiteur")
      */
     private $serviceDebiteurId;
 

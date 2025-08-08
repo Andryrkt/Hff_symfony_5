@@ -13,10 +13,37 @@ use App\Entity\Admin\PersonnelUser\UserAccess;
 use App\Entity\Admin\AgenceService\AgenceServiceIrium;
 use App\Entity\Admin\AgenceService\Service;
 
+use ApiPlatform\Core\Annotation\ApiResource;
+use App\Controller\Api\AgenceServicesController;
+
 /**
  * @Broadcast()
  * @ORM\Entity(repositoryClass=AgenceRepository::class)
  * @ORM\HasLifecycleCallbacks
+ * @ApiResource(
+ *     collectionOperations={"get"},
+ *     itemOperations={
+ *         "get",
+ *         "get_services"={
+ *             "method"="GET",
+ *             "path"="/agences/{id}/services",
+ *             "controller"=AgenceServicesController::class,
+ *             "openapi_context"={
+ *                 "summary"="Retrieves the collection of Service resources for a given Agence.",
+ *                 "parameters"={
+ *                     {
+ *                         "name"="id",
+ *                         "in"="path",
+ *                         "required"=true,
+ *                         "schema"={
+ *                             "type"="integer"
+ *                         }
+ *                     }
+ *                 }
+ *             }
+ *         }
+ *     }
+ * )
  */
 class Agence
 {

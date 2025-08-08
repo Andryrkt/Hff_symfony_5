@@ -13,7 +13,7 @@ class PersonnelFixtures extends Fixture implements DependentFixtureInterface
     {
         $p1 = new Personnel();
         $p1->setNom('Rabe');
-        $p1->setPrenom('Jean');
+        $p1->setPrenoms('Jean');
         $p1->setAgenceServiceIrium($this->getReference('agence_service_administration_inf_DA14'));
         $manager->persist($p1);
 
