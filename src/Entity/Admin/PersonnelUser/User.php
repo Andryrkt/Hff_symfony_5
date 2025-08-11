@@ -334,23 +334,45 @@ class User implements UserInterface
 
     public function getAgenceEmetteur(): ?string
     {
-        try {
-            $nomAgence = $this->getPersonnel()->getAgenceServiceIrium()->getAgence()->getNom();
-            $codeAgence = $this->getPersonnel()->getAgenceServiceIrium()->getAgence()->getCode();
-            return $codeAgence . ' - ' . $nomAgence;
-        } catch (\Exception $e) {
+        $personnel = $this->getPersonnel();
+        if ($personnel === null) {
             return null;
         }
+
+        $agenceServiceIrium = $personnel->getAgenceServiceIrium();
+        if ($agenceServiceIrium === null) {
+            return null;
+        }
+
+        $agence = $agenceServiceIrium->getAgence();
+        if ($agence === null) {
+            return null;
+        }
+
+        $nomAgence = $agence->getNom();
+        $codeAgence = $agence->getCode();
+        return $codeAgence . ' - ' . $nomAgence;
     }
 
     public function getServiceEmetteur(): ?string
     {
-        try {
-            $nomService = $this->getPersonnel()->getAgenceServiceIrium()->getService()->getNom();
-            $codeService = $this->getPersonnel()->getAgenceServiceIrium()->getService()->getCode();
-            return $codeService . ' - ' . $nomService;
-        } catch (\Exception $e) {
+        $personnel = $this->getPersonnel();
+        if ($personnel === null) {
             return null;
         }
+
+        $agenceServiceIrium = $personnel->getAgenceServiceIrium();
+        if ($agenceServiceIrium === null) {
+            return null;
+        }
+
+        $service = $agenceServiceIrium->getService();
+        if ($service === null) {
+            return null;
+        }
+
+        $nomService = $service->getNom();
+        $codeService = $service->getCode();
+        return $codeService . ' - ' . $nomService;
     }
 }
