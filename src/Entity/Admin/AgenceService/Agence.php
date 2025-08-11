@@ -28,6 +28,8 @@ use App\Controller\Api\AgenceServicesController;
  *             "method"="GET",
  *             "path"="/agences/{id}/services",
  *             "controller"=AgenceServicesController::class,
+ *             "security"="is_granted('ROLE_USER')",
+ *             "normalization_context"={"groups"={"service:read"}},
  *             "openapi_context"={
  *                 "summary"="Retrieves the collection of Service resources for a given Agence.",
  *                 "parameters"={

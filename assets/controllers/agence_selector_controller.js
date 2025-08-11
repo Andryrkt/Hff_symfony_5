@@ -55,9 +55,17 @@ export default class extends Controller {
   }
 
   updateServiceOptions(services) {
+    // Supporte JSON-LD (hydra:member) et un tableau JSON simple
+    const list = Array.isArray(services)
+      ? services
+      : services && services["hydra:member"]
+      ? services["hydra:member"]
+      : [];
+
     let options = '<option value="">-- Choisir un service --</option>';
-    services.forEach((service) => {
-      options += `<option value="${service.id}">${service.code} - ${service.name}</option>`;
+    list.forEach((service) => {
+      const label = `${service.code} - ${service.nom ?? service.name ?? ""}`;
+      options += `<option value="${service.id}">${label}</option>`;
     });
     this.serviceTarget.innerHTML = options;
     this.serviceTarget.disabled = false;

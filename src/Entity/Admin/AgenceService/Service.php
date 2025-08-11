@@ -12,6 +12,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Admin\PersonnelUser\UserAccess;
 use App\Entity\Admin\AgenceService\AgenceServiceIrium;
 use App\Entity\Admin\AgenceService\Agence;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @Broadcast()
@@ -26,16 +27,19 @@ class Service
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"service:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=10)
+     * @Groups({"service:read"})
      */
     private $code;
 
     /**
      * @ORM\Column(type="string", length=100)
+     * @Groups({"service:read"})
      */
     private $nom;
 
