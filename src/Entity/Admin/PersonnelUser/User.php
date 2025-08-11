@@ -336,16 +336,37 @@ class User implements UserInterface
     {
         $personnel = $this->getPersonnel();
         if ($personnel === null) {
+            // Fallback: tenter via UserAccess
+            foreach ($this->getUserAccesses() as $userAccess) {
+                $agence = $userAccess->getAgence();
+                if ($agence !== null) {
+                    return sprintf('%s - %s', $agence->getCode(), $agence->getNom());
+                }
+            }
             return null;
         }
 
         $agenceServiceIrium = $personnel->getAgenceServiceIrium();
         if ($agenceServiceIrium === null) {
+            // Fallback: tenter via UserAccess
+            foreach ($this->getUserAccesses() as $userAccess) {
+                $agence = $userAccess->getAgence();
+                if ($agence !== null) {
+                    return sprintf('%s - %s', $agence->getCode(), $agence->getNom());
+                }
+            }
             return null;
         }
 
         $agence = $agenceServiceIrium->getAgence();
         if ($agence === null) {
+            // Fallback: tenter via UserAccess
+            foreach ($this->getUserAccesses() as $userAccess) {
+                $fallbackAgence = $userAccess->getAgence();
+                if ($fallbackAgence !== null) {
+                    return sprintf('%s - %s', $fallbackAgence->getCode(), $fallbackAgence->getNom());
+                }
+            }
             return null;
         }
 
@@ -358,16 +379,37 @@ class User implements UserInterface
     {
         $personnel = $this->getPersonnel();
         if ($personnel === null) {
+            // Fallback: tenter via UserAccess
+            foreach ($this->getUserAccesses() as $userAccess) {
+                $service = $userAccess->getService();
+                if ($service !== null) {
+                    return sprintf('%s - %s', $service->getCode(), $service->getNom());
+                }
+            }
             return null;
         }
 
         $agenceServiceIrium = $personnel->getAgenceServiceIrium();
         if ($agenceServiceIrium === null) {
+            // Fallback: tenter via UserAccess
+            foreach ($this->getUserAccesses() as $userAccess) {
+                $service = $userAccess->getService();
+                if ($service !== null) {
+                    return sprintf('%s - %s', $service->getCode(), $service->getNom());
+                }
+            }
             return null;
         }
 
         $service = $agenceServiceIrium->getService();
         if ($service === null) {
+            // Fallback: tenter via UserAccess
+            foreach ($this->getUserAccesses() as $userAccess) {
+                $fallbackService = $userAccess->getService();
+                if ($fallbackService !== null) {
+                    return sprintf('%s - %s', $fallbackService->getCode(), $fallbackService->getNom());
+                }
+            }
             return null;
         }
 
