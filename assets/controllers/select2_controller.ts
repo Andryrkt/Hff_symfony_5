@@ -1,4 +1,4 @@
-import { Controller } from "stimulus";
+import { Controller } from "@hotwired/stimulus";
 import $ from "jquery";
 
 export default class extends Controller {
@@ -7,8 +7,8 @@ export default class extends Controller {
       theme: "bootstrap5",
       width: "100%",
       placeholder:
-        this.element.dataset.placeholder || "Sélectionnez une option",
-      allowClear: Boolean(this.element.dataset.allowClear),
+        (this.element as HTMLElement).dataset.placeholder || "Sélectionnez une option",
+      allowClear: Boolean((this.element as HTMLElement).dataset.allowClear),
     });
 
     // Gestion de la destruction propre

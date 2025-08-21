@@ -13,11 +13,17 @@ use App\Entity\Admin\PersonnelUser\UserAccess;
 use App\Entity\Admin\AgenceService\AgenceServiceIrium;
 use App\Entity\Admin\AgenceService\Agence;
 use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Annotation\ApiResource;
 
 /**
  * @Broadcast()
  * @ORM\Entity(repositoryClass=ServiceRepository::class)
  * @ORM\HasLifecycleCallbacks
+ * @ApiResource(
+ *     collectionOperations={"get"},
+ *     itemOperations={"get"},
+ *     normalizationContext={"groups"={"service:read"}}
+ * )
  */
 class Service
 {

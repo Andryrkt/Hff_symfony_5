@@ -142,21 +142,8 @@ class AgenceApiController extends AbstractController
         return new JsonResponse(['message' => 'Agence supprimée avec succès'], Response::HTTP_OK);
     }
 
-    /**
-     * @Route("/{id}/services", name="services", methods={"GET"})
-     */
-    public function getServices(Agence $agence): JsonResponse
-    {
-        $services = $agence->getServices();
-
-        $data = $this->serializer->serialize($services, 'json', [
-            'circular_reference_handler' => function ($object) {
-                return $object->getId();
-            }
-        ]);
-
-        return new JsonResponse($data, Response::HTTP_OK, [], true);
-    }
+    // The GET /api/agences/{id}/services endpoint is now handled by API Platform
+    // via the Agence entity's item operation "get_services".
 
     /**
      * @Route("/{id}/users", name="users", methods={"GET"})

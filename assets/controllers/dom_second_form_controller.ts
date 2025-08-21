@@ -3,6 +3,9 @@ import { Controller } from "@hotwired/stimulus";
 export default class extends Controller {
   static targets = ["agenceServiceSection"];
 
+  // Declare properties for targets
+  agenceServiceSectionTarget!: HTMLElement;
+
   connect() {
     console.log("DOM Form controller connected");
     // Autres initialisations du formulaire principal
@@ -20,7 +23,7 @@ export default class extends Controller {
     // Logique de validation
   }
 
-  onSubmit(event) {
+  onSubmit(event: Event) {
     // Logique de soumission
   }
 }

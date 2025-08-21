@@ -1,4 +1,4 @@
-import { Controller } from "stimulus";
+import { Controller } from "@hotwired/stimulus";
 import $ from "jquery";
 
 export default class extends Controller {
@@ -14,6 +14,21 @@ export default class extends Controller {
     "categorieGroup",
   ];
 
+  // Declare properties for targets
+  salarieTypeTarget!: HTMLSelectElement;
+  nomGroupTarget!: HTMLElement;
+  prenomGroupTarget!: HTMLElement;
+  cinGroupTarget!: HTMLElement;
+  matriculeGroupTarget!: HTMLElement;
+  matriculeNomSelectTarget!: HTMLSelectElement;
+  matriculeInputTarget!: HTMLInputElement;
+  sousTypeDocumentTarget!: HTMLSelectElement;
+  categorieGroupTarget!: HTMLElement;
+  hasMatriculeNomSelectTarget!: boolean;
+  hasMatriculeInputTarget!: boolean;
+  hasCategorieGroupTarget!: boolean;
+
+
   connect() {
     this.initSelect2();
     this.toggleFields();
@@ -23,9 +38,9 @@ export default class extends Controller {
   }
 
   // Debug pour voir si le formulaire se soumet
-  onSubmit(event) {
+  onSubmit(event: Event) {
     console.log("Form submitting...", event);
-    console.log("Form data:", new FormData(event.target));
+    console.log("Form data:", new FormData(event.target as HTMLFormElement));
 
     // Vérifier les champs requis avant soumission
     const requiredFields = this.element.querySelectorAll(
@@ -34,8 +49,8 @@ export default class extends Controller {
     let hasErrors = false;
 
     requiredFields.forEach((field) => {
-      if (!field.value.trim()) {
-        console.error("Required field empty:", field.name || field.id, field);
+      if (!(field as HTMLInputElement).value.trim()) {
+        console.error("Required field empty:", (field as HTMLInputElement).name || field.id, field);
         hasErrors = true;
       }
     });
@@ -57,7 +72,7 @@ export default class extends Controller {
     ];
 
     temporaryGroups.forEach((groupEl) => {
-      const inputEl = groupEl.querySelector("input, select, textarea");
+      const inputEl = groupEl.querySelector("input, select, textarea") as HTMLInputElement;
 
       if (isTemporary) {
         // Montrer et activer les champs temporaires
@@ -86,7 +101,7 @@ export default class extends Controller {
 
       if (this.hasMatriculeNomSelectTarget) {
         // Vider et désélectionner
-        $(this.matriculeNomSelectTarget).val(null).trigger("change");
+        $(this.matriculeNomSelectTarget).val('').trigger("change");
         this.matriculeNomSelectTarget.required = false;
       }
 
@@ -118,7 +133,7 @@ export default class extends Controller {
         placeholder: "-- choisir un personnel --",
         allowClear: true,
       })
-      .on("select2:select", (e) => {
+      .on("select2:select", (e: any) => {
         // Améliorer l'extraction du matricule
         const text = e.params.data.text;
         const matriculeMatch = text.match(/^(\w+)/);
@@ -139,7 +154,7 @@ export default class extends Controller {
       const typeDoc = this.sousTypeDocumentTarget.value;
       const agenceElement = this.element.querySelector(
         '[name*="[agenceEmetteur]"]'
-      );
+      ) as HTMLInputElement;
 
       if (!agenceElement || !agenceElement.value || !typeDoc) {
         console.log("Missing required data for category update");
@@ -174,7 +189,7 @@ export default class extends Controller {
     }
   }
 
-  updateCategorieSelect(categories) {
+  updateCategorieSelect(categories: any[]) {
     if (!this.hasCategorieGroupTarget) return;
 
     const select = this.categorieGroupTarget.querySelector("select");
@@ -190,7 +205,7 @@ export default class extends Controller {
     select.appendChild(defaultOption);
 
     // Ajouter les catégories
-    categories.forEach((cat) => {
+    categories.forEach((cat: any) => {
       const option = document.createElement("option");
       option.value = cat.id;
       option.textContent = cat.description;

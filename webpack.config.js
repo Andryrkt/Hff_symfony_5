@@ -20,10 +20,10 @@ Encore
    * Each entry will result in one JavaScript file (e.g. app.js)
    * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
    */
-  .addEntry("app", "./assets/app.js")
+  .addEntry("app", "./assets/app.ts")
 
   // page login
-  .addEntry("login", "./assets/js/login/login.js") // JS
+  .addEntry("login", "./assets/js/login/login.ts") // JS
   .addStyleEntry("login-style", "./assets/styles/login/login.scss") // CSS
 
   // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
@@ -73,7 +73,7 @@ Encore
   .enableSassLoader()
 
   // uncomment if you use TypeScript
-  //.enableTypeScriptLoader()
+  .enableTypeScriptLoader()
 
   // uncomment if you use React
   //.enableReactPreset()
