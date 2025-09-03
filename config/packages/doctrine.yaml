@@ -5,10 +5,21 @@ doctrine:
         server_version: '15.0'
         charset: UTF-8
         use_savepoints: true
+        # Optimisations de performance
+        options:
+            1002: "SET NAMES utf8"
+            1003: 1
+        # Pool de connexions
+        connections:
+            default:
+                server_version: '15.0'
+                charset: UTF-8
     orm:
         auto_generate_proxy_classes: false
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         auto_mapping: true
+        # Optimisations de performance
+        enable_lazy_ghost_objects: true
         mappings:
             App:
                 is_bundle: false

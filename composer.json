@@ -57,6 +57,8 @@
             "symfony/runtime": true
         },
         "optimize-autoloader": true,
+        "classmap-authoritative": true,
+        "apcu-autoloader": true,
         "preferred-install": {
             "*": "dist"
         },

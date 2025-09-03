@@ -1,0 +1,36 @@
+# Configuration optimisée pour la production
+framework:
+    # Désactiver le debug
+    secret: '%env(APP_SECRET)%'
+    
+    # Optimisations de session
+    session:
+        handler_id: null
+        cookie_secure: true
+        cookie_samesite: strict
+        storage_factory_id: session.storage.factory.native
+        # Cache des sessions
+        gc_probability: 1
+        gc_divisor: 1000
+        gc_maxlifetime: 1440
+    
+    # Cache agressif
+    cache:
+        app: cache.adapter.filesystem
+        system: cache.adapter.system
+        pools:
+            # Cache pour les requêtes Doctrine
+            doctrine.query_cache:
+                adapter: cache.app
+            doctrine.result_cache:
+                adapter: cache.app
+            # Cache pour les sessions
+            session_cache:
+                adapter: cache.app
+    
+    # Optimisations HTTP
+    http_method_override: false
+    
+    # Désactiver les erreurs PHP en production
+    php_errors:
+        log: true

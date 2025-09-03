@@ -1,7 +1,22 @@
 twig:
     default_path: '%kernel.project_dir%/templates'
     form_themes: ['bootstrap_5_layout.html.twig']
+    # Optimisations de performance
+    auto_reload: '%kernel.debug%'
+    cache: '%kernel.cache_dir%/twig'
+    # Compilation optimisée
+    autoescape: 'html'
+    # Optimisations pour la production
+    strict_variables: false
 
 when@test:
     twig:
         strict_variables: true
+
+when@prod:
+    twig:
+        # Désactiver le debug en production
+        debug: false
+        strict_variables: false
+        # Cache agressif en production
+        cache: '%kernel.cache_dir%/twig'

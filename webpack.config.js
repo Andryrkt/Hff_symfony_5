@@ -49,16 +49,21 @@ Encore
   // enables hashed filenames (e.g. app.abc123.css)
   .enableVersioning(Encore.isProduction())
 
-  // configure Babel
-  // .configureBabel((config) => {
-  //     config.plugins.push('@babel/a-babel-plugin');
-  // })
+  // configure Babel for better performance
+  .configureBabel((config) => {
+    if (Encore.isProduction()) {
+      config.plugins.push('@babel/plugin-transform-runtime');
+    }
+  })
 
   // enables and configure @babel/preset-env polyfills
-  // .configureBabelPresetEnv((config) => {
-  //   config.useBuiltIns = "usage";
-  //   config.corejs = "3.23";
-  // })
+  .configureBabelPresetEnv((config) => {
+    config.useBuiltIns = "usage";
+    config.corejs = "3.41";
+    config.targets = {
+      browsers: ['> 1%', 'last 2 versions', 'not dead']
+    };
+  })
   //pour copier les fichiers images
   .copyFiles({
     from: "./assets/images",
