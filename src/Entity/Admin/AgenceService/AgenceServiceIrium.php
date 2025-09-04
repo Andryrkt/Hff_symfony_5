@@ -30,12 +30,12 @@ class AgenceServiceIrium
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Agence::class, inversedBy="agenceServices")
+     * @ORM\ManyToOne(targetEntity=Agence::class, inversedBy="agenceServiceIriums")
      */
     private $agence;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Service::class, inversedBy="agenceServices")
+     * @ORM\ManyToOne(targetEntity=Service::class, inversedBy="agenceServiceIriums")
      */
     private $service;
 

@@ -237,7 +237,7 @@ class Service
     {
         if (!$this->domDebiteur->contains($domDebiteur)) {
             $this->domDebiteur[] = $domDebiteur;
-            $domDebiteur->setServiceEmetteurId($this);
+            $domDebiteur->setServiceDebiteurId($this);
         }
 
         return $this;
@@ -247,8 +247,8 @@ class Service
     {
         if ($this->domDebiteur->removeElement($domDebiteur)) {
             // set the owning side to null (unless already changed)
-            if ($domDebiteur->getServiceEmetteurId() === $this) {
-                $domDebiteur->setServiceEmetteurId(null);
+            if ($domDebiteur->getServiceDebiteurId() === $this) {
+                $domDebiteur->setServiceDebiteurId(null);
             }
         }
 

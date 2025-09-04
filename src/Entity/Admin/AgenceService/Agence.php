@@ -260,7 +260,7 @@ class Agence
     {
         if (!$this->domDebiteur->contains($domDebiteur)) {
             $this->domDebiteur[] = $domDebiteur;
-            $domDebiteur->setAgenceEmetteurId($this);
+            $domDebiteur->setAgenceDebiteurId($this);
         }
 
         return $this;
@@ -270,8 +270,8 @@ class Agence
     {
         if ($this->domDebiteur->removeElement($domDebiteur)) {
             // set the owning side to null (unless already changed)
-            if ($domDebiteur->getAgenceEmetteurId() === $this) {
-                $domDebiteur->setAgenceEmetteurId(null);
+            if ($domDebiteur->getAgenceDebiteurId() === $this) {
+                $domDebiteur->setAgenceDebiteurId(null);
             }
         }
 

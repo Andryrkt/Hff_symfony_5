@@ -86,6 +86,9 @@
         },
         "post-install-cmd": [
             "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
         ]
     },
     "conflict": {
@@ -98,6 +101,7 @@
         }
     },
     "require-dev": {
+        "myclabs/deep-copy": "^1.13",
         "phpunit/phpunit": "^9.6",
         "symfony/browser-kit": "5.4.*",
         "symfony/css-selector": "5.4.*",
