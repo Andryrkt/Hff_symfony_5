@@ -180,4 +180,23 @@ temp/
 ###> Scripts personnalisés ###
 # Garder les scripts d'optimisation mais ignorer les logs
 scripts/*.log
+# Ignorer les fichiers temporaires des scripts
+scripts/tmp/
+scripts/temp/
 ###< Scripts personnalisés ###
+
+###> Tests ###
+# Fichiers de test temporaires
+tests/tmp/
+tests/temp/
+tests/*.log
+# Couverture de code
+tests/coverage/
+###< Tests ###
+
+###> Documentation ###
+# Fichiers de documentation générés
+docs/build/
+docs/_build/
+docs/*.log
+###< Documentation ###

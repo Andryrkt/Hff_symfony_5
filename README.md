@@ -87,7 +87,11 @@ npm run build
 | config/     | Fichiers de configuration                     |
 | migrations/ | Fichiers de migration                         |
 | tests/      | Tests automatisés                             |
-| assers/     | Fichiers (css, js, images)                    |
+| assets/     | Fichiers frontend (css, js, images)           |
+| docs/       | Documentation du projet                       |
+| scripts/    | Scripts utilitaires                           |
+
+> 📋 **Voir la structure détaillée** : [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md)
 
 ## 🔐 Authentification et sécurité
 
