@@ -1,0 +1,86 @@
+# Configuration Git pour optimiser le traitement des fichiers
+
+# Fichiers texte avec fin de ligne LF
+*.php text eol=lf
+*.js text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.xml text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf
+
+# Fichiers binaires
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pdf binary
+*.zip binary
+*.tar.gz binary
+*.rar binary
+
+# Fichiers de configuration
+.env export-ignore
+.env.local export-ignore
+.env.local.php export-ignore
+.env.*.local export-ignore
+
+# Dossiers à ignorer lors des exports
+/vendor/ export-ignore
+/node_modules/ export-ignore
+/var/ export-ignore
+/public/build/ export-ignore
+/.git/ export-ignore
+
+# Fichiers de développement
+.phpunit.result.cache export-ignore
+/coverage/ export-ignore
+/.phpunit.cache export-ignore
+
+# Fichiers IDE
+.vscode/ export-ignore
+.idea/ export-ignore
+*.sublime-* export-ignore
+
+# Fichiers système
+Thumbs.db export-ignore
+.DS_Store export-ignore
+Desktop.ini export-ignore
+
+# Fichiers de logs
+*.log export-ignore
+/logs/ export-ignore
+
+# Fichiers temporaires
+/tmp/ export-ignore
+/temp/ export-ignore
+/cache/ export-ignore
+
+# Fichiers de base de données
+*.sqlite export-ignore
+*.sqlite3 export-ignore
+*.db export-ignore
+
+# Fichiers de backup
+*.bak export-ignore
+*.backup export-ignore
+*.old export-ignore
+*.orig export-ignore
+
+# Fichiers de sécurité
+*.pem export-ignore
+*.key export-ignore
+*.crt export-ignore
+*.p12 export-ignore
+*.pfx export-ignore

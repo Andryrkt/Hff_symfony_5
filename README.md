@@ -28,15 +28,53 @@ Application Symfony 5 permettant de faire une dématérialisation .
 ## 🛠️ Installation
 
 ```bash
+# 1. Cloner le projet
 git clone https://github.com/Andryrkt/Hff_symfony_5.git
 cd Hff_symfony_5
+
+# 2. Installer les dépendances
 composer install
-yarn install ou npm install
-cp .env .env.local
-# Modifier .env.local avec vos infos
+npm install
+
+# 3. Configurer l'environnement
+cp .env.example .env
+# Modifier .env avec vos vraies valeurs (voir docs/ENVIRONMENT_SETUP.md)
+
+# 4. Initialiser la base de données
 php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate
+
+# 5. Compiler les assets
+npm run build
+
+# 6. Démarrer le serveur
 symfony server:start
+```
+
+## 🧹 Nettoyage Git
+
+Pour nettoyer les fichiers qui ne devraient pas être versionnés :
+
+```bash
+# Exécuter le script de nettoyage
+./scripts/clean-git.sh
+
+# Ou manuellement
+git rm --cached .env
+git rm -r --cached var/ vendor/ node_modules/
+```
+
+## 🚀 Optimisation des performances
+
+```bash
+# Script d'optimisation complet
+./scripts/optimize-gitbash.sh
+
+# Ou commandes manuelles
+composer install --no-dev --optimize-autoloader --classmap-authoritative
+php bin/console cache:clear --env=prod --no-debug
+php bin/console cache:warmup --env=prod
+npm run build
 ```
 
 ## 🗂️ Structure du projet
