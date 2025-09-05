@@ -68,6 +68,13 @@ class DomFirstFormType extends AbstractType
                 'query_builder' => $this->findAllowedTypesQueryBuilder(),
                 'placeholder' => 'Sélectionnez un type de mission',
             ])
+            ->add('categorie', EntityType::class, [
+                'label' => 'Catégorie',
+                'class' => DomCategorie::class,
+                'choice_label' => 'description',
+                'choices' => [],
+                'placeholder' => 'Sélectionnez d\'abord un type de mission',
+            ])
             ->add('salarie', ChoiceType::class, [
                 'mapped' => false,
                 'label' => 'Salarié',
@@ -93,47 +100,8 @@ class DomFirstFormType extends AbstractType
                 'required' => true,
             ]);
 
+        $this->addMatriculeNomField($builder, $this->security->getUser());
         $this->setupEventListeners($builder);
-    }
-
-    private function setupEventListeners(FormBuilderInterface $builder): void
-    {
-        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
-            $form = $event->getForm();
-            $data = $event->getData();
-            /** @var User */
-            $user = $this->security->getUser();
-
-            if (!$user) {
-                return;
-            }
-
-            $this->addMatriculeNomField($form, $user);
-
-            if ($data->sousTypeDocument) {
-                $this->addCategorieField($form, $data->sousTypeDocument, $user->getAgenceEmetteur());
-            }
-        });
-
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
-            $form = $event->getForm();
-            $data = $event->getData();
-            $user = $this->security->getUser();
-
-            if (!$user) {
-                return;
-            }
-
-            $this->addMatriculeNomField($form, $user);
-
-            if (isset($data['sousTypeDocument']) && isset($data['agenceEmetteur'])) {
-                $sousTypeDocument = $this->entityManager
-                    ->getRepository(DomSousTypeDocument::class)
-                    ->find($data['sousTypeDocument']);
-
-                $this->addCategorieField($form, $sousTypeDocument, $data['agenceEmetteur']);
-            }
-        });
     }
 
     private function addMatriculeNomField($form, $user): void
@@ -151,7 +119,14 @@ class DomFirstFormType extends AbstractType
             ),
             'required' => true,
             'query_builder' => function (PersonnelRepository $personnelRepository) use ($user) {
-                $accesses = $this->userAccessRepository->findBy(['users' => $user]);
+                // Optimisation : charger les accès en une seule requête avec jointures
+                $accesses = $this->userAccessRepository->createQueryBuilder('ua')
+                    ->leftJoin('ua.agence', 'a')
+                    ->leftJoin('ua.service', 's')
+                    ->where('ua.users = :user')
+                    ->setParameter('user', $user)
+                    ->getQuery()
+                    ->getResult();
 
                 $qb = $personnelRepository->createQueryBuilder('p');
 
@@ -186,28 +161,48 @@ class DomFirstFormType extends AbstractType
         ]);
     }
 
+    private function setupEventListeners(FormBuilderInterface $builder): void
+    {
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            $form = $event->getForm();
+            $data = $event->getData();
+
+            if (isset($data['sousTypeDocument']) && isset($data['emetteur']['agenceEmetteur'])) {
+                $sousTypeDocument = $this->entityManager
+                    ->getRepository(DomSousTypeDocument::class)
+                    ->find($data['sousTypeDocument']);
+
+                $this->addCategorieField($form, $sousTypeDocument, $data['emetteur']['agenceEmetteur']);
+            }
+        });
+    }
+
     private function addCategorieField($form, ?DomSousTypeDocument $sousTypeDocument, ?string $agenceEmetteur): void
     {
-        $rmqDescription = str_starts_with($agenceEmetteur, '50') ? DomRmq::DESCRIPTION_50 : DomRmq::DESCRIPTION_STD;
-        $rmq = $this->entityManager->getRepository(DomRmq::class)->findOneBy(['description' => $rmqDescription]);
-
-        if (!$sousTypeDocument || !$rmq) {
+        if (!$sousTypeDocument || !$agenceEmetteur) {
             return;
         }
 
-        $criteria = [
-            'sousTypeDoc' => $sousTypeDocument,
-            'rmq' => $rmq,
-        ];
-        $categories = $this->entityManager->getRepository(DomIndemnite::class)
-            ->findDistinctCategoriesByCriteria($criteria);
+        $rmqDescription = str_starts_with($agenceEmetteur, '50') ? DomRmq::DESCRIPTION_50 : DomRmq::DESCRIPTION_STD;
+
+        $categories = $this->entityManager->createQueryBuilder()
+            ->select('DISTINCT c')
+            ->from(DomCategorie::class, 'c')
+            ->join('c.domIndemnites', 'i')
+            ->join('i.domRmqId', 'r')
+            ->where('i.domSousTypeDocumentId = :sousTypeDoc')
+            ->andWhere('r.description = :rmqDescription')
+            ->setParameter('sousTypeDoc', $sousTypeDocument)
+            ->setParameter('rmqDescription', $rmqDescription)
+            ->getQuery()
+            ->getResult();
 
         $form->add('categorie', EntityType::class, [
             'label' => 'Catégorie',
             'class' => DomCategorie::class,
             'choice_label' => 'description',
             'choices' => $categories,
-            'placeholder' => false,
+            'placeholder' => 'Sélectionnez une catégorie',
         ]);
     }
 

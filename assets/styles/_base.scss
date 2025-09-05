@@ -1,23 +1,48 @@
-/* ===== BASE STYLES ===== */
-/* Optionnel : si vous n'utilisez pas Bootstrap */
+/* ========================================================================= */
+/* GENERALES */
+/* ========================================================================= */
+
+@media print {
+
+  html,
+  body {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  #fil-d-ariane {
+    position: sticky !important;
+  }
+}
+
+html {
+  height: 100%;
+  overflow-y: scroll;
+}
+
 body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    background-color: var(--light-bg);
+  overflow-x: hidden;
+  background-color: #f8f9fa;
   font-family: "Noto Sans Nandinagari", sans-serif;
-  font-size: var(--base-font-size);
+  font-size: 0.6875rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 main {
-    flex: 1; /* Prend tout l'espace disponible */
+  flex: 1;
 }
 
-/* Style de base pour le footer */
-.footer {
-    // background: #f8f9fa;
-    padding: 20px 0;
-    margin-top: auto; /* S'assure qu'il reste en bas */
+.main-content {
+  min-height: 90%;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  flex: 1;
 }
 
 a,
@@ -26,7 +51,7 @@ input,
 button,
 textarea,
 span {
-  font-size: var(--base-font-size) !important;
+  font-size: 0.6875rem !important;
 }
 
 nav {
@@ -44,4 +69,104 @@ h3 {
 label {
   font-weight: bold;
   margin-top: 5px;
+}
+
+.color {
+  background-color: #fbbb01;
+}
+
+.perso-titre {
+  color: white;
+  background-color: #212529;
+  font-size: 1rem;
+  text-align: center;
+  padding: 10px;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+/* ========================================================================= */
+/* LOADING OVERLAY */
+/* ========================================================================= */
+
+#loading-overlays {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.spinner-overlay {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #fbbb01;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.text-overlay {
+  position: absolute;
+  top: 60%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* ========================================================================= */
+/* BREADCRUMB */
+/* ========================================================================= */
+
+#fil-d-ariane {
+  background-color: #f8f9fa;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #dee2e6;
+  margin-bottom: 1rem;
+}
+
+.breadcrumb {
+  margin-bottom: 0;
+  background-color: transparent;
+  padding: 0;
+}
+
+.breadcrumb-item {
+  font-size: 0.8rem;
+}
+
+.breadcrumb-item a {
+  color: #6c757d;
+  text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+  color: #fbbb01;
+}
+
+.breadcrumb-item.active {
+  color: #495057;
+  font-weight: 500;
+}
+
+/* Style de base pour le footer */
+.footer {
+  padding: 20px 0;
+  margin-top: auto;
 }

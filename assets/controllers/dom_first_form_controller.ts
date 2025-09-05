@@ -11,7 +11,7 @@ export default class extends Controller {
     "matriculeNomSelect",
     "matriculeInput",
     "sousTypeDocument",
-    "categorieGroup",
+    "categorie",
   ];
 
   // Declare properties for targets
@@ -23,10 +23,10 @@ export default class extends Controller {
   matriculeNomSelectTarget!: HTMLSelectElement;
   matriculeInputTarget!: HTMLInputElement;
   sousTypeDocumentTarget!: HTMLSelectElement;
-  categorieGroupTarget!: HTMLElement;
+  categorieTarget!: HTMLSelectElement;
   hasMatriculeNomSelectTarget!: boolean;
   hasMatriculeInputTarget!: boolean;
-  hasCategorieGroupTarget!: boolean;
+  hasCategorieTarget!: boolean;
 
 
   connect() {
@@ -35,6 +35,8 @@ export default class extends Controller {
 
     // Ajouter un listener pour debug
     this.element.addEventListener("submit", this.onSubmit.bind(this));
+    this.updateCategorie();
+    this.toggleCategorie();
   }
 
   // Debug pour voir si le formulaire se soumet
@@ -148,52 +150,83 @@ export default class extends Controller {
       });
   }
 
-  // Gestion dynamique de la catégorie
+  // Gestion dynamique de la catégorie avec cache côté client
+  private categoryCache = new Map<string, any[]>();
+  private debounceTimer: number | null = null;
+
   async updateCategorie() {
-    try {
-      const typeDoc = this.sousTypeDocumentTarget.value;
-      const agenceElement = this.element.querySelector(
-        '[name*="[agenceEmetteur]"]'
-      ) as HTMLInputElement;
-
-      if (!agenceElement || !agenceElement.value || !typeDoc) {
-        console.log("Missing required data for category update");
-        this.hideCategorieSelect();
-        return;
-      }
-
-      const agence = agenceElement.value;
-
-      console.log("Fetching categories for:", { typeDoc, agence });
-
-      const response = await fetch(
-        `/dom/categories?typeDoc=${encodeURIComponent(
-          typeDoc
-        )}&agence=${encodeURIComponent(agence)}`
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      this.updateCategorieSelect(data);
-    } catch (error) {
-      console.error("Error updating categories:", error);
-      this.hideCategorieSelect();
+    console.log("updateCategorie called");
+    // Debounce pour éviter les appels multiples
+    if (this.debounceTimer) {
+      clearTimeout(this.debounceTimer);
     }
+
+    this.debounceTimer = window.setTimeout(async () => {
+      try {
+        const typeDoc = this.sousTypeDocumentTarget.value;
+        const agenceElement = this.element.querySelector(
+          '[name*="agenceEmetteur"]'
+        ) as HTMLInputElement;
+        console.log("typeDoc:", typeDoc);
+        console.log("agenceElement:", agenceElement);
+
+        if (!agenceElement || !agenceElement.value || !typeDoc) {
+          this.hideCategorieSelect();
+          return;
+        }
+
+        const agence = agenceElement.value;
+        const cacheKey = `${typeDoc}_${agence}`;
+        console.log("agence:", agence);
+
+        // Vérifier le cache côté client
+        if (this.categoryCache.has(cacheKey)) {
+          this.updateCategorieSelect(this.categoryCache.get(cacheKey)!);
+          return;
+        }
+
+        const url = `${window.location.protocol}//${window.location.host}/dom/categories?typeDoc=${encodeURIComponent(
+          typeDoc
+        )}&agence=${encodeURIComponent(agence)}`;
+
+        console.log("url:", url);
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/json'
+          },
+          credentials: 'same-origin'
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        console.log("data:", data);
+
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        // Mettre en cache les résultats
+        this.categoryCache.set(cacheKey, data);
+        this.updateCategorieSelect(data);
+      } catch (error) {
+        console.error("Error updating categories:", error);
+        this.hideCategorieSelect();
+      }
+    }, 300); // Debounce de 300ms
   }
 
   updateCategorieSelect(categories: any[]) {
-    if (!this.hasCategorieGroupTarget) return;
+    if (!this.hasCategorieTarget) {
+      return;
+    }
 
-    const select = this.categorieGroupTarget.querySelector("select");
-    if (!select) return;
+    const select = this.categorieTarget;
 
     // Vider les options existantes
     select.innerHTML = "";
@@ -214,21 +247,31 @@ export default class extends Controller {
 
     // Montrer le groupe si il y a des catégories
     if (categories.length > 0) {
-      this.categorieGroupTarget.style.display = "block";
-      select.required = true;
+      select.disabled = false;
     } else {
       this.hideCategorieSelect();
     }
   }
 
   hideCategorieSelect() {
-    if (this.hasCategorieGroupTarget) {
-      this.categorieGroupTarget.style.display = "none";
-      const select = this.categorieGroupTarget.querySelector("select");
-      if (select) {
-        select.required = false;
-        select.value = "";
+    if (this.hasCategorieTarget) {
+      const select = this.categorieTarget;
+      select.required = false;
+      select.value = "";
+      select.disabled = true;
+    }
+  }
+
+  toggleCategorie() {
+    if (this.sousTypeDocumentTarget.selectedOptions.length > 0) {
+      const selectedOption = this.sousTypeDocumentTarget.selectedOptions[0];
+      if (selectedOption.text === 'MISSION') {
+        (this.categorieTarget.closest('.row') as HTMLElement).style.display = 'block';
+      } else {
+        (this.categorieTarget.closest('.row') as HTMLElement).style.display = 'none';
       }
+    } else {
+      (this.categorieTarget.closest('.row') as HTMLElement).style.display = 'none';
     }
   }
 }

@@ -26,6 +26,9 @@ Encore
   .addEntry("login", "./assets/js/login/login.ts") // JS
   .addStyleEntry("login-style", "./assets/styles/login/login.scss") // CSS
 
+  // page accueil
+  .addEntry("accueil", "./assets/js/accueil.js") // JS
+
   // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
   .enableStimulusBridge("./assets/controllers.json")
 
@@ -49,21 +52,7 @@ Encore
   // enables hashed filenames (e.g. app.abc123.css)
   .enableVersioning(Encore.isProduction())
 
-  // configure Babel for better performance
-  .configureBabel((config) => {
-    if (Encore.isProduction()) {
-      config.plugins.push('@babel/plugin-transform-runtime');
-    }
-  })
-
-  // enables and configure @babel/preset-env polyfills
-  .configureBabelPresetEnv((config) => {
-    config.useBuiltIns = "usage";
-    config.corejs = "3.41";
-    config.targets = {
-      browsers: ['> 1%', 'last 2 versions', 'not dead']
-    };
-  })
+  // Babel configuration is handled by babel.config.js
   //pour copier les fichiers images
   .copyFiles({
     from: "./assets/images",

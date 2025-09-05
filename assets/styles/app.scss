@@ -2,9 +2,13 @@
 @use "base";
 @use "components/title";
 @use "components/select2";
+@use "components/navigation";
+@use "components/chronometer";
+@use "components/sidebar";
+@use "components/dropdown-grid";
+@use "accueil";
 
 /* ===== IMPORTS ===== */
 @import "~bootstrap/dist/css/bootstrap.min.css";
 @import "~select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css";
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Nandinagari&display=swap");
-

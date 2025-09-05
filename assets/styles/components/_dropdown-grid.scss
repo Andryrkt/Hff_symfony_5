@@ -1,0 +1,54 @@
+// Styles pour les dropdowns en grille comme dans l'original
+.dropdown-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--col-count, 1), 1fr);
+    gap: 1rem;
+}
+
+.dropdown-column {
+    min-width: 200px;
+}
+
+.dropdown-line {
+    margin-bottom: 1rem;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.dropdown-header {
+    font-weight: 600;
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    padding: 0.25rem 0;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.dropdown-item {
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    transition: all 0.15s ease-in-out;
+
+    &:hover {
+        background-color: #f8f9fa;
+        color: #495057;
+    }
+
+    i {
+        width: 16px;
+        text-align: center;
+    }
+}
+
+// Responsive pour les dropdowns
+@media (max-width: 768px) {
+    .dropdown-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dropdown-column {
+        min-width: auto;
+    }
+}

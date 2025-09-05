@@ -8,6 +8,7 @@ import { Application } from "stimulus";
 import HelloController from "./controllers/hello_controller";
 import ModalController from "./controllers/modal_controller";
 import DomFirstFormController from "./controllers/dom_first_form_controller";
+import NavigationController from "./controllers/navigation_controller";
 // imporation du bibliothèque bootstrap
 import "bootstrap";
 
@@ -26,7 +27,28 @@ import "select2";
 import "select2/dist/css/select2.css";
 import "select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css";
 
+// Import des utilitaires de navigation
+import { ChronometerManager } from "./js/utils/chronometer";
+import { SessionManager } from "./js/utils/session";
+import { ToastManager } from "./js/utils/toast";
+
 const application = Application.start();
 application.register("hello", HelloController);
 application.register("modal", ModalController); //modal controller stimulus
 application.register("dom-first-form", DomFirstFormController);
+application.register("navigation", NavigationController);
+
+// Initialisation des gestionnaires de navigation
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialiser le chronomètre de session
+    const chronometer = new ChronometerManager();
+    chronometer.init();
+
+    // Initialiser la gestion de session
+    const sessionManager = new SessionManager();
+    sessionManager.init();
+
+    // Initialiser les notifications toast
+    const toastManager = new ToastManager();
+    toastManager.init();
+});
