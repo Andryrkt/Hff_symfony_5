@@ -2,7 +2,6 @@
 
 namespace App\Entity\Admin\PersonnelUser;
 
-use App\Entity\Dom\DemandeOrdreMission;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -49,10 +48,6 @@ class Personnel
      */
     private $users;
 
-    /**
-     * @ORM\OneToMany(targetEntity=DemandeOrdreMission::class, mappedBy="domPersonnel")
-     */
-    private $demandeOrdreMissions;
 
     /**
      * @ORM\Column(type="integer", nullable=true)
@@ -61,7 +56,6 @@ class Personnel
 
     public function __construct()
     {
-        $this->demandeOrdreMissions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -127,35 +121,6 @@ class Personnel
         return $this;
     }
 
-    /**
-     * @return Collection<int, DemandeOrdreMission>
-     */
-    public function getDemandeOrdreMissions(): Collection
-    {
-        return $this->demandeOrdreMissions;
-    }
-
-    public function addDemandeOrdreMission(DemandeOrdreMission $demandeOrdreMission): self
-    {
-        if (!$this->demandeOrdreMissions->contains($demandeOrdreMission)) {
-            $this->demandeOrdreMissions[] = $demandeOrdreMission;
-            $demandeOrdreMission->setDomPersonnel($this);
-        }
-
-        return $this;
-    }
-
-    public function removeDemandeOrdreMission(DemandeOrdreMission $demandeOrdreMission): self
-    {
-        if ($this->demandeOrdreMissions->removeElement($demandeOrdreMission)) {
-            // set the owning side to null (unless already changed)
-            if ($demandeOrdreMission->getDomPersonnel() === $this) {
-                $demandeOrdreMission->setDomPersonnel(null);
-            }
-        }
-
-        return $this;
-    }
 
     public function getMatricule(): ?int
     {

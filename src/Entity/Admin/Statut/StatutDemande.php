@@ -2,7 +2,6 @@
 
 namespace App\Entity\Admin\Statut;
 
-use App\Entity\Dom\DemandeOrdreMission;
 use App\Entity\Traits\TimestampableTrait;
 use App\Repository\Admin\Statut\StatutDemandeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -39,14 +38,9 @@ class StatutDemande
      */
     private $description;
 
-    /**
-     * @ORM\OneToMany(targetEntity=DemandeOrdreMission::class, mappedBy="statutDemande_id")
-     */
-    private $demandeOrdreMissions;
 
     public function __construct()
     {
-        $this->demandeOrdreMissions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -90,33 +84,4 @@ class StatutDemande
         return $this;
     }
 
-    /**
-     * @return Collection<int, DemandeOrdreMission>
-     */
-    public function getDemandeOrdreMissions(): Collection
-    {
-        return $this->demandeOrdreMissions;
-    }
-
-    public function addDemandeOrdreMission(DemandeOrdreMission $demandeOrdreMission): self
-    {
-        if (!$this->demandeOrdreMissions->contains($demandeOrdreMission)) {
-            $this->demandeOrdreMissions[] = $demandeOrdreMission;
-            $demandeOrdreMission->setStatutDemandeId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeDemandeOrdreMission(DemandeOrdreMission $demandeOrdreMission): self
-    {
-        if ($this->demandeOrdreMissions->removeElement($demandeOrdreMission)) {
-            // set the owning side to null (unless already changed)
-            if ($demandeOrdreMission->getStatutDemandeId() === $this) {
-                $demandeOrdreMission->setStatutDemandeId(null);
-            }
-        }
-
-        return $this;
-    }
 }

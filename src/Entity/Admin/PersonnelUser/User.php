@@ -2,7 +2,6 @@
 
 namespace App\Entity\Admin\PersonnelUser;
 
-use App\Entity\Dom\DemandeOrdreMission;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Traits\TimestampableTrait;
 use Doctrine\Common\Collections\Collection;
@@ -81,16 +80,11 @@ class User implements UserInterface
      */
     private $groups;
 
-    /**
-     * @ORM\OneToMany(targetEntity=DemandeOrdreMission::class, mappedBy="domDemandeur")
-     */
-    private $demandeOrdreMissions;
 
     public function __construct()
     {
         $this->userAccesses = new ArrayCollection();
         $this->groups = new ArrayCollection();
-        $this->demandeOrdreMissions = new ArrayCollection();
     }
 
 
@@ -301,35 +295,6 @@ class User implements UserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, DemandeOrdreMission>
-     */
-    public function getDemandeOrdreMissions(): Collection
-    {
-        return $this->demandeOrdreMissions;
-    }
-
-    public function addDemandeOrdreMission(DemandeOrdreMission $demandeOrdreMission): self
-    {
-        if (!$this->demandeOrdreMissions->contains($demandeOrdreMission)) {
-            $this->demandeOrdreMissions[] = $demandeOrdreMission;
-            $demandeOrdreMission->setDomDemandeur($this);
-        }
-
-        return $this;
-    }
-
-    public function removeDemandeOrdreMission(DemandeOrdreMission $demandeOrdreMission): self
-    {
-        if ($this->demandeOrdreMissions->removeElement($demandeOrdreMission)) {
-            // set the owning side to null (unless already changed)
-            if ($demandeOrdreMission->getDomDemandeur() === $this) {
-                $demandeOrdreMission->setDomDemandeur(null);
-            }
-        }
-
-        return $this;
-    }
 
 
     public function getAgenceEmetteur(): ?string

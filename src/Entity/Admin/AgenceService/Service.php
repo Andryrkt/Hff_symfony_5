@@ -2,7 +2,6 @@
 
 namespace App\Entity\Admin\AgenceService;
 
-use App\Entity\Dom\DemandeOrdreMission;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\Admin\AgenceService\ServiceRepository;
 use App\Entity\Traits\TimestampableTrait;
@@ -64,23 +63,12 @@ class Service
      */
     private $agences;
 
-    /**
-     * @ORM\OneToMany(targetEntity=DemandeOrdreMission::class, mappedBy="serviceEmetteurId")
-     */
-    private $domEmetteur;
-
-    /**
-     * @ORM\OneToMany(targetEntity=DemandeOrdreMission::class, mappedBy="serviceDebiteurId")
-     */
-    private $domDebiteur;
 
     public function __construct()
     {
         $this->agenceServiceIriums = new ArrayCollection();
         $this->userAccesses = new ArrayCollection();
         $this->agences = new ArrayCollection();
-        $this->domEmetteur = new ArrayCollection();
-        $this->domDebiteur = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -194,64 +182,4 @@ class Service
         return $this;
     }
 
-    /**
-     * @return Collection<int, DemandeOrdreMission>
-     */
-    public function getDomEmetteur(): Collection
-    {
-        return $this->domEmetteur;
-    }
-
-    public function addDomEmetteur(DemandeOrdreMission $domEmetteur): self
-    {
-        if (!$this->domEmetteur->contains($domEmetteur)) {
-            $this->domEmetteur[] = $domEmetteur;
-            $domEmetteur->setServiceEmetteurId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeDomEmetteur(DemandeOrdreMission $domEmetteur): self
-    {
-        if ($this->domEmetteur->removeElement($domEmetteur)) {
-            // set the owning side to null (unless already changed)
-            if ($domEmetteur->getServiceEmetteurId() === $this) {
-                $domEmetteur->setServiceEmetteurId(null);
-            }
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * @return Collection<int, DemandeOrdreMission>
-     */
-    public function getDomDebiteur(): Collection
-    {
-        return $this->domDebiteur;
-    }
-
-    public function addDomDebiteur(DemandeOrdreMission $domDebiteur): self
-    {
-        if (!$this->domDebiteur->contains($domDebiteur)) {
-            $this->domDebiteur[] = $domDebiteur;
-            $domDebiteur->setServiceDebiteurId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeDomDebiteur(DemandeOrdreMission $domDebiteur): self
-    {
-        if ($this->domDebiteur->removeElement($domDebiteur)) {
-            // set the owning side to null (unless already changed)
-            if ($domDebiteur->getServiceDebiteurId() === $this) {
-                $domDebiteur->setServiceDebiteurId(null);
-            }
-        }
-
-        return $this;
-    }
 }

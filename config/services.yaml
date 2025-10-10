@@ -58,19 +58,10 @@ services:
   App\Twig\WebpackAssetExtension:
     tags: [ "twig.extension" ]
 
-  # service pour le navigation
-  App\Twig\MenuExtension:
-    arguments:
-    - '@App\Service\Menu\MenuBuilder'
-    tags:
-    - "twig.extension"
 
   App\Service\LdapService:
     arguments:
       $searchDn: "%env(resolve:LDAP_SEARCH_DN)%"
       $searchPassword: "%env(resolve:LDAP_SEARCH_PASSWORD)%"
 
-  # service pour le wizard de création de DOM
-  App\Service\Dom\DomWizardManager:
-    arguments:
-      $session: '@session'
+
