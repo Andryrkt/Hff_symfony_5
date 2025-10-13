@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Service\navigation;
+namespace App\Service\Navigation;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class BreadcrumbBuilderService
+class BreadcrumbBuilder
 {
     private array $items = [];
     private UrlGeneratorInterface $urlGenerator;
@@ -30,5 +30,12 @@ class BreadcrumbBuilderService
     public function get(): array
     {
         return $this->items;
+    }
+
+    public function clear(): self
+    {
+        $this->items = [];
+
+        return $this;
     }
 }

@@ -58,11 +58,7 @@ services:
   App\Twig\WebpackAssetExtension:
     tags: [ "twig.extension" ]
 
-
   App\Service\LdapService:
     arguments:
       $searchDn: "%env(resolve:LDAP_SEARCH_DN)%"
       $searchPassword: "%env(resolve:LDAP_SEARCH_PASSWORD)%"
-
-
-
