@@ -7,7 +7,6 @@
 import { Application } from "stimulus";
 import HelloController from "./controllers/hello_controller";
 import ModalController from "./controllers/modal_controller";
-import DomFirstFormController from "./controllers/dom_first_form_controller";
 import NavigationController from "./controllers/navigation_controller";
 // imporation du bibliothèque bootstrap
 import "bootstrap";
@@ -35,7 +34,6 @@ import { ToastManager } from "./js/utils/toast";
 const application = Application.start();
 application.register("hello", HelloController);
 application.register("modal", ModalController); //modal controller stimulus
-application.register("dom-first-form", DomFirstFormController);
 application.register("navigation", NavigationController);
 
 // Initialisation des gestionnaires de navigation
@@ -52,3 +50,5 @@ document.addEventListener('DOMContentLoaded', function () {
     const toastManager = new ToastManager();
     toastManager.init();
 });
+
+import './styles/home.css';

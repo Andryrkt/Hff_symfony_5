@@ -3,7 +3,10 @@
 {% block title %}Accueil
 {% endblock %}
 
-{% block body %}
+
+{% block content %}
+
+	{% include "home/shared/_card.html.twig" with { cards: cards } %}
 
 	<h1>Bienvenu
 		{{ app.user.username }}

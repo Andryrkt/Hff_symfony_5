@@ -26,6 +26,15 @@ services:
   # add more service definitions when explicit configuration is needed
   # please note that last definitions always *replace* previous ones
 
+  _instanceof:
+    App\Contract\Navigation\BreadcrumbBuilderInterface:
+      tags: ['app.breadcrumb_builder']
+
+  App\Service\Navigation\ContextAwareBreadcrumbBuilder:
+    arguments:
+      - !tagged_iterator app.breadcrumb_builder
+
+
   App\Model\DatabaseInformix:
     arguments:
       $logger: "@logger"
