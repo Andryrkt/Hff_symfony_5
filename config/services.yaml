@@ -65,3 +65,4 @@ services:
       $searchPassword: "%env(resolve:LDAP_SEARCH_PASSWORD)%"
 
 
+
