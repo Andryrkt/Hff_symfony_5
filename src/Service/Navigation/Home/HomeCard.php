@@ -9,8 +9,8 @@ class HomeCard
     private string $title;
     private string $description;
     private string $icon;
-    private string $color = 'primary';
-    private array $links = [];
+    private string $color;
+    private array $links;
 
     public function __construct(
         string $title,
@@ -46,11 +46,5 @@ class HomeCard
     public function getLinks(): array
     {
         return $this->links;
-    }
-
-    public function addLink(string $label, string $route, array $params = [], bool $newTab = false): self
-    {
-        $this->links[] = compact('label', 'route', 'params', 'newTab');
-        return $this;
     }
 }

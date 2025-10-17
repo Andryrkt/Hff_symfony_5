@@ -8,65 +8,82 @@ class HomeCardService
     {
         return [
             // Card Produits
-            (new HomeCard(
+            new HomeCard(
                 'Produits',
                 'Gestion des produits et catalogues',
                 'fas fa-box',
-                'success'
-            ))
-                ->addLink('Liste des produits', 'product_list')
-                ->addLink('Nouveau produit', 'product_new')
-                ->addLink('Catégories', 'category_list')
-                ->addLink('Inventaire', 'inventory_management')
-                ->addLink('Fournisseurs', 'supplier_list', [], true), // Ouvre dans un nouvel onglet
+                'success',
+                [
+                    ['label' => 'Liste des produits', 'route' => 'product_list', 'icon' => 'fas fa-list-ul'],
+                    ['label' => 'Nouveau produit', 'route' => 'product_new', 'icon' => 'fas fa-plus-circle'],
+                    [
+                        'label' => 'Catégories', // Lien parent pour le sous-menu
+                        'icon' => 'fas fa-tags',
+                        'children' => [
+                            ['label' => 'Voir les catégories', 'route' => 'category_list', 'icon' => 'fas fa-search'],
+                            ['label' => 'Ajouter une catégorie', 'route' => 'category_add', 'icon' => 'fas fa-plus'],
+                        ]
+                    ],
+                    ['label' => 'Inventaire', 'route' => 'inventory_management', 'icon' => 'fas fa-clipboard-check'],
+                    ['label' => 'Fournisseurs', 'route' => 'supplier_list', 'newTab' => true, 'icon' => 'fas fa-truck'], // Ouvre dans un nouvel onglet
+                ]
+            ),
 
             // Card Utilisateurs
-            (new HomeCard(
+            new HomeCard(
                 'Utilisateurs',
                 'Gestion des comptes utilisateurs',
                 'fas fa-users',
-                'info'
-            ))
-                ->addLink('Liste des utilisateurs', 'user_list')
-                ->addLink('Créer un utilisateur', 'user_new')
-                ->addLink('Rôles et permissions', 'role_management')
-                ->addLink('Activité récente', 'user_activity'),
+                'info',
+                [
+                    ['label' => 'Liste des utilisateurs', 'route' => 'user_list'],
+                    ['label' => 'Créer un utilisateur', 'route' => 'user_new'],
+                    ['label' => 'Rôles et permissions', 'route' => 'role_management'],
+                    ['label' => 'Activité récente', 'route' => 'user_activity'],
+                ]
+            ),
 
             // Commandes
-            (new HomeCard(
+            new HomeCard(
                 'Commandes',
                 'Suivi et gestion des commandes',
                 'fas fa-shopping-cart',
-                'warning'
-            ))
-                ->addLink('Commandes en cours', 'order_list', ['status' => 'pending'])
-                ->addLink('Commandes terminées', 'order_list', ['status' => 'completed'])
-                ->addLink('Statistiques', 'order_stats')
-                ->addLink('Retours', 'order_returns'),
+                'warning',
+                [
+                    ['label' => 'Commandes en cours', 'route' => 'order_list', 'params' => ['status' => 'pending']],
+                    ['label' => 'Commandes terminées', 'route' => 'order_list', 'params' => ['status' => 'completed']],
+                    ['label' => 'Statistiques', 'route' => 'order_stats'],
+                    ['label' => 'Retours', 'route' => 'order_returns'],
+                ]
+            ),
 
             // Analytics
-            (new HomeCard(
+            new HomeCard(
                 'Analytics',
                 'Statistiques et rapports',
                 'fas fa-chart-bar',
-                'danger'
-            ))
-                ->addLink('Tableau de bord', 'analytics_dashboard')
-                ->addLink('Rapports ventes', 'sales_reports')
-                ->addLink('Performance produits', 'product_performance')
-                ->addLink('Analytics visiteurs', 'visitor_analytics'),
+                'danger',
+                [
+                    ['label' => 'Tableau de bord', 'route' => 'analytics_dashboard'],
+                    ['label' => 'Rapports ventes', 'route' => 'sales_reports'],
+                    ['label' => 'Performance produits', 'route' => 'product_performance'],
+                    ['label' => 'Analytics visiteurs', 'route' => 'visitor_analytics'],
+                ]
+            ),
 
             // Paramètres
-            (new HomeCard(
+            new HomeCard(
                 'Paramètres',
                 'Configuration du système',
                 'fas fa-cogs',
-                'secondary'
-            ))
-                ->addLink('Général', 'settings_general')
-                ->addLink('Notifications', 'settings_notifications')
-                ->addLink('Sécurité', 'settings_security')
-                ->addLink('Backup', 'settings_backup')
+                'secondary',
+                [
+                    ['label' => 'Général', 'route' => 'settings_general'],
+                    ['label' => 'Notifications', 'route' => 'settings_notifications'],
+                    ['label' => 'Sécurité', 'route' => 'settings_security'],
+                    ['label' => 'Backup', 'route' => 'settings_backup'],
+                ]
+            )
         ];
     }
 
