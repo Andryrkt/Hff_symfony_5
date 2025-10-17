@@ -2,7 +2,7 @@
 
 // src/Model/HomeCard.php
 
-namespace App\Service\Navigation\Home;
+namespace App\Service\Home;
 
 class HomeCard
 {

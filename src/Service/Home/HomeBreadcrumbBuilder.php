@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Navigation\Home;
+namespace App\Service\Home;
 
 use App\Contract\Navigation\BreadcrumbBuilderInterface;
 use App\Service\Navigation\BreadcrumbBuilder;

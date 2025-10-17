@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Home;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Service\Navigation\Home\HomeCardService;
+use App\Service\Home\HomeCardService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -79,7 +79,7 @@ class HomeController extends AbstractController
             if (!empty($link['children'])) {
                 $link['children'] = $this->generateLinkUrls($link['children'], $urlGenerator);
             }
-            
+
             // Retourne uniquement les clés nécessaires pour le frontend
             return [
                 'label' => $link['label'],
@@ -88,7 +88,6 @@ class HomeController extends AbstractController
                 'children' => $link['children'],
                 'icon' => $link['icon'],
             ];
-
         }, $links);
     }
 }
