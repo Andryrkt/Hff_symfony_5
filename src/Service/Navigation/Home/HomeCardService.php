@@ -18,7 +18,7 @@ class HomeCardService
                 ->addLink('Nouveau produit', 'product_new')
                 ->addLink('Catégories', 'category_list')
                 ->addLink('Inventaire', 'inventory_management')
-                ->addLink('Fournisseurs', 'supplier_list'),
+                ->addLink('Fournisseurs', 'supplier_list', [], true), // Ouvre dans un nouvel onglet
 
             // Card Utilisateurs
             (new HomeCard(

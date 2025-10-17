@@ -48,9 +48,9 @@ class HomeCard
         return $this->links;
     }
 
-    public function addLink(string $label, string $route, array $params = []): self
+    public function addLink(string $label, string $route, array $params = [], bool $newTab = false): self
     {
-        $this->links[] = compact('label', 'route', 'params');
+        $this->links[] = compact('label', 'route', 'params', 'newTab');
         return $this;
     }
 }

@@ -10,7 +10,6 @@ export default class extends Controller {
     private modalContentTarget!: HTMLElement;
 
     connect() {
-        // this.element est le modal lui-même, car data-controller est sur l'élément du modal.
         this.element.addEventListener('show.bs.modal', this.onModalShow);
         this.element.addEventListener('hidden.bs.modal', this.resetModalContent);
     }
@@ -20,10 +19,6 @@ export default class extends Controller {
         this.element.removeEventListener('hidden.bs.modal', this.resetModalContent);
     }
 
-    /**
-     * Se déclenche juste avant que le modal ne soit affiché.
-     * Récupère l'élément déclencheur pour savoir quel contenu charger.
-     */
     private onModalShow = (event: any) => {
         const triggerElement = event.relatedTarget as HTMLElement;
         if (!triggerElement) {
@@ -39,9 +34,6 @@ export default class extends Controller {
         }
     }
 
-    /**
-     * Récupère et affiche le contenu de la carte.
-     */
     private async loadCardContent(cardId: string) {
         this.modalContentTarget.innerHTML = this.loadingHtml();
 
@@ -62,17 +54,15 @@ export default class extends Controller {
         }
     }
 
-    /**
-     * Met à jour le DOM du modal avec les données reçues.
-     */
     private displayCardContent(data: any) {
         this.modalTitleTarget.textContent = data.title;
 
         if (data.links && data.links.length > 0) {
             let linksHtml = '<div class="list-group list-group-flush">';
-            data.links.forEach((link: { url: string, label: string }) => {
+            data.links.forEach((link: { url: string, label: string, newTab: boolean }) => {
+                const targetAttr = link.newTab ? 'target="_blank" rel="noopener noreferrer"' : '';
                 linksHtml += `
-                    <a href="${link.url}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <a href="${link.url}" ${targetAttr} class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                         <span>${link.label}</span>
                         <i class="fas fa-chevron-right text-muted"></i>
                     </a>
@@ -85,9 +75,6 @@ export default class extends Controller {
         }
     }
 
-    /**
-     * Réinitialise le contenu du modal après sa fermeture.
-     */
     private resetModalContent = () => {
         this.modalTitleTarget.textContent = 'Navigation';
         this.modalContentTarget.innerHTML = this.loadingHtml();
