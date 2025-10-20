@@ -2,9 +2,9 @@
 
 namespace App\DataFixtures\dom;
 
-use App\Entity\Dom\DomSousTypeDocument;
-use Doctrine\Bundle\FixturesBundle\Fixture;
+use App\Entity\Dom\SousTypeDocument;
 use Doctrine\Persistence\ObjectManager;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 
 class SousTypeDocumentFixtures extends Fixture
 {
@@ -20,7 +20,7 @@ class SousTypeDocumentFixtures extends Fixture
         ];
 
         foreach ($sousTypes as $sousTypeData) {
-            $sousType = new DomSousTypeDocument();
+            $sousType = new SousTypeDocument();
             $sousType->setCodeSousType($sousTypeData['code']);
 
             $manager->persist($sousType);

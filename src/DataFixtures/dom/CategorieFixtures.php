@@ -2,7 +2,7 @@
 
 namespace App\DataFixtures\dom;
 
-use App\Entity\Dom\DomCategorie;
+use App\Entity\Dom\Categorie;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -50,13 +50,13 @@ class CategorieFixtures extends Fixture implements DependentFixtureInterface
         ];
 
         foreach ($categories as $categorieData) {
-            $categorie = new DomCategorie();
+            $categorie = new Categorie();
             $categorie->setDescription($categorieData['description']);
 
             // Gestion du sous-type
             if ($categorieData['sousType'] !== null) {
                 $sousType = $this->getReference($categorieData['sousType']);
-                $categorie->setDomSousTypeDocumentId($sousType);
+                $categorie->setSousTypeDocumentId($sousType);
             }
 
             $manager->persist($categorie);

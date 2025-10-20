@@ -2,7 +2,7 @@
 
 namespace App\DataFixtures\dom;
 
-use App\Entity\Dom\DomIndemnite;
+use App\Entity\Dom\Indemnite;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -520,13 +520,13 @@ class IndemniteFixtures extends Fixture implements DependentFixtureInterface
 
 
         foreach ($indemnites as $indemniteData) {
-            $indemnite = new DomIndemnite();
+            $indemnite = new Indemnite();
             $indemnite->setMontant($indemniteData['montant'])
 
-                ->setDomSiteId($this->getReference($indemniteData['siteId']))
-                ->setDomCategorieId($this->getReference($indemniteData['categorieId']))
-                ->setDomRmqId($this->getReference($indemniteData['rmqId']))
-                ->setDomSousTypeDocumentId($this->getReference($indemniteData['sousTypeDocId']))
+                ->setSiteId($this->getReference($indemniteData['siteId']))
+                ->setCategorieId($this->getReference($indemniteData['categorieId']))
+                ->setRmqId($this->getReference($indemniteData['rmqId']))
+                ->setSousTypeDocumentId($this->getReference($indemniteData['sousTypeDocId']))
             ;
 
             $manager->persist($indemnite);

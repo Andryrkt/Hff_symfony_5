@@ -2,9 +2,9 @@
 
 namespace App\DataFixtures\dom;
 
-use App\Entity\Dom\DomRmq;
-use Doctrine\Bundle\FixturesBundle\Fixture;
+use App\Entity\Dom\Rmq;
 use Doctrine\Persistence\ObjectManager;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 
 class RmqFixtures extends Fixture
 {
@@ -16,7 +16,7 @@ class RmqFixtures extends Fixture
         ];
 
         foreach ($rmqs as $rmqData) {
-            $rmq = new DomRmq();
+            $rmq = new Rmq();
             $rmq->setDescription($rmqData['description']);
 
             $manager->persist($rmq);

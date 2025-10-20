@@ -2,10 +2,9 @@
 
 namespace App\DataFixtures\dom;
 
-use App\Entity\Dom\DomSite;
-use Doctrine\Bundle\FixturesBundle\Fixture;
+use App\Entity\Dom\Site;
 use Doctrine\Persistence\ObjectManager;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use Doctrine\Bundle\FixturesBundle\Fixture;
 
 class SiteFixtures extends Fixture
 {
@@ -23,7 +22,7 @@ class SiteFixtures extends Fixture
         ];
 
         foreach ($sites as $siteData) {
-            $site = new DomSite();
+            $site = new Site();
             $site->setNomZone($siteData['nomZone']);
 
             $manager->persist($site);

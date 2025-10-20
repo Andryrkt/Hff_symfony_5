@@ -54,6 +54,11 @@ class Personnel
      */
     private $matricule;
 
+    /**
+     * @ORM\Column(type="string", length=3, nullable=true)
+     */
+    private $societe;
+
     public function __construct()
     {
     }
@@ -130,6 +135,18 @@ class Personnel
     public function setMatricule(?int $matricule): self
     {
         $this->matricule = $matricule;
+
+        return $this;
+    }
+
+    public function getSociete(): ?string
+    {
+        return $this->societe;
+    }
+
+    public function setSociete(?string $societe): self
+    {
+        $this->societe = $societe;
 
         return $this;
     }
