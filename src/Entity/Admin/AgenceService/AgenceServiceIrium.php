@@ -60,7 +60,7 @@ class AgenceServiceIrium
     private $societe;
 
     /**
-     * @ORM\Column(type="string", length=6, nullable=true)
+     * @ORM\Column(name="codeSage", type="string", length=6, nullable=true)
      */
     private $codeSage;
 
