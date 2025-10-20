@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Form\Shared;
+namespace App\Form\shared;
 
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;

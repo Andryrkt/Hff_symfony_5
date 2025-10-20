@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Form\Shared;
+namespace App\Form\shared;
 
 use App\Entity\Admin\PersonnelUser\User;
 use Symfony\Component\Form\FormEvent;
