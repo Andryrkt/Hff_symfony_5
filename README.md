@@ -203,4 +203,4 @@ php bin/phpunit
   ENCORE à fair
   - ajout du type scipte
   - ajut de rabbitMQ
-  - mettre l'aégence et service debitteur dans une autre ficher
+  - mettre l'agence et service debitteur dans une autre ficher
