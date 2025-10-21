@@ -22,7 +22,7 @@ class UserController extends AbstractController
      */
     public function index(UserRepository $userRepository): Response
     {
-        return $this->render('admin/personnelUser/user/index.html.twig', [
+        return $this->render('admin/personnel_user/user/index.html.twig', [
             'users' => $userRepository->findAll(),
         ]);
     }
@@ -43,7 +43,7 @@ class UserController extends AbstractController
             return $this->redirectToRoute('admin_user_index');
         }
 
-        return $this->render('admin/personnelUser/user/new.html.twig', [
+        return $this->render('admin/personnel_user/user/new.html.twig', [
             'form' => $form->createView(),
         ]);
     }
@@ -62,7 +62,7 @@ class UserController extends AbstractController
             return $this->redirectToRoute('admin_user_index');
         }
 
-        return $this->render('admin/personnelUser/user/edit.html.twig', [
+        return $this->render('admin/personnel_user/user/edit.html.twig', [
             'form' => $form->createView(),
             'user' => $user,
         ]);
@@ -73,7 +73,7 @@ class UserController extends AbstractController
      */
     public function delete(Request $request, User $user, EntityManagerInterface $em): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $user->getId(), $request->request->get('_token'))) {
             $em->remove($user);
             $em->flush();
             $this->addFlash('success', 'Utilisateur supprimé avec succès.');
@@ -86,8 +86,8 @@ class UserController extends AbstractController
      */
     public function show(User $user): Response
     {
-        return $this->render('admin/personnelUser/user/show.html.twig', [
+        return $this->render('admin/personnel_user/user/show.html.twig', [
             'user' => $user,
         ]);
     }
-} 
+}

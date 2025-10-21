@@ -49,13 +49,13 @@ class UserType extends AbstractType
                 'multiple' => true,
                 'expanded' => true,
             ])
-            ->add('groups', EntityType::class, [
-                'class' => Group::class,
-                'choice_label' => 'name',
-                'label' => 'Groupes',
-                'multiple' => true,
-                'required' => false,
-            ])
+            // ->add('groups', EntityType::class, [
+            //     'class' => Group::class,
+            //     'choice_label' => 'name',
+            //     'label' => 'Groupes',
+            //     'multiple' => true,
+            //     'required' => false,
+            // ])
         ;
     }
 
