@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=CategorieRepository::class)
  * @ORM\Table(name="dom_categorie")
+ * @ORM\HasLifecycleCallbacks
  */
 class Categorie
 {

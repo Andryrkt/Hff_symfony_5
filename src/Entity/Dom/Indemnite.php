@@ -9,6 +9,7 @@ use App\Repository\Dom\IndemniteRepository;
 /**
  * @ORM\Entity(repositoryClass=IndemniteRepository::class)
  * @ORM\Table(name="dom_indemnite")
+ * @ORM\HasLifecycleCallbacks
  */
 class Indemnite
 {

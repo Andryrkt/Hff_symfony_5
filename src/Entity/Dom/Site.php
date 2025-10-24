@@ -11,6 +11,7 @@ use App\Entity\Traits\TimestampableTrait;
 /**
  * @ORM\Entity(repositoryClass=SiteRepository::class)
  * @ORM\Table(name="dom_site")
+ * @ORM\HasLifecycleCallbacks
  */
 class Site
 {

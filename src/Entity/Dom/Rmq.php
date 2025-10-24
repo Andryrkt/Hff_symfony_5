@@ -11,6 +11,7 @@ use App\Entity\Traits\TimestampableTrait;
 /**
  * @ORM\Entity(repositoryClass=RmqRepository::class)
  * @ORM\Table(name="dom_rmq")
+ * @ORM\HasLifecycleCallbacks
  */
 class Rmq
 {

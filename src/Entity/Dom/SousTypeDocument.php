@@ -11,6 +11,7 @@ use App\Repository\Dom\SousTypeDocumentRepository;
 /**
  * @ORM\Entity(repositoryClass=SousTypeDocumentRepository::class)
  * @ORM\Table(name="dom_sous_type_document")
+ * @ORM\HasLifecycleCallbacks
  */
 class SousTypeDocument
 {
