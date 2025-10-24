@@ -527,7 +527,6 @@ class IndemniteFixtures extends Fixture implements DependentFixtureInterface
                 ->setCategorieId($this->getReference($indemniteData['categorieId']))
                 ->setRmqId($this->getReference($indemniteData['rmqId']))
                 ->setSousTypeDocumentId($this->getReference($indemniteData['sousTypeDocId']))
-                ->setCreatedAt(new \DateTime())
             ;
 
             $manager->persist($indemnite);
