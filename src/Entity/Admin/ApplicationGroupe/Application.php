@@ -30,20 +30,12 @@ class Application
      */
     private $description;
 
-    /**
-     * @ORM\OneToMany(targetEntity=UserAccess::class, mappedBy="application")
-     */
-    private $userAccesses;
 
     /**
      * @ORM\Column(type="string", length=10, nullable=true)
      */
     private $code;
 
-    public function __construct()
-    {
-        $this->userAccesses = new ArrayCollection();
-    }
 
     // Getters et setters
 
@@ -74,35 +66,6 @@ class Application
         return $this;
     }
 
-    /**
-     * @return Collection<int, UserAccess>
-     */
-    public function getUserAccesses(): Collection
-    {
-        return $this->userAccesses;
-    }
-
-    public function addUserAccess(UserAccess $userAccess): self
-    {
-        if (!$this->userAccesses->contains($userAccess)) {
-            $this->userAccesses[] = $userAccess;
-            $userAccess->setApplication($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUserAccess(UserAccess $userAccess): self
-    {
-        if ($this->userAccesses->removeElement($userAccess)) {
-            // set the owning side to null (unless already changed)
-            if ($userAccess->getApplication() === $this) {
-                $userAccess->setApplication(null);
-            }
-        }
-
-        return $this;
-    }
 
     public function getCode(): ?string
     {

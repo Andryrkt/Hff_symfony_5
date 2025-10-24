@@ -2,6 +2,7 @@
 
 namespace App\Entity\Admin\PersonnelUser;
 
+use App\Entity\Admin\ApplicationGroupe\Permission;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Traits\TimestampableTrait;
 use Doctrine\Common\Collections\Collection;
@@ -75,16 +76,15 @@ class User implements UserInterface
     private $userAccesses;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Group::class, inversedBy="users")
-     * @ORM\JoinTable(name="users_groups")
+     * @ORM\ManyToMany(targetEntity=Permission::class, inversedBy="users")
      */
-    private $groups;
+    private $permissionsDirectes;
 
 
     public function __construct()
     {
         $this->userAccesses = new ArrayCollection();
-        $this->groups = new ArrayCollection();
+        $this->permissionsDirectes = new ArrayCollection();
     }
 
 
@@ -268,33 +268,6 @@ class User implements UserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, Group>
-     */
-    public function getGroups(): Collection
-    {
-        return $this->groups;
-    }
-
-    public function addGroup(Group $group): self
-    {
-        if (!$this->groups->contains($group)) {
-            $this->groups[] = $group;
-            $group->addUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeGroup(Group $group): self
-    {
-        if ($this->groups->removeElement($group)) {
-            $group->removeUser($this);
-        }
-
-        return $this;
-    }
-
 
 
     public function getAgenceEmetteur(): ?string
@@ -381,5 +354,29 @@ class User implements UserInterface
         $nomService = $service->getNom();
         $codeService = $service->getCode();
         return $codeService . ' - ' . $nomService;
+    }
+
+    /**
+     * @return Collection<int, Permission>
+     */
+    public function getPermissionsDirectes(): Collection
+    {
+        return $this->permissionsDirectes;
+    }
+
+    public function addPermissionsDirecte(Permission $permissionsDirecte): self
+    {
+        if (!$this->permissionsDirectes->contains($permissionsDirecte)) {
+            $this->permissionsDirectes[] = $permissionsDirecte;
+        }
+
+        return $this;
+    }
+
+    public function removePermissionsDirecte(Permission $permissionsDirecte): self
+    {
+        $this->permissionsDirectes->removeElement($permissionsDirecte);
+
+        return $this;
     }
 }
