@@ -34,7 +34,7 @@ class Vignette
     private $description;
 
     /**
-     * @ORM\OneToMany(targetEntity=Persmission::class, mappedBy="vignette")
+     * @ORM\OneToMany(targetEntity=Permission::class, mappedBy="vignette")
      */
     private $permission;
 
@@ -73,14 +73,14 @@ class Vignette
     }
 
     /**
-     * @return Collection<int, Persmission>
+     * @return Collection<int, Permission>
      */
     public function getPermission(): Collection
     {
         return $this->permission;
     }
 
-    public function addPermission(Persmission $permission): self
+    public function addPermission(Permission $permission): self
     {
         if (!$this->permission->contains($permission)) {
             $this->permission[] = $permission;
@@ -90,7 +90,7 @@ class Vignette
         return $this;
     }
 
-    public function removePermission(Persmission $permission): self
+    public function removePermission(Permission $permission): self
     {
         if ($this->permission->removeElement($permission)) {
             // set the owning side to null (unless already changed)

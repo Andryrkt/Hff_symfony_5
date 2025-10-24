@@ -2,26 +2,26 @@
 
 namespace App\Repository\Admin\ApplicationGroupe;
 
-use App\Entity\Admin\ApplicationGroupe\Persmission;
+use App\Entity\Admin\ApplicationGroupe\Permission;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Persmission>
+ * @extends ServiceEntityRepository<Permission>
  *
- * @method Persmission|null find($id, $lockMode = null, $lockVersion = null)
- * @method Persmission|null findOneBy(array $criteria, array $orderBy = null)
- * @method Persmission[]    findAll()
- * @method Persmission[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Permission|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Permission|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Permission[]    findAll()
+ * @method Permission[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class PersmissionRepository extends ServiceEntityRepository
+class PermissionRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Persmission::class);
+        parent::__construct($registry, Permission::class);
     }
 
-    public function add(Persmission $entity, bool $flush = false): void
+    public function add(Permission $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class PersmissionRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(Persmission $entity, bool $flush = false): void
+    public function remove(Permission $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class PersmissionRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return Persmission[] Returns an array of Persmission objects
+//     * @return Permission[] Returns an array of Permission objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class PersmissionRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Persmission
+//    public function findOneBySomeField($value): ?Permission
 //    {
 //        return $this->createQueryBuilder('p')
 //            ->andWhere('p.exampleField = :val')

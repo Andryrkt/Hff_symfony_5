@@ -2,14 +2,18 @@
 
 namespace App\Entity\Admin\ApplicationGroupe;
 
-use App\Repository\Admin\ApplicationGroupe\PersmissionRepository;
+use App\Entity\Traits\TimestampableTrait;
+use App\Repository\Admin\ApplicationGroupe\PermissionRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass=PersmissionRepository::class)
+ * @ORM\Entity(repositoryClass=PermissionRepository::class)
+ * @ORM\HasLifecycleCallbacks
  */
-class Persmission
+class Permission
 {
+    use TimestampableTrait;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
