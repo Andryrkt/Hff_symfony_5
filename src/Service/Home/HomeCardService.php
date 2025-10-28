@@ -7,83 +7,278 @@ class HomeCardService
     public function getHomeCards(): array
     {
         return [
-            // Card Produits
+            // Card Documentation
             new HomeCard(
-                'Produits',
-                'Gestion des produits et catalogues',
+                'Documentation',
+                'Gestion des documentaions',
                 'fas fa-box',
                 'success',
                 [
-                    ['label' => 'Liste des produits', 'route' => 'product_list', 'icon' => 'fas fa-list-ul'],
-                    ['label' => 'Nouveau produit', 'route' => 'product_new', 'icon' => 'fas fa-plus-circle'],
+                    ['label' => 'Annuaire', 'route' => '#', 'icon' => 'fas fa-list-ul'],
+                    ['label' => 'plan analytique Hff', 'route' => '#', 'icon' => 'fas fa-plus-circle'],
+                    ['label' => 'Documentaion interne', 'route' => '#', 'icon' => 'fas fa-clipboard-check'],
                     [
-                        'label' => 'Catégories', // Lien parent pour le sous-menu
+                        'label' => 'Contrat', // Lien parent pour le sous-menu
                         'icon' => 'fas fa-tags',
                         'children' => [
-                            ['label' => 'Voir les catégories', 'route' => 'category_list', 'icon' => 'fas fa-search'],
-                            ['label' => 'Ajouter une catégorie', 'route' => 'category_add', 'icon' => 'fas fa-plus'],
+                            ['label' => 'Nouveau contrat', 'route' => '#', 'icon' => 'fas fa-search'],
+                            ['label' => 'Consultation', 'route' => '#', 'icon' => 'fas fa-plus'],
                         ]
                     ],
-                    ['label' => 'Inventaire', 'route' => 'inventory_management', 'icon' => 'fas fa-clipboard-check'],
-                    ['label' => 'Fournisseurs', 'route' => 'supplier_list', 'newTab' => true, 'icon' => 'fas fa-truck'], // Ouvre dans un nouvel onglet
+                    // ['label' => 'Fournisseurs', 'route' => 'supplier_list', 'newTab' => true, 'icon' => 'fas fa-truck'], // Ouvre dans un nouvel onglet
                 ]
             ),
 
-            // Card Utilisateurs
+            // Card Reporting
             new HomeCard(
-                'Utilisateurs',
+                'Reporting',
                 'Gestion des comptes utilisateurs',
                 'fas fa-users',
                 'info',
                 [
-                    ['label' => 'Liste des utilisateurs', 'route' => 'user_list'],
-                    ['label' => 'Créer un utilisateur', 'route' => 'user_new'],
-                    ['label' => 'Rôles et permissions', 'route' => 'role_management'],
-                    ['label' => 'Activité récente', 'route' => 'user_activity'],
+                    ['label' => 'Reporting Power BI', 'route' => '#'],
+                    ['label' => 'Reporting Excel', 'route' => '#']
                 ]
             ),
 
-            // Commandes
+            // Compta
             new HomeCard(
-                'Commandes',
-                'Suivi et gestion des commandes',
-                'fas fa-shopping-cart',
-                'warning',
-                [
-                    ['label' => 'Commandes en cours', 'route' => 'order_list', 'params' => ['status' => 'pending']],
-                    ['label' => 'Commandes terminées', 'route' => 'order_list', 'params' => ['status' => 'completed']],
-                    ['label' => 'Statistiques', 'route' => 'order_stats'],
-                    ['label' => 'Retours', 'route' => 'order_returns'],
-                ]
-            ),
-
-            // Analytics
-            new HomeCard(
-                'Analytics',
+                'Compta',
                 'Statistiques et rapports',
                 'fas fa-chart-bar',
                 'danger',
                 [
-                    ['label' => 'Tableau de bord', 'route' => 'analytics_dashboard'],
-                    ['label' => 'Rapports ventes', 'route' => 'sales_reports'],
-                    ['label' => 'Performance produits', 'route' => 'product_performance'],
-                    ['label' => 'Analytics visiteurs', 'route' => 'visitor_analytics'],
+                    ['label' => 'Cours de change', 'route' => '#'],
+                    [
+                        'label' => 'Demande de paiement', // Lien parent pour le sous-menu
+                        'icon' => 'fas fa-tags',
+                        'children' => [
+                            ['label' => 'Nouvelle demande', 'route' => '#', 'icon' => 'fas fa-search'],
+                            ['label' => 'Consultation', 'route' => '#', 'icon' => 'fas fa-plus'],
+                        ]
+                    ],
+                    [
+                        'label' => 'Bon de caisse', // Lien parent pour le sous-menu
+                        'icon' => 'fas fa-tags',
+                        'children' => [
+                            ['label' => 'Nouvelle demande', 'route' => '#', 'icon' => 'fas fa-search'],
+                            ['label' => 'Consultation', 'route' => '#', 'icon' => 'fas fa-plus'],
+                        ]
+                    ],
                 ]
             ),
 
-            // Paramètres
+            // RH
             new HomeCard(
-                'Paramètres',
+                'RH',
+                'Suivi et gestion des commandes',
+                'fas fa-shopping-cart',
+                'warning',
+                [
+                    [
+                        'label' => 'Ordre de mission',
+                        'icon' => 'fas fa-tags',
+                        'children' => [
+                            ['label' => 'Nouvelle demande', 'route' => '#', 'icon' => 'fas fa-search'],
+                            ['label' => 'Consultation', 'route' => '#', 'icon' => 'fas fa-plus'],
+                        ]
+                    ],
+                    [
+                        'label' => 'Mutations',
+                        'icon' => 'fas fa-tags',
+                        'children' => [
+                            ['label' => 'Nouvelle demande', 'route' => '#', 'icon' => 'fas fa-search'],
+                            ['label' => 'Consultation', 'route' => '#', 'icon' => 'fas fa-plus'],
+                        ]
+                    ],
+                    [
+                        'label' => 'Congé',
+                        'icon' => 'fas fa-tags',
+                        'children' => [
+                            ['label' => 'Nouvelle demande', 'route' => '#', 'icon' => 'fas fa-search'],
+                            ['label' => 'Consultation', 'route' => '#', 'icon' => 'fas fa-plus'],
+                        ]
+                    ],
+                    [
+                        'label' => 'Temporaire',
+                        'icon' => 'fas fa-tags',
+                        'children' => [
+                            ['label' => 'Nouvelle demande', 'route' => '#', 'icon' => 'fas fa-search'],
+                            ['label' => 'Consultation', 'route' => '#', 'icon' => 'fas fa-plus'],
+                        ]
+                    ],
+                ]
+            ),
+
+
+
+            // Matériel
+            new HomeCard(
+                'Matériel',
                 'Configuration du système',
                 'fas fa-cogs',
                 'secondary',
                 [
-                    ['label' => 'Général', 'route' => 'settings_general'],
-                    ['label' => 'Notifications', 'route' => 'settings_notifications'],
-                    ['label' => 'Sécurité', 'route' => 'settings_security'],
-                    ['label' => 'Backup', 'route' => 'settings_backup'],
+                    [
+                        'label' => 'Mouvemnet matériel',
+                        'icon' => 'fas fa-tags',
+                        'children' => [
+                            ['label' => 'Nouvelle demande', 'route' => '#', 'icon' => 'fas fa-search'],
+                            ['label' => 'Consultation', 'route' => '#', 'icon' => 'fas fa-plus'],
+                        ]
+                    ],
+                    [
+                        'label' => 'Casier',
+                        'icon' => 'fas fa-tags',
+                        'children' => [
+                            ['label' => 'Nouvelle demande', 'route' => '#', 'icon' => 'fas fa-search'],
+                            ['label' => 'Consultation', 'route' => '#', 'icon' => 'fas fa-plus'],
+                        ]
+                    ],
+                    ['label' => 'Commandes matériel', 'route' => '#'],
+                    ['label' => 'Suivi administratif des matériels', 'route' => '#'],
                 ]
-            )
+            ),
+
+
+            /**=========================== Atelier ===============================*/
+            new HomeCard(
+                'Atelier',
+                'Configuration du système',
+                'fas fa-cogs',
+                'secondary',
+                [
+                    [
+                        'label' => 'Demande d\'intervention',
+                        'icon' => 'fas fa-tags',
+                        'children' => [
+                            ['label' => 'Nouvelle demande', 'route' => '#', 'icon' => 'fas fa-search'],
+                            ['label' => 'Consultation', 'route' => '#', 'icon' => 'fas fa-plus'],
+                        ]
+                    ],
+                    ['label' => 'Glossaire OR', 'route' => '#'],
+                    ['label' => 'planning', 'route' => '#'],
+                    ['label' => 'Planning détaillé', 'route' => '#'],
+                    ['label' => 'planning interne Atelier', 'route' => '#'],
+                    ['label' => 'Satisfaction client (Atelier excellence survey)', 'route' => '#'],
+                ]
+            ),
+
+            /**=========================== Magasin ===============================*/
+            new HomeCard(
+                'Magasin',
+                'Configuration du système',
+                'fas fa-cogs',
+                'secondary',
+                [
+                    [
+                        'label' => 'OR',
+                        'icon' => 'fas fa-tags',
+                        'children' => [
+                            ['label' => 'Liste à traiter', 'route' => '#', 'icon' => 'fas fa-search'],
+                            ['label' => 'Liste à livrer', 'route' => '#', 'icon' => 'fas fa-plus'],
+                        ]
+                    ],
+                    [
+                        'label' => 'CIS',
+                        'icon' => 'fas fa-tags',
+                        'children' => [
+                            ['label' => 'Liste à traiter', 'route' => '#', 'icon' => 'fas fa-search'],
+                            ['label' => 'Liste à livrer', 'route' => '#', 'icon' => 'fas fa-plus'],
+                        ]
+                    ],
+                    [
+                        'label' => 'INVENTAIRE',
+                        'icon' => 'fas fa-tags',
+                        'children' => [
+                            ['label' => 'Liste inventaire', 'route' => '#', 'icon' => 'fas fa-search'],
+                            ['label' => 'Inventaire détaillé', 'route' => '#', 'icon' => 'fas fa-plus'],
+                        ]
+                    ],
+                    [
+                        'label' => 'SORTIE DE PIECES',
+                        'icon' => 'fas fa-tags',
+                        'children' => [
+                            ['label' => 'Nouvelle demande', 'route' => '#', 'icon' => 'fas fa-search'],
+                        ]
+                    ],
+                    [
+                        'label' => 'DEMATERIALISATION',
+                        'icon' => 'fas fa-tags',
+                        'children' => [
+                            ['label' => 'Devis', 'route' => '#', 'icon' => 'fas fa-search'],
+                            ['label' => 'Commandes clients', 'route' => '#', 'icon' => 'fas fa-plus'],
+                            ['label' => 'Planning magasin', 'route' => '#', 'icon' => 'fas fa-plus'],
+                        ]
+                    ],
+
+                    ['label' => 'Soumission commandes fournisseur', 'route' => '#'],
+                    ['label' => 'Liste des non placées', 'route' => '#'],
+                ]
+            ),
+
+            /**=========================== Appro ===============================*/
+            new HomeCard(
+                'Appro',
+                'Configuration du système',
+                'fas fa-cogs',
+                'secondary',
+                [
+                    ['label' => 'Nouvelle DA', 'route' => '#'],
+                    ['label' => 'Consultation des DA', 'route' => '#'],
+                    ['label' => 'Liste des commandes fournisseurs', 'route' => '#'],
+                ]
+            ),
+
+            /**=========================== IT ===============================*/
+            new HomeCard(
+                'IT',
+                'Configuration du système',
+                'fas fa-cogs',
+                'secondary',
+                [
+                    ['label' => 'Nouvelle Demande', 'route' => '#'],
+                    ['label' => 'Consultation', 'route' => '#'],
+                    ['label' => 'Planning', 'route' => '#'],
+                ]
+            ),
+
+            /**=========================== POL ===============================*/
+            new HomeCard(
+                'POL',
+                'Configuration du système',
+                'fas fa-cogs',
+                'secondary',
+                [
+                    ['label' => 'Nouvelle DLUB', 'route' => '#'],
+                    ['label' => 'Consultation des DLUB', 'route' => '#'],
+                    ['label' => 'Liste des commandes fournisseur', 'route' => '#'],
+                    ['label' => 'Pneumatiques', 'route' => '#'],
+                ]
+            ),
+
+            /**=========================== Energie ===============================*/
+            new HomeCard(
+                'Energie',
+                'Configuration du système',
+                'fas fa-cogs',
+                'secondary',
+                [
+                    ['label' => 'Rapport de production centrale', 'route' => '#'],
+                ]
+            ),
+
+            /**=========================== HSE ===============================*/
+            new HomeCard(
+                'HSE',
+                'Configuration du système',
+                'fas fa-cogs',
+                'secondary',
+                [
+                    ['label' => 'Rapport d\'incident', 'route' => '#'],
+                    ['label' => 'Documentation', 'route' => '#']
+                ]
+            ),
         ];
     }
 
