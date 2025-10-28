@@ -39,6 +39,17 @@ class VignetteRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * @return Vignette[]
+     */
+    public function findForHomeCards(): array
+    {
+        return $this->createQueryBuilder('v')
+            ->select('PARTIAL v.{id, nom, description}')
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Vignette[] Returns an array of Vignette objects
 //     */
