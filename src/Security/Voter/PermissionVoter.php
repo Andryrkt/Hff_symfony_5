@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class PermissionVoter extends Voter
 {
-    protected function supports(string $attribute, mixed $subject): bool
+    protected function supports(string $attribute, $subject): bool
     {
         // Ce voter s’applique à toute permission sous forme de code (string)
         return is_string($attribute);
@@ -21,7 +21,7 @@ class PermissionVoter extends Voter
      * @param string $attribute  -> ex: "RH_CONGE_CREATE"
      * @param mixed $subject     -> peut être une entité (ex: une demande de congé) ou null
      */
-    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
+    protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
     {
         $user = $token->getUser();
 
