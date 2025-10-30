@@ -23,8 +23,7 @@ Encore
   .addEntry("app", "./assets/app.ts")
 
   // page login
-  .addEntry("login", "./assets/js/login/login.ts") // JS
-  .addStyleEntry("login-style", "./assets/styles/login/login.scss") // CSS
+  .addEntry("login", ["./assets/js/login/login.js", "./assets/styles/login/login.scss"]) // JS and CSS
 
   // page accueil
   .addEntry("accueil", "./assets/js/accueil.js") // JS

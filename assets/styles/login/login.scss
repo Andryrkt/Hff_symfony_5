@@ -1,68 +1,49 @@
 #intro {
-  /* background-image: url('../assets/Hff.png'); */
-  height: 100vh;
+    height: 100vh;
 }
 
 #Logo {
-  margin-left: 10%;
-  margin-bottom: 5%;
-}
-
-.navbar .nav-link {
-  color: #fff !important;
+    margin-left: 10%;
+    margin-bottom: 5%;
 }
 
 .notice {
-  background-color: #fbbb01; /* Couleur de fond douce */
-  border-left: 4px solid #000000; /* Bordure colorée sur le côté gauche */
-  padding: 10px 15px; /* Espacement à l'intérieur de la boîte */
-  margin-top: 1rem;
-  font-size: 0.875rem;
-  font-family: Arial, sans-serif; /* Police d'écriture */
-  color: #6c757d; /* Couleur du texte */
-  border-radius: 4px; /* Coins arrondis */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombre douce */
-  display: flex; /* Permet d'ajouter une icône avec flexbox */
-  align-items: center; /* Centre l'icône verticalement */
+    background-color: #fbbb01;
+    border-left: 4px solid #000000;
+    padding: 10px 15px;
+    margin: 20px 0;
+    font-family: Arial, sans-serif;
+    color: #000000;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
 }
 
 .notice-icon {
-  margin-right: 10px; /* Espace entre l'icône et le texte */
-  color: #000000; /* Couleur de l'icône */
-  font-size: 24px; /* Taille de l'icône */
+    margin-right: 10px;
+    color: #000000;
+    font-size: 24px;
 }
 
 .notice-content {
-  flex: 1; /* Le texte prend tout l'espace disponible */
+    flex: 1;
 }
 
-/* Enlever la bordure entre l'input et le conteneur */
 .input-group #password.form-control {
-  border-right: none;
+    border-right: none;
 }
 
 .input-group .input-group-text {
-  border-left: none;
-  width: 2rem; /* Taille fixe pour l'icône */
-  padding: 0; /* Pas de padding supplémentaire */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
+    border-left: none;
+    width: 2rem;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
 }
 
 .input-group .form-control:focus {
-  z-index: 3; /* Éviter tout problème de superposition au focus */
-}
-
-/* Animation pour l'entrer */
-.login-card {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.5s ease-in-out;
-}
-
-body.loaded .login-card {
-  opacity: 1;
-  transform: translateY(0);
+    z-index: 3;
 }

@@ -1,0 +1,11 @@
+
+.breadcrumb-item.dropdown .dropdown-menu {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+.breadcrumb-item.dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    display: block;
+}
