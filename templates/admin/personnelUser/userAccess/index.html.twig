@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}UserAccess index{% endblock %}
+
+{% block content %}
+    <h1>UserAccess index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>User</th>
+                <th>Agence</th>
+                <th>Service</th>
+                <th>All Agence</th>
+                <th>All Service</th>
+                <th>Permissions</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user_access in user_accesses %}
+            <tr>
+                <td>{{ user_access.id }}</td>
+                <td>{{ user_access.users.fullname }}</td>
+                <td>{{ user_access.agence.nom }}</td>
+                <td>{{ user_access.service.nom }}</td>
+                <td>{{ user_access.allAgence ? 'Yes' : 'No' }}</td>
+                <td>{{ user_access.allService ? 'Yes' : 'No' }}</td>
+                <td>
+                    {% for permission in user_access.permissions %}
+                        {{ permission.name }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    <a href="{{ path('admin_user_access_show', {'id': user_access.id}) }}">show</a>
+                    <a href="{{ path('admin_user_access_edit', {'id': user_access.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('admin_user_access_new') }}">Create new</a>
+{% endblock %}

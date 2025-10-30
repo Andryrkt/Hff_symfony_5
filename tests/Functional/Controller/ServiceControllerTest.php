@@ -2,10 +2,12 @@
 
 namespace App\Test\Controller;
 
-use App\Entity\Service;
-use App\Repository\ServiceRepository;
+
+
+use App\Entity\Admin\AgenceService\Service;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Repository\Admin\AgenceService\ServiceRepository;
 
 class ServiceControllerTest extends WebTestCase
 {

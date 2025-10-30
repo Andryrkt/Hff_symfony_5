@@ -2,13 +2,15 @@
 
 namespace App\Controller\Admin\AgenceService;
 
-use App\Entity\Service;
-use App\Form\ServiceType;
-use App\Repository\ServiceRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+
+use App\Entity\Admin\AgenceService\Service;
+use App\Form\Admin\AgenceService\ServiceType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Repository\Admin\AgenceService\ServiceRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * @Route("/admin/service")

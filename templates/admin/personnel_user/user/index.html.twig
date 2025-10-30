@@ -31,6 +31,7 @@
                 <td>
                     <a href="{{ path('admin_user_show', {'id': user.id}) }}" class="btn btn-sm btn-info">Détail</a>
                     <a href="{{ path('admin_user_edit', {'id': user.id}) }}" class="btn btn-sm btn-warning">Modifier</a>
+                    <a href="{{ path('admin_user_roles_edit', {'id': user.id}) }}" class="btn btn-sm btn-primary">Éditer les rôles</a>
                     <form method="post" action="{{ path('admin_user_delete', {'id': user.id}) }}" style="display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">
                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
                         <button class="btn btn-sm btn-danger">Supprimer</button>

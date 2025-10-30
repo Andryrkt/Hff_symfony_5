@@ -4,6 +4,7 @@ namespace App\Controller\Admin\PersonnelUser;
 
 use App\Entity\Admin\PersonnelUser\User;
 use App\Form\Admin\PersonnelUser\UserType;
+use App\Form\Admin\PersonnelUser\UserRolesType;
 use App\Repository\Admin\PersonnelUser\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -88,6 +89,26 @@ class UserController extends AbstractController
     {
         return $this->render('admin/personnel_user/user/show.html.twig', [
             'user' => $user,
+        ]);
+    }
+
+    /**
+     * @Route("/{id}/roles/edit", name="admin_user_roles_edit", methods={"GET", "POST"})
+     */
+    public function editRoles(Request $request, User $user, EntityManagerInterface $em): Response
+    {
+        $form = $this->createForm(UserRolesType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->flush();
+            $this->addFlash('success', 'Rôles de l\'utilisateur mis à jour avec succès.');
+            return $this->redirectToRoute('admin_user_index');
+        }
+
+        return $this->render('admin/personnel_user/user/edit_roles.html.twig', [
+            'user' => $user,
+            'form' => $form->createView(),
         ]);
     }
 }

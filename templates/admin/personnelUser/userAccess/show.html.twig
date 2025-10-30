@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}UserAccess
+{% endblock %}
+
+{% block content %}
+	<h1>UserAccess</h1>
+
+	<table class="table">
+		<tbody>
+			<tr>
+				<th>Id</th>
+				<td>{{ user_access.id }}</td>
+			</tr>
+			<tr>
+				<th>User</th>
+				                <td>{{ user_access.users.fullname }}</td>			</tr>
+			<tr>
+				<th>Agence</th>
+				                <td>{{ user_access.agence.nom }}</td>			</tr>
+			<tr>
+				<th>Service</th>
+				                <td>{{ user_access.service.nom }}</td>			</tr>
+			<tr>
+				<th>All Agence</th>
+				<td>{{ user_access.allAgence ? 'Yes' : 'No' }}</td>
+			</tr>
+			<tr>
+				<th>All Service</th>
+				<td>{{ user_access.allService ? 'Yes' : 'No' }}</td>
+			</tr>
+			<tr>
+				<th>Permissions</th>
+				<td>
+					{% for permission in user_access.permissions %}
+						{{ permission.name }}
+						{% if not loop.last %},
+						{% endif %}
+					{% endfor %}
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<a href="{{ path('admin_user_access_index') }}">back to list</a>
+
+	<a href="{{ path('admin_user_access_edit', {'id': user_access.id}) }}">edit</a>
+
+	{{ include('admin/personnelUser/userAccess/_delete_form.html.twig') }}
+{% endblock %}

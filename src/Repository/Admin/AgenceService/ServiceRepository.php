@@ -2,9 +2,10 @@
 
 namespace App\Repository\Admin\AgenceService;
 
-use App\Entity\Service;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\Admin\AgenceService\Service;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Service>
