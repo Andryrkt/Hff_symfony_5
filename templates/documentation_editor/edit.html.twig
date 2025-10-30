@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Documentation - {{ filepath }}{% endblock %}
+
+{% block content %}
+    <div class="container-fluid my-5">
+        <div class="row">
+            <div class="col-md-6">
+                <h1>Edit Documentation: {{ filepath }}</h1>
+
+                {% for message in app.flashes('success') %}
+                    <div class="alert alert-success">{{ message }}</div>
+                {% endfor %}
+                {% for message in app.flashes('error') %}
+                    <div class="alert alert-danger">{{ message }}</div>
+                {% endfor %}
+
+                <form method="post">
+                    <div class="form-group mb-3">
+                        <label for="content">Content</label>
+                        <textarea class="form-control" id="markdown-content" name="content" rows="20">{{ content }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a href="{{ path('app_documentation_editor_list') }}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <h1>Preview</h1>
+                <div id="markdown-preview" class="border p-3" style="min-height: 400px;">
+                    <!-- Markdown preview will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const markdownContent = document.getElementById('markdown-content');
+            const markdownPreview = document.getElementById('markdown-preview');
+
+            function updatePreview() {
+                fetch('{{ path('app_documentation_editor_preview') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'markdown=' + encodeURIComponent(markdownContent.value)
+                })
+                .then(response => response.text())
+                .then(html => {
+                    markdownPreview.innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error fetching markdown preview:', error);
+                });
+            }
+
+            markdownContent.addEventListener('keyup', updatePreview);
+            // Initial preview update on page load
+            updatePreview();
+        });
+    </script>
+{% endblock %}

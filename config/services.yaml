@@ -71,3 +71,7 @@ services:
     arguments:
       $searchDn: "%env(resolve:LDAP_SEARCH_DN)%"
       $searchPassword: "%env(resolve:LDAP_SEARCH_PASSWORD)%"
+
+  Parsedown:
+    class: Parsedown
+    public: true

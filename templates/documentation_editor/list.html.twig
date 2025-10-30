@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Documentation Editor{% endblock %}
+
+{% block content %}
+    <div class="container my-5">
+        <h1>Documentation Files</h1>
+
+        <a href="{{ path('app_documentation_editor_new') }}" class="btn btn-success mb-3">Create New Document</a>
+
+        {% if files is not empty %}
+            <ul class="list-group">
+                {% for file in files %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ file }}
+                        <a href="{{ path('app_documentation_editor_edit', { filepath: file|base64_encode }) }}" class="btn btn-primary btn-sm">Edit</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No documentation files found.</p>
+        {% endif %}
+    </div>
+{% endblock %}

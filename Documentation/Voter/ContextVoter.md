@@ -1,0 +1,1 @@
+un exemple de generation de document
