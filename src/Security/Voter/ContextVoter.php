@@ -21,7 +21,7 @@ class ContextVoter extends Voter
 {
     public const ACCESS = 'CONTEXT_ACCESS';
 
-    protected function supports(string $attribute, mixed $subject): bool
+    protected function supports(string $attribute, $subject): bool
     {
         // Le voter ne gère que l'attribut CONTEXT_ACCESS
         if ($attribute !== self::ACCESS) {
@@ -32,7 +32,7 @@ class ContextVoter extends Voter
         return is_array($subject) && count($subject) === 2;
     }
 
-    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
+    protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
     {
         $user = $token->getUser();
         if (!$user instanceof User) {

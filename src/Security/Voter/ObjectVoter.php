@@ -18,7 +18,7 @@ class ObjectVoter extends Voter
         $this->authChecker = $authChecker;
     }
 
-    protected function supports(string $attribute, mixed $subject): bool
+    protected function supports(string $attribute, $subject): bool
     {
         // On ne gère que des entités (objets métiers)
         return is_object($subject) && in_array($attribute, [
@@ -30,7 +30,7 @@ class ObjectVoter extends Voter
         ]);
     }
 
-    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
+    protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
     {
         $user = $token->getUser();
         if (!$user instanceof User) {
