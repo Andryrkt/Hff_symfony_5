@@ -15,7 +15,7 @@ L'application utilise les voters suivants :
 
 1.  [PermissionVoter](#permissionvoter)
 2.  [ContextVoter](#contextvoter)
-3.  [VignetteVoter](#vignettevoter)
+3.  [VignetteVoter](/admin/documentation/voter/VignetteVoter.md)
 4.  [ObjectVoter](#objectvoter)
 
 ---

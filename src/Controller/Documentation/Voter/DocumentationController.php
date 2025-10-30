@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Documentation\Voter;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,10 +20,10 @@ class DocumentationController extends AbstractController
     /** 
      * @Route("/admin/documentation/voters", name="app_documentation_voters")] 
      * 
-    */
+     */
     public function voters(): Response
     {
-        $markdownFilePath = $this->projectDir . '/Documentation/Voters.md';
+        $markdownFilePath = $this->projectDir . '/Documentation/Voter/Voters.md';
 
         if (!file_exists($markdownFilePath)) {
             throw $this->createNotFoundException('Le fichier de documentation n\'a pas été trouvé.');
@@ -35,6 +35,27 @@ class DocumentationController extends AbstractController
         $htmlContent = $parsedown->text($markdownContent);
 
         return $this->render('documentation/voters.html.twig', [
+            'htmlContent' => $htmlContent,
+        ]);
+    }
+
+    /**
+     * @Route("/admin/documentation/voter/{filename}", name="app_documentation_voter")
+     */
+    public function voter(string $filename): Response
+    {
+        $markdownFilePath = $this->projectDir . '/Documentation/Voter/' . $filename;
+
+        if (!file_exists($markdownFilePath)) {
+            throw $this->createNotFoundException('Le fichier de documentation n\'a pas été trouvé.');
+        }
+
+        $markdownContent = file_get_contents($markdownFilePath);
+
+        $parsedown = new Parsedown();
+        $htmlContent = $parsedown->text($markdownContent);
+
+        return $this->render('documentation/voter.html.twig', [
             'htmlContent' => $htmlContent,
         ]);
     }
