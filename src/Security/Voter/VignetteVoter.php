@@ -18,7 +18,7 @@ class VignetteVoter extends Voter
 
     protected function supports(string $attribute, $subject): bool
     {
-        // On ne gère que l’accès aux applications
+        // On ne gère que l’accès aux vignettes
         return $attribute === self::ACCESS && $subject instanceof Vignette;
     }
 
@@ -38,7 +38,7 @@ class VignetteVoter extends Voter
             return true;
         }
 
-        /** @var Vignette $application */
+        /** @var Vignette $vignette */
         $vignette = $subject;
 
         switch ($attribute) {
