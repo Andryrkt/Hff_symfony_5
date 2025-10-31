@@ -2,14 +2,16 @@
 
 namespace App\Form\Admin\PersonnelUser;
 
-use App\Entity\Admin\PersonnelUser\UserAccess;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
+use App\Entity\Admin\PersonnelUser\UserAccess;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType; // Import EntityType
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use App\Entity\Admin\PersonnelUser\User; // Import User entity
 use App\Entity\Admin\AgenceService\Agence; // Import Agence entity
 use App\Entity\Admin\AgenceService\Service; // Import Service entity
+use Symfony\Bridge\Doctrine\Form\Type\EntityType; // Import EntityType
 use App\Entity\Admin\ApplicationGroupe\Permission; // Import Permission entity
 
 class UserAccessType extends AbstractType
@@ -22,29 +24,64 @@ class UserAccessType extends AbstractType
                 'choice_label' => 'fullname', // Display the fullname of the user
                 'multiple' => false,
                 'expanded' => false,
+                'attr' => [
+                    'class' => 'form-select',
+                    'data-controller' => 'tom-select',
+                    'data-placeholder' => 'Sélectionnez un utilisateur...',
+                ],
             ])
             ->add('agence', EntityType::class, [
+                'label' => 'Agence cible',
                 'class' => Agence::class,
-                'choice_label' => 'nom', // Display the name of the agency
+                'choice_label' => function (Agence $agence) {
+                    return $agence->getCodeNom(' - ');
+                },
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('a')
+                        ->orderBy('a.code', 'ASC');
+                },
                 'multiple' => false,
                 'expanded' => false,
                 'required' => false, // Agence can be null if allAgence is true
+                'attr' => [
+                    'class' => 'form-select',
+                    'data-controller' => 'tom-select',
+                    'data-placeholder' => 'Sélectionnez une agence...',
+                ],
             ])
             ->add('service', EntityType::class, [
+                'label' => 'Service cible',
                 'class' => Service::class,
-                'choice_label' => 'nom', // Display the name of the service
+                'choice_label' => function (Service $service) {
+                    return $service->getCodeNom(' - ');
+                },
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('a')
+                        ->orderBy('a.code', 'ASC');
+                },
                 'multiple' => false,
                 'expanded' => false,
                 'required' => false, // Service can be null if allService is true
+                'attr' => [
+                    'class' => 'form-select',
+                    'data-controller' => 'tom-select',
+                    'data-placeholder' => 'Sélectionnez un service...',
+                ],
             ])
-            ->add('allAgence')
-            ->add('allService')
+            ->add('allAgence', CheckboxType::class, [
+                'label' => 'Toutes les agences',
+                'required' => false,
+            ])
+            ->add('allService', CheckboxType::class, [
+                'label' => 'Toutes les services',
+                'required' => false,
+            ])
             ->add('permissions', EntityType::class, [
                 'class' => Permission::class,
                 'choice_label' => 'code',
                 'multiple' => true,
                 'expanded' => false,
-                'group_by' => function($choice, $key, $value) {
+                'group_by' => function ($choice, $key, $value) {
                     // Grouper par vignette
                     $vignette = $choice->getVignette();
                     return $vignette ? $vignette->getNom() : 'Sans vignette'; // Adaptez getNom() selon votre entité Vignette

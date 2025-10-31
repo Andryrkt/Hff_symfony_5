@@ -92,6 +92,11 @@ class Agence
         $this->services = new ArrayCollection();
     }
 
+    public function getCodeNom(string $separateur = ""): string
+    {
+        return $this->getCode() . $separateur . $this->getNom();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -205,5 +210,4 @@ class Agence
         }
         return $this;
     }
-
 }

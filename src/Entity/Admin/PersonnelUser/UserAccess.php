@@ -10,11 +10,13 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Admin\ApplicationGroupe\Permission;
 use App\Repository\Admin\PersonnelUser\UserAccessRepository;
+use Symfony\UX\Turbo\Attribute\Broadcast;
 
 /**
  * @ORM\Entity(repositoryClass=UserAccessRepository::class)
  * @ORM\HasLifecycleCallbacks
  */
+#[Broadcast]
 class UserAccess
 {
     use TimestampableTrait;

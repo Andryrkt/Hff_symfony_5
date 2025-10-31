@@ -1,14 +1,7 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Edit UserAccess
-{% endblock %}
-
-{% block content %}
-	<h1>Edit UserAccess</h1>
-
-	{{ include('admin/personnel_user/userAccess/_form.html.twig', {'button_label': 'Update'}) }}
-
-	<a href="{{ path('admin_user_access_index') }}">back to list</a>
-
-	{{ include('admin/personnel_user/userAccess/_delete_form.html.twig') }}
-{% endblock %}
+<turbo-frame id="form-{{ user_access.id }}">
+    <tr>
+        <td colspan="8">
+            {{ include('admin/personnel_user/userAccess/_form.html.twig', {'button_label': 'Update'}) }}
+        </td>
+    </tr>
+</turbo-frame>

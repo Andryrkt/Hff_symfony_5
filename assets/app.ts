@@ -4,11 +4,15 @@
  * We recommend including the built version of this JavaScript file
  * (and its CSS file) in your base layout (base.html.twig).
  */
-import { Application } from "stimulus";
+
+// ⚠️ CORRECTION : Importez depuis '@hotwired/stimulus' au lieu de 'stimulus'
+import { Application } from "@hotwired/stimulus";
 import HelloController from "./controllers/hello_controller";
 import ModalController from "./controllers/modal_controller";
 import NavigationController from "./controllers/navigation_controller";
 import UserRolesController from "./controllers/user_roles_controller";
+import ClickableController from "./controllers/inline_edit_controller"; // ⭐ AJOUT
+
 // imporation du bibliothèque bootstrap
 import "bootstrap";
 
@@ -34,9 +38,10 @@ import { ToastManager } from "./js/utils/toast";
 
 const application = Application.start();
 application.register("hello", HelloController);
-application.register("modal", ModalController); //modal controller stimulus
+application.register("modal", ModalController);
 application.register("navigation", NavigationController);
 application.register("user-roles", UserRolesController);
+application.register("clickable", ClickableController); // ⭐ AJOUT
 
 // Initialisation des gestionnaires de navigation
 document.addEventListener('DOMContentLoaded', function () {

@@ -5,17 +5,12 @@ export default class extends Controller {
     private tomSelect!: TomSelect;
 
     connect() {
-        const settings: { [key: string]: any } = {
-            // Configuration importante pour les groupes
-            optgroups: this.getOptGroups(),
-            options: this.getOptions(),
-            labelField: 'text',
-            valueField: 'value',
-            optgroupField: 'group',
-            optgroupLabelField: 'label',
-            optgroupValueField: 'id',
-            searchField: ['text']
-        };
+        // Prevent re-initialization by Turbo
+        if ((this.element as any).tomselect) {
+            return;
+        }
+
+        const settings: { [key: string]: any } = {};
 
         if (this.element.hasAttribute('data-placeholder')) {
             settings.placeholder = this.element.getAttribute('data-placeholder');

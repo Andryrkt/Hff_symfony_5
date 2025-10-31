@@ -62,7 +62,21 @@ class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
             $this->addFlash('success', 'Utilisateur modifié avec succès.');
+
+            // Si c'est une requête Turbo Frame, rediriger vers la page index
+            if ($request->headers->get('Turbo-Frame')) {
+                return $this->redirectToRoute('admin_user_index');
+            }
+
             return $this->redirectToRoute('admin_user_index');
+        }
+
+        // Si c'est une requête Turbo Frame, retourner seulement le formulaire
+        if ($request->headers->get('Turbo-Frame')) {
+            return $this->render('admin/personnel_user/user/_edit_form.html.twig', [
+                'form' => $form->createView(),
+                'user' => $user,
+            ]);
         }
 
         return $this->render('admin/personnel_user/user/edit.html.twig', [

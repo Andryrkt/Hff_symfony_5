@@ -71,6 +71,11 @@ class Service
         $this->agences = new ArrayCollection();
     }
 
+    public function getCodeNom(string $separateur): string
+    {
+        return $this->getCode() . $separateur . $this->getNom();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -181,5 +186,4 @@ class Service
         $this->agences->removeElement($agence);
         return $this;
     }
-
 }

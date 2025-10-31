@@ -1,0 +1,35 @@
+{# templates/broadcast/Admin/PersonnelUser/UserAccess.stream.html.twig #}
+{% block create %}
+<turbo-stream action="append" target="user_accesses">
+    <template>
+        {# 
+          This is a basic notification. For a better user experience,
+          consider creating a partial template (e.g., `admin/personnel_user/user_access/_row.html.twig`)
+          and including it here to render the full new row.
+          Example: {{ include('admin/personnel_user/user_access/_row.html.twig', {user_access: entity}) }}
+        #}
+        <div id="user_access_{{ id }}">
+            New User Access #{{ id }} for user {{ entity.users.fullname }} created.
+        </div>
+    </template>
+</turbo-stream>
+{% endblock %}
+
+{% block update %}
+<turbo-stream action="replace" target="user_access_{{ id }}">
+    <template>
+        {# 
+          For a better user experience, consider creating a partial template
+          and including it here to re-render the full row.
+          Example: {{ include('admin/personnel_user/user_access/_row.html.twig', {user_access: entity}) }}
+        #}
+        <div id="user_access_{{ id }}">
+            User Access #{{ id }} for user {{ entity.users.fullname }} updated.
+        </div>
+    </template>
+</turbo-stream>
+{% endblock %}
+
+{% block remove %}
+<turbo-stream action="remove" target="user_access_{{ id }}"></turbo-stream>
+{% endblock %}
