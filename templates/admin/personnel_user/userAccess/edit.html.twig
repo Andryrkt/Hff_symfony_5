@@ -6,9 +6,9 @@
 {% block content %}
 	<h1>Edit UserAccess</h1>
 
-	{{ include('admin/personnelUser/userAccess/_form.html.twig', {'button_label': 'Update'}) }}
+	{{ include('admin/personnel_user/userAccess/_form.html.twig', {'button_label': 'Update'}) }}
 
 	<a href="{{ path('admin_user_access_index') }}">back to list</a>
 
-	{{ include('admin/personnelUser/userAccess/_delete_form.html.twig') }}
+	{{ include('admin/personnel_user/userAccess/_delete_form.html.twig') }}
 {% endblock %}

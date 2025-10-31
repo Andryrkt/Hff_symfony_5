@@ -8,6 +8,7 @@ import { Application } from "stimulus";
 import HelloController from "./controllers/hello_controller";
 import ModalController from "./controllers/modal_controller";
 import NavigationController from "./controllers/navigation_controller";
+import UserRolesController from "./controllers/user_roles_controller";
 // imporation du bibliothèque bootstrap
 import "bootstrap";
 
@@ -35,6 +36,7 @@ const application = Application.start();
 application.register("hello", HelloController);
 application.register("modal", ModalController); //modal controller stimulus
 application.register("navigation", NavigationController);
+application.register("user-roles", UserRolesController);
 
 // Initialisation des gestionnaires de navigation
 document.addEventListener('DOMContentLoaded', function () {

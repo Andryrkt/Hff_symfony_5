@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20251028083223 extends AbstractMigration
+final class Version20251031072914 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,19 +20,19 @@ final class Version20251028083223 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE group_access DROP CONSTRAINT FK_D5EFF384D725330D');
-        $this->addSql('ALTER TABLE group_access DROP CONSTRAINT FK_D5EFF384ED5CA9E6');
-        $this->addSql('ALTER TABLE group_access DROP CONSTRAINT FK_D5EFF3843E030ACD');
-        $this->addSql('ALTER TABLE group_access DROP CONSTRAINT FK_D5EFF384FE54D947');
-        $this->addSql('ALTER TABLE users_groups DROP CONSTRAINT FK_FF8AB7E0A76ED395');
-        $this->addSql('ALTER TABLE users_groups DROP CONSTRAINT FK_FF8AB7E0FE54D947');
-        $this->addSql('DROP TABLE group_access');
-        $this->addSql('DROP TABLE users_groups');
-        $this->addSql('DROP TABLE user_group');
+        // $this->addSql('ALTER TABLE group_access DROP CONSTRAINT FK_D5EFF384D725330D');
+        // $this->addSql('ALTER TABLE group_access DROP CONSTRAINT FK_D5EFF384ED5CA9E6');
+        // $this->addSql('ALTER TABLE group_access DROP CONSTRAINT FK_D5EFF3843E030ACD');
+        // $this->addSql('ALTER TABLE group_access DROP CONSTRAINT FK_D5EFF384FE54D947');
+        // $this->addSql('ALTER TABLE users_groups DROP CONSTRAINT FK_FF8AB7E0A76ED395');
+        // $this->addSql('ALTER TABLE users_groups DROP CONSTRAINT FK_FF8AB7E0FE54D947');
+        // $this->addSql('DROP TABLE group_access');
+        // $this->addSql('DROP TABLE users_groups');
+        // $this->addSql('DROP TABLE user_group');
         // $this->addSql('ALTER TABLE user_access DROP CONSTRAINT DF_633B3069_8B8E8428');
-        $this->addSql('ALTER TABLE user_access ALTER COLUMN created_at DATETIME2(6) NOT NULL');
-        $this->addSql('ALTER TABLE vignette ADD icon NVARCHAR(255)');
-        $this->addSql('ALTER TABLE vignette ADD color NVARCHAR(255)');
+        // $this->addSql('ALTER TABLE user_access ALTER COLUMN created_at DATETIME2(6) NOT NULL');
+        // $this->addSql('ALTER TABLE vignette ADD icon NVARCHAR(255)');
+        // $this->addSql('ALTER TABLE vignette ADD color NVARCHAR(255)');
     }
 
     public function down(Schema $schema): void

@@ -41,9 +41,26 @@ class UserAccessType extends AbstractType
             ->add('allService')
             ->add('permissions', EntityType::class, [
                 'class' => Permission::class,
-                'choice_label' => 'name', // Display the name of the permission
+                'choice_label' => 'code',
                 'multiple' => true,
-                'expanded' => true,
+                'expanded' => false,
+                'group_by' => function($choice, $key, $value) {
+                    // Grouper par vignette
+                    $vignette = $choice->getVignette();
+                    return $vignette ? $vignette->getNom() : 'Sans vignette'; // Adaptez getNom() selon votre entité Vignette
+                },
+                'attr' => [
+                    'class' => 'form-select',
+                    'data-controller' => 'tom-select',
+                    'data-placeholder' => 'Sélectionnez des permissions...',
+                ],
+                'query_builder' => function ($repository) {
+                    // Optionnel : trier les permissions
+                    return $repository->createQueryBuilder('p')
+                        ->leftJoin('p.vignette', 'v')
+                        ->orderBy('v.nom', 'ASC') // Adaptez selon votre entité Vignette
+                        ->addOrderBy('p.code', 'ASC');
+                },
             ])
         ;
     }

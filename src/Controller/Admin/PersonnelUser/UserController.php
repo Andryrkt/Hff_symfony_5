@@ -6,10 +6,12 @@ use App\Entity\Admin\PersonnelUser\User;
 use App\Form\Admin\PersonnelUser\UserType;
 use App\Form\Admin\PersonnelUser\UserRolesType;
 use App\Repository\Admin\PersonnelUser\UserRepository;
+use App\Repository\Admin\PersonnelUser\UserAccessRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 
@@ -109,6 +111,38 @@ class UserController extends AbstractController
         return $this->render('admin/personnel_user/user/edit_roles.html.twig', [
             'user' => $user,
             'form' => $form->createView(),
+        ]);
+    }
+
+    /**
+     * @Route("/{id}/access", name="admin_user_manage_access", methods={"GET"})
+     */
+    public function manageAccess(User $user, UserAccessRepository $userAccessRepository): Response
+    {
+        return $this->render('admin/personnel_user/user/manage_access.html.twig', [
+            'user' => $user,
+            'user_accesses' => $userAccessRepository->findBy(['users' => $user]),
+        ]);
+    }
+
+    /**
+     * @Route("/{id}/roles/update-ajax", name="admin_user_roles_update_ajax", methods={"POST"})
+     */
+    public function updateRolesAjax(Request $request, User $user, EntityManagerInterface $em): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN'); // Or a more specific role
+
+        $rolesString = $request->request->get('roles');
+        $roles = array_map('trim', explode(',', $rolesString));
+        $roles = array_filter($roles); // Remove empty roles
+
+        $user->setRoles($roles);
+        $em->flush();
+
+        return new JsonResponse([
+            'success' => true,
+            'roles' => $user->getRoles(),
+            'message' => 'Rôles mis à jour avec succès.'
         ]);
     }
 }

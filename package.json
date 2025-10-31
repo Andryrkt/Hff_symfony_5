@@ -18,6 +18,7 @@
         "regenerator-runtime": "^0.14.1",
         "sass": "^1.89.2",
         "sass-loader": "^16.0.5",
+        "tom-select": "^2.4.3",
         "ts-loader": "^9.5.2",
         "typescript": "^5.9.2",
         "webpack-notifier": "^1.15.0"

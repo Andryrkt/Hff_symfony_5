@@ -29,7 +29,7 @@
                 <td>{{ user_access.allService ? 'Yes' : 'No' }}</td>
                 <td>
                     {% for permission in user_access.permissions %}
-                        {{ permission.name }}{% if not loop.last %}, {% endif %}
+                        {{ permission.code }}{% if not loop.last %}, {% endif %}
                     {% endfor %}
                 </td>
                 <td>

@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Manage User Access for
+	{{ user.fullname }}
+{% endblock %}
+
+{% block content %}
+	<h1>Manage User Access for
+		{{ user.fullname }}</h1>
+
+	<a href="{{ path('admin_user_index') }}">Back to user list</a>
+
+	<h2>User Accesses</h2>
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Agence</th>
+				<th>Service</th>
+				<th>All Agence</th>
+				<th>All Service</th>
+				<th>Permissions</th>
+				<th>actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for user_access in user_accesses %}
+				<tr>
+					<td>{{ user_access.id }}</td>
+					<td>{{ user_access.agence ? user_access.agence.nom : 'N/A' }}</td>
+					<td>{{ user_access.service ? user_access.service.nom : 'N/A' }}</td>
+					<td>{{ user_access.allAgence ? 'Yes' : 'No' }}</td>
+					<td>{{ user_access.allService ? 'Yes' : 'No' }}</td>
+					<td>
+						{% for permission in user_access.permissions %}
+							{{ permission.code }}
+							{% if not loop.last %},
+							{% endif %}
+						{% endfor %}
+					</td>
+					<td>
+						<a href="{{ path('admin_user_access_show', {'id': user_access.id}) }}">show</a>
+						<a href="{{ path('admin_user_access_edit', {'id': user_access.id}) }}">edit</a>
+					</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="7">no user accesses found for this user</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+	    <a href="{{ path('admin_user_access_new', {'user_id': user.id}) }}">Create new User Access for this user</a>{% endblock %}

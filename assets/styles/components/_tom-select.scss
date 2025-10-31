@@ -1,5 +1,5 @@
 /* Styles pour les groupes de permissions (vignettes) */
-.custom-select2-dropdown.group-selection-enabled .select2-results__group.clickable-optgroup {
+.ts-dropdown.custom-ts-dropdown .ts-optgroup-header {
     cursor: pointer;
     padding: 10px 12px;
     font-weight: 600;
@@ -10,29 +10,29 @@
     position: relative;
 }
 
-.custom-select2-dropdown.group-selection-enabled .select2-results__group.clickable-optgroup:hover {
+.ts-dropdown.custom-ts-dropdown .ts-optgroup-header:hover {
     background-color: #e9ecef;
 }
 
 /* États de sélection des groupes */
-.custom-select2-dropdown.group-selection-enabled .select2-results__group.fully-selected {
+.ts-dropdown.custom-ts-dropdown .ts-optgroup-header.fully-selected {
     background-color: #d4edda;
     color: #155724;
     border-left: 4px solid #28a745;
 }
 
-.custom-select2-dropdown.group-selection-enabled .select2-results__group.partially-selected {
+.ts-dropdown.custom-ts-dropdown .ts-optgroup-header.partially-selected {
     background-color: #fff3cd;
     color: #856404;
     border-left: 4px solid #ffc107;
 }
 
-.custom-select2-dropdown.group-selection-enabled .select2-results__group.no-selection {
+.ts-dropdown.custom-ts-dropdown .ts-optgroup-header.no-selection {
     border-left: 4px solid #6c757d;
 }
 
 /* Indicateurs visuels */
-.custom-select2-dropdown.group-selection-enabled .select2-results__group.clickable-optgroup::after {
+.ts-dropdown.custom-ts-dropdown .ts-optgroup-header::after {
     content: "✓";
     position: absolute;
     right: 12px;
@@ -43,35 +43,52 @@
     transition: opacity 0.2s ease;
 }
 
-.custom-select2-dropdown.group-selection-enabled .select2-results__group.fully-selected::after {
+.ts-dropdown.custom-ts-dropdown .ts-optgroup-header.fully-selected::after {
     opacity: 1;
 }
 
-.custom-select2-dropdown.group-selection-enabled .select2-results__group.partially-selected::after {
+.ts-dropdown.custom-ts-dropdown .ts-optgroup-header.partially-selected::after {
     content: "–";
     opacity: 1;
 }
 
 /* Options individuelles */
-.permissions-select2 .select2-results__option {
+.ts-dropdown .ts-option {
     padding: 6px 12px 6px 20px;
     border-left: 3px solid transparent;
 }
 
-.permissions-select2 .select2-results__option[aria-selected="true"] {
+.ts-dropdown .ts-option.selected {
     background-color: #e7f1ff;
     border-left-color: #007bff;
 }
 
 /* Zone de sélection */
-.permissions-select2 .select2-selection--multiple {
+.ts-control {
     min-height: 42px;
     border: 1px solid #ced4da;
 }
 
-.permissions-select2 .select2-selection--multiple .select2-selection__choice {
+.ts-control .item {
     background-color: #007bff;
     color: white;
     border: none;
     border-radius: 3px;
+}
+
+/* Style du champ de recherche */
+.ts-dropdown .ts-input {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin: 8px;
+    width: calc(100% - 16px);
+    box-shadow: none;
+    transition: border-color 0.2s ease;
+}
+
+.ts-dropdown .ts-input:focus {
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
