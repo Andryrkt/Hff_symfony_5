@@ -34,9 +34,15 @@ class Site
      */
     private $indemnites;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Dom::class, mappedBy="siteId")
+     */
+    private $doms;
+
     public function __construct()
     {
         $this->indemnites = new ArrayCollection();
+        $this->doms = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -80,6 +86,36 @@ class Site
             // set the owning side to null (unless already changed)
             if ($indemnite->getSiteId() === $this) {
                 $indemnite->setSiteId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Dom>
+     */
+    public function getDoms(): Collection
+    {
+        return $this->doms;
+    }
+
+    public function addDom(Dom $dom): self
+    {
+        if (!$this->doms->contains($dom)) {
+            $this->doms[] = $dom;
+            $dom->setSiteId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDom(Dom $dom): self
+    {
+        if ($this->doms->removeElement($dom)) {
+            // set the owning side to null (unless already changed)
+            if ($dom->getSiteId() === $this) {
+                $dom->setSiteId(null);
             }
         }
 

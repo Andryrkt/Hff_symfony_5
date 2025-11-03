@@ -39,9 +39,15 @@ class Categorie
      */
     private $indemnites;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Dom::class, mappedBy="categoryId")
+     */
+    private $doms;
+
     public function __construct()
     {
         $this->indemnites = new ArrayCollection();
+        $this->doms = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -97,6 +103,36 @@ class Categorie
             // set the owning side to null (unless already changed)
             if ($indemnite->getCategorieId() === $this) {
                 $indemnite->setCategorieId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Dom>
+     */
+    public function getDoms(): Collection
+    {
+        return $this->doms;
+    }
+
+    public function addDom(Dom $dom): self
+    {
+        if (!$this->doms->contains($dom)) {
+            $this->doms[] = $dom;
+            $dom->setCategoryId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDom(Dom $dom): self
+    {
+        if ($this->doms->removeElement($dom)) {
+            // set the owning side to null (unless already changed)
+            if ($dom->getCategoryId() === $this) {
+                $dom->setCategoryId(null);
             }
         }
 

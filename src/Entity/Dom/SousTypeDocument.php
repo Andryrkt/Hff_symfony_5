@@ -39,10 +39,16 @@ class SousTypeDocument
      */
     private $indemnites;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Dom::class, mappedBy="sousTypeDocument")
+     */
+    private $doms;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
         $this->indemnites = new ArrayCollection();
+        $this->doms = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -116,6 +122,36 @@ class SousTypeDocument
             // set the owning side to null (unless already changed)
             if ($indemnite->getSousTypeDocumentId() === $this) {
                 $indemnite->setSousTypeDocumentId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Dom>
+     */
+    public function getDoms(): Collection
+    {
+        return $this->doms;
+    }
+
+    public function addDom(Dom $dom): self
+    {
+        if (!$this->doms->contains($dom)) {
+            $this->doms[] = $dom;
+            $dom->setSousTypeDocument($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDom(Dom $dom): self
+    {
+        if ($this->doms->removeElement($dom)) {
+            // set the owning side to null (unless already changed)
+            if ($dom->getSousTypeDocument() === $this) {
+                $dom->setSousTypeDocument(null);
             }
         }
 
