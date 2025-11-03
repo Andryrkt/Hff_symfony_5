@@ -1,41 +1,42 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Agence index{% endblock %}
+{% block title %}Agence index
+{% endblock %}
 
-{% block body %}
-    <h1>Agence index</h1>
+{% block content %}
+	<h1>Agence index</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Code</th>
-                <th>Nom</th>
-                <th>CreatedAt</th>
-                <th>UpdatedAt</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for agence in agences %}
-            <tr>
-                <td>{{ agence.id }}</td>
-                <td>{{ agence.code }}</td>
-                <td>{{ agence.nom }}</td>
-                <td>{{ agence.createdAt ? agence.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ agence.updatedAt ? agence.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>
-                    <a href="{{ path('admin_agence_show', {'id': agence.id}) }}">show</a>
-                    <a href="{{ path('admin_agence_edit', {'id': agence.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Code</th>
+				<th>Nom</th>
+				<th>CreatedAt</th>
+				<th>UpdatedAt</th>
+				<th>actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for agence in agences %}
+				<tr>
+					<td>{{ agence.id }}</td>
+					<td>{{ agence.code }}</td>
+					<td>{{ agence.nom }}</td>
+					<td>{{ agence.createdAt ? agence.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+					<td>{{ agence.updatedAt ? agence.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+					<td>
+						<a href="{{ path('admin_agence_show', {'id': agence.id}) }}">show</a>
+						<a href="{{ path('admin_agence_edit', {'id': agence.id}) }}">edit</a>
+					</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="6">no records found</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 
-    <a href="{{ path('admin_agence_new') }}">Create new</a>
+	<a href="{{ path('admin_agence_new') }}">Create new</a>
 {% endblock %}

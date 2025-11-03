@@ -1,13 +1,14 @@
 /* Styles pour les groupes de permissions (vignettes) */
 .ts-dropdown.custom-ts-dropdown .ts-optgroup-header {
     cursor: pointer;
-    padding: 10px 12px;
+    padding: 8px 12px; /* Adjusted padding */
     font-weight: 600;
     border-bottom: 2px solid #dee2e6;
     background-color: #f8f9fa;
     margin-top: 5px;
     transition: all 0.2s ease;
     position: relative;
+    font-size: 0.875em; /* Smaller font size */
 }
 
 .ts-dropdown.custom-ts-dropdown .ts-optgroup-header:hover {
@@ -56,6 +57,7 @@
 .ts-dropdown .ts-option {
     padding: 6px 12px 6px 20px;
     border-left: 3px solid transparent;
+    font-size: 0.875em; /* Smaller font size */
 }
 
 .ts-dropdown .ts-option.selected {
@@ -65,8 +67,9 @@
 
 /* Zone de sélection */
 .ts-control {
-    min-height: 42px;
+    min-height: 38px; /* Reduced min-height */
     border: 1px solid #ced4da;
+    font-size: 0.875em; /* Smaller font size for selected items/input */
 }
 
 .ts-control .item {
@@ -74,17 +77,19 @@
     color: white;
     border: none;
     border-radius: 3px;
+    font-size: 0.875em; /* Ensure selected items also have smaller font */
 }
 
 /* Style du champ de recherche */
 .ts-dropdown .ts-input {
     border: 1px solid #ced4da;
     border-radius: 4px;
-    padding: 8px 12px;
+    padding: 6px 10px; /* Adjusted padding */
     margin: 8px;
     width: calc(100% - 16px);
     box-shadow: none;
     transition: border-color 0.2s ease;
+    font-size: 0.875em; /* Smaller font size */
 }
 
 .ts-dropdown .ts-input:focus {

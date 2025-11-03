@@ -1,61 +1,137 @@
 /*
- * Welcome to your app's main JavaScript file!
- *
- * We recommend including the built version of this JavaScript file
- * (and its CSS file) in your base layout (base.html.twig).
+ * Fichier JavaScript principal de l'application
+ * Chargement automatique des contrôleurs Stimulus
  */
 
-// ⚠️ CORRECTION : Importez depuis '@hotwired/stimulus' au lieu de 'stimulus'
+// Import Stimulus
 import { Application } from "@hotwired/stimulus";
-import HelloController from "./controllers/hello_controller";
-import ModalController from "./controllers/modal_controller";
-import NavigationController from "./controllers/navigation_controller";
-import UserRolesController from "./controllers/user_roles_controller";
-import ClickableController from "./controllers/inline_edit_controller"; // ⭐ AJOUT
 
-// imporation du bibliothèque bootstrap
+// Import de l'auto-loader
+import { StimulusAutoloader } from "./utils/stimulus-autoloader";
+
+// Import des styles et bibliothèques
 import "bootstrap";
-
-// Import complet (icônes + CSS) font awesome
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "@fortawesome/fontawesome-free/js/all.min.js";
-
-// any CSS you import will output into a single css file (app.css in this case)
 import "./styles/app.scss";
-
-// start the Stimulus application
-import "./bootstrap";
-
-//select 2
 import "select2";
 import "select2/dist/css/select2.css";
 import "select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css";
 
-// Import des utilitaires de navigation
+// Import des utilitaires
 import { ChronometerManager } from "./js/utils/chronometer";
 import { SessionManager } from "./js/utils/session";
 import { ToastManager } from "./js/utils/toast";
 
-const application = Application.start();
-application.register("hello", HelloController);
-application.register("modal", ModalController);
-application.register("navigation", NavigationController);
-application.register("user-roles", UserRolesController);
-application.register("clickable", ClickableController); // ⭐ AJOUT
-
-// Initialisation des gestionnaires de navigation
-document.addEventListener('DOMContentLoaded', function () {
-    // Initialiser le chronomètre de session
-    const chronometer = new ChronometerManager();
-    chronometer.init();
-
-    // Initialiser la gestion de session
-    const sessionManager = new SessionManager();
-    sessionManager.init();
-
-    // Initialiser les notifications toast
-    const toastManager = new ToastManager();
-    toastManager.init();
-});
-
+// Import des styles supplémentaires
 import './styles/home.css';
+
+/**
+ * Classe principale de l'application
+ */
+class App {
+    public application: Application;
+
+    constructor() {
+        this.application = Application.start();
+        this.init();
+    }
+
+    /**
+     * Initialise l'application
+     */
+    private async init(): Promise<void> {
+        console.log('🚀 Initialisation de l\'application...');
+        
+        try {
+            // Charge automatiquement tous les contrôleurs Stimulus
+            await this.loadStimulusControllers();
+            
+            // Initialise les autres fonctionnalités
+            this.initManagers();
+            this.bindEvents();
+            
+            console.log('🎯 Application prête !');
+            
+        } catch (error) {
+            console.error('❌ Erreur lors de l\'initialisation:', error);
+        }
+    }
+
+    /**
+     * Charge les contrôleurs Stimulus
+     */
+    private async loadStimulusControllers(): Promise<void> {
+        const autoloader = new StimulusAutoloader(this.application);
+        await autoloader.autoload();
+    }
+
+    /**
+     * Initialise les gestionnaires
+     */
+    private initManagers(): void {
+        new ChronometerManager().init();
+        new SessionManager().init();
+        new ToastManager().init();
+    }
+
+    /**
+     * Lie les événements globaux
+     */
+    private bindEvents(): void {
+        document.addEventListener('DOMContentLoaded', () => this.onDomReady());
+        
+        if (typeof window.Turbo !== 'undefined') {
+            document.addEventListener('turbo:load', () => this.onTurboLoad());
+        }
+    }
+
+    private onDomReady(): void {
+        this.initSelect2();
+    }
+
+    private onTurboLoad(): void {
+        this.initSelect2();
+    }
+
+    private initSelect2(): void {
+        const selectElements = document.querySelectorAll('select[data-select2]');
+        selectElements.forEach((select: Element) => {
+            const htmlSelect = select as HTMLSelectElement;
+            if (htmlSelect && !htmlSelect.classList.contains('select2-hidden-accessible')) {
+                try {
+                    $(htmlSelect).select2({
+                        theme: 'bootstrap-5',
+                        width: '100%'
+                    });
+                } catch (error) {
+                    console.error('Error initializing Select2:', error);
+                }
+            }
+        });
+    }
+
+    /**
+     * Instance singleton
+     */
+    public static getInstance(): App {
+        if (!window.appInstance) {
+            window.appInstance = new App();
+        }
+        return window.appInstance;
+    }
+}
+
+// Déclarations globales
+declare global {
+    interface Window {
+        appInstance: any;
+        $: any;
+        Turbo: any;
+    }
+}
+
+// Initialisation
+const app = App.getInstance();
+
+export default app;

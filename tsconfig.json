@@ -1,23 +1,19 @@
 {
-    "compilerOptions": {
-        "target": "es6",
-        "module": "esnext",
-        "lib": ["dom", "es6"],
-        "strict": true,
-        "esModuleInterop": true,
-        "moduleResolution": "node",
-        "forceConsistentCasingInFileNames": true,
-        "skipLibCheck": true,
-        "allowJs": true,
-        "noEmit": false,
-        "resolveJsonModule": true
-    },
-    "include": [
-        "assets/**/*.ts",
-        "assets/**/*.js"
-    ],
-    "exclude": [
-        "node_modules",
-        "assets/js/accueil.js"
-    ]
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "allowJs": true,
+    "outDir": "./public/build",
+    "rootDir": "./assets",
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": ["node", "bootstrap", "select2"]
+  },
+  "include": ["assets/**/*", "assets/types/**/*"],
+  "exclude": ["node_modules", "public/build"]
 }

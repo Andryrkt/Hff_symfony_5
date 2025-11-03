@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil de {{ user.fullname }}{% endblock %}
+
+{% block content %}
+    <h1>Profil de {{ user.fullname }}</h1>
+
+    <div class="card">
+        <div class="card-header">
+            Informations sur l'utilisateur
+        </div>
+        <div class="card-body">
+            <p><strong>Nom d'utilisateur:</strong> {{ user.username }}</p>
+            <p><strong>Matricule:</strong> {{ user.matricule }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header">
+            Rôles
+        </div>
+        <div class="card-body">
+            <ul>
+                {% for role in user.roles %}
+                    <li>{{ role }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header">
+            Accès
+        </div>
+        <div class="card-body">
+            {% if user.userAccesses|length > 0 %}
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Agence</th>
+                            <th>Service</th>
+                            <th>Permissions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for access in user.userAccesses %}
+                            <tr>
+                                <td>{{ access.allAgence ? 'Toutes les agences' : access.agence.nom|default('N/A') }}</td>
+                                <td>{{ access.allService ? 'Tous les services' : access.service.nom|default('N/A') }}</td>
+                                <td>
+                                    {% for permission in access.permissions %}
+                                        <span class="badge bg-secondary">{{ permission.name }}</span>
+                                    {% else %}
+                                        <span class="badge bg-light text-dark">Aucune permission</span>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Cet utilisateur n'a aucun accès.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <a href="{{ path('admin_user_index') }}" class="btn btn-primary mt-4">Retour à la liste</a>
+{% endblock %}

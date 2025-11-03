@@ -6,6 +6,7 @@ use App\Entity\Admin\PersonnelUser\UserAccess;
 use App\Form\Admin\PersonnelUser\UserAccessType;
 use App\Repository\Admin\PersonnelUser\UserAccessRepository;
 use App\Repository\Admin\PersonnelUser\UserRepository;
+use App\Entity\Admin\PersonnelUser\User; // ADDED: Missing use statement for User entity
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -96,5 +97,16 @@ class UserAccessController extends AbstractController
         }
 
         return $this->redirectToRoute('admin_user_access_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    /**
+     * @Route("/user/{id}", name="admin_user_access_for_user", methods={"GET"})
+     */
+    public function listForUser(User $user, UserAccessRepository $userAccessRepository): Response
+    {
+        return $this->render('admin/personnel_user/userAccess/_list_for_user.html.twig', [
+            'user_accesses' => $userAccessRepository->findBy(['users' => $user]),
+            'user' => $user,
+        ]);
     }
 }

@@ -1,3 +1,4 @@
+import '../../styles/login/login.scss';
 // import du logo
 import logoPath from "../../images/logoHFF.jpg";
 

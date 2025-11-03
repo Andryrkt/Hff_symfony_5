@@ -3,16 +3,17 @@
 namespace App\Controller\Admin\PersonnelUser;
 
 use App\Entity\Admin\PersonnelUser\User;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Form\Admin\PersonnelUser\UserType;
+use Symfony\Component\HttpFoundation\Request;
+use App\Entity\Admin\PersonnelUser\UserAccess;
+use Symfony\Component\HttpFoundation\Response;
 use App\Form\Admin\PersonnelUser\UserRolesType;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\Admin\PersonnelUser\UserRepository;
 use App\Repository\Admin\PersonnelUser\UserAccessRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
 
 
 /**
@@ -109,6 +110,17 @@ class UserController extends AbstractController
     }
 
     /**
+     * @Route("/{id}/profile", name="admin_user_profile", methods={"GET"})
+     */
+    public function profile(User $user, UserAccessRepository $userAccessRepository): Response
+    {
+        return $this->render('admin/personnel_user/user/profile.html.twig', [
+            'user' => $user,
+            'user_accesses' => $userAccessRepository->findBy(['users' => $user]),
+        ]);
+    }
+
+    /**
      * @Route("/{id}/roles/edit", name="admin_user_roles_edit", methods={"GET", "POST"})
      */
     public function editRoles(Request $request, User $user, EntityManagerInterface $em): Response
@@ -158,5 +170,76 @@ class UserController extends AbstractController
             'roles' => $user->getRoles(),
             'message' => 'Rôles mis à jour avec succès.'
         ]);
+    }
+
+
+    // src/Controller/Admin/UserController.php
+
+    /**
+     * @Route("/admin/user/{id}/access", name="admin_user_access_for_user")
+     */
+    public function userAccessForUser(?User $user = null, UserAccessRepository $accessRepo): Response
+    {
+        try {
+            // Vérifier si l'utilisateur existe
+            if (!$user) {
+                return $this->render('admin/personnel_user/user/_access_error.html.twig', [
+                    'message' => 'Utilisateur non trouvé'
+                ], new Response('', 404));
+            }
+
+            // Récupérer les accès de l'utilisateur
+            $accesses = $user->getUserAccesses() ?? [];
+
+            // Récupérer tous les accès disponibles pour le formulaire
+            $availableAccesses = $accessRepo->findAll();
+
+            return $this->render('admin/personnel_user/user/_access_list.html.twig', [
+                'user' => $user,
+                'accesses' => $accesses,
+                'availableAccesses' => $availableAccesses,
+            ]);
+        } catch (\Exception $e) {
+            // Logger l'erreur
+            // $this->logger->error('Erreur accès utilisateur: ' . $e->getMessage());
+
+            return $this->render('admin/personnel_user/user/_access_error.html.twig', [
+                'user' => $user,
+                'message' => 'Erreur lors du chargement des accès'
+            ], new Response('', 500));
+        }
+    }
+
+    /**
+     * @Route("/admin/user/{id}/add-access", name="admin_user_add_access", methods={"POST"})
+     */
+    public function addAccessToUser(?User $user = null, Request $request, EntityManagerInterface $em): Response
+    {
+        try {
+            if (!$user) {
+                return $this->render('admin/personnel_user/user/_access_error.html.twig', [
+                    'message' => 'Utilisateur non trouvé'
+                ], new Response('', 404));
+            }
+
+            $accessId = $request->request->get('access_id');
+            $access = $em->getRepository(UserAccess::class)->find($accessId);
+
+            if (!$access) {
+                throw new \Exception('Accès non trouvé');
+            }
+
+            // Ajouter l'accès à l'utilisateur
+            $user->addUserAccess($access);
+            $em->flush();
+
+            // Recharger la liste des accès
+            return $this->redirectToRoute('admin_user_access_for_user', ['id' => $user->getId()]);
+        } catch (\Exception $e) {
+            return $this->render('admin/personnel_user/user/_access_error.html.twig', [
+                'user' => $user,
+                'message' => 'Erreur lors de l\'ajout de l\'accès'
+            ], new Response('', 500));
+        }
     }
 }

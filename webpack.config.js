@@ -1,78 +1,62 @@
-const Encore = require("@symfony/webpack-encore");
+const Encore = require('@symfony/webpack-encore');
 
-// Manually configure the runtime environment if not already configured yet by the "encore" command.
-// It's useful when you use tools that rely on webpack.config.js file.
 if (!Encore.isRuntimeEnvironmentConfigured()) {
-  Encore.configureRuntimeEnvironment(process.env.NODE_ENV || "dev");
+    Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
 }
 
 Encore
-  // directory where compiled assets will be stored
-  .setOutputPath("public/build/")
-  // public path used by the web server to access the output path
-  .setPublicPath("/build")
-  // only needed for CDN's or subdirectory deploy
-  //.setManifestKeyPrefix('build/')
+    .setOutputPath('public/build/')
+    .setPublicPath('/build')
+    
+    // Entrées
+    .addEntry('app', './assets/app.ts')
+    .addEntry('login', './assets/js/login/login.ts')
+    .addEntry('accueil', './assets/js/accueil.js')
 
-  /*
-   * ENTRY CONFIG
-   *
-   * Each entry will result in one JavaScript file (e.g. app.js)
-   * and one CSS file (e.g. app.css) if your JavaScript imports CSS.
-   */
-  .addEntry("app", "./assets/app.ts")
+    // Split chunks
+    .splitEntryChunks()
+    .enableSingleRuntimeChunk()
 
-  // page login
-  .addEntry("login", ["./assets/js/login/login.js", "./assets/styles/login/login.scss"]) // JS and CSS
+    // Copie des images et polices
+    .copyFiles({
+        from: './assets/images',
+        to: 'images/[path][name].[hash:8].[ext]',
+        pattern: /\.(png|jpg|jpeg|gif|ico|svg|webp)$/
+    })
+    .copyFiles({
+        from: './assets/fonts',
+        to: 'fonts/[path][name].[hash:8].[ext]',
+        pattern: /\.(woff|woff2|ttf|eot|otf)$/
+    })
 
-  // page accueil
-  .addEntry("accueil", "./assets/js/accueil.js") // JS
+    // Copie des polices Font Awesome depuis node_modules
+    .copyFiles({
+        from: './node_modules/@fortawesome/fontawesome-free/webfonts',
+        to: 'fonts/[name].[hash:8].[ext]',
+        pattern: /\.(woff|woff2|ttf|eot|otf|svg)$/
+    })
 
-  // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
-  .enableStimulusBridge("./assets/controllers.json")
+    // Features
+    .cleanupOutputBeforeBuild()
+    .enableBuildNotifications()
+    .enableSourceMaps(!Encore.isProduction())
+    .enableVersioning(Encore.isProduction())
 
-  // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
-  .splitEntryChunks()
+    // Babel - NOTE: This is commented out because a .babelrc file is present.
+    // .configureBabel((config) => {
+    //     config.plugins.push('@babel/plugin-proposal-class-properties');
+    // })
+    // .configureBabelPresetEnv((config) => {
+    //     config.useBuiltIns = 'usage';
+    //     config.corejs = 3;
+    // })
 
-  // will require an extra script tag for runtime.js
-  // but, you probably want this, unless you're building a single-page app
-  .enableSingleRuntimeChunk()
+    // Loaders
+    .enableSassLoader()
+    .enableTypeScriptLoader()
 
-  /*
-   * FEATURE CONFIG
-   *
-   * Enable & configure other features below. For a full
-   * list of features, see:
-   * https://symfony.com/doc/current/frontend.html#adding-more-features
-   */
-  .cleanupOutputBeforeBuild()
-  .enableBuildNotifications()
-  .enableSourceMaps(!Encore.isProduction())
-  // enables hashed filenames (e.g. app.abc123.css)
-  .enableVersioning(Encore.isProduction())
-
-  // Babel configuration is handled by babel.config.js
-  //pour copier les fichiers images
-  .copyFiles({
-    from: "./assets/images",
-    to: "images/[name].[hash:8].[ext]",
-  })
-  .enableVersioning(true)
-
-  // uncomment if you're having problems with a jQuery plugin
-  .autoProvidejQuery()
-
-  // enables Sass/SCSS support
-  .enableSassLoader()
-
-  // uncomment if you use TypeScript
-  .enableTypeScriptLoader()
-
-  // uncomment if you use React
-  //.enableReactPreset()
-
-  // uncomment to get integrity="..." attributes on your script & link tags
-  // requires WebpackEncoreBundle 1.4 or higher
-  //.enableIntegrityHashes(Encore.isProduction());
+    // jQuery
+    .autoProvidejQuery()
+;
 
 module.exports = Encore.getWebpackConfig();
