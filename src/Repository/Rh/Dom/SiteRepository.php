@@ -1,27 +1,27 @@
 <?php
 
-namespace App\Repository\Dom;
+namespace App\Repository\Rh\Dom;
 
-use App\Entity\Dom\SousTypeDocument;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Entity\Rh\Dom\Site;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
- * @extends ServiceEntityRepository<SousTypeDocument>
+ * @extends ServiceEntityRepository<Site>
  *
- * @method SousTypeDocument|null find($id, $lockMode = null, $lockVersion = null)
- * @method SousTypeDocument|null findOneBy(array $criteria, array $orderBy = null)
- * @method SousTypeDocument[]    findAll()
- * @method SousTypeDocument[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Site|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Site|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Site[]    findAll()
+ * @method Site[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class SousTypeDocumentRepository extends ServiceEntityRepository
+class SiteRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, SousTypeDocument::class);
+        parent::__construct($registry, Site::class);
     }
 
-    public function add(SousTypeDocument $entity, bool $flush = false): void
+    public function add(Site $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -30,7 +30,7 @@ class SousTypeDocumentRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(SousTypeDocument $entity, bool $flush = false): void
+    public function remove(Site $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -40,7 +40,7 @@ class SousTypeDocumentRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return SousTypeDocument[] Returns an array of SousTypeDocument objects
+//     * @return Site[] Returns an array of Site objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -54,7 +54,7 @@ class SousTypeDocumentRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?SousTypeDocument
+//    public function findOneBySomeField($value): ?Site
 //    {
 //        return $this->createQueryBuilder('s')
 //            ->andWhere('s.exampleField = :val')

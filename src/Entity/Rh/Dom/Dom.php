@@ -1,12 +1,15 @@
 <?php
 
-namespace App\Entity\Dom;
+namespace App\Entity\Rh\Dom;
 
-use App\Entity\Admin\Statut\StatutDemande;
+use App\Entity\Rh\Dom\Site;
+use App\Entity\Rh\Dom\Categorie;
+use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Rh\Dom\SousTypeDocument;
+use App\Repository\Rh\Dom\DomRepository;
 use App\Entity\Traits\AgenceServiceTrait;
 use App\Entity\Traits\TimestampableTrait;
-use App\Repository\Dom\DomRepository;
-use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Admin\Statut\StatutDemande;
 
 /**
  * @ORM\Entity(repositoryClass=DomRepository::class)

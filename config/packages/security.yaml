@@ -17,6 +17,5 @@ security:
         target: app_login
 
   access_control:
-  - { path: ^/login, roles: PUBLIC_ACCESS }
-  - { path: ^/$, roles: IS_AUTHENTICATED_FULLY }
-  - { path: ^/dom, roles: PUBLIC_ACCESS }
+    - { path: ^/login, roles: PUBLIC_ACCESS }
+    - { path: ^/, roles: IS_AUTHENTICATED_FULLY }

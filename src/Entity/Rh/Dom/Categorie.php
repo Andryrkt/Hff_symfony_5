@@ -1,22 +1,25 @@
 <?php
 
-namespace App\Entity\Dom;
+namespace App\Entity\Rh\Dom;
 
+use App\Entity\Rh\Dom\Dom;
+use App\Entity\Rh\Dom\Indemnite;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Rh\Dom\SousTypeDocument;
 use App\Entity\Traits\TimestampableTrait;
 use Doctrine\Common\Collections\Collection;
+use App\Repository\Rh\Dom\CategorieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
-use App\Repository\Dom\SousTypeDocumentRepository;
 
 /**
- * @ORM\Entity(repositoryClass=SousTypeDocumentRepository::class)
- * @ORM\Table(name="dom_sous_type_document")
+ * @ORM\Entity(repositoryClass=CategorieRepository::class)
+ * @ORM\Table(name="dom_categorie")
  * @ORM\HasLifecycleCallbacks
  */
-class SousTypeDocument
+class Categorie
 {
     use TimestampableTrait;
-
+    
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -25,28 +28,27 @@ class SousTypeDocument
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=50, nullable=true)
+     * @ORM\ManyToOne(targetEntity=SousTypeDocument::class, inversedBy="categories")
      */
-    private $codeSousType;
+    private $sousTypeDocumentId;
 
     /**
-     * @ORM\OneToMany(targetEntity=Categorie::class, mappedBy="sousTypeDocumentId")
+     * @ORM\Column(type="string", length=60, nullable=true)
      */
-    private $categories;
+    private $description;
 
     /**
-     * @ORM\OneToMany(targetEntity=Indemnite::class, mappedBy="sousTypeDocumentId")
+     * @ORM\OneToMany(targetEntity=Indemnite::class, mappedBy="CategorieId")
      */
     private $indemnites;
 
     /**
-     * @ORM\OneToMany(targetEntity=Dom::class, mappedBy="sousTypeDocument")
+     * @ORM\OneToMany(targetEntity=Dom::class, mappedBy="categoryId")
      */
     private $doms;
 
     public function __construct()
     {
-        $this->categories = new ArrayCollection();
         $this->indemnites = new ArrayCollection();
         $this->doms = new ArrayCollection();
     }
@@ -56,44 +58,26 @@ class SousTypeDocument
         return $this->id;
     }
 
-    public function getCodeSousType(): ?string
+    public function getSousTypeDocumentId(): ?SousTypeDocument
     {
-        return $this->codeSousType;
+        return $this->sousTypeDocumentId;
     }
 
-    public function setCodeSousType(?string $codeSousType): self
+    public function setSousTypeDocumentId(?SousTypeDocument $sousTypeDocumentId): self
     {
-        $this->codeSousType = $codeSousType;
+        $this->sousTypeDocumentId = $sousTypeDocumentId;
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, Categorie>
-     */
-    public function getCategories(): Collection
+    public function getDescription(): ?string
     {
-        return $this->categories;
+        return $this->description;
     }
 
-    public function addCategory(Categorie $category): self
+    public function setDescription(?string $description): self
     {
-        if (!$this->categories->contains($category)) {
-            $this->categories[] = $category;
-            $category->setSousTypeDocumentId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCategory(Categorie $category): self
-    {
-        if ($this->categories->removeElement($category)) {
-            // set the owning side to null (unless already changed)
-            if ($category->getSousTypeDocumentId() === $this) {
-                $category->setSousTypeDocumentId(null);
-            }
-        }
+        $this->description = $description;
 
         return $this;
     }
@@ -110,7 +94,7 @@ class SousTypeDocument
     {
         if (!$this->indemnites->contains($indemnite)) {
             $this->indemnites[] = $indemnite;
-            $indemnite->setSousTypeDocumentId($this);
+            $indemnite->setCategorieId($this);
         }
 
         return $this;
@@ -120,8 +104,8 @@ class SousTypeDocument
     {
         if ($this->indemnites->removeElement($indemnite)) {
             // set the owning side to null (unless already changed)
-            if ($indemnite->getSousTypeDocumentId() === $this) {
-                $indemnite->setSousTypeDocumentId(null);
+            if ($indemnite->getCategorieId() === $this) {
+                $indemnite->setCategorieId(null);
             }
         }
 
@@ -140,7 +124,7 @@ class SousTypeDocument
     {
         if (!$this->doms->contains($dom)) {
             $this->doms[] = $dom;
-            $dom->setSousTypeDocument($this);
+            $dom->setCategoryId($this);
         }
 
         return $this;
@@ -150,8 +134,8 @@ class SousTypeDocument
     {
         if ($this->doms->removeElement($dom)) {
             // set the owning side to null (unless already changed)
-            if ($dom->getSousTypeDocument() === $this) {
-                $dom->setSousTypeDocument(null);
+            if ($dom->getCategoryId() === $this) {
+                $dom->setCategoryId(null);
             }
         }
 

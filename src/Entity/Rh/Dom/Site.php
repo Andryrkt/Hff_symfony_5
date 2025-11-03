@@ -1,22 +1,24 @@
 <?php
 
-namespace App\Entity\Dom;
+namespace App\Entity\Rh\Dom;
 
-use App\Entity\Traits\TimestampableTrait;
-use App\Repository\Dom\CategorieRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Entity\Rh\Dom\Dom;
+use App\Entity\Rh\Dom\Indemnite;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Traits\TimestampableTrait;
+use App\Repository\Rh\Dom\SiteRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * @ORM\Entity(repositoryClass=CategorieRepository::class)
- * @ORM\Table(name="dom_categorie")
+ * @ORM\Entity(repositoryClass=SiteRepository::class)
+ * @ORM\Table(name="dom_site")
  * @ORM\HasLifecycleCallbacks
  */
-class Categorie
+class Site
 {
     use TimestampableTrait;
-    
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -25,22 +27,17 @@ class Categorie
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=SousTypeDocument::class, inversedBy="categories")
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
-    private $sousTypeDocumentId;
+    private $nomZone;
 
     /**
-     * @ORM\Column(type="string", length=60, nullable=true)
-     */
-    private $description;
-
-    /**
-     * @ORM\OneToMany(targetEntity=Indemnite::class, mappedBy="CategorieId")
+     * @ORM\OneToMany(targetEntity=Indemnite::class, mappedBy="siteId")
      */
     private $indemnites;
 
     /**
-     * @ORM\OneToMany(targetEntity=Dom::class, mappedBy="categoryId")
+     * @ORM\OneToMany(targetEntity=Dom::class, mappedBy="siteId")
      */
     private $doms;
 
@@ -55,26 +52,14 @@ class Categorie
         return $this->id;
     }
 
-    public function getSousTypeDocumentId(): ?SousTypeDocument
+    public function getNomZone(): ?string
     {
-        return $this->sousTypeDocumentId;
+        return $this->nomZone;
     }
 
-    public function setSousTypeDocumentId(?SousTypeDocument $sousTypeDocumentId): self
+    public function setNomZone(?string $nomZone): self
     {
-        $this->sousTypeDocumentId = $sousTypeDocumentId;
-
-        return $this;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): self
-    {
-        $this->description = $description;
+        $this->nomZone = $nomZone;
 
         return $this;
     }
@@ -91,7 +76,7 @@ class Categorie
     {
         if (!$this->indemnites->contains($indemnite)) {
             $this->indemnites[] = $indemnite;
-            $indemnite->setCategorieId($this);
+            $indemnite->setSiteId($this);
         }
 
         return $this;
@@ -101,8 +86,8 @@ class Categorie
     {
         if ($this->indemnites->removeElement($indemnite)) {
             // set the owning side to null (unless already changed)
-            if ($indemnite->getCategorieId() === $this) {
-                $indemnite->setCategorieId(null);
+            if ($indemnite->getSiteId() === $this) {
+                $indemnite->setSiteId(null);
             }
         }
 
@@ -121,7 +106,7 @@ class Categorie
     {
         if (!$this->doms->contains($dom)) {
             $this->doms[] = $dom;
-            $dom->setCategoryId($this);
+            $dom->setSiteId($this);
         }
 
         return $this;
@@ -131,8 +116,8 @@ class Categorie
     {
         if ($this->doms->removeElement($dom)) {
             // set the owning side to null (unless already changed)
-            if ($dom->getCategoryId() === $this) {
-                $dom->setCategoryId(null);
+            if ($dom->getSiteId() === $this) {
+                $dom->setSiteId(null);
             }
         }
 

@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Repository\Dom;
+namespace App\Repository\Rh\Dom;
 
-use App\Entity\Dom\Rmq;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+
+use App\Entity\Rh\Dom\Rmq;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Rmq>

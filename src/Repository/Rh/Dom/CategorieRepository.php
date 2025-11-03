@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Repository\Dom;
+namespace App\Repository\Rh\Dom;
 
-use App\Entity\Dom\Categorie;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+
+use App\Entity\Rh\Dom\Categorie;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Categorie>

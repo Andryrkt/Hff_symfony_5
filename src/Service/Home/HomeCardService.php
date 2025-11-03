@@ -102,7 +102,7 @@ class HomeCardService
                     'label' => 'Ordre de mission',
                     'icon' => 'fas fa-tags',
                     'children' => [
-                        ['label' => 'Nouvelle demande', 'route' => '#', 'icon' => 'fas fa-search'],
+                        ['label' => 'Nouvelle demande', 'route' => 'dom_first_form', 'icon' => 'fas fa-search'],
                         ['label' => 'Consultation', 'route' => '#', 'icon' => 'fas fa-plus'],
                     ]
                 ],

@@ -57,9 +57,9 @@
             "symfony/flex": true,
             "symfony/runtime": true
         },
-        "optimize-autoloader": true,
-        "classmap-authoritative": true,
-        "apcu-autoloader": true,
+        "optimize-autoloader": false,
+        "classmap-authoritative": false,
+        "apcu-autoloader": false,
         "preferred-install": {
             "*": "dist"
         },

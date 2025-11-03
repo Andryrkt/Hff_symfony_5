@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Entity\Dom;
+namespace App\Entity\Rh\Dom;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Entity\Rh\Dom\Indemnite;
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\Dom\RmqRepository;
+use App\Repository\Rh\Dom\RmqRepository;
 use App\Entity\Traits\TimestampableTrait;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity(repositoryClass=RmqRepository::class)

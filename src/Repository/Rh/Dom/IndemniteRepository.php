@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Repository\Dom;
+namespace App\Repository\Rh\Dom;
 
-use App\Entity\Dom\Indemnite;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+
+use App\Entity\Rh\Dom\Indemnite;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Indemnite>

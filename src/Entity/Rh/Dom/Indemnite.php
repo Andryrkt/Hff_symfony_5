@@ -1,10 +1,15 @@
 <?php
 
-namespace App\Entity\Dom;
+namespace App\Entity\Rh\Dom;
 
+use App\Entity\Rh\Dom\Rmq;
+use App\Entity\Rh\Dom\Site;
+use App\Entity\Rh\Dom\Categorie;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Rh\Dom\SousTypeDocument;
 use App\Entity\Traits\TimestampableTrait;
-use App\Repository\Dom\IndemniteRepository;
+use App\Repository\Rh\Dom\IndemniteRepository;
+
 
 /**
  * @ORM\Entity(repositoryClass=IndemniteRepository::class)
