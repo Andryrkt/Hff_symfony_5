@@ -2,12 +2,14 @@
 
 namespace App\Controller\Rh\Dom;
 
-
+use App\Dto\Rh\Dom\FirstFormDto;
 use App\Factory\Rh\Dom\FirstFormDtoFactory;
 use App\Form\Rh\Dom\FirstFormType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * @Route("/rh/ordre-de-mission")
@@ -26,41 +28,42 @@ class DomFirstController extends AbstractController
      */
     public function firstForm(Request $request)
     {
-        //gerer l'accés 
+        // 1. gerer l'accés 
         $this->denyAccessUnlessGranted('RH_ORDRE_MISSION_CREATE');
 
-        $dom = $this->firstFormDtoFactory->create();
+        // 2 . initialisation de la FirstFormDto
+        $dto = $this->firstFormDtoFactory->create();
 
+        //3. creation du formualire
+        $form = $this->createForm(FirstFormType::class, $dto);
+        //4. traitement du formualire
+        $response = $this->traitemementForm($form, $request, $dto);
 
-        //CREATION DU FORMULAIRE
-        $form = $this->createForm(FirstFormType::class, $dom);
-        //TRAITEMENT DU FORMULAIRE
-        //$this->traitemementForm($form, $request, $dom);
+        if ($response instanceof RedirectResponse) {
+            return $response;
+        }
 
-        //RENDU DE LA VUE
+        //5. rendu de la vue
         return $this->render('rh/dom/firstForm.html.twig', [
             'form' => $form->createView(),
         ]);
     }
 
-    private function traitemementForm($form, $request, $dom)
+    private function traitemementForm(FormInterface $form, Request $request, FirstFormDto $dom)
     {
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // 1. recupération des données du formulaire
+            $data = $form->getData();
 
-            $salarier = $form->get('salarie')->getData();
-            $dom->setSalarier($salarier);
+            // 2. stocage des donner dans le session
+            $session = $request->getSession();
+            $session->set('dom_first_form_data', $data);
 
-            $formData = $form->getData()->toArray();
-
-            //$this->getSessionService()->set('form1Data', $formData);
-
-            // Redirection vers le second formulaire
+            // 3. Redirection vers le second formulaire
             return $this->redirectToRoute('dom_second_form');
         }
+        return null;
     }
-
-
-
 }
