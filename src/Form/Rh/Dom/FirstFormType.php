@@ -22,7 +22,6 @@ use App\Repository\Admin\PersonnelUser\PersonnelRepository;
 
 class FirstFormType extends AbstractType
 {
-    private $em;
     private $security;
 
     const SALARIE = [
@@ -32,7 +31,6 @@ class FirstFormType extends AbstractType
 
     public function __construct(EntityManagerInterface $em, Security $security)
     {
-        $this->em = $em;
         $this->security = $security;
     }
 

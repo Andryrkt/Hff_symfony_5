@@ -91,6 +91,11 @@ class User implements UserInterface
      * Fonction personaliser
      *================================================*/
 
+    /**
+     * Récupération de l'agence de l'utilisateur conecter
+     *
+     * @return string|null
+     */
     public function getAgenceEmetteur(): ?string
     {
         $personnel = $this->getPersonnel();
@@ -113,6 +118,11 @@ class User implements UserInterface
         return $codeAgence . ' - ' . $nomAgence;
     }
 
+    /**
+     * Recuperation du service de l'utilisateur connecter
+     *
+     * @return string|null
+     */
     public function getServiceEmetteur(): ?string
     {
         $personnel = $this->getPersonnel();
@@ -135,6 +145,35 @@ class User implements UserInterface
         return $codeService . ' - ' . $nomService;
     }
 
+    /**
+     * Récupération du nom de l'utilisateur connecter
+     *
+     * @return string
+     */
+    public function getNom(): string
+    {
+        $personnel = $this->getPersonnel();
+        if (!$personnel) {
+            throw new \RuntimeException('Personnel not found for this user.');
+        }
+
+        return $personnel->getNom();
+    }
+
+    /**
+     * Récupération du prénoms de l'utilisateur connecter
+     *
+     * @return string
+     */
+    public function getPrenoms(): string
+    {
+        $personnel = $this->getPersonnel();
+        if (!$personnel) {
+            throw new \RuntimeException('Personnel not found for this user.');
+        }
+
+        return $personnel->getPrenoms();
+    }
     /** ==================================================
      *  GETTERS & SETTERS
      *==================================================*/
