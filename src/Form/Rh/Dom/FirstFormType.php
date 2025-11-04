@@ -7,30 +7,37 @@ use App\Entity\Rh\Dom\Categorie;
 use App\Entity\Rh\Dom\SousTypeDocument;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
+use App\Entity\Admin\PersonnelUser\Personnel;
+use App\Repository\Rh\Dom\CategorieRepository;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Repository\Rh\Dom\SousTypeDocumentRepository;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Security\Core\Security;
+use App\Entity\Admin\PersonnelUser\User;
+use App\Repository\Admin\PersonnelUser\PersonnelRepository;
 
 
 class FirstFormType extends AbstractType
 {
     private $em;
+    private $security;
 
     const SALARIE = [
         'PERMANENT' => 'PERMANENT',
         'TEMPORAIRE' => 'TEMPORAIRE',
     ];
 
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(EntityManagerInterface $em, Security $security)
     {
         $this->em = $em;
+        $this->security = $security;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-
         $builder
             ->add(
                 'agenceUser',
@@ -42,7 +49,7 @@ class FirstFormType extends AbstractType
                     'attr' => [
                         'readonly' => true
                     ],
-                    // 'data' => $options["data"]->getAgenceEmetteur() ?? null
+                    'data' => $options["data"]->agenceUser ?? null
                 ]
             )
 
@@ -56,7 +63,7 @@ class FirstFormType extends AbstractType
                     'attr' => [
                         'readonly' => true,
                     ],
-                    // 'data' => $options["data"]->getServiceEmetteur() ?? null
+                    'data' => $options["data"]->serviceUser ?? null
                 ]
             )
             ->add(
@@ -66,11 +73,11 @@ class FirstFormType extends AbstractType
                     'label' => 'Type de Mission',
                     'class' => SousTypeDocument::class,
                     'choice_label' => 'codeSousType',
-                    // 'query_builder' => function (SousTypeDocumentRepository $repo) {
-                    //     return $repo->createQueryBuilder('s')
-                    //         ->where('s.id NOT IN (:excludedIds)')
-                    //         ->setParameter('excludedIds', [5, 11]); // id de mutation et trop perçu
-                    // }
+                    'query_builder' => function (SousTypeDocumentRepository $repo) {
+                        return $repo->createQueryBuilder('s')
+                            ->where('s.codeSousType NOT IN (:excludedIds)')
+                            ->setParameter('excludedIds', ['MUTATION', 'TROP PERCU']); // id de mutation et trop perçu
+                    }
                 ]
             )
             ->add(
@@ -125,15 +132,88 @@ class FirstFormType extends AbstractType
                     'label' => 'Catégorie',
                     'class' => Categorie::class,
                     'choice_label' => 'description',
-                    'choices' => [],
                     'placeholder' => false,
                     'required' => false,
                     'empty_data' => null,
                     'mapped' => true,
                     'invalid_message' => 'Veuillez sélectionner une catégorie valide.',
+                    'query_builder' => function (CategorieRepository $repository) use ($options) {
+                        $descriptionRmq = explode('-', $options['data']->agenceUser)[0] == '50' ? '50' : 'STD';
+                        return $repository->createQueryBuilder('c')
+                            ->leftJoin('c.rmq', 'r')
+                            ->where('r.description = :description')
+                            ->setParameter('description', $descriptionRmq)
+                            ->orderBy('c.description', 'ASC');
+                    },
                 ]
             )
-        
+            ->add(
+                'matriculeNom',
+                EntityType::class,
+                [
+                    'mapped' => false,
+                    'label' => 'Matricule et nom',
+                    'class' => Personnel::class,
+                    'placeholder' => '-- choisir un personnel --',
+                    'choice_label' => function (Personnel $personnel): string {
+                        return $personnel->getMatricule() . ' ' . $personnel->getNom() . ' ' . $personnel->getPrenoms();
+                    },
+                    'multiple' => false, // Explicitly set to false
+                    'required' => true,
+                    'attr' => [
+                        'data-controller' => 'tom-select',
+                        'data-placeholder' => '-- choisir un personnel --'
+                    ],
+                    'choice_attr' => function (Personnel $personnel) {
+                        return ['data-matricule' => $personnel->getMatricule()];
+                    },
+                    'query_builder' => function (PersonnelRepository $repo) use ($options) {
+                        $qb = $repo->createQueryBuilder('p');
+                        $user = $this->security->getUser();
+
+                        if ($user instanceof User) {
+                            $userAccesses = $user->getUserAccesses();
+
+                            $agenceIds = [];
+                            $serviceIds = [];
+                            $allAgence = false;
+                            $allService = false;
+
+                            foreach ($userAccesses as $userAccess) {
+                                if ($userAccess->getAllAgence()) {
+                                    $allAgence = true;
+                                    break;
+                                }
+                                if ($userAccess->getAgence()) {
+                                    $agenceIds[] = $userAccess->getAgence()->getId();
+                                }
+                            }
+
+                            foreach ($userAccesses as $userAccess) {
+                                if ($userAccess->getAllService()) {
+                                    $allService = true;
+                                    break;
+                                }
+                                if ($userAccess->getService()) {
+                                    $serviceIds[] = $userAccess->getService()->getId();
+                                }
+                            }
+
+                            if (!$allAgence && !empty($agenceIds)) {
+                                $qb->andWhere('p.agence IN (:agenceIds)')
+                                    ->setParameter('agenceIds', $agenceIds);
+                            }
+
+                            if (!$allService && !empty($serviceIds)) {
+                                $qb->andWhere('p.service IN (:serviceIds)')
+                                    ->setParameter('serviceIds', $serviceIds);
+                            }
+                        }
+
+                        return $qb->orderBy('p.matricule', 'ASC');
+                    },
+                ]
+            )
         ;
     }
 

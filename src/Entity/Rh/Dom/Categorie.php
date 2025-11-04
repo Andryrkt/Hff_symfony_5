@@ -47,6 +47,11 @@ class Categorie
      */
     private $doms;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Rmq::class, inversedBy="categories")
+     */
+    private $rmq;
+
     public function __construct()
     {
         $this->indemnites = new ArrayCollection();
@@ -138,6 +143,18 @@ class Categorie
                 $dom->setCategoryId(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getRmq(): ?Rmq
+    {
+        return $this->rmq;
+    }
+
+    public function setRmq(?Rmq $rmq): self
+    {
+        $this->rmq = $rmq;
 
         return $this;
     }

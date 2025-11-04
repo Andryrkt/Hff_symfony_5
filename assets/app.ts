@@ -134,4 +134,6 @@ declare global {
 // Initialisation
 const app = App.getInstance();
 
+import "./js/dom/firstForm.js";
+
 export default app;

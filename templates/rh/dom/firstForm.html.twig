@@ -4,7 +4,6 @@
 	Création DOM - 1
 {% endblock %}
 
-
 {% block content %}
 
 	<div class="container mt-6 mb-4">
@@ -36,16 +35,14 @@
 					</div>
 
 				</div>
-				<div class="row">
+				<div class="row" id="categorie_field_container">
 					<div class="col-12">
-						{% if form.categorie is defined %}
-							{{ form_row(form.categorie)}}
-						{% endif %}
+						{{ form_row(form.categorie)}}
 					</div>
 				</div>
 				<div class="row" id="Interne">
 
-					{# {{ form_row(form.matriculeNom)}} #}
+					{{ form_row(form.matriculeNom)}}
 
 					{{ form_row(form.matricule)}}
 
@@ -73,3 +70,5 @@
 </div>
 {{ form_end(form)}}
 {% endblock %}
+
+

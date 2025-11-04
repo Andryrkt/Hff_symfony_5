@@ -35,9 +35,17 @@ class Rmq
      */
     private $indemnites;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Categorie::class, mappedBy="rmq")
+     */
+    private $categories;
+
+
+
     public function __construct()
     {
         $this->indemnites = new ArrayCollection();
+        $this->categories = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -86,4 +94,35 @@ class Rmq
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Categorie>
+     */
+    public function getCategories(): Collection
+    {
+        return $this->categories;
+    }
+
+    public function addCategory(Categorie $category): self
+    {
+        if (!$this->categories->contains($category)) {
+            $this->categories[] = $category;
+            $category->setRmq($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCategory(Categorie $category): self
+    {
+        if ($this->categories->removeElement($category)) {
+            // set the owning side to null (unless already changed)
+            if ($category->getRmq() === $this) {
+                $category->setRmq(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

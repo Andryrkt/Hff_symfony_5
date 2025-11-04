@@ -131,6 +131,7 @@ class PermissionFixtures extends Fixture implements DependentFixtureInterface
             ;
 
             $manager->persist($permission);
+            $this->addReference('permission_'.$permissionData['code'], $permission);
         }
 
         $manager->flush();

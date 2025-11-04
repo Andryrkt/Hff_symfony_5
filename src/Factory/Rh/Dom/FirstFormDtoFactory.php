@@ -16,7 +16,7 @@ class FirstFormDtoFactory
         Security $security,
         EntityManagerInterface $em
     ) {
-        $this->security= $security;
+        $this->security = $security;
         $this->em = $em;
     }
 

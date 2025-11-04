@@ -9,32 +9,47 @@ use App\DataFixtures\Admin\ServiceFixtures;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use App\Entity\Admin\PersonnelUser\UserAccess;
 use App\DataFixtures\Admin\ApplicationFixtures;
+use App\DataFixtures\Admin\PermissionFixtures;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 class UserAccessFixtures extends Fixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager)
     {
-        $userAccess = new UserAccess();
+        $userAccesss = [
+            //pour user test
+            ['user' => 'user_u1', 'agence' => 'agence_administration', 'service' => 'service_inf', 'allAgence' => false, 'allService' => false, 'permissions' => ['permission_RH_ORDRE_MISSION_CREATE', 'permission_RH_ORDRE_MISSION_VIEW']],
+            // pour user lanto
+            ['user' => 'user_u2', 'agence' => null, 'service' => null, 'allAgence' => true, 'allService' => true, 'permissions' => ['permission_RH_ORDRE_MISSION_CREATE', 'permission_RH_ORDRE_MISSION_VIEW']],
+        ];
 
-        // Récupérer les références des entités liées
-        // Assurez-vous que ces références sont définies dans d'autres fixtures
-        $user = $this->getReference('user_test');
-        $agence = $this->getReference('agence_administration');
-        $service = $this->getReference('service_inf');
-        $application = $this->getReference('app_dom');
 
-        $userAccess->setUsers($user);
-        $userAccess->setAgence($agence);
-        $userAccess->setService($service);
-        $userAccess->setApplication($application);
-        $userAccess->setAccessType('ALL');
+        foreach ($userAccesss as $userAccessData) {
+            $userAccess = new UserAccess();
 
-        $manager->persist($userAccess);
+            $userAccess->setUsers($this->getReference($userAccessData['user']));
+            if ($userAccessData['agence'] !== null) {
+                $userAccess->setAgence($this->getReference($userAccessData['agence']));
+            } else {
+                $userAccess->setAgence(null);
+            }
+            if ($userAccessData['service'] !== null) {
+                $userAccess->setService($this->getReference($userAccessData['service']));
+            } else {
+                $userAccess->setService(null);
+            }
+            $userAccess->setAllAgence($userAccessData['allAgence']);
+            $userAccess->setAllService($userAccessData['allService']);
+
+            foreach ($userAccessData['permissions'] as $permissionRef) {
+                $permission = $this->getReference($permissionRef);
+                $userAccess->addPermission($permission);
+            }
+
+            $manager->persist($userAccess);
+        }
+
         $manager->flush();
-
-        // Vous pouvez ajouter une référence à cette fixture si d'autres en dépendent
-        $this->addReference('user_access_test', $userAccess);
     }
 
     public function getDependencies()
@@ -43,7 +58,7 @@ class UserAccessFixtures extends Fixture implements DependentFixtureInterface
             UserFixtures::class,
             AgenceFixtures::class,
             ServiceFixtures::class,
-            ApplicationFixtures::class,
+            PermissionFixtures::class
         ];
     }
 }

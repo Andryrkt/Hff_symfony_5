@@ -21,6 +21,7 @@ export class StimulusAutoloader {
             { name: 'user-roles', import: () => import('../controllers/user_roles_controller') },
             { name: 'clickable', import: () => import('../controllers/inline_edit_controller') },
             { name: 'user-access', import: () => import('../controllers/user_access_controller') },
+            { name: 'tom-select', import: () => import('../controllers/tom_select_controller') },
         ];
 
         let loadedCount = 0;

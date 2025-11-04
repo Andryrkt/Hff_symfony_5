@@ -1,8 +1,9 @@
 <?php
 
-namespace App\DataFixtures\dom;
+namespace App\DataFixtures\Rh\dom;
 
-use App\Entity\Dom\Rmq;
+
+use App\Entity\Rh\Dom\Rmq;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 

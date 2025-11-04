@@ -1,8 +1,9 @@
 <?php
 
-namespace App\DataFixtures\dom;
+namespace App\DataFixtures\Rh\dom;
 
-use App\Entity\Dom\SousTypeDocument;
+
+use App\Entity\Rh\Dom\SousTypeDocument;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\DataFixtures\dom;
+namespace App\DataFixtures\Rh\dom;
 
-use App\Entity\Dom\Indemnite;
+
+use App\Entity\Rh\Dom\Indemnite;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;

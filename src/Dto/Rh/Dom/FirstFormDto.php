@@ -14,9 +14,10 @@ class FirstFormDto
     #[Assert\NotBlank]
     public $typeMission;
     #[Assert\Choice(['PERMANENT', 'TEMPORAIRE'])]
-    public $salarier = 'PERMANENT';
+    public string $salarier = 'PERMANENT';
     public $categorie;
     public $matricule;
+    public $matriculeNom;
     public ?string $cin = null;
     public ?string $nom = null;
     public ?string $prenom = null;

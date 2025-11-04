@@ -11,22 +11,29 @@ class PersonnelFixtures extends Fixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager): void
     {
-        $p1 = new Personnel();
-        $p1->setNom('Rabe');
-        $p1->setPrenoms('Jean');
-        $p1->setAgenceServiceIrium($this->getReference('agence_service_administration_inf_DA14'));
-        $manager->persist($p1);
+        $personnels = [
+            ['nom' => 'Rabe', 'prenoms' => 'Jean', 'matricule' => '9999', 'agServIrium' => 'agence_service_administration_inf_DA14', 'reference' => 'personnel_p1'],
+            ['nom' => 'Rakoto', 'prenoms' => 'Doe', 'matricule' => '9998', 'agServIrium' => 'agence_service_administration_inf_DA14', 'reference' => 'personnel_p2']
+        ];
 
+
+        foreach ($personnels as $personelData) {
+            $personnel = new Personnel();
+            $personnel->setNom($personelData['nom']);
+            $personnel->setPrenoms($personelData['prenoms']);
+            $personnel->setMatricule($personelData['matricule']);
+            $personnel->setAgenceServiceIrium($this->getReference($personelData['agServIrium']));
+            
+            $manager->persist($personnel);
+            $this->addReference($personelData['reference'], $personnel);
+        }
         $manager->flush();
-
-        $this->addReference('personnel_p1', $p1);
     }
 
     public function getDependencies(): array
     {
         return [
-            AgenceServiceIriumFixtures::class,
-            GroupFixtures::class,
+            AgenceServiceIriumFixtures::class
         ];
     }
 }
