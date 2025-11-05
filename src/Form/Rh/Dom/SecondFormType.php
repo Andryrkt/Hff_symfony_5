@@ -4,6 +4,7 @@ namespace App\Form\Rh\Dom;
 
 use App\Dto\Rh\Dom\SecondFormDto;
 use App\Entity\Rh\Dom\Site;
+use App\Entity\Rh\Dom\SousTypeDocument;
 use App\Form\Common\DateRangeType;
 use App\Form\Common\FileUploadType;
 use App\Form\Common\AgenceServiceType;
@@ -61,6 +62,7 @@ class SecondFormType extends AbstractType
                 'service_label' => 'Service Debiteur',
                 'agence_placeholder' => '-- Agence Debiteur --',
                 'service_placeholder' => '-- Service Debiteur --',
+                'data' => $options["data"]->debiteur ?? []
             ])
             ->add(
                 'agenceUser',
@@ -110,7 +112,8 @@ class SecondFormType extends AbstractType
                     'label' => 'Type de Mission :',
                     'attr' => [
                         'disabled' => true
-                    ]
+                    ],
+                    'data' => $options["data"]->typeMission->getCodeSousType()
                 ]
             )
             ->add(
@@ -118,9 +121,13 @@ class SecondFormType extends AbstractType
                 TextType::class,
                 [
                     'label' => 'Catégorie :',
+                    'row_attr' => [
+                        'style' => $options["data"]->typeMission->getCodeSousType() === SousTypeDocument::CODE_COMPLEMENT || $options["data"]->typeMission->getCodeSousType() === SousTypeDocument::CODE_MUTATION || $options["data"]->typeMission->getCodeSousType() === SousTypeDocument::CODE_FRAIS_EXCEPTIONNEL ? 'display: none;' : ''
+                    ],
                     'attr' => [
                         'disabled' => true
-                    ]
+                    ],
+                    'data' => $options["data"]->categorie->getDescription()
                 ]
             )
             ->add(
@@ -134,12 +141,13 @@ class SecondFormType extends AbstractType
                         return $this->siteRepository->createQueryBuilder('s')
                             ->orderBy('s.nomZone', 'ASC');
                     },
-                    // 'row_attr' => [
-                    //     'style' => $idSousTypeDocument === 3 || $idSousTypeDocument === 4 || $idSousTypeDocument === 10 ? 'display: none;' : ''
-                    // ],
-                    // 'attr' => [
-                    //     'disabled' => $idSousTypeDocument === 3 || $idSousTypeDocument === 4 || $idSousTypeDocument === 10,
-                    // ]
+                    'row_attr' => [
+                        'style' => $options["data"]->typeMission->getCodeSousType() === SousTypeDocument::CODE_COMPLEMENT || $options["data"]->typeMission->getCodeSousType()  === SousTypeDocument::CODE_MUTATION || $options["data"]->typeMission->getCodeSousType()  === SousTypeDocument::CODE_FRAIS_EXCEPTIONNEL ? 'display: none;' : ''
+                    ],
+                    'attr' => [
+                        'disabled' => $options["data"]->typeMission->getCodeSousType()  === SousTypeDocument::CODE_COMPLEMENT || $options["data"]->typeMission->getCodeSousType() === SousTypeDocument::CODE_MUTATION || $options["data"]->typeMission->getCodeSousType()  === SousTypeDocument::CODE_FRAIS_EXCEPTIONNEL,
+                    ],
+                    'data' => $options["data"]->site
                 ]
             )
             ->add(
@@ -330,7 +338,7 @@ class SecondFormType extends AbstractType
                     'label' => 'supplément journalier',
                     'required' => false,
                     'attr' => [
-                        // 'disabled' => $idSousTypeDocument === 11,
+                        'disabled' => $options["data"]->typeMission === SousTypeDocument::CODE_TROP_PERCU,
                     ]
                 ]
             )
@@ -339,10 +347,11 @@ class SecondFormType extends AbstractType
                 TextType::class,
                 [
                     'label' => 'Indeminté forfaitaire journalière(s)',
-                    // 'attr' => [
-                    //     'readonly' => $idSousTypeDocument === 2 || $idSousTypeDocument === 5,
-                    //     'disabled' => $idSousTypeDocument === 3 || $idSousTypeDocument === 4
-                    // ],
+                    'attr' => [
+                        'readonly' => $options["data"]->typeMission->getCodeSousType() === SousTypeDocument::CODE_MISSION || $options["data"]->typeMission->getCodeSousType() === SousTypeDocument::CODE_MUTATION,
+                        'disabled' => $options["data"]->typeMission->getCodeSousType() === SousTypeDocument::CODE_COMPLEMENT || $options["data"]->typeMission->getCodeSousType() === SousTypeDocument::CODE_MUTATION
+                    ],
+                    'data' => $options["data"]->indemniteForfaitaire
                 ]
             )
             ->add(
@@ -486,7 +495,7 @@ class SecondFormType extends AbstractType
                 FileUploadType::class,
                 [
                     'label' => 'Fichier Joint 01 (Merci de mettre un fichier PDF)',
-                    //'required' => $salarier !== 'PERMANENT',
+                    'required' => $options["data"]->salarier !== 'PERMANENT',
                     'allowed_mime_types' => ['application/pdf'],
                     'accept' => '.pdf',
                 ]
@@ -496,7 +505,7 @@ class SecondFormType extends AbstractType
                 FileUploadType::class,
                 [
                     'label' => 'Fichier Joint 02 (Merci de mettre un fichier PDF)',
-                    //'required' => $salarier !== 'PERMANENT',
+                    'required' => $options["data"]->salarier !== 'PERMANENT',
                     'allowed_mime_types' => ['application/pdf'],
                     'accept' => '.pdf',
                 ]

@@ -19,6 +19,9 @@ class Site
 {
     use TimestampableTrait;
 
+    public const NOM_ZONE_TANA = 'TANA';
+    public const NOM_ZONE_AUTRES_VILLES = 'AUTRES VILLES';
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue

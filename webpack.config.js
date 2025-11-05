@@ -12,6 +12,7 @@ Encore
     .addEntry('app', './assets/app.ts')
     .addEntry('login', './assets/js/login/login.ts')
     .addEntry('accueil', './assets/js/accueil.js')
+    .addEntry('secondForm', './assets/styles/pages/secondForm.scss')
 
     // Split chunks
     .splitEntryChunks()

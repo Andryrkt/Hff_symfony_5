@@ -20,6 +20,12 @@ class SousTypeDocument
 {
     use TimestampableTrait;
 
+    public const CODE_MISSION = 'MISSION'; //2
+    public const CODE_COMPLEMENT = 'COMPLEMENT'; //3
+    public const CODE_MUTATION = 'MUTATION'; //5
+    public const CODE_FRAIS_EXCEPTIONNEL = 'FRAIS EXCEPTIONNEL'; //10
+    public const CODE_TROP_PERCU = 'TROP PERCU'; //11
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue

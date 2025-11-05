@@ -4,6 +4,11 @@
 	Création DOM - 2
 {% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('secondForm') }}
+{% endblock %}
+
 {% import "macros/form_macros.html.twig" as formMacros %}
 
 {% block content %}
@@ -106,7 +111,7 @@
 							<div class="col-12 col-md-4">
 								{{ form_row(form.prenom, {'attr': {'id': 'dom_form2_prenom_2'}}) }}
 							</div>
-							<div class="col-12 col-md-4">
+							<div class="col-12 col-md-4 {{ firstFormDto.salarier == "PERMANENT" ? 'd-none' : ''}}">
 								{{ form_row(form.cin) }}
 							</div>
 						</div>

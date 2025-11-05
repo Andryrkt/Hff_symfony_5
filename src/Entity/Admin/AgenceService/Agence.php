@@ -50,6 +50,7 @@ class Agence
 {
     use TimestampableTrait;
 
+    public const CODE_AGENCE_RENTAL = 50;
     /**
      * @ORM\Id
      * @ORM\GeneratedValue

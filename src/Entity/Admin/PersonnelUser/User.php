@@ -2,14 +2,16 @@
 
 namespace App\Entity\Admin\PersonnelUser;
 
-use App\Entity\Admin\ApplicationGroupe\Permission;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Traits\TimestampableTrait;
+use App\Entity\Admin\AgenceService\Agence;
+use App\Entity\Admin\AgenceService\Service;
 use Doctrine\Common\Collections\Collection;
 use App\Entity\Admin\ApplicationGroupe\Group;
 use App\Entity\Admin\PersonnelUser\Personnel;
 use App\Entity\Admin\PersonnelUser\UserAccess;
 use Doctrine\Common\Collections\ArrayCollection;
+use App\Entity\Admin\ApplicationGroupe\Permission;
 use App\Repository\Admin\PersonnelUser\UserRepository;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -96,7 +98,7 @@ class User implements UserInterface
      *
      * @return string|null
      */
-    public function getAgenceEmetteur(): ?string
+    public function getAgenceUser(): ?Agence
     {
         $personnel = $this->getPersonnel();
         if (!$personnel) {
@@ -113,9 +115,7 @@ class User implements UserInterface
             throw new \RuntimeException('Agence not found for the AgenceServiceIrium.');
         }
 
-        $nomAgence = $agence->getNom();
-        $codeAgence = $agence->getCode();
-        return $codeAgence . ' - ' . $nomAgence;
+        return $agence;
     }
 
     /**
@@ -123,7 +123,7 @@ class User implements UserInterface
      *
      * @return string|null
      */
-    public function getServiceEmetteur(): ?string
+    public function getServiceUser(): ?Service
     {
         $personnel = $this->getPersonnel();
         if (!$personnel) {
@@ -140,9 +140,7 @@ class User implements UserInterface
             throw new \RuntimeException('Service not found for the AgenceServiceIrium.');
         }
 
-        $nomService = $service->getNom();
-        $codeService = $service->getCode();
-        return $codeService . ' - ' . $nomService;
+        return $service;
     }
 
     /**

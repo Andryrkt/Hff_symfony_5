@@ -2,21 +2,28 @@
 
 namespace App\Dto\Rh\Dom;
 
+use App\Entity\Rh\Dom\Categorie;
+use App\Entity\Rh\Dom\Rmq;
+use App\Entity\Rh\Dom\Site;
+use App\Entity\Rh\Dom\SousTypeDocument;
 use DateTime;
 
 class SecondFormDto
 {
-    public $debiteur;
+    public array $debiteur;
     public string $agenceUser;
     public string $serviceUser;
     public DateTime $dateDemande;
-    public string $typeMission;
-    public ?string $categorie; // TODO: n'affiche pas la categorie si le type mission est complement , mutation et frais exceptionnel
-    public string $site;
+    public ?SousTypeDocument $typeMission;
+    public ?Categorie $categorie;
+    public ?Site $site;
     public ?string $matricule;
     public ?string $nom;
     public ?string $prenom;
     public ?string $cin;
+    
+    public ?string $salarier;
+    public ?Rmq $rmq;
 
 
     public string $dateHeureMission;
@@ -32,7 +39,7 @@ class SecondFormDto
     public $totalIndemniteDeplacement;
     public string $devis;
     public $supplementJournaliere;
-    public $indemniteForfaitaire;
+    public string $indemniteForfaitaire;
     public $totalIndemniteForfaitaire;
     public string $motifAutresDepense1;
     public $autresDepense1;

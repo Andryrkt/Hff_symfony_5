@@ -29,8 +29,8 @@ class FirstFormDtoFactory
             throw new \RuntimeException('User not authenticated');
         }
 
-        $dto->agenceUser = $user->getAgenceEmetteur();
-        $dto->serviceUser = $user->getServiceEmetteur();
+        $dto->agenceUser = $user->getAgenceUser()->getCode() .'-'. $user->getAgenceUser()->getNom();
+        $dto->serviceUser = $user->getServiceUser()->getCode().'-'.$user->getServiceUser()->getNom();
         $dto->typeMission = $this->em->getRepository(SousTypeDocument::class)
             ->findOneBy(['codeSousType' => 'MISSION']);
 
