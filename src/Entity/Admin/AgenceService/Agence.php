@@ -11,9 +11,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Admin\PersonnelUser\UserAccess;
 use App\Entity\Admin\AgenceService\AgenceServiceIrium;
 use App\Entity\Admin\AgenceService\Service;
-
 use ApiPlatform\Core\Annotation\ApiResource;
-use App\Controller\Api\AgenceServicesController;
+use ApiPlatform\Core\Annotation\ApiSubresource;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @Broadcast()
@@ -21,29 +21,8 @@ use App\Controller\Api\AgenceServicesController;
  * @ORM\HasLifecycleCallbacks
  * @ApiResource(
  *     collectionOperations={"get"},
- *     itemOperations={
- *         "get",
- *         "get_services"={
- *             "method"="GET",
- *             "path"="/agences/{id}/services",
- *             "controller"=AgenceServicesController::class,
- *             "security"="is_granted('ROLE_USER')",
- *             "normalization_context"={"groups"={"service:read"}},
- *             "openapi_context"={
- *                 "summary"="Retrieves the collection of Service resources for a given Agence.",
- *                 "parameters"={
- *                     {
- *                         "name"="id",
- *                         "in"="path",
- *                         "required"=true,
- *                         "schema"={
- *                             "type"="integer"
- *                         }
- *                     }
- *                 }
- *             }
- *         }
- *     }
+ *     itemOperations={"get"},
+ *     normalizationContext={"groups"={"agence:read"}}
  * )
  */
 class Agence
@@ -55,16 +34,19 @@ class Agence
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"agence:read", "service:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=10, unique=true)
+     * @Groups({"agence:read", "service:read"})
      */
     private $code;
 
     /**
      * @ORM\Column(type="string", length=100)
+     * @Groups({"agence:read", "service:read"})
      */
     private $nom;
 
@@ -81,10 +63,10 @@ class Agence
     /**
      * @ORM\ManyToMany(targetEntity=Service::class, inversedBy="agences")
      * @ORM\JoinTable(name="agence_service")
+     * @ApiSubresource
+     * @Groups({"agence:read"})
      */
     private $services;
-
-
 
     public function __construct()
     {

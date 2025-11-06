@@ -76,14 +76,13 @@ class SecondFormDtoFactory
 
     private function getSite(FirstFormDto $firstFormDto, User $user): Site
     {
-
         $criteria = [
             'sousTypeDocumentId' => $firstFormDto->typeMission,
             'rmqId' => $this->getRmq($user),
             'categorieId' => $firstFormDto->categorie
         ];
+
         $indemites = $this->em->getRepository(Indemnite::class)->findBy($criteria);
-        $sites = [];
         foreach ($indemites as $value) {
             $sites[] = $value->getSiteId()->getNomZone();
         }
@@ -121,7 +120,7 @@ class SecondFormDtoFactory
         return [$agence, $service];
     }
 
-    private function getMontantIndemniteForfaitaire(FirstFormDto $firstFormDto, User $user): string 
+    private function getMontantIndemniteForfaitaire(FirstFormDto $firstFormDto, User $user): string
     {
         $criteria = [
             'sousTypeDocumentId' => $firstFormDto->typeMission,

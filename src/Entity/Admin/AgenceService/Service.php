@@ -32,19 +32,19 @@ class Service
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"service:read"})
+     * @Groups({"service:read", "agence:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=10)
-     * @Groups({"service:read"})
+     * @Groups({"service:read", "agence:read"})
      */
     private $code;
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Groups({"service:read"})
+     * @Groups({"service:read", "agence:read"})
      */
     private $nom;
 

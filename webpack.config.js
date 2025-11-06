@@ -12,7 +12,7 @@ Encore
     .addEntry('app', './assets/app.ts')
     .addEntry('login', './assets/js/login/login.ts')
     .addEntry('accueil', './assets/js/accueil.js')
-    .addEntry('secondForm', './assets/styles/pages/secondForm.scss')
+    .addEntry('secondForm', './assets/js/pages/rh/dom/secondForm.ts')
 
     // Split chunks
     .splitEntryChunks()
@@ -24,11 +24,7 @@ Encore
         to: 'images/[path][name].[hash:8].[ext]',
         pattern: /\.(png|jpg|jpeg|gif|ico|svg|webp)$/
     })
-    .copyFiles({
-        from: './assets/fonts',
-        to: 'fonts/[path][name].[hash:8].[ext]',
-        pattern: /\.(woff|woff2|ttf|eot|otf)$/
-    })
+
 
     // Copie des polices Font Awesome depuis node_modules
     .copyFiles({

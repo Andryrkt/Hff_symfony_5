@@ -137,8 +137,17 @@ class SecondFormType extends AbstractType
                     'label' => 'Site:',
                     'class' => Site::class,
                     'choice_label' => 'nomZone',
-                    'query_builder' => function () {
+                    'query_builder' => function () use($options) {
                         return $this->siteRepository->createQueryBuilder('s')
+                        ->join('s.indemnites', 'i')
+                        ->where('i.categorieId = :categorie')
+                        ->andWhere('i.rmqId = :rmq')
+                        ->andWhere('i.sousTypeDocumentId = :typeMission')
+                        ->setParameters([
+                            'categorie' => $options["data"]->categorie,
+                            'rmq' => $options["data"]->rmq,
+                            'typeMission' => $options["data"]->typeMission
+                        ])
                             ->orderBy('s.nomZone', 'ASC');
                     },
                     'row_attr' => [

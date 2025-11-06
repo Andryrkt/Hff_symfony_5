@@ -59,6 +59,11 @@ class Personnel
      */
     private $societe;
 
+    /**
+     * @ORM\Column(type="string", length=200, nullable=true)
+     */
+    private $numeroCompteBancaire;
+
     public function __construct()
     {
     }
@@ -147,6 +152,18 @@ class Personnel
     public function setSociete(?string $societe): self
     {
         $this->societe = $societe;
+
+        return $this;
+    }
+
+    public function getNumeroCompteBancaire(): ?string
+    {
+        return $this->numeroCompteBancaire;
+    }
+
+    public function setNumeroCompteBancaire(?string $numeroCompteBancaire): self
+    {
+        $this->numeroCompteBancaire = $numeroCompteBancaire;
 
         return $this;
     }

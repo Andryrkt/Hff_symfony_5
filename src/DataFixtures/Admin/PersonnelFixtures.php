@@ -12,8 +12,8 @@ class PersonnelFixtures extends Fixture implements DependentFixtureInterface
     public function load(ObjectManager $manager): void
     {
         $personnels = [
-            ['nom' => 'Rabe', 'prenoms' => 'Jean', 'matricule' => '9999', 'agServIrium' => 'agence_service_administration_inf_DA14', 'reference' => 'personnel_p1'],
-            ['nom' => 'Rakoto', 'prenoms' => 'Doe', 'matricule' => '9998', 'agServIrium' => 'agence_service_administration_inf_DA14', 'reference' => 'personnel_p2']
+            ['nom' => 'Rabe', 'prenoms' => 'Jean', 'matricule' => '9999', 'codeBancaire' => null, 'agServIrium' => 'agence_service_administration_inf_DA14', 'reference' => 'personnel_p1'],
+            ['nom' => 'Rakoto', 'prenoms' => 'Doe', 'matricule' => '9998', 'codeBancaire' => '4875 96321547 89966 3211 4778', 'agServIrium' => 'agence_service_administration_inf_DA14', 'reference' => 'personnel_p2']
         ];
 
 
@@ -22,8 +22,9 @@ class PersonnelFixtures extends Fixture implements DependentFixtureInterface
             $personnel->setNom($personelData['nom']);
             $personnel->setPrenoms($personelData['prenoms']);
             $personnel->setMatricule($personelData['matricule']);
+            $personnel->setNumeroCompteBancaire($personelData['codeBancaire']);
             $personnel->setAgenceServiceIrium($this->getReference($personelData['agServIrium']));
-            
+
             $manager->persist($personnel);
             $this->addReference($personelData['reference'], $personnel);
         }
