@@ -133,7 +133,7 @@ class SecondFormDtoFactory
         if ($indemites) {
             $montant = $indemites->getMontant();
 
-            $montant = $this->formattingService->formatNumber($montant);
+            $montant = $this->formattingService->formatNumber($montant, 0);
         } else {
             $montant = 0;
         }

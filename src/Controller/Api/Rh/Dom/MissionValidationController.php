@@ -25,25 +25,26 @@ class MissionValidationController extends AbstractController
      */
     public function getMontantIndemniteForfaitaire(Request $request, EntityManagerInterface $em, FormattingService $formattingService): JsonResponse
     {
-        $typeMission = $em->getRepository(SousTypeDocument::class)->find($request->query->get('typeMission'));
-        $categorie = $em->getRepository(Categorie::class)->find($request->query->get('categorie'));
+        $typeMission = $em->getRepository(SousTypeDocument::class)->findOneBy(['codeSousType' => $request->query->get('typeMission')]);
+        $categorie = $em->getRepository(Categorie::class)->findOneBy(['description' => $request->query->get('categorie')]);
         $site = $em->getRepository(Site::class)->find($request->query->get('site'));
         $rmq = $em->getRepository(Rmq::class)->find($request->query->get('rmq'));
 
-        $criteria = [
-            'sousTypeDocumentId' => $typeMission,
-            'rmqId' => $rmq,
-            'categorieId' => $categorie,
-            'siteId' => $site
-        ];
-
-        $indemnite = $em->getRepository(Indemnite::class)->findOneBy($criteria);
         $montant = 0;
 
-        if ($indemnite) {
-            $montant = $indemnite->getMontant();
-        }
+        if ($typeMission && $categorie && $site && $rmq) {
+            $criteria = [
+                'sousTypeDocumentId' => $typeMission,
+                'rmqId' => $rmq,
+                'categorieId' => $categorie,
+                'siteId' => $site
+            ];
 
+            $indemnite = $em->getRepository(Indemnite::class)->findOneBy($criteria);
+
+                            if ($indemnite) {
+                                $montant = $indemnite->getMontant();
+                            }        }
         if ($typeMission) {
             if ($typeMission->getCodeSousType() === SousTypeDocument::CODE_TROP_PERCU) {
                 $montant = 0;
@@ -52,7 +53,9 @@ class MissionValidationController extends AbstractController
             }
         }
 
-        return new JsonResponse(['montant' => $formattingService->formatNumber($montant)]);
+        $formattedMontant = ($montant === '') ? '' : $formattingService->formatNumber($montant, 0);
+
+        return new JsonResponse(['montant' => $formattedMontant]);
     }
     /**
      * @Route("/api/rh/dom/mode", name="api_rh_dom_mode", methods={"GET"})

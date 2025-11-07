@@ -1,3 +1,5 @@
+import numeral from 'numeral';
+
 // assets/js/secondForm.js
 
 import '../../../../styles/pages/secondForm.scss';
@@ -111,6 +113,10 @@ function calculateNumberOfDays() {
     } else {
         nombreJourInput.value = '';
     }
+
+    // Déclenche manuellement l'événement 'input' pour que les calculs dépendants s'exécutent
+    const event = new Event('input', { bubbles: true });
+    nombreJourInput.dispatchEvent(event);
 }
 
 // Crée une version "debounced" de la fonction de vérification
@@ -143,7 +149,165 @@ document.addEventListener('DOMContentLoaded', () => {
     initIndemniteForfaitaireUpdate();
     initInputValidation();
     initModeLabelUpdate();
+    initTotalCalculations();
 });
+
+/**
+ * Initialise les calculs des totaux.
+ */
+function initTotalCalculations() {
+    const nombreJourInput = document.getElementById('second_form_nombreJour') as HTMLInputElement;
+    const totalIdemniteDeplacementInput = document.getElementById('second_form_totalIndemniteDeplacement') as HTMLInputElement;
+    const idemnityDeplInput = document.getElementById('second_form_idemnityDepl') as HTMLInputElement;
+    const supplementJournalierInput = document.getElementById('second_form_supplementJournaliere') as HTMLInputElement;
+    const indemniteForfaitaireJournaliereInput = document.getElementById('second_form_indemniteForfaitaire') as HTMLInputElement;
+    const totalindemniteForfaitaireInput = document.getElementById('second_form_totalIndemniteForfaitaire') as HTMLInputElement;
+    const autreDepenseInput_1 = document.getElementById('second_form_autresDepense1') as HTMLInputElement;
+    const autreDepenseInput_2 = document.getElementById('second_form_autresDepense2') as HTMLInputElement;
+    const autreDepenseInput_3 = document.getElementById('second_form_autresDepense3') as HTMLInputElement;
+    const totaAutreDepenseInput = document.getElementById('second_form_totalAutresDepenses') as HTMLInputElement;
+    const montantTotalInput = document.getElementById('second_form_totalGeneralPayer') as HTMLInputElement;
+    const sousTypeDocInput = document.getElementById('typeMission') as HTMLInputElement;
+
+    // --- Numeral.js Configuration ---
+    numeral.register('locale', 'fr-custom', {
+        delimiters: {
+            thousands: '.',
+            decimal: ','
+        },
+        abbreviations: {
+            thousand: 'k',
+            million: 'm',
+            billion: 'b',
+            trillion: 't'
+        },
+        ordinal: function (number) {
+            return number === 1 ? 'er' : 'ème';
+        },
+        currency: {
+            symbol: 'Ar'
+        }
+    });
+    numeral.locale('fr-custom');
+
+    function formatNumberInt(value: string | number): string {
+        return numeral(value).format('0,0');
+    }
+
+    // --- Total Indemnité de Déplacement ---
+    function updateTotalIndemnity() {
+        const nombreDeJour = parseInt(nombreJourInput.value);
+        const indemnityDepl = parseInt(idemnityDeplInput.value.replace(/[^\d]/g, ""));
+
+        if (!isNaN(nombreDeJour) && !isNaN(indemnityDepl)) {
+            const totalIndemnity = nombreDeJour * indemnityDepl;
+            totalIdemniteDeplacementInput.value = formatNumberInt(totalIndemnity);
+            const event = new Event("valueAdded");
+            totalIdemniteDeplacementInput.dispatchEvent(event);
+        } else {
+            totalIdemniteDeplacementInput.value = "";
+        }
+    }
+
+    if (idemnityDeplInput) {
+        idemnityDeplInput.addEventListener("input", () => {
+            idemnityDeplInput.value = formatNumberInt(idemnityDeplInput.value);
+            updateTotalIndemnity();
+        });
+    }
+
+    // --- Total Indemnité Forfaitaire ---
+    nombreJourInput.addEventListener("input", calculTotalForfaitaire);
+
+    function calculTotalForfaitaire() {
+        
+        if (supplementJournalierInput.value === "" && indemniteForfaitaireJournaliereInput.value !== "") {
+            const nombreDeJour = parseInt(nombreJourInput.value);
+            const indemniteForfaitaireJournaliere = parseInt(indemniteForfaitaireJournaliereInput.value.replace(/[^\d]/g, ""));
+            totalindemniteForfaitaireInput.value = formatNumberInt(nombreDeJour * indemniteForfaitaireJournaliere);
+        } else if (supplementJournalierInput.value !== "" && indemniteForfaitaireJournaliereInput.value !== "") {
+            const supplementJournalier = parseInt(supplementJournalierInput.value.replace(/[^\d]/g, ""));
+            const nombreDeJour = parseInt(nombreJourInput.value);
+            const indemniteForfaitaireJournaliere = parseInt(indemniteForfaitaireJournaliereInput.value.replace(/[^\d]/g, ""));
+            totalindemniteForfaitaireInput.value = formatNumberInt(nombreDeJour * (indemniteForfaitaireJournaliere + supplementJournalier));
+        } else if (supplementJournalierInput.value !== "") {
+            const supplementJournalier = parseInt(supplementJournalierInput.value.replace(/[^\d]/g, ""));
+            const nombreDeJour = parseInt(nombreJourInput.value);
+            totalindemniteForfaitaireInput.value = formatNumberInt(nombreDeJour * supplementJournalier);
+        }
+
+        const event = new Event("valueAdded");
+        totalindemniteForfaitaireInput.dispatchEvent(event);
+    }
+
+    supplementJournalierInput.addEventListener("input", () => {
+        supplementJournalierInput.value = formatNumberInt(supplementJournalierInput.value);
+        calculTotalForfaitaire();
+    });
+
+    indemniteForfaitaireJournaliereInput.addEventListener("input", () => {
+        indemniteForfaitaireJournaliereInput.value = formatNumberInt(indemniteForfaitaireJournaliereInput.value);
+        calculTotalForfaitaire();
+    });
+
+    // --- Total Autres Dépenses ---
+    function calculTotalAutreDepense() {
+        const autreDepense_1 = parseInt(autreDepenseInput_1.value.replace(/[^\d]/g, "")) || 0;
+        const autreDepense_2 = parseInt(autreDepenseInput_2.value.replace(/[^\d]/g, "")) || 0;
+        const autreDepense_3 = parseInt(autreDepenseInput_3.value.replace(/[^\d]/g, "")) || 0;
+        let totaAutreDepense = autreDepense_1 + autreDepense_2 + autreDepense_3;
+        totaAutreDepenseInput.value = formatNumberInt(totaAutreDepense);
+        const event = new Event("valueAdded");
+        totaAutreDepenseInput.dispatchEvent(event);
+    }
+
+    autreDepenseInput_1.addEventListener("input", () => {
+        autreDepenseInput_1.value = formatNumberInt(autreDepenseInput_1.value);
+        calculTotalAutreDepense();
+    });
+    autreDepenseInput_2.addEventListener("input", () => {
+        autreDepenseInput_2.value = formatNumberInt(autreDepenseInput_2.value);
+        calculTotalAutreDepense();
+    });
+    autreDepenseInput_3.addEventListener("input", () => {
+        autreDepenseInput_3.value = formatNumberInt(autreDepenseInput_3.value);
+        calculTotalAutreDepense();
+    });
+
+    // --- Calcul Montant Total ---
+    function calculTotal() {
+        const totaAutreDepense = parseInt(totaAutreDepenseInput.value.replace(/[^\d]/g, "")) || 0;
+        const totalIdemniteDeplacement = parseInt(totalIdemniteDeplacementInput.value.replace(/[^\d]/g, "")) || 0;
+        const totalindemniteForfaitaire = parseInt(totalindemniteForfaitaireInput.value.replace(/[^\d]/g, "")) || 0;
+
+        let montantTotal = totalindemniteForfaitaire + totaAutreDepense - totalIdemniteDeplacement;
+
+        if (sousTypeDocInput.value == 'TROP PERCU') {
+            montantTotalInput.value = "-" + formatNumberInt(montantTotal);
+        } else {
+            montantTotalInput.value = formatNumberInt(montantTotal);
+        }
+    }
+
+    totalIdemniteDeplacementInput.addEventListener("valueAdded", calculTotal);
+    totalindemniteForfaitaireInput.addEventListener("valueAdded", calculTotal);
+    totaAutreDepenseInput.addEventListener("valueAdded", calculTotal);
+}
+
+/**
+ * Gère la validation en temps réel pour le champ 'mode' lorsque 'MOBILE MONEY' est sélectionné.
+ */
+function handleModeInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const modePayementInput = document.getElementById('second_form_modePayement') as HTMLSelectElement;
+
+    if (modePayementInput && modePayementInput.value === 'MOBILE MONEY') {
+        // Remplacer tout ce qui n'est pas un chiffre
+        const numericValue = input.value.replace(/\D/g, '');
+        // Limiter à 10 chiffres et mettre à jour la valeur
+        input.value = numericValue.slice(0, 10);
+    }
+}
 
 /**
  * Initialise la mise à jour dynamique du label du champ 'mode' en fonction du 'modePayement'.
@@ -155,6 +319,12 @@ function initModeLabelUpdate() {
         // Appeler une fois au chargement pour définir le label initial
         updateModeLabel();
     }
+
+    // Ajout de l'écouteur pour la validation du champ 'mode'
+    const modeInput = document.getElementById('second_form_mode') as HTMLInputElement;
+    if (modeInput) {
+        modeInput.addEventListener('input', handleModeInput);
+    }
 }
 
 /**
@@ -163,33 +333,43 @@ function initModeLabelUpdate() {
 async function updateModeLabel(): Promise<void> {
     const modePayementInput = document.getElementById('second_form_modePayement') as HTMLSelectElement;
     const modeLabel = document.querySelector('label[for="second_form_mode"]') as HTMLLabelElement;
+    const modeInput = document.getElementById("second_form_mode") as HTMLInputElement;
 
-    if (!modePayementInput || !modeLabel) {
+    if (!modePayementInput || !modeLabel || !modeInput) {
         return;
     }
     const selectedModePayement = modePayementInput.value;
 
     modeLabel.textContent = selectedModePayement;
-console.log(selectedModePayement);
+
+    // --- Réinitialiser l'état du champ 'mode' ---
+    modeInput.readOnly = false;
+    modeInput.placeholder = '';
 
     if (selectedModePayement === 'VIREMENT BANCAIRE') {
+        modeInput.readOnly = true; // Verrouiller le champ
         const matriculeInput = document.getElementById('second_form_matricule') as HTMLSelectElement;
         if(matriculeInput) {
             try {
                 const matricule = matriculeInput.value;
-                console.log(matricule);
                 
                 const response = await axios.get('/api/rh/dom/mode', {
                     params: {
                         matricule: matricule,
                     }
                 });
-                const modeInput = document.getElementById("second_form_mode") as HTMLSelectElement;
                 modeInput.value =  response.data.codeBancaire;
             } catch (error) {
-                console.error('Erreur lors de la recupéraiton du code bancaire de l\'utilisateur, voir l\'erreur :', error);
+                console.error("Erreur lors de la recupéraiton du code bancaire de l'utilisateur, voir l'erreur :", error);
+                modeInput.value = ''; // Effacer en cas d'erreur
             }
         }
+    } else if (selectedModePayement === 'MOBILE MONEY') {
+        modeInput.value = ''; // Effacer la valeur précédente
+        modeInput.placeholder = 'Numéro sur 10 chiffres'; // Ajouter une indication
+    } else {
+        // Pour tous les autres modes, effacer le champ
+        modeInput.value = '';
     }
 }
 
@@ -231,6 +411,7 @@ function initIndemniteForfaitaireUpdate() {
 async function updateIndemniteForfaitaire() {
     const typeMissionInput = document.getElementById('second_form_typeMission') as HTMLInputElement;
     const categorieInput = document.getElementById('second_form_categorie') as HTMLInputElement;
+    const rmqInput = document.getElementById('rmq') as HTMLInputElement;
     const siteInput = document.getElementById('second_form_site') as HTMLInputElement;
     const indemniteForfaitaireInput = document.getElementById('second_form_indemniteForfaitaire') as HTMLInputElement;
 
@@ -240,6 +421,7 @@ async function updateIndemniteForfaitaire() {
 
     const typeMissionId = typeMissionInput.value;
     const categorieId = categorieInput.value;
+    const rmqId = rmqInput.value;
     const siteId = siteInput.value;
 
     if (typeMissionId && categorieId && siteId) {
@@ -248,13 +430,22 @@ async function updateIndemniteForfaitaire() {
                 params: {
                     typeMission: typeMissionId,
                     categorie: categorieId,
+                    rmq: rmqId,
                     site: siteId
                 }
             });
             indemniteForfaitaireInput.value = response.data.montant;
+
+            // Déclenche l'événement input pour recalculer le total
+            const event = new Event('input', { bubbles: true });
+            indemniteForfaitaireInput.dispatchEvent(event);
         } catch (error) {
             console.error('Erreur lors de la mise à jour de l\'indemnité forfaitaire:', error);
             indemniteForfaitaireInput.value = '';
+
+            // Déclenche également l'événement en cas d'erreur pour vider le total
+            const event = new Event('input', { bubbles: true });
+            indemniteForfaitaireInput.dispatchEvent(event);
         }
     }
 }
