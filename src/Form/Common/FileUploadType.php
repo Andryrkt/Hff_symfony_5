@@ -19,7 +19,7 @@ class FileUploadType extends AbstractType
             'required' => false,
             'multiple' => false, // Par défaut multiple, mais peut être changé
             'data_class' => null,
-            'mapped' => false,
+            'mapped' => true,
             'max_size' => '5M',
             'allowed_mime_types' => [
                 'application/pdf',

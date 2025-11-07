@@ -37,7 +37,7 @@ class DomFirstController extends AbstractController
         //3. creation du formualire
         $form = $this->createForm(FirstFormType::class, $dto);
         //4. traitement du formualire
-        $response = $this->traitemementForm($form, $request, $dto);
+        $response = $this->traitemementForm($form, $request);
 
         if ($response instanceof RedirectResponse) {
             return $response;
@@ -49,7 +49,7 @@ class DomFirstController extends AbstractController
         ]);
     }
 
-    private function traitemementForm(FormInterface $form, Request $request, FirstFormDto $dom)
+    private function traitemementForm(FormInterface $form, Request $request)
     {
         $form->handleRequest($request);
 

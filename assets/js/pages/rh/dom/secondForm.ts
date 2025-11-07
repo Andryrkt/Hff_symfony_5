@@ -150,6 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initInputValidation();
     initModeLabelUpdate();
     initTotalCalculations();
+    initEmployeeFieldSwitching();
 });
 
 /**
@@ -447,5 +448,29 @@ async function updateIndemniteForfaitaire() {
             const event = new Event('input', { bubbles: true });
             indemniteForfaitaireInput.dispatchEvent(event);
         }
+    }
+}
+
+/**
+ * Initialise le basculement d'affichage des champs matricule et cin en fonction du type de salarié.
+ */
+function initEmployeeFieldSwitching() {
+    const formContainer = document.getElementById('form-container');
+    const matriculeContainer = document.getElementById('matricule-field-container');
+    const cinContainer = document.getElementById('cin-field-container');
+
+    if (!formContainer || !matriculeContainer || !cinContainer) {
+        console.error('One or more required elements for employee field switching are missing.');
+        return;
+    }
+
+    const salarierType = formContainer.dataset.salarierType;
+
+    if (salarierType === 'PERMANENT') {
+        matriculeContainer.style.display = ''; 
+        cinContainer.style.display = 'none';
+    } else {
+        matriculeContainer.style.display = 'none';
+        cinContainer.style.display = '';
     }
 }
