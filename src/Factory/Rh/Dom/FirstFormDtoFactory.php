@@ -23,14 +23,15 @@ class FirstFormDtoFactory
     public function create(): FirstFormDto
     {
         $dto = new FirstFormDto();
+        /** @var User */
         $user = $this->security->getUser();
 
         if (!$user instanceof User) {
             throw new \RuntimeException('User not authenticated');
         }
 
-        $dto->agenceUser = $user->getAgenceUser()->getCode() .'-'. $user->getAgenceUser()->getNom();
-        $dto->serviceUser = $user->getServiceUser()->getCode().'-'.$user->getServiceUser()->getNom();
+        $dto->agenceUser = $user->getAgenceUser()->getCode() . '-' . $user->getAgenceUser()->getNom();
+        $dto->serviceUser = $user->getServiceUser()->getCode() . '-' . $user->getServiceUser()->getNom();
         $dto->typeMission = $this->em->getRepository(SousTypeDocument::class)
             ->findOneBy(['codeSousType' => 'MISSION']);
 

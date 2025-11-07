@@ -18,17 +18,46 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // --- Logic for Salarie ---
     function toggleSalarieFields() {
-        if (!salarieSelect) return;
-        const isTemporaire = salarieSelect.value === 'TEMPORAIRE';
+    if (!salarieSelect) return;
+    const isTemporaire = salarieSelect.value === 'TEMPORAIRE';
 
-        if (interneDiv) interneDiv.style.display = isTemporaire ? 'none' : 'block';
-        if (externeDiv) externeDiv.style.display = isTemporaire ? 'block' : 'none';
-
-        if (matriculeInput) matriculeInput.required = !isTemporaire;
-        if (nomInput) nomInput.required = isTemporaire;
-        if (prenomInput) prenomInput.required = isTemporaire;
-        if (cinInput) cinInput.required = isTemporaire;
+    // Gestion de l'affichage
+    if (interneDiv) {
+        interneDiv.style.display = isTemporaire ? 'none' : 'block';
+        // Désactiver les champs requis quand masqués
+        const interneInputs = interneDiv.querySelectorAll('input, select, textarea');
+        interneInputs.forEach(input => {
+            if (isTemporaire) {
+                input.required = false;
+                input.disabled = true; // Empêche la soumission
+            } else {
+                input.required = true; // ou restaurer l'état original
+                input.disabled = false;
+            }
+        });
     }
+
+    if (externeDiv) {
+        externeDiv.style.display = isTemporaire ? 'block' : 'none';
+        // Activer/désactiver les champs selon l'état
+        const externeInputs = externeDiv.querySelectorAll('input, select, textarea');
+        externeInputs.forEach(input => {
+            if (isTemporaire) {
+                input.required = true;
+                input.disabled = false;
+            } else {
+                input.required = false;
+                input.disabled = true; // Empêche la soumission
+            }
+        });
+    }
+
+    // Focus sur le premier champ visible
+    setTimeout(() => {
+        const firstVisibleInput = document.querySelector('input:not([disabled]):not([style*="display: none"])');
+        if (firstVisibleInput) firstVisibleInput.focus();
+    }, 100);
+}
 
     // --- Logic for Categorie ---
     function toggleCategorieField() {

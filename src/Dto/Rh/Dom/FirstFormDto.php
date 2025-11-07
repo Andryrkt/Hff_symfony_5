@@ -2,7 +2,7 @@
 
 namespace App\Dto\Rh\Dom;
 
-
+use App\Entity\Rh\Dom\SousTypeDocument;
 use Symfony\Component\Validator\Constraints as Assert;
 use ArrayAccess;
 
@@ -13,7 +13,7 @@ class FirstFormDto implements ArrayAccess
     #[Assert\NotBlank]
     public $serviceUser;
     #[Assert\NotBlank]
-    public $typeMission;
+    public ?SousTypeDocument $typeMission = null;
     #[Assert\Choice(['PERMANENT', 'TEMPORAIRE'])]
     public string $salarier = 'PERMANENT';
     public $categorie;
@@ -29,6 +29,10 @@ class FirstFormDto implements ArrayAccess
         return property_exists($this, $offset);
     }
 
+    /**
+     * @param mixed $offset
+     * @return mixed
+     */
     public function offsetGet($offset)
     {
         return $this->$offset;

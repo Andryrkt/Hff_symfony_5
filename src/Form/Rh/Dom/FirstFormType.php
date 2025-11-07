@@ -82,7 +82,6 @@ class FirstFormType extends AbstractType
                 'salarier',
                 ChoiceType::class,
                 [
-                    'mapped' => false,
                     'label' => 'Salarié',
                     'choices' => self::SALARIE,
                     'data' => 'PERMANENT'

@@ -41,20 +41,13 @@
 					</div>
 				</div>
 				<div class="row" id="Interne">
-
 					{{ form_row(form.matriculeNom)}}
-
 					{{ form_row(form.matricule)}}
-
 				</div>
-				<div class="row" id="externe">
-
+				<div class="row" id="externe" style="display:none">
 					{{ form_row(form.nom)}}
-
 					{{ form_row(form.prenom)}}
-
 					{{ form_row(form.cin)}}
-
 				</div>
 				<div class="row">
 					<div class="mt-2">
@@ -65,9 +58,7 @@
 					</div>
 				</div>
 				{{ form_end(form)}}
+			</div>
 		</div>
 	</div>
-</div>
 {% endblock %}
-
-
