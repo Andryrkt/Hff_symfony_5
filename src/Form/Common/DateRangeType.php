@@ -60,7 +60,6 @@ class DateRangeType extends AbstractType
             'heure_debut_default' => '08:00',
             'heure_fin_default' => '18:00',
             'with_time' => false, // Option pour activer/désactiver les champs d'heure
-            'mapped' => false, // Important pour les champs composites non liés à une seule propriété
         ]);
 
         // Validation des options

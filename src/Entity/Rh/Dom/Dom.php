@@ -156,7 +156,7 @@ class Dom
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
      */
-    private $pieceJoint3;
+    private $pieceJoint3; // TODO à supprimer
 
     /**
      * @ORM\Column(type="string", length=3, nullable=true)
@@ -201,7 +201,7 @@ class Dom
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
      */
-    private $droitIndemnite;
+    private $droitIndemnite; //! supplement jounalier
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
@@ -221,12 +221,12 @@ class Dom
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
      */
-    private $emetteur;
+    private $emetteur; // TODO: à suprimer si c'est pas necessaire
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
      */
-    private $debiteur;
+    private $debiteur; // TODO: à suprimer si c'est pas necessaire
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -241,7 +241,7 @@ class Dom
     /**
      * @ORM\Column(type="boolean", nullable=true)
      */
-    private $pieceJustificatif;
+    private $pieceJustificatif; // TODO: à verifier
 
     /**
      * @ORM\ManyToOne(targetEntity=StatutDemande::class, inversedBy="doms")
@@ -801,7 +801,7 @@ class Dom
         return $this;
     }
 
-    public function isPieceJustificatif(): ?bool
+    public function getPieceJustificatif(): ?bool
     {
         return $this->pieceJustificatif;
     }

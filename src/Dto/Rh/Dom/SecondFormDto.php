@@ -21,12 +21,12 @@ class SecondFormDto
     public ?string $nom;
     public ?string $prenom;
     public ?string $cin;
-    
+
     public ?string $salarier;
     public ?Rmq $rmq;
 
 
-    public string $dateHeureMission;
+    public array $dateHeureMission;
     public $nombreJour;
     public string $motifDeplacement;
     public bool $pieceJustificatif;

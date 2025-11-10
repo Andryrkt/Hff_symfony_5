@@ -2,35 +2,54 @@
 
 namespace App\Controller\Rh\Dom;
 
+use Symfony\Component\Routing\Annotation\Route;
+
+
+use DateTime;
+use App\Entity\Rh\Dom\Dom;
 use App\Dto\Rh\Dom\FirstFormDto;
 use App\Dto\Rh\Dom\SecondFormDto;
 use App\Form\Rh\Dom\SecondFormType;
-use Symfony\Component\Form\FormInterface;
+use App\Repository\Rh\Dom\DomRepository;
 use App\Factory\Rh\Dom\SecondFormDtoFactory;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use App\Repository\Admin\AgenceService\AgenceRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Repository\Admin\Statut\StatutDemandeRepository;
+use App\Service\Utils\ExtractorStringService;
+use App\Service\Utils\NumeroGeneratorService;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+
 
 /**
  * @Route("/rh/ordre-de-mission")
  */
 class DomSecondController extends AbstractController
 {
-    private $secondFormDtoFactory;
+    private const CODE_APPLICATION = 'DOM';
 
-    public function __construct(SecondFormDtoFactory $firstFormDtoFactory)
+    private $secondFormDtoFactory;
+    private $domRepository;
+
+    public function __construct(SecondFormDtoFactory $firstFormDtoFactory, DomRepository $domRepository)
     {
         $this->secondFormDtoFactory = $firstFormDtoFactory;
+        $this->domRepository = $domRepository;
     }
 
     /**
      * @Route("/dom-second-form", name="dom_second_form")
      */
-    public function secondForm(Request $request, AgenceRepository $agenceRepository, SerializerInterface $serializer)
-    {
+    public function secondForm(
+        Request $request,
+        AgenceRepository $agenceRepository,
+        SerializerInterface $serializer,
+        NumeroGeneratorService $numeroGeneratorService,
+        StatutDemandeRepository $statutDemandeRepository,
+        ExtractorStringService $extractorStringService
+    ) {
         // 1. gerer l'accés 
         $this->denyAccessUnlessGranted('RH_ORDRE_MISSION_CREATE');
 
@@ -50,10 +69,16 @@ class DomSecondController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-                // 1. récupère les données du formulaire
-                $data = $form->getData();
-                dd($data);
+            /** @var SecondFormDto $secondFormDto */
+            $secondFormDto = $form->getData();
+            dd($secondFormDto);
+            $dom = $this->createDomFromDtos($secondFormDto, $numeroGeneratorService, $statutDemandeRepository, $extractorStringService);
 
+            $this->domRepository->add($dom, true);
+
+            $this->addFlash('success', 'La demande d\'ordre de mission a été créée avec succès.');
+
+            return $this->redirectToRoute('dom_first_form');
         }
 
         // 6. rendu de toutes les agences pendant le premier chargement
@@ -65,6 +90,80 @@ class DomSecondController extends AbstractController
             'secondFormDto' => $secondFormDto,
             'agencesJson' => $agencesJson,
         ]);
+    }
+
+    private function createDomFromDtos(
+        SecondFormDto $secondFormDto,
+        NumeroGeneratorService $numeroGeneratorService,
+        StatutDemandeRepository $statutDemandeRepository,
+        ExtractorStringService $extractorStringService
+    ): Dom {
+        $dom = new Dom();
+        $user = $this->getUser();
+        $statut = $statutDemandeRepository->findOneBy(['codeApplication' => self::CODE_APPLICATION, 'description' => 'OUVERT']);
+        $numTel = $secondFormDto->modePayement == "MOBILE MONEY" ? $secondFormDto->mode : null;
+        $codeAgenceEmetteur = $extractorStringService->extraireCode($secondFormDto->agenceUser, ' ');
+        $libelleAgenceEmetteur = $extractorStringService->extraireDescription($secondFormDto->agenceUser, ' ');
+        $codeSeviceEmetteur = $extractorStringService->extraireCode($secondFormDto->serviceUser, ' ');
+        $libelleServiceEmetteur = $extractorStringService->extraireDescription($secondFormDto->serviceUser, ' ');
+
+        $dom->setNumeroOrdreMission($numeroGeneratorService->autoGenerateNumero(self::CODE_APPLICATION, true));
+        $dom->setMatricule($secondFormDto->matricule);
+        $dom->setNomSessionUtilisateur($user->getUserIdentifier());
+        //Date debut et fin mission / et nombre de jour
+        $dom->setDateDebut($secondFormDto->dateHeureMission['debut']);
+        $dom->setHeureDebut($secondFormDto->dateHeureMission['heureDebut']);
+        $dom->setDateFin($secondFormDto->dateHeureMission['fin']);
+        $dom->setHeureFin($secondFormDto->dateHeureMission['heureFin']);
+        $dom->setNombreJour($secondFormDto->nombreJour);
+
+        //
+        $dom->setMotifDeplacement($secondFormDto->motifDeplacement);
+        $dom->setClient($secondFormDto->client);
+        $dom->setLieuIntervention($secondFormDto->lieuIntervention);
+        $dom->setVehiculeSociete($secondFormDto->vehiculeSociete);
+        $dom->setIndemniteForfaitaire($secondFormDto->indemniteForfaitaire);
+        $dom->setTotalIndemniteForfaitaire($secondFormDto->totalIndemniteForfaitaire);
+        // Autres depenses
+        $dom->setAutresDepense1($secondFormDto->autresDepense1);
+        $dom->setMotifAutresDepense2($secondFormDto->motifAutresDepense2);
+        $dom->setAutresDepense2($secondFormDto->autresDepense2);
+        $dom->setMotifAutresDepense3($secondFormDto->motifAutresDepense3);
+        $dom->setAutresDepense3($secondFormDto->autresDepense3);
+        $dom->setTotalAutresDepenses($secondFormDto->totalAutresDepenses);
+        // total generale et mode de paiement et devis
+        $dom->setTotalGeneralPayer($secondFormDto->totalGeneralPayer);
+        $dom->setModePayement($secondFormDto->modePayement . ':' . $numTel);
+        $dom->setDevis($secondFormDto->devis);
+        //pieces joint
+        $dom->setPieceJoint01($secondFormDto->pieceJoint01);
+        $dom->setPieceJoint02($secondFormDto->pieceJoint02);
+        // code statut , num tel, nom, prenom
+        $dom->setCodeStatut($statut->getCodeStatut());
+        $dom->setNumeroTel($numTel);
+        $dom->setNom($secondFormDto->nom);
+        $dom->setPrenom($secondFormDto->prenom);
+        // agence et service
+        $dom->setLibelleCodeAgenceService($libelleAgenceEmetteur . '-' . $libelleServiceEmetteur);
+        //fichet et num vehicule
+        $dom->setFiche($secondFormDto->fiche);
+        $dom->setNumVehicule($secondFormDto->numVehicule);
+        $dom->setDroitIndemnite($secondFormDto->supplementJournaliere);
+        //
+        $dom->setIdemnityDepl($secondFormDto->idemnityDepl);
+        $dom->setDateDemande($secondFormDto->dateDemande);
+        $dom->setPieceJustificatif($secondFormDto->pieceJustificatif);
+        $dom->setIdStatutDemande($statut);
+
+        // type mission, categorie et site
+        $dom->setSousTypeDocument($secondFormDto->typeMission);
+        $dom->setCategoryId($secondFormDto->categorie);
+        $dom->setCategorie($secondFormDto->categorie->getDescription());
+        $dom->setSiteId($secondFormDto->site);
+        $dom->setSite($secondFormDto->site->getNomZone());
+
+
+        return $dom;
     }
 
     private function recuperationDonnerPremierFormulaire(SessionInterface $session)
@@ -89,6 +188,4 @@ class DomSecondController extends AbstractController
 
         return $agencesJson;
     }
-
-
 }
