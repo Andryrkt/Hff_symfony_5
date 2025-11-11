@@ -32,7 +32,7 @@ class NumeroGeneratorService
 
         try {
             // 1. Récupérer et verrouiller la séquence
-            $sequence = $this->sequenceRepository->findAndLock($codeApp);
+            $sequence = $this->sequenceRepository->findOneByCodeAppWithLock($codeApp);
 
             // 2. Calculer le nouveau numéro
             if (!$sequence) {

@@ -15,6 +15,7 @@ use App\Factory\Rh\Dom\SecondFormDtoFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\SerializerInterface;
 use App\Repository\Admin\AgenceService\AgenceRepository;
+use App\Repository\Admin\AgenceService\ServiceRepository;
 use App\Repository\Admin\Statut\StatutDemandeRepository;
 use App\Service\Utils\ExtractorStringService;
 use App\Service\Utils\NumeroGeneratorService;
@@ -48,7 +49,8 @@ class DomSecondController extends AbstractController
         SerializerInterface $serializer,
         NumeroGeneratorService $numeroGeneratorService,
         StatutDemandeRepository $statutDemandeRepository,
-        ExtractorStringService $extractorStringService
+        ExtractorStringService $extractorStringService,
+        ServiceRepository $serviceRepository
     ) {
         // 1. gerer l'accés 
         $this->denyAccessUnlessGranted('RH_ORDRE_MISSION_CREATE');
@@ -71,8 +73,8 @@ class DomSecondController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var SecondFormDto $secondFormDto */
             $secondFormDto = $form->getData();
-            dd($secondFormDto);
-            $dom = $this->createDomFromDtos($secondFormDto, $numeroGeneratorService, $statutDemandeRepository, $extractorStringService);
+
+            $dom = $this->createDomFromDtos($secondFormDto, $numeroGeneratorService, $statutDemandeRepository, $extractorStringService, $agenceRepository, $serviceRepository);
 
             $this->domRepository->add($dom, true);
 
@@ -96,7 +98,9 @@ class DomSecondController extends AbstractController
         SecondFormDto $secondFormDto,
         NumeroGeneratorService $numeroGeneratorService,
         StatutDemandeRepository $statutDemandeRepository,
-        ExtractorStringService $extractorStringService
+        ExtractorStringService $extractorStringService,
+        AgenceRepository $agenceRepository,
+        ServiceRepository $serviceRepository
     ): Dom {
         $dom = new Dom();
         $user = $this->getUser();
@@ -107,24 +111,32 @@ class DomSecondController extends AbstractController
         $codeSeviceEmetteur = $extractorStringService->extraireCode($secondFormDto->serviceUser, ' ');
         $libelleServiceEmetteur = $extractorStringService->extraireDescription($secondFormDto->serviceUser, ' ');
 
+        $agenceEmetteur = $agenceRepository->findOneBy(['code' => $codeAgenceEmetteur]);
+        $serviceEmetteur = $serviceRepository->findOneBy(['code' => $codeSeviceEmetteur]);
+
+
+
+
         $dom->setNumeroOrdreMission($numeroGeneratorService->autoGenerateNumero(self::CODE_APPLICATION, true));
         $dom->setMatricule($secondFormDto->matricule);
         $dom->setNomSessionUtilisateur($user->getUserIdentifier());
         //Date debut et fin mission / et nombre de jour
         $dom->setDateDebut($secondFormDto->dateHeureMission['debut']);
-        $dom->setHeureDebut($secondFormDto->dateHeureMission['heureDebut']);
+        $dom->setHeureDebut($secondFormDto->dateHeureMission['heureDebut']->format('H:i'));
         $dom->setDateFin($secondFormDto->dateHeureMission['fin']);
-        $dom->setHeureFin($secondFormDto->dateHeureMission['heureFin']);
+        $dom->setHeureFin($secondFormDto->dateHeureMission['heureFin']->format('H:i'));
         $dom->setNombreJour($secondFormDto->nombreJour);
 
-        //
+        //motif deplacmene , client, lieu d'intervention, vehicule societe
         $dom->setMotifDeplacement($secondFormDto->motifDeplacement);
         $dom->setClient($secondFormDto->client);
         $dom->setLieuIntervention($secondFormDto->lieuIntervention);
         $dom->setVehiculeSociete($secondFormDto->vehiculeSociete);
+        // indemnite forfaitaire
         $dom->setIndemniteForfaitaire($secondFormDto->indemniteForfaitaire);
         $dom->setTotalIndemniteForfaitaire($secondFormDto->totalIndemniteForfaitaire);
         // Autres depenses
+        $dom->setMotifAutreDepense1($secondFormDto->motifAutresDepense1);
         $dom->setAutresDepense1($secondFormDto->autresDepense1);
         $dom->setMotifAutresDepense2($secondFormDto->motifAutresDepense2);
         $dom->setAutresDepense2($secondFormDto->autresDepense2);
@@ -145,6 +157,10 @@ class DomSecondController extends AbstractController
         $dom->setPrenom($secondFormDto->prenom);
         // agence et service
         $dom->setLibelleCodeAgenceService($libelleAgenceEmetteur . '-' . $libelleServiceEmetteur);
+        $dom->setAgenceEmetteurId($agenceEmetteur);
+        $dom->setServiceEmetteurId($serviceEmetteur);
+        $dom->setAgenceDebiteurId($secondFormDto->debiteur['agence']);
+        $dom->setServiceDebiteurId($secondFormDto->debiteur['service']);
         //fichet et num vehicule
         $dom->setFiche($secondFormDto->fiche);
         $dom->setNumVehicule($secondFormDto->numVehicule);

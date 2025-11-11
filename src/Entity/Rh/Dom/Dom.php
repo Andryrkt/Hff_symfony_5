@@ -249,7 +249,7 @@ class Dom
     private $idStatutDemande;
 
     /**
-     * @ORM\ManyToOne(targetEntity=SousTypeDocument::class, inversedBy="doms")
+     * @ORM\ManyToOne(targetEntity=SousTypeDocument::class, inversedBy="doms", cascade={"persist"})
      */
     private $sousTypeDocument;
 
@@ -259,7 +259,7 @@ class Dom
     private $siteId;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Categorie::class, inversedBy="doms")
+     * @ORM\ManyToOne(targetEntity=Categorie::class, inversedBy="doms", cascade={"persist"})
      */
     private $categoryId;
 

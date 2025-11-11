@@ -36,6 +36,13 @@ class SequenceAppllication
      */
     private $dernierNumero;
 
+    public function __construct(string $codeApp, string $anneeMois, int $dernierNumero)
+    {
+        $this->codeApp = $codeApp;
+        $this->anneeMois = $anneeMois;
+        $this->dernierNumero = $dernierNumero;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

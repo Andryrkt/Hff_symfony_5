@@ -44,6 +44,13 @@ class SecondFormDtoFactory
             throw new \RuntimeException('User not authenticated');
         }
 
+        if ($firstFormDto->typeMission) {
+            $firstFormDto->typeMission = $this->em->merge($firstFormDto->typeMission);
+        }
+        if ($firstFormDto->categorie) {
+            $firstFormDto->categorie = $this->em->merge($firstFormDto->categorie);
+        }
+
         $dto->dateDemande = new DateTime('now');
         $dto->typeMission = $firstFormDto->typeMission;
         $dto->categorie = $firstFormDto->categorie;

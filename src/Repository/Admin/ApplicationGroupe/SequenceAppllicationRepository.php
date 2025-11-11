@@ -39,6 +39,16 @@ class SequenceAppllicationRepository extends ServiceEntityRepository
         }
     }
 
+    public function findOneByCodeAppWithLock(string $codeApp): ?SequenceAppllication
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.codeApp = :codeApp')
+            ->setParameter('codeApp', $codeApp)
+            ->getQuery()
+            ->setLockMode(\Doctrine\DBAL\LockMode::PESSIMISTIC_WRITE)
+            ->getOneOrNullResult();
+    }
+
 //    /**
 //     * @return SequenceAppllication[] Returns an array of SequenceAppllication objects
 //     */
