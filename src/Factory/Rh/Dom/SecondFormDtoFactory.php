@@ -3,35 +3,38 @@
 namespace App\Factory\Rh\Dom;
 
 use DateTime;
+use App\Entity\Rh\Dom\Rmq;
 use App\Entity\Rh\Dom\Site;
 use App\Dto\Rh\Dom\FirstFormDto;
 use App\Entity\Rh\Dom\Indemnite;
 use App\Dto\Rh\Dom\SecondFormDto;
-use App\Service\CodeExtractorService;
+use App\Entity\Rh\Dom\SousTypeDocument;
 use App\Entity\Admin\PersonnelUser\User;
+use App\Service\Utils\FormattingService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Admin\AgenceService\Agence;
 use App\Entity\Admin\PersonnelUser\Personnel;
+use App\Entity\Rh\Dom\Dom;
+use App\Service\Utils\NumeroGeneratorService;
 use Symfony\Component\Security\Core\Security;
-use App\Entity\Admin\AgenceService\AgenceServiceIrium;
-use App\Entity\Rh\Dom\Rmq;
-use App\Entity\Rh\Dom\SousTypeDocument;
-use App\Service\Utils\FormattingService;
 
 class SecondFormDtoFactory
 {
     private $security;
     private $em;
     private FormattingService $formattingService;
+    private NumeroGeneratorService $numeroGeneratorService;
 
     public function __construct(
         Security $security,
         EntityManagerInterface $em,
-        FormattingService $formattingService
+        FormattingService $formattingService,
+        NumeroGeneratorService $numeroGeneratorService
     ) {
         $this->security = $security;
         $this->em = $em;
         $this->formattingService = $formattingService;
+        $this->numeroGeneratorService = $numeroGeneratorService;
     }
 
     public function create(FirstFormDto $firstFormDto): SecondFormDto
@@ -66,9 +69,13 @@ class SecondFormDtoFactory
 
         /** @var Agence $agence @var Service $service */
         [$agence, $service] = $this->getAgenceService($firstFormDto, $user);
-        $dto->agenceUser = $agence->getCode() . ' ' . $agence->getNom();
-        $dto->serviceUser = $service->getCode() . ' ' . $service->getNom();
+        $dto->agenceUser = $agence->getCode() . ' ' . $agence->getNom(); // ex: 01 ANTANANARIVO
+        $dto->serviceUser = $service->getCode() . ' ' . $service->getNom(); // ex: INF INFORMATIQUE
         $dto->debiteur = ['agence' => $agence, 'service' => $service];
+
+        // autres
+        $dto->numeroOrdreMission = $this->numeroGeneratorService->autoGenerateNumero(Dom::CODE_APPLICATION, true);
+        $dto->mailUser = $user->getEmail();
 
         return $dto;
     }

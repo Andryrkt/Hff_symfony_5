@@ -21,6 +21,8 @@ class Dom
     use TimestampableTrait;
     use AgenceServiceTrait;
 
+    public const CODE_APPLICATION = 'DOM';
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue

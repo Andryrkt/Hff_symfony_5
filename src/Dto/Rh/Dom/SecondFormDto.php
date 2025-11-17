@@ -53,4 +53,8 @@ class SecondFormDto
     public ?string $mode = null;
     public $pieceJoint01 = null;
     public $pieceJoint02 = null;
+
+    // autre
+    public string $numeroOrdreMission;
+    public string $mailUser;
 }

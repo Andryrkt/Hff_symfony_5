@@ -4,7 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-  app.timezone: 'UTC'
+  app.timezone: 'Etc/GMT-3'
   env(LDAP_HOST): "192.168.0.1"
   env(LDAP_SEARCH_DN): "%env(resolve:LDAP_SEARCH_DN)%"
   env(LDAP_SEARCH_PASSWORD): "%env(resolve:LDAP_SEARCH_PASSWORD)%"
@@ -76,3 +76,7 @@ services:
   Parsedown:
     class: Parsedown
     public: true
+
+  App\Service\Rh\Dom\DomPdfService:
+    arguments:
+      $projectDir: '%kernel.project_dir%'
