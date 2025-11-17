@@ -27,7 +27,9 @@
 		<div class="main-content">
 			{% block nav %}
 				{% include 'partials/_navbar.html.twig' %}
-				{% include 'partials/_breadcrumb.html.twig' with { breadcrumb: breadcrumb } %}
+				{% if breadcrumbs is defined and breadcrumbs is not empty %}
+					{% include 'partials/_breadcrumb.html.twig' with { breadcrumb: breadcrumbs } %}
+				{% endif %}
 			{% endblock %}
 
 			<div class="container">

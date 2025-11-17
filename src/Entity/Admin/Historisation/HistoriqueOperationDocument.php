@@ -41,6 +41,21 @@ class HistoriqueOperationDocument
      */
     private $typeDocument;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $statutOperation;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $libelleOperation;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $pathPieceJointe;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -90,6 +105,42 @@ class HistoriqueOperationDocument
     public function setTypeDocument(?TypeDocument $typeDocument): self
     {
         $this->typeDocument = $typeDocument;
+
+        return $this;
+    }
+
+    public function getStatutOperation(): ?string
+    {
+        return $this->statutOperation;
+    }
+
+    public function setStatutOperation(?string $statutOperation): self
+    {
+        $this->statutOperation = $statutOperation;
+
+        return $this;
+    }
+
+    public function getLibelleOperation(): ?string
+    {
+        return $this->libelleOperation;
+    }
+
+    public function setLibelleOperation(?string $libelleOperation): self
+    {
+        $this->libelleOperation = $libelleOperation;
+
+        return $this;
+    }
+
+    public function getPathPieceJointe(): ?string
+    {
+        return $this->pathPieceJointe;
+    }
+
+    public function setPathPieceJointe(?string $pathPieceJointe): self
+    {
+        $this->pathPieceJointe = $pathPieceJointe;
 
         return $this;
     }
