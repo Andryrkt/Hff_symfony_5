@@ -2,10 +2,10 @@
 
 namespace App\DataFixtures\Admin;
 
-use App\Entity\Admin\ApplicationGroupe\Permission;
-use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use App\Entity\Admin\ApplicationGroupe\Permission;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
 class PermissionFixtures extends Fixture implements DependentFixtureInterface
 {

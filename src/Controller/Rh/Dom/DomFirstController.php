@@ -5,6 +5,7 @@ namespace App\Controller\Rh\Dom;
 use App\Dto\Rh\Dom\FirstFormDto;
 use App\Factory\Rh\Dom\FirstFormDtoFactory;
 use App\Form\Rh\Dom\FirstFormType;
+use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,7 +27,7 @@ class DomFirstController extends AbstractController
     /**
      * @Route("/dom-first-form", name="dom_first_form")
      */
-    public function firstForm(Request $request)
+    public function firstForm(Request $request, ContextAwareBreadcrumbBuilder $breadcrumbBuilder)
     {
         // 1. gerer l'accés 
         $this->denyAccessUnlessGranted('RH_ORDRE_MISSION_CREATE');
@@ -46,6 +47,7 @@ class DomFirstController extends AbstractController
         //5. rendu de la vue
         return $this->render('rh/dom/firstForm.html.twig', [
             'form' => $form->createView(),
+            'breadcrumbs' => $breadcrumbBuilder->build(['route' => 'dom_first_form']),
         ]);
     }
 

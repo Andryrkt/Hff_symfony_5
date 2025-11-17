@@ -11,6 +11,7 @@ use App\Service\Rh\Dom\DomPdfService;
 use App\Repository\Rh\Dom\DomRepository;
 use Symfony\Component\Form\FormInterface;
 use App\Factory\Rh\Dom\SecondFormDtoFactory;
+use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Utils\Fichier\UploderFileService;
@@ -48,7 +49,8 @@ class DomSecondController extends AbstractController
         Request $request,
         AgenceRepository $agenceRepository,
         SerializerInterface $serializer,
-        DomPdfService $pdfService
+        DomPdfService $pdfService,
+        ContextAwareBreadcrumbBuilder $breadcrumbBuilder
     ) {
         // 1. gerer l'accés
         $this->denyAccessUnlessGranted('RH_ORDRE_MISSION_CREATE');
@@ -76,6 +78,7 @@ class DomSecondController extends AbstractController
             'form'          => $form->createView(),
             'secondFormDto' => $secondFormDto,
             'agencesJson' => $agencesJson,
+            'breadcrumbs' => $breadcrumbBuilder->build(['route' => 'dom_second_form']),
         ]);
     }
 
