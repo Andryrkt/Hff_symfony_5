@@ -64,7 +64,7 @@ class SecondFormType extends AbstractType
         $this->addDebiteurSection($builder, $data);
         $this->addUserInfoSection($builder, $data);
         $this->addMissionSection($builder, $data, $typeMission, $isSpecialMission);
-        $this->addEmployeeSection($builder);
+        $this->addEmployeeSection($builder, $options);
         $this->addDateSection($builder);
         $this->addMotifSection($builder);
         $this->addVehicleSection($builder);
@@ -183,7 +183,7 @@ class SecondFormType extends AbstractType
             ->orderBy('s.nomZone', 'ASC');
     }
 
-    private function addEmployeeSection(FormBuilderInterface $builder): void
+    private function addEmployeeSection(FormBuilderInterface $builder, $options): void
     {
         $disabledAttr = ['disabled' => true];
 
@@ -192,21 +192,25 @@ class SecondFormType extends AbstractType
                 'label' => 'Matricule',
                 'attr' => $disabledAttr,
                 'mapped' => false,
+                'data' => $options['data']->matricule
             ])
             ->add('nom', TextType::class, [
                 'label' => 'Nom',
                 'attr' => $disabledAttr,
                 'mapped' => false,
+                'data' => $options['data']->nom
             ])
             ->add('prenom', TextType::class, [
                 'label' => 'Prénoms',
                 'attr' => $disabledAttr,
                 'mapped' => false,
+                'data' => $options['data']->prenom
             ])
             ->add('cin', TextType::class, [
                 'label' => 'CIN',
                 'attr' => $disabledAttr,
                 'mapped' => false,
+                'data' => $options['data']->cin
             ]);
     }
 

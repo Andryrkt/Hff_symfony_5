@@ -3,10 +3,31 @@
 namespace App\Service\Rh\Dom;
 
 use App\Dto\Rh\Dom\SecondFormDto;
+use App\Service\Utils\Fichier\AbstractGeneratePdf;
 use TCPDF;
 
-class DomPdfService
+class DomPdfService extends AbstractGeneratePdf
 {
+    private string $projectDir;
+
+    public function __construct(string $projectDir)
+    {
+        $this->projectDir = $projectDir;
+    }
+
+    /**
+     * copie la page de garde du BC magasin dans docuware
+     *
+     * @param string $cheminVersDw
+     * @param string $filePathName
+     * 
+     * @return void
+     */
+    public function copyToDW(string $cheminVersDw, string $filePathName): void
+    {
+        $this->copyFile($filePathName, $cheminVersDw);
+    }
+
     /**
      * Genere le PDF DEMANDE D'ORDRE DE MISSION (DOM)
      */
@@ -41,7 +62,7 @@ class DomPdfService
         $pdf->Cell($w50, 8, $secondFormDto->mailUser, 0, 1, 'R');
 
         // Logo HFF
-        $logoPath = $_ENV['BASE_PATH_LONG'] . '/Views/assets/logoHff.jpg';
+        $logoPath = $this->projectDir . '/assets/images/logoHff.jpg';
         $pdf->Image($logoPath, 10, 10, 60, 0, 'jpg');
 
         // Grand titre du pdf
@@ -49,7 +70,7 @@ class DomPdfService
         $pdf->setX($pdf->GetX() + 35);
         $pdf->Cell(0, 10, 'ORDRE DE MISSION ', 0, 0, 'C');
         $pdf->SetFont($font, '', 12);
-        $pdf->Cell(0, 10, 'Le: ' . $secondFormDto->dateDemande, 0, 1, 'R');
+        $pdf->Cell(0, 10, 'Le: ' . $secondFormDto->dateDemande->format('d/m/Y'), 0, 1, 'R');
 
         $pdf->SetTextColor(...$couleurTitre);
         $pdf->setX($pdf->GetX() + 35);
