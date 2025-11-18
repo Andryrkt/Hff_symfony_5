@@ -420,6 +420,7 @@ class SecondFormType extends AbstractType
                 'required' => $isRequired,
                 'allowed_mime_types' => ['application/pdf'],
                 'accept' => '.pdf',
+                'max_size' => '5M',
             ]);
         }
     }

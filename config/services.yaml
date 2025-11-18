@@ -81,3 +81,16 @@ services:
   App\Service\Rh\Dom\DomPdfService:
     arguments:
       $projectDir: '%kernel.project_dir%'
+
+  App\Logger\UserProcessor:
+    tags:
+        - { name: monolog.processor, channel: dom_first_form }
+        - { name: monolog.processor, channel: dom_second_form }
+
+  monolog.formatter.user_log:
+    class: Monolog\Formatter\LineFormatter
+    arguments:
+        - "[%%datetime%%] [User: %%extra.user_email%%] %%channel%%.%%level_name%%: %%message%% %%context%% %%extra%%\n----------------------------------------------------------------------------------------------------\n"
+        - 'Y-m-d H:i:s'
+        - true # allowInlineLineBreaks
+        - true # ignoreEmptyContextAndExtra

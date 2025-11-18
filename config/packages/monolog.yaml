@@ -10,11 +10,13 @@ monolog:
             path: "%kernel.logs_dir%/dom_first_form.log"
             level: debug
             channels: [dom_first_form]
+            formatter: monolog.formatter.user_log
         dom_second:
             type: stream
             path: "%kernel.logs_dir%/dom_second_form.log"
             level: debug
             channels: [dom_second_form]
+            formatter: monolog.formatter.user_log
 
 when@dev:
     monolog:
