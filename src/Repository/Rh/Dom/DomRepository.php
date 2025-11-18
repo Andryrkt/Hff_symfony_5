@@ -78,6 +78,21 @@ class DomRepository extends ServiceEntityRepository
         return $count > 0;
     }
 
+    public function getInfoDOMMatrSelet(string $matricule)
+    {
+        return $this->createQueryBuilder('d')
+            ->select('d.dateDebut, d.dateFin')
+            ->where('d.matricule = :matricule')
+            ->andWhere('d.idStatutDemande not in (:excludStatut)')
+            ->setParameters([
+                'matricule' => $matricule,
+                'excludStatut' => []
+            ])
+            ->getQuery()
+            ->getArrayResult()
+        ;
+    }
+
 
     /**
 //     * @return Dom[] Returns an array of Dom objects

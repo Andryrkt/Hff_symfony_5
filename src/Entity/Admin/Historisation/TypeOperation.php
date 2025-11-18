@@ -15,7 +15,14 @@ use App\Repository\Admin\Historisation\TypeOperationRepository;
 class TypeOperation
 {
     use TimestampableTrait;
-    
+
+    public const TYPE_OPERATION_SOUMISSION_NAME = 'SOUMISSION';
+    public const TYPE_OPERATION_VALIDATION_NAME = 'VALIDATION';
+    public const TYPE_OPERATION_MODIFICATION_NAME = 'MODIFICATION';
+    public const TYPE_OPERATION_SUPPRESSION_NAME = 'SUPPRESSION';
+    public const TYPE_OPERATION_CREATION_NAME = 'CREATION';
+    public const TYPE_OPERATION_CLOTURE_NAME = 'CLOTURE';
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue

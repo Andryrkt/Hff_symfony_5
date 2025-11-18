@@ -2,16 +2,17 @@
 
 namespace App\Controller\Rh\Dom;
 
+use DateTime;
 use App\Entity\Rh\Dom\Dom;
 use App\Dto\Rh\Dom\FirstFormDto;
 use App\Dto\Rh\Dom\SecondFormDto;
+use App\Entity\Rh\Dom\SousTypeDocument;
 use App\Factory\Rh\Dom\DomFactory;
 use App\Form\Rh\Dom\SecondFormType;
 use App\Service\Rh\Dom\DomPdfService;
 use App\Repository\Rh\Dom\DomRepository;
 use Symfony\Component\Form\FormInterface;
 use App\Factory\Rh\Dom\SecondFormDtoFactory;
-use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Utils\Fichier\UploderFileService;
@@ -20,6 +21,8 @@ use App\Service\Utils\Fichier\TraitementDeFichier;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Repository\Admin\AgenceService\AgenceRepository;
+use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
+use App\Service\Historique_operation\HistoriqueOperationService;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -31,15 +34,18 @@ class DomSecondController extends AbstractController
     private SecondFormDtoFactory $secondFormDtoFactory;
     private DomRepository $domRepository;
     private DomFactory $domFactory;
+    private HistoriqueOperationService $historiqueOperationService;
 
     public function __construct(
         SecondFormDtoFactory $firstFormDtoFactory,
         DomRepository $domRepository,
-        DomFactory $domFactory
+        DomFactory $domFactory,
+        HistoriqueOperationService $historiqueOperationService
     ) {
         $this->secondFormDtoFactory = $firstFormDtoFactory;
         $this->domRepository = $domRepository;
         $this->domFactory = $domFactory;
+        $this->historiqueOperationService = $historiqueOperationService;
     }
 
     /**
@@ -60,6 +66,9 @@ class DomSecondController extends AbstractController
 
         // 2. recupération des donées du premier formulaire
         $firstFormDto = $this->recuperationDonnerPremierFormulaire($session);
+        if ($firstFormDto instanceof \Symfony\Component\HttpFoundation\RedirectResponse) {
+            return $firstFormDto;
+        }
 
         // 3 . initialisation de la FirstFormDto
         $secondFormDto = $this->secondFormDtoFactory->create($firstFormDto);
@@ -78,7 +87,7 @@ class DomSecondController extends AbstractController
             'form'          => $form->createView(),
             'secondFormDto' => $secondFormDto,
             'agencesJson' => $agencesJson,
-            'breadcrumbs' => $breadcrumbBuilder->build(['route' => 'dom_second_form']),
+            'breadcrumbs' => $breadcrumbBuilder->build('dom_second_form'),
         ]);
     }
 
@@ -87,22 +96,79 @@ class DomSecondController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** 1. recuperation des données dans le formulaire @var SecondFormDto $secondFormDto */
+            /** @var SecondFormDto $secondFormDto */
             $secondFormDto = $form->getData();
-
-            // 2. creation de l'entité DOM 
             $dom = $this->domFactory->create($secondFormDto);
 
-            // 3. traitement de fichier
-            $this->traitementFichier($form, $dom, $pdfService, $secondFormDto);
+            $message = null;
+            $success = false;
 
-            // 4. enregistrement  des données dans la base de donnée
-            $this->domRepository->add($dom, true);
+            $typeMission = $dom->getSousTypeDocument()->getCodeSousType();
+            $isComplementOrTropPercu = in_array($typeMission, [SousTypeDocument::CODE_COMPLEMENT, SousTypeDocument::CODE_TROP_PERCU]);
 
-            $this->addFlash('success', 'La demande d\'ordre de mission a été créée avec succès.');
+            if (!$isComplementOrTropPercu && $this->verifierSiDateExistant($dom->getMatricule(), $dom->getDateDebut(), $dom->getDateFin())) {
+                $message = sprintf(
+                    '%s %s %s a déjà une mission enregistrée sur ces dates, veuillez vérifier.',
+                    $dom->getMatricule(),
+                    $dom->getNom(),
+                    $dom->getPrenom()
+                );
+            } else {
+                $isFraisExceptionnel = $typeMission === SousTypeDocument::CODE_FRAIS_EXCEPTIONNEL;
+                $totalGeneral = (int) str_replace('.', '', $dom->getTotalGeneralPayer());
+                $isAmountValid = $totalGeneral <= 500000;
 
-            return $this->redirectToRoute('dom_first_form');
+                if ($isFraisExceptionnel || $isAmountValid) {
+                    try {
+                        $this->TraitementFichierEtEnregistrementDAnsBd($form, $dom, $pdfService, $secondFormDto);
+                        $success = true;
+                        $message = 'La demande d\'ordre de mission a été créée avec succès.';
+                    } catch (\Exception $e) {
+                        $message = "Une erreur est survenue lors de l'enregistrement de la demande.";
+                        $this->historiqueOperationService->enregistrer(
+                            $dom->getNumeroOrdreMission(),
+                            'CREATION',
+                            'DOM',
+                            $success,
+                            $message
+                        );
+                    }
+                } else {
+                    $message = "Assurez-vous que le Montant Total est inférieur à 500.000 Ar.";
+                    $this->historiqueOperationService->enregistrer(
+                        $dom->getNumeroOrdreMission(),
+                        'CREATION',
+                        'DOM',
+                        $success,
+                        $message
+                    );
+                }
+            }
+
+            $this->historiqueOperationService->enregistrer(
+                $dom->getNumeroOrdreMission(),
+                'CREATION',
+                'DOM',
+                $success,
+                $message ?? 'Création de l\'ordre de mission.'
+            );
+
+            if ($success) {
+                $this->addFlash('success', $message);
+                return $this->redirectToRoute('dom_first_form');
+            } else {
+                $this->addFlash('warning', $message);
+            }
         }
+    }
+
+    private function TraitementFichierEtEnregistrementDAnsBd(FormInterface $form, Dom $dom, DomPdfService $pdfService, SecondFormDto $secondFormDto)
+    {
+        // 3. traitement de fichier
+        $this->traitementFichier($form, $dom, $pdfService, $secondFormDto);
+
+        // 4. enregistrement  des données dans la base de donnée
+        $this->domRepository->add($dom, true);
     }
     private function traitementFichier(FormInterface $form, Dom $dom, DomPdfService $pdfService, SecondFormDto $secondFormDto): void
     {
@@ -197,5 +263,35 @@ class DomSecondController extends AbstractController
         $agencesJson = $serializer->serialize($agences, 'json', ['groups' => 'agence:read']);
 
         return $agencesJson;
+    }
+
+    private function verifierSiDateExistant(string $matricule,  $dateDebutInput, $dateFinInput): bool
+    {
+        $Dates = $this->domRepository->getInfoDOMMatrSelet($matricule);
+
+        if (empty($Dates)) {
+            return false; // Pas de périodes dans la base
+        }
+
+        // Convertir les dates d'entrée si elles sont en chaînes
+        $dateDebutInputObj = $dateDebutInput instanceof DateTime ? $dateDebutInput : new DateTime($dateDebutInput);
+        $dateFinInputObj = $dateFinInput instanceof DateTime ? $dateFinInput : new DateTime($dateFinInput);
+
+        foreach ($Dates as $periode) {
+            // Convertir les dates en objets DateTime pour faciliter la comparaison
+            $dateDebut = new DateTime($periode['Date_Debut']); //date dans la base de donner
+            $dateFin = new DateTime($periode['Date_Fin']); //date dans la base de donner
+            $dateDebutInputObj = $dateDebutInput; // date entrer par l'utilisateur
+            $dateFinInputObj = $dateFinInput; // date entrer par l'utilisateur
+
+            // Vérifier si la date à vérifier est comprise entre la date de début et la date de fin
+            if (($dateFinInputObj >= $dateDebut && $dateFinInputObj <= $dateFin) || ($dateDebutInputObj >= $dateDebut && $dateDebutInputObj <= $dateFin) || ($dateDebutInputObj === $dateFin)) { // Correction des noms de variables
+                $trouve = true;
+
+                return $trouve;
+            }
+        }
+
+        return false; // Pas de chevauchement
     }
 }

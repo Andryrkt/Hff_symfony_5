@@ -1,230 +1,92 @@
 <?php
 
-namespace App\Service\historiqueOperation;
+namespace App\Service\Historique_operation;
 
-use App\Entity\Admin\PersonnelUser\User;
-use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\Admin\Historisation\TypeDocument;
-use App\Entity\Admin\Historisation\TypeOperation;
 use App\Entity\Admin\Historisation\HistoriqueOperationDocument;
-use App\Contract\Historique_operation\HistoriqueOperationInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
+use App\Repository\Admin\Historisation\TypeDocumentRepository;
+use App\Repository\Admin\Historisation\TypeOperationRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Security;
 
-class HistoriqueOperationService implements HistoriqueOperationInterface
+/**
+ * Service pour gérer la création des entrées dans l'historique des opérations.
+ * Ce service a une unique responsabilité : créer un enregistrement.
+ * La logique de redirection et de messages flash doit être gérée par les contrôleurs.
+ */
+class HistoriqueOperationService
 {
-    private $em;
-    private $userRepository;
-    private $typeOperationRepository;
-    private $typeDocumentRepository;
-    private RequestStack $requestStack;
-    private $typeDocumentId;
+    private EntityManagerInterface $em;
+    private Security $security;
+    private TypeOperationRepository $typeOperationRepository;
+    private TypeDocumentRepository $typeDocumentRepository;
+    private LoggerInterface $logger;
 
-    /** 
-     * Constructeur pour l'historique des opérations de document par type
-     * 
-     * @param int $typeDocumentId ID du type de document
-     *  - 1 : DIT - Demande d'intervention
-     *  - 2 : OR - Ordre de réparation
-     *  - 3 : FAC - Facture
-     *  - 4 : RI - Rapport d'intervention
-     *  - 5 : TIK - Ticketing (Demande de support informatique)
-     *  - 6 : DA - Demande d'approvisionnement
-     *  - 7 : DOM - Ordre de mission
-     *  - 8 : BADM - Mouvement matériel
-     *  - 9 : CAS - Casier
-     *  - 10 : CDE - Commande
-     *  - 11 : DEV - Devis
-     *  - 12 : BC - Bon de commande
-     *  - 13 : AC - Accusé de réception
-     *  - 16 : MUT - Demande de mutation
-     */
-    public function __construct(EntityManagerInterface $em, RequestStack $requestStack, int $typeDocumentId)
-    {
-        $this->em                      = $em;
-        $this->requestStack            = $requestStack;
-        $this->userRepository          = $em->getRepository(User::class);
-        $this->typeOperationRepository = $em->getRepository(TypeOperation::class);
-        $this->typeDocumentRepository  = $em->getRepository(TypeDocument::class);
-        $this->typeDocumentId          = $typeDocumentId;
+    public function __construct(
+        EntityManagerInterface $em,
+        Security $security,
+        TypeOperationRepository $typeOperationRepository,
+        TypeDocumentRepository $typeDocumentRepository,
+        LoggerInterface $logger
+    ) {
+        $this->em = $em;
+        $this->security = $security;
+        $this->typeOperationRepository = $typeOperationRepository;
+        $this->typeDocumentRepository = $typeDocumentRepository;
+        $this->logger = $logger;
     }
 
-    /** 
-     * Méthode pour enregistrer l'historique de l'opération
-     * 
-     * @param string $numeroDocument numéro du document, mettre '-' s'il n'y en a pas
-     * @param int $typeOperationId ID de l'opération effectué, avec les valeurs possibles:
-     *  - 1 : SOUMISSION
-     *  - 2 : VALIDATION
-     *  - 3 : MODIFICATION
-     *  - 4 : SUPPRESSION
-     *  - 5 : CREATION
-     *  - 6 : CLOTURE
-     * @param bool $succes statut de l'opération, valeur possible:
-     *  - true : Succès de l'opération
-     *  - false : Echec de l'opération (avec erreur)
-     * @param string $libelleOperation libellé de l'opération
+    /**
+     * Enregistre une opération dans l'historique.
+     *
+     * @param string $numeroDocument Le numéro du document.
+     * @param int $typeOperation Le nom de l'opération (ex: 'SOUMISSION', 'CREATION').
+     * @param string $typeDocumentCode Le code unique du type de document (ex: 'DIT', 'OR').
+     * @param bool $isSuccess Le statut de l'opération (true pour succès, false pour échec).
+     * @param string|null $libelleOperation Un libellé décrivant l'opération.
      */
-    public function enregistrer(string $numeroDocument, int $typeOperationId, bool $statutOperation, ?string $libelleOperation = null): void
-    {
-        $historique    = new HistoriqueOperationDocument();
-        $utilisateurId = $this->requestStack->getSession()->get('user_id');
+    public function enregistrer(
+        string $numeroDocument,
+        string $typeOperation,
+        string $typeDocumentCode,
+        bool $isSuccess,
+        ?string $libelleOperation = null
+    ): void {
+        $user = $this->security->getUser();
+        if (!$user) {
+            $this->logger->warning('Tentative d\'enregistrement d\'historique sans utilisateur connecté.');
+            throw new \RuntimeException('Aucun utilisateur connecté pour enregistrer l\'historique.');
+        }
+
+        $typeOperationEntity = $this->typeOperationRepository->findOneBy(['typeOperation' => $typeOperation]);
+        $typeDocumentEntity = $this->typeDocumentRepository->findOneBy(['typeDocumenet' => $typeDocumentCode]);
+
+        if (!$typeOperationEntity) {
+            $this->logger->error(sprintf('Type d\'opération "%s" non trouvé pour l\'historique du document "%s".', $typeOperation, $numeroDocument));
+            throw new \InvalidArgumentException(sprintf('Le type d\'opération "%s" est invalide.', $typeOperation));
+        }
+
+        if (!$typeDocumentEntity) {
+            $this->logger->error(sprintf('Type de document "%s" non trouvé pour l\'historique du document "%s".', $typeDocumentCode, $numeroDocument));
+            throw new \InvalidArgumentException(sprintf('Le code de type de document "%s" est invalide.', $typeDocumentCode));
+        }
+
+        $historique = new HistoriqueOperationDocument();
         $historique
             ->setNumeroDocument($numeroDocument)
-            ->setUtilisateur($this->userRepository->find($utilisateurId)->getNomUtilisateur())
-            ->setTypeOperation($this->typeOperationRepository->find($typeOperationId))
-            ->setTypeDocument($this->typeDocumentRepository->find($this->typeDocumentId))
-            ->setStatutOperation($statutOperation ? 'Succès' : 'Echec')
-            ->setLibelleOperation($libelleOperation)
-        ;
+            ->setUtilisateur($user->getUserIdentifier())
+            ->setTypeOperation($typeOperationEntity)
+            ->setTypeDocument($typeDocumentEntity)
+            ->setStatutOperation($isSuccess ? 'Succès' : 'Echec')
+            ->setLibelleOperation($libelleOperation);
 
-        // Sauvegarder dans la base de données
-        $this->em->persist($historique);
-        $this->em->flush();
-    }
-
-    /**
-     * Methode qui permet d'enregistrer le message et le type dans une session
-     *
-     * @param string $message
-     * @param boolean $success
-     * @return void
-     */
-    protected function enregistrerDansSession(string $message,  bool $success = false)
-    {
-        $this->requestStack->getSession()->set('notification', [
-            'type'    => $success ? 'success' : 'danger',
-            'message' => $message,
-        ]);
-    }
-
-    /**
-     * Methode qui permet d'enregistrer les information de l'historique dans la table historique_des_operations
-     *
-     * @param string $message
-     * @param string $numeroDocument
-     * @param integer $typeOperationId
-     * @param boolean $success
-     * @return void
-     */
-    protected function sendNotificationCore(string $message, string $numeroDocument, int $typeOperationId, bool $success = false)
-    {
-        $this->enregistrer($numeroDocument, $typeOperationId, $success, $message);
-    }
-
-    /** 
-     * @param int $typeOperationId ID de l'opération effectué, avec les valeurs possibles:
-     *  - 1 : SOUMISSION
-     *  - 2 : VALIDATION
-     *  - 3 : MODIFICATION
-     *  - 4 : SUPPRESSION
-     *  - 5 : CREATION
-     *  - 6 : CLOTURE
-     */
-    protected function sendNotification(string $message, string $numeroDocument, string $routeName, int $typeOperationId, bool $success = false)
-    {
-        $this->enregistrerDansSession($message, $success);
-
-        $this->sendNotificationCore($message, $numeroDocument, $typeOperationId, $success);
-
-        global $container;
-        if ($container && $container->has('router')) {
-            $urlGenerator = $container->get('router');
-            $url = $urlGenerator->generate($routeName);
-        } else {
-            // Fallback si le conteneur n'est pas disponible
-            $url = '/' . $routeName;
+        try {
+            $this->em->persist($historique);
+            $this->em->flush();
+            $this->logger->info(sprintf('Opération "%s" sur document "%s" enregistrée avec succès par "%s".', $typeOperation, $numeroDocument, $user->getUserIdentifier()));
+        } catch (\Exception $e) {
+            $this->logger->error(sprintf('Erreur lors de l\'enregistrement de l\'historique pour le document "%s" : %s', $numeroDocument, $e->getMessage()));
+            throw new \RuntimeException('Erreur lors de l\'enregistrement de l\'historique de l\'opération.', 0, $e);
         }
-        header("Location: " . $url);
-        exit();
-    }
-
-    /** 
-     * Méthode pour envoyer une notification et enregistrer l'historique de la SOUMISSION dU document
-     * 
-     * @param string $message message pour la notification
-     * @param string $numeroDocument numéro du document, mettre '-' s'il n'y en a pas
-     * @param string $routeName nom de la route pour la redirection
-     * @param bool $success statut de la soumission, valeurs possibles:
-     *  - true : Succès de la soumission
-     *  - false : Echec de la soumission (valeur par défaut)
-     */
-    public function sendNotificationSoumission(string $message, string $numeroDocument, string $routeName, bool $success = false)
-    {
-        $this->sendNotification($message, $numeroDocument, $routeName, 1, $success);
-    }
-
-    /** 
-     * Méthode pour envoyer une notification et enregistrer l'historique de la VALIDATION dU document
-     * 
-     * @param string $message message pour la notification
-     * @param string $numeroDocument numéro du document, mettre '-' s'il n'y en a pas
-     * @param string $routeName nom de la route pour la redirection
-     * @param bool $success statut de la validation, valeurs possibles:
-     *  - true : Succès de la validation
-     *  - false : Echec de la validation (valeur par défaut)
-     */
-    public function sendNotificationValidation(string $message, string $numeroDocument, string $routeName, bool $success = false)
-    {
-        $this->sendNotification($message, $numeroDocument, $routeName, 2, $success);
-    }
-
-    /** 
-     * Méthode pour envoyer une notification et enregistrer l'historique de la MODIFICATION dU document
-     * 
-     * @param string $message message pour la notification
-     * @param string $numeroDocument numéro du document, mettre '-' s'il n'y en a pas
-     * @param string $routeName nom de la route pour la redirection
-     * @param bool $success statut de la modification, valeurs possibles:
-     *  - true : Succès de la modification
-     *  - false : Echec de la modification (valeur par défaut)
-     */
-    public function sendNotificationModification(string $message, string $numeroDocument, string $routeName, bool $success = false)
-    {
-        $this->sendNotification($message, $numeroDocument, $routeName, 3, $success);
-    }
-
-    /** 
-     * Méthode pour envoyer une notification et enregistrer l'historique de la SUPPRESSION dU document
-     * 
-     * @param string $message message pour la notification
-     * @param string $numeroDocument numéro du document, mettre '-' s'il n'y en a pas
-     * @param string $routeName nom de la route pour la redirection
-     * @param bool $success statut de la suppression, valeurs possibles:
-     *  - true : Succès de la suppression
-     *  - false : Echec de la suppression (valeur par défaut)
-     */
-    public function sendNotificationSuppression(string $message, string $numeroDocument, string $routeName, bool $success = false)
-    {
-        $this->sendNotification($message, $numeroDocument, $routeName, 4, $success);
-    }
-
-    /** 
-     * Méthode pour envoyer une notification et enregistrer l'historique de la CREATION dU document
-     * 
-     * @param string $message message pour la notification
-     * @param string $numeroDocument numéro du document, mettre '-' s'il n'y en a pas
-     * @param string $routeName nom de la route pour la redirection
-     * @param bool $success statut de la création, valeurs possibles:
-     *  - true : Succès de la création
-     *  - false : Echec de la création (valeur par défaut)
-     */
-    public function sendNotificationCreation(string $message, string $numeroDocument, string $routeName, bool $success = false)
-    {
-        $this->sendNotification($message, $numeroDocument, $routeName, 5, $success);
-    }
-
-    /** 
-     * Méthode pour envoyer une notification et enregistrer l'historique de la CLOTURE dU document
-     * 
-     * @param string $message message pour la notification
-     * @param string $numeroDocument numéro du document, mettre '-' s'il n'y en a pas
-     * @param string $routeName nom de la route pour la redirection
-     * @param bool $success statut de la clôture, valeurs possibles:
-     *  - true : Succès de la clôture
-     *  - false : Echec de la clôture (valeur par défaut)
-     */
-    public function sendNotificationCloture(string $message, string $numeroDocument, string $routeName, bool $success = false)
-    {
-        $this->sendNotification($message, $numeroDocument, $routeName, 6, $success);
     }
 }
