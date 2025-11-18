@@ -280,13 +280,20 @@ function initTotalCalculations() {
         const totaAutreDepense = parseInt(totaAutreDepenseInput.value.replace(/[^\d]/g, "")) || 0;
         const totalIdemniteDeplacement = parseInt(totalIdemniteDeplacementInput.value.replace(/[^\d]/g, "")) || 0;
         const totalindemniteForfaitaire = parseInt(totalindemniteForfaitaireInput.value.replace(/[^\d]/g, "")) || 0;
+        const totalAmountWarning = document.querySelector("#total-amount-warning") as HTMLInputElement;
 
         let montantTotal = totalindemniteForfaitaire + totaAutreDepense - totalIdemniteDeplacement;
 
         if (sousTypeDocInput.value == 'TROP PERCU') {
             montantTotalInput.value = "-" + formatNumberInt(montantTotal);
-        } else {
+            totalAmountWarning.style.display = "none";
+        } else if(sousTypeDocInput.value != 'FRAIS EXCEPTIONNEL' && montantTotal > 500000){
+            totalAmountWarning.style.display = "block";
             montantTotalInput.value = formatNumberInt(montantTotal);
+        } else
+            {
+            montantTotalInput.value = formatNumberInt(montantTotal);
+            totalAmountWarning.style.display = "none";
         }
     }
 

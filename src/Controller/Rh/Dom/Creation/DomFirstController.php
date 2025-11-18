@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Rh\Dom;
+namespace App\Controller\Rh\Dom\Creation;
 
 use App\Dto\Rh\Dom\FirstFormDto;
 use App\Factory\Rh\Dom\FirstFormDtoFactory;

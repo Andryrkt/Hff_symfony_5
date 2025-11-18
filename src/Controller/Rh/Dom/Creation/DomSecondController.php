@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Controller\Rh\Dom;
+namespace App\Controller\Rh\Dom\Creation;
 
 use DateTime;
 use App\Entity\Rh\Dom\Dom;
 use App\Dto\Rh\Dom\FirstFormDto;
 use App\Dto\Rh\Dom\SecondFormDto;
-use App\Entity\Rh\Dom\SousTypeDocument;
 use App\Factory\Rh\Dom\DomFactory;
 use App\Form\Rh\Dom\SecondFormType;
 use App\Service\Rh\Dom\DomPdfService;
+use App\Entity\Rh\Dom\SousTypeDocument;
 use App\Repository\Rh\Dom\DomRepository;
 use Symfony\Component\Form\FormInterface;
 use App\Factory\Rh\Dom\SecondFormDtoFactory;
@@ -19,11 +19,12 @@ use App\Service\Utils\Fichier\UploderFileService;
 use App\Service\Rh\Dom\DomGenerateFileNameService;
 use App\Service\Utils\Fichier\TraitementDeFichier;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Repository\Admin\AgenceService\AgenceRepository;
 use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
-use App\Service\Historique_operation\HistoriqueOperationService;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use App\Service\Historique_operation\HistoriqueOperationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
@@ -61,12 +62,10 @@ class DomSecondController extends AbstractController
         // 1. gerer l'accés
         $this->denyAccessUnlessGranted('RH_ORDRE_MISSION_CREATE');
 
-        // recuperation de session
-        $session = $request->getSession();
 
-        // 2. recupération des donées du premier formulaire
-        $firstFormDto = $this->recuperationDonnerPremierFormulaire($session);
-        if ($firstFormDto instanceof \Symfony\Component\HttpFoundation\RedirectResponse) {
+        // 2. recupération de session et des donées du premier formulaire
+        $firstFormDto = $this->recuperationDonnerPremierFormulaire($request->getSession());
+        if ($firstFormDto instanceof RedirectResponse) {
             return $firstFormDto;
         }
 
@@ -77,7 +76,21 @@ class DomSecondController extends AbstractController
         $form = $this->createForm(SecondFormType::class, $secondFormDto);
 
         // 5. traitement du formulaire
-        $this->traitementFormulaire($form, $request, $pdfService);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                // 5a. Formulaire valide : traitement métier
+                $redirectResponse = $this->processValidForm($form, $pdfService);
+                if ($redirectResponse) {
+                    return $redirectResponse;
+                }
+            } else {
+                // 5b. Formulaire invalide : fusion des valeurs par défaut
+                $defaultsDto = $this->secondFormDtoFactory->create($firstFormDto);
+                $this->mergeDefaultsIntoDto($form->getData(), $defaultsDto);
+            }
+        }
 
         // 6. rendu de toutes les agences pendant le premier chargement
         $agencesJson = $this->serealisationAgence($agenceRepository, $serializer);
@@ -85,56 +98,43 @@ class DomSecondController extends AbstractController
         // rendu du vue
         return $this->render('rh/dom/secondForm.html.twig', [
             'form'          => $form->createView(),
-            'secondFormDto' => $secondFormDto,
+            'secondFormDto' => $form->getData(),
             'agencesJson' => $agencesJson,
             'breadcrumbs' => $breadcrumbBuilder->build('dom_second_form'),
         ]);
     }
 
-    private function traitementFormulaire(FormInterface $form, Request $request, DomPdfService $pdfService)
+    private function processValidForm(FormInterface $form, DomPdfService $pdfService): ?RedirectResponse
     {
-        $form->handleRequest($request);
+        /** @var SecondFormDto $secondFormDto */
+        $secondFormDto = $form->getData();
+        $dom = $this->domFactory->create($secondFormDto);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            /** @var SecondFormDto $secondFormDto */
-            $secondFormDto = $form->getData();
-            $dom = $this->domFactory->create($secondFormDto);
+        $message = null;
+        $success = false;
 
-            $message = null;
-            $success = false;
+        $typeMission = $dom->getSousTypeDocument()->getCodeSousType();
+        $isComplementOrTropPercu = in_array($typeMission, [SousTypeDocument::CODE_COMPLEMENT, SousTypeDocument::CODE_TROP_PERCU]);
 
-            $typeMission = $dom->getSousTypeDocument()->getCodeSousType();
-            $isComplementOrTropPercu = in_array($typeMission, [SousTypeDocument::CODE_COMPLEMENT, SousTypeDocument::CODE_TROP_PERCU]);
+        if (!$isComplementOrTropPercu && $this->verifierSiDateExistant($dom->getMatricule(), $dom->getDateDebut(), $dom->getDateFin())) {
+            $message = sprintf(
+                '%s %s %s a déjà une mission enregistrée sur ces dates, veuillez vérifier.',
+                $dom->getMatricule(),
+                $dom->getNom(),
+                $dom->getPrenom()
+            );
+        } else {
+            $isFraisExceptionnel = $typeMission === SousTypeDocument::CODE_FRAIS_EXCEPTIONNEL;
+            $totalGeneral = (int) str_replace('.', '', $dom->getTotalGeneralPayer());
+            $isAmountValid = $totalGeneral <= 500000;
 
-            if (!$isComplementOrTropPercu && $this->verifierSiDateExistant($dom->getMatricule(), $dom->getDateDebut(), $dom->getDateFin())) {
-                $message = sprintf(
-                    '%s %s %s a déjà une mission enregistrée sur ces dates, veuillez vérifier.',
-                    $dom->getMatricule(),
-                    $dom->getNom(),
-                    $dom->getPrenom()
-                );
-            } else {
-                $isFraisExceptionnel = $typeMission === SousTypeDocument::CODE_FRAIS_EXCEPTIONNEL;
-                $totalGeneral = (int) str_replace('.', '', $dom->getTotalGeneralPayer());
-                $isAmountValid = $totalGeneral <= 500000;
-
-                if ($isFraisExceptionnel || $isAmountValid) {
-                    try {
-                        $this->TraitementFichierEtEnregistrementDAnsBd($form, $dom, $pdfService, $secondFormDto);
-                        $success = true;
-                        $message = 'La demande d\'ordre de mission a été créée avec succès.';
-                    } catch (\Exception $e) {
-                        $message = "Une erreur est survenue lors de l'enregistrement de la demande.";
-                        $this->historiqueOperationService->enregistrer(
-                            $dom->getNumeroOrdreMission(),
-                            'CREATION',
-                            'DOM',
-                            $success,
-                            $message
-                        );
-                    }
-                } else {
-                    $message = "Assurez-vous que le Montant Total est inférieur à 500.000 Ar.";
+            if ($isFraisExceptionnel || $isAmountValid) {
+                try {
+                    $this->TraitementFichierEtEnregistrementDAnsBd($form, $dom, $pdfService, $secondFormDto);
+                    $success = true;
+                    $message = 'La demande d\'ordre de mission a été créée avec succès.';
+                } catch (\Exception $e) {
+                    $message = "Une erreur est survenue lors de l'enregistrement de la demande.";
                     $this->historiqueOperationService->enregistrer(
                         $dom->getNumeroOrdreMission(),
                         'CREATION',
@@ -143,21 +143,55 @@ class DomSecondController extends AbstractController
                         $message
                     );
                 }
-            }
-
-            $this->historiqueOperationService->enregistrer(
-                $dom->getNumeroOrdreMission(),
-                'CREATION',
-                'DOM',
-                $success,
-                $message ?? 'Création de l\'ordre de mission.'
-            );
-
-            if ($success) {
-                $this->addFlash('success', $message);
-                return $this->redirectToRoute('dom_first_form');
             } else {
-                $this->addFlash('warning', $message);
+                $message = "Assurez-vous que le Montant Total est inférieur à 500.000 Ar.";
+                $this->historiqueOperationService->enregistrer(
+                    $dom->getNumeroOrdreMission(),
+                    'CREATION',
+                    'DOM',
+                    $success,
+                    $message
+                );
+            }
+        }
+
+        $this->historiqueOperationService->enregistrer(
+            $dom->getNumeroOrdreMission(),
+            'CREATION',
+            'DOM',
+            $success,
+            $message ?? 'Création de l\'ordre de mission.'
+        );
+
+        if ($success) {
+            $this->addFlash('success', $message);
+            return $this->redirectToRoute('doms_liste');
+        } else {
+            $this->addFlash('warning', $message);
+            return null;
+        }
+    }
+
+    private function mergeDefaultsIntoDto(SecondFormDto $submittedDto, SecondFormDto $defaultsDto): void
+    {
+        $submittedReflection = new \ReflectionObject($submittedDto);
+        $defaultsReflection = new \ReflectionObject($defaultsDto);
+
+        foreach ($submittedReflection->getProperties() as $prop) {
+            $prop->setAccessible(true);
+
+            $submittedValue = $prop->isInitialized($submittedDto) ? $prop->getValue($submittedDto) : null;
+
+            if ($submittedValue === null) {
+                $propName = $prop->getName();
+                if ($defaultsReflection->hasProperty($propName)) {
+                    $defaultProp = $defaultsReflection->getProperty($propName);
+                    $defaultProp->setAccessible(true);
+                    if ($defaultProp->isInitialized($defaultsDto)) {
+                        $defaultValue = $defaultProp->getValue($defaultsDto);
+                        $prop->setValue($submittedDto, $defaultValue);
+                    }
+                }
             }
         }
     }
@@ -170,6 +204,7 @@ class DomSecondController extends AbstractController
         // 4. enregistrement  des données dans la base de donnée
         $this->domRepository->add($dom, true);
     }
+
     private function traitementFichier(FormInterface $form, Dom $dom, DomPdfService $pdfService, SecondFormDto $secondFormDto): void
     {
         /** 
@@ -183,7 +218,7 @@ class DomSecondController extends AbstractController
         [$nomEtCheminFichiersEnregistrer, $nomFichierEnregistrer, $nomAvecCheminFichier, $nomFichier] = $this->saveFileUploder($form, $dom);
 
         // 2. ajout des nom de fichier dans le DOM
-        if (empty($nomFichierEnregistrer)) {
+        if (!empty($nomFichierEnregistrer)) {
             $dom->setPieceJoint01($nomAvecCheminFichier[0] ?? null);
             $dom->setPieceJoint02($nomAvecCheminFichier[1] ?? null);
         }

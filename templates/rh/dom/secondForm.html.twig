@@ -12,6 +12,9 @@
 {% import "macros/form_macros.html.twig" as formMacros %}
 
 {% block content %}
+	<div class="container-fluid">
+		{% include 'partials/flash_messages.html.twig' %}
+	</div>
 
 	<div class="container mt-6 mb-4" id="agence-service-data" data-agences="{{ agencesJson|e('html_attr') }}">
 		<div class="card p-2">
@@ -290,6 +293,10 @@
 						{{ form_row(form.autresDepense3, {'attr': { 'class' : 'border_orange'}})}}
 
 						{{ form_row(form.totalGeneralPayer)}}
+						<div id="total-amount-warning" class="text-danger mt-2" style="display: none;">
+							<b>
+								le Montant Total dépasse le 500.000 Ar qui n'est pas valide pour cette type de mission</b>
+						</div>
 
 					</div>
 

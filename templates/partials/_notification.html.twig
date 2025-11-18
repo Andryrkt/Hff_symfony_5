@@ -1,9 +1,0 @@
-{% if app.flashes %}
-{% for type, messages in app.flashes %}
-{% for message in messages %}
-<div class="alert alert-{{ type }}">
-    <p class="fw-bold text-break">{{ message }}</p>
-</div>
-{% endfor %}
-{% endfor %}
-{% endif %}

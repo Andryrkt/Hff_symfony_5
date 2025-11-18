@@ -14,7 +14,9 @@
 						<h3 class="perso-titre">Demande d'Ordre de Mission</h3>
 					</div>
 				</div>
-				{% include "/partials/_notification.html.twig" %}
+				<div class="container-fluid">
+					{% include 'partials/flash_messages.html.twig' %}
+				</div>
 
 				{{ form_start(form)}}
 				<div class="row">
