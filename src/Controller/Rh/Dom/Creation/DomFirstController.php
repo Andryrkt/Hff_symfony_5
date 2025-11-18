@@ -6,6 +6,7 @@ use App\Dto\Rh\Dom\FirstFormDto;
 use App\Factory\Rh\Dom\FirstFormDtoFactory;
 use App\Form\Rh\Dom\FirstFormType;
 use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,10 +19,12 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class DomFirstController extends AbstractController
 {
     private $firstFormDtoFactory;
+    private LoggerInterface $logger;
 
-    public function __construct(FirstFormDtoFactory $firstFormDtoFactory)
+    public function __construct(FirstFormDtoFactory $firstFormDtoFactory, LoggerInterface $domFirstFormLogger)
     {
         $this->firstFormDtoFactory = $firstFormDtoFactory;
+        $this->logger = $domFirstFormLogger;
     }
 
     /**
@@ -29,6 +32,7 @@ class DomFirstController extends AbstractController
      */
     public function firstForm(Request $request, ContextAwareBreadcrumbBuilder $breadcrumbBuilder)
     {
+        $this->logger->info('Affichage du premier formulaire de création de DOM.');
         // 1. gerer l'accés 
         $this->denyAccessUnlessGranted('RH_ORDRE_MISSION_CREATE');
 
@@ -56,8 +60,10 @@ class DomFirstController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->logger->info('Premier formulaire soumis et valide.');
             // 1. recupération des données du formulaire
             $data = $form->getData();
+            $this->logger->debug('Données du formulaire', ['data' => $data]);
 
             // 2. stocage des donner dans le session
             $session = $request->getSession();

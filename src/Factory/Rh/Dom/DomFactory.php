@@ -35,7 +35,8 @@ class DomFactory
         /** @var User $user */
         $user = $this->security->getUser();
         $statut = $this->statutDemandeRepository->findOneBy(['codeApplication' => Dom::CODE_APPLICATION, 'description' => 'OUVERT']);
-        $numTel = $secondFormDto->modePayement == "MOBILE MONEY" ? $secondFormDto->mode : null;
+        $numTel = $secondFormDto->modePayement === "MOBILE MONEY" ? $secondFormDto->mode : null;
+        $matricule = $secondFormDto->salarier === "TEMPORAIRE" ? $secondFormDto->cin : $secondFormDto->matricule;
         $agenceEmetteur = $user->getAgenceUser();
         $serviceEmetteur = $user->getServiceUser();
         $codeAgenceEmetteur = $agenceEmetteur->getCode();
@@ -46,7 +47,7 @@ class DomFactory
 
         $dom->setDateDemande($secondFormDto->dateDemande);
         $dom->setNumeroOrdreMission($this->numeroGeneratorService->autoGenerateNumero(Dom::CODE_APPLICATION, true));
-        $dom->setMatricule($secondFormDto->matricule);
+        $dom->setMatricule($matricule);
         $dom->setNomSessionUtilisateur($user->getUserIdentifier());
         //Date debut et fin mission / et nombre de jour
         $dom->setDateDebut($secondFormDto->dateHeureMission['debut']);

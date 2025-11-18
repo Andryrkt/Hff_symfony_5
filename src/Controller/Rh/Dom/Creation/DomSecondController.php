@@ -18,6 +18,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Utils\Fichier\UploderFileService;
 use App\Service\Rh\Dom\DomGenerateFileNameService;
 use App\Service\Utils\Fichier\TraitementDeFichier;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -36,17 +37,20 @@ class DomSecondController extends AbstractController
     private DomRepository $domRepository;
     private DomFactory $domFactory;
     private HistoriqueOperationService $historiqueOperationService;
+    private LoggerInterface $logger;
 
     public function __construct(
-        SecondFormDtoFactory $firstFormDtoFactory,
+        SecondFormDtoFactory $secondFormDtoFactory,
         DomRepository $domRepository,
         DomFactory $domFactory,
-        HistoriqueOperationService $historiqueOperationService
+        HistoriqueOperationService $historiqueOperationService,
+        LoggerInterface $domSecondFormLogger
     ) {
-        $this->secondFormDtoFactory = $firstFormDtoFactory;
+        $this->secondFormDtoFactory = $secondFormDtoFactory;
         $this->domRepository = $domRepository;
         $this->domFactory = $domFactory;
         $this->historiqueOperationService = $historiqueOperationService;
+        $this->logger = $domSecondFormLogger;
     }
 
     /**
@@ -59,48 +63,33 @@ class DomSecondController extends AbstractController
         DomPdfService $pdfService,
         ContextAwareBreadcrumbBuilder $breadcrumbBuilder
     ) {
-        // 1. gerer l'accés
+        $this->logger->info('Affichage du second formulaire de création de DOM.');
         $this->denyAccessUnlessGranted('RH_ORDRE_MISSION_CREATE');
 
-
-        // 2. recupération de session et des donées du premier formulaire
-        $firstFormDto = $this->recuperationDonnerPremierFormulaire($request->getSession());
+        $firstFormDto = $this->getFirstFormDataFromSession($request->getSession());
         if ($firstFormDto instanceof RedirectResponse) {
+            $this->logger->warning('Données du premier formulaire non trouvées en session.');
             return $firstFormDto;
         }
 
-        // 3 . initialisation de la FirstFormDto
         $secondFormDto = $this->secondFormDtoFactory->create($firstFormDto);
-
-        // 4. creation du formulaire
         $form = $this->createForm(SecondFormType::class, $secondFormDto);
-
-        // 5. traitement du formulaire
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
-            if ($form->isValid()) {
-                // 5a. Formulaire valide : traitement métier
-                $redirectResponse = $this->processValidForm($form, $pdfService);
-                if ($redirectResponse) {
-                    return $redirectResponse;
-                }
-            } else {
-                // 5b. Formulaire invalide : fusion des valeurs par défaut
-                $defaultsDto = $this->secondFormDtoFactory->create($firstFormDto);
-                $this->mergeDefaultsIntoDto($form->getData(), $defaultsDto);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->logger->info('Second formulaire soumis et valide.');
+            $this->logger->debug('Données du formulaire', ['data' => $form->getData()]);
+            $redirectResponse = $this->processValidForm($form, $pdfService);
+            if ($redirectResponse) {
+                return $redirectResponse;
             }
         }
 
-        // 6. rendu de toutes les agences pendant le premier chargement
-        $agencesJson = $this->serealisationAgence($agenceRepository, $serializer);
-
-        // rendu du vue
         return $this->render('rh/dom/secondForm.html.twig', [
             'form'          => $form->createView(),
             'secondFormDto' => $form->getData(),
-            'agencesJson' => $agencesJson,
-            'breadcrumbs' => $breadcrumbBuilder->build('dom_second_form'),
+            'agencesJson'   => $this->serializeAgences($agenceRepository, $serializer),
+            'breadcrumbs'   => $breadcrumbBuilder->build('dom_second_form'),
         ]);
     }
 
@@ -110,49 +99,21 @@ class DomSecondController extends AbstractController
         $secondFormDto = $form->getData();
         $dom = $this->domFactory->create($secondFormDto);
 
-        $message = null;
+        $message = 'Création de l\'ordre de mission.';
         $success = false;
 
-        $typeMission = $dom->getSousTypeDocument()->getCodeSousType();
-        $isComplementOrTropPercu = in_array($typeMission, [SousTypeDocument::CODE_COMPLEMENT, SousTypeDocument::CODE_TROP_PERCU]);
-
-        if (!$isComplementOrTropPercu && $this->verifierSiDateExistant($dom->getMatricule(), $dom->getDateDebut(), $dom->getDateFin())) {
-            $message = sprintf(
-                '%s %s %s a déjà une mission enregistrée sur ces dates, veuillez vérifier.',
-                $dom->getMatricule(),
-                $dom->getNom(),
-                $dom->getPrenom()
+        try {
+            $this->validateDom($dom);
+            $this->saveDomWithFiles($form, $dom, $pdfService, $secondFormDto);
+            $success = true;
+            $message = 'La demande d\'ordre de mission a été créée avec succès.';
+            $this->logger->info($message, ['numero_dom' => $dom->getNumeroOrdreMission()]);
+        } catch (\Exception $e) {
+            $message = $e->getMessage();
+            $this->logger->error(
+                'Erreur lors de la création de l\'ordre de mission : ' . $message,
+                ['numero_dom' => $dom->getNumeroOrdreMission(), 'exception' => $e]
             );
-        } else {
-            $isFraisExceptionnel = $typeMission === SousTypeDocument::CODE_FRAIS_EXCEPTIONNEL;
-            $totalGeneral = (int) str_replace('.', '', $dom->getTotalGeneralPayer());
-            $isAmountValid = $totalGeneral <= 500000;
-
-            if ($isFraisExceptionnel || $isAmountValid) {
-                try {
-                    $this->TraitementFichierEtEnregistrementDAnsBd($form, $dom, $pdfService, $secondFormDto);
-                    $success = true;
-                    $message = 'La demande d\'ordre de mission a été créée avec succès.';
-                } catch (\Exception $e) {
-                    $message = "Une erreur est survenue lors de l'enregistrement de la demande.";
-                    $this->historiqueOperationService->enregistrer(
-                        $dom->getNumeroOrdreMission(),
-                        'CREATION',
-                        'DOM',
-                        $success,
-                        $message
-                    );
-                }
-            } else {
-                $message = "Assurez-vous que le Montant Total est inférieur à 500.000 Ar.";
-                $this->historiqueOperationService->enregistrer(
-                    $dom->getNumeroOrdreMission(),
-                    'CREATION',
-                    'DOM',
-                    $success,
-                    $message
-                );
-            }
         }
 
         $this->historiqueOperationService->enregistrer(
@@ -160,90 +121,133 @@ class DomSecondController extends AbstractController
             'CREATION',
             'DOM',
             $success,
-            $message ?? 'Création de l\'ordre de mission.'
+            $message
         );
 
         if ($success) {
             $this->addFlash('success', $message);
             return $this->redirectToRoute('doms_liste');
-        } else {
-            $this->addFlash('warning', $message);
-            return null;
+        }
+
+        $this->addFlash('warning', $message);
+        return null;
+    }
+
+    private function validateDom(Dom $dom): void
+    {
+        $typeMission = $dom->getSousTypeDocument()->getCodeSousType();
+        $isComplementOrTropPercu = in_array($typeMission, [SousTypeDocument::CODE_COMPLEMENT, SousTypeDocument::CODE_TROP_PERCU]);
+
+        if (!$isComplementOrTropPercu && $this->hasExistingMissionOnDates($dom->getMatricule(), $dom->getDateDebut(), $dom->getDateFin())) {
+            throw new \LogicException(sprintf(
+                '%s %s %s a déjà une mission enregistrée sur ces dates, veuillez vérifier.',
+                $dom->getMatricule(),
+                $dom->getNom(),
+                $dom->getPrenom()
+            ));
+        }
+
+        $isFraisExceptionnel = $typeMission === SousTypeDocument::CODE_FRAIS_EXCEPTIONNEL;
+        $totalGeneral = (int) str_replace('.', '', $dom->getTotalGeneralPayer());
+        $isAmountValid = $totalGeneral <= 500000;
+
+        if (!$isFraisExceptionnel && !$isAmountValid) {
+            throw new \LogicException("Assurez-vous que le Montant Total est inférieur à 500.000 Ar.");
         }
     }
 
-    private function mergeDefaultsIntoDto(SecondFormDto $submittedDto, SecondFormDto $defaultsDto): void
+    private function saveDomWithFiles(FormInterface $form, Dom $dom, DomPdfService $pdfService, SecondFormDto $secondFormDto): void
     {
-        $submittedReflection = new \ReflectionObject($submittedDto);
-        $defaultsReflection = new \ReflectionObject($defaultsDto);
+        $this->processFiles($form, $dom, $pdfService, $secondFormDto);
 
-        foreach ($submittedReflection->getProperties() as $prop) {
-            $prop->setAccessible(true);
-
-            $submittedValue = $prop->isInitialized($submittedDto) ? $prop->getValue($submittedDto) : null;
-
-            if ($submittedValue === null) {
-                $propName = $prop->getName();
-                if ($defaultsReflection->hasProperty($propName)) {
-                    $defaultProp = $defaultsReflection->getProperty($propName);
-                    $defaultProp->setAccessible(true);
-                    if ($defaultProp->isInitialized($defaultsDto)) {
-                        $defaultValue = $defaultProp->getValue($defaultsDto);
-                        $prop->setValue($submittedDto, $defaultValue);
-                    }
-                }
-            }
+        $success = false;
+        $message = 'Enregistrement dans la base de données.';
+        try {
+            $this->domRepository->add($dom, true);
+            $success = true;
+            $message = 'Enregistrement dans la base de données réussi.';
+            $this->logger->info($message, ['numero_dom' => $dom->getNumeroOrdreMission()]);
+        } catch (\Exception $e) {
+            $message = 'Erreur lors de l\'enregistrement dans la base de données : ' . $e->getMessage();
+            $this->logger->error($message, ['numero_dom' => $dom->getNumeroOrdreMission(), 'exception' => $e]);
+            throw $e;
+        } finally {
+            $this->historiqueOperationService->enregistrer(
+                $dom->getNumeroOrdreMission(),
+                'DB_SAVE',
+                'DOM',
+                $success,
+                $message
+            );
         }
     }
 
-    private function TraitementFichierEtEnregistrementDAnsBd(FormInterface $form, Dom $dom, DomPdfService $pdfService, SecondFormDto $secondFormDto)
+    private function processFiles(FormInterface $form, Dom $dom, DomPdfService $pdfService, SecondFormDto $secondFormDto): void
     {
-        // 3. traitement de fichier
-        $this->traitementFichier($form, $dom, $pdfService, $secondFormDto);
+        [$uploadedFilesPaths, $uploadedFileNames, $finalPdfPath, $finalPdfName] = $this->saveUploadedFiles($form, $dom);
 
-        // 4. enregistrement  des données dans la base de donnée
-        $this->domRepository->add($dom, true);
-    }
+        $pdfService->genererPDF($secondFormDto, $finalPdfPath);
 
-    private function traitementFichier(FormInterface $form, Dom $dom, DomPdfService $pdfService, SecondFormDto $secondFormDto): void
-    {
-        /** 
-         * 1. gestion des pieces jointes et generer le nom du fichier PDF
-         * Enregistrement de fichier uploder
-         * @var array $nomEtCheminFichiersEnregistrer
-         * @var array $nomFichierEnregistrer 
-         * @var string $nomAvecCheminFichier (page de garde)
-         * @var string $nomFichier (page de garde)
-         */
-        [$nomEtCheminFichiersEnregistrer, $nomFichierEnregistrer, $nomAvecCheminFichier, $nomFichier] = $this->saveFileUploder($form, $dom);
-
-        // 2. ajout des nom de fichier dans le DOM
-        if (!empty($nomFichierEnregistrer)) {
-            $dom->setPieceJoint01($nomAvecCheminFichier[0] ?? null);
-            $dom->setPieceJoint02($nomAvecCheminFichier[1] ?? null);
+        $success = false;
+        $message = 'Fusion des fichiers.';
+        try {
+            $fileProcessor = new TraitementDeFichier();
+            $filesToMerge = $fileProcessor->insertFileAtPosition($uploadedFilesPaths, $finalPdfPath, 0);
+    
+            $fileProcessor->fusionFichers($filesToMerge, $finalPdfPath);
+            $success = true;
+            $message = 'Fusion des fichiers réussie.';
+            $this->logger->info($message, ['numero_dom' => $dom->getNumeroOrdreMission()]);
+        } catch (\Exception $e) {
+            $message = 'Erreur lors de la fusion des fichiers : ' . $e->getMessage();
+            $this->logger->error($message, ['numero_dom' => $dom->getNumeroOrdreMission(), 'exception' => $e]);
+            throw $e;
+        } finally {
+            $this->historiqueOperationService->enregistrer(
+                $dom->getNumeroOrdreMission(),
+                'FILE_MERGE',
+                'DOM',
+                $success,
+                $message
+            );
         }
 
-        // 3. creation de page de garde
-        $pdfService->genererPDF($secondFormDto, $nomAvecCheminFichier);
 
-        // 4. ajout du page de garde à la dernière position
-        $traitementDeFichier = new TraitementDeFichier();
-        $nomEtCheminFichiersEnregistrer = $traitementDeFichier->insertFileAtPosition($nomEtCheminFichiersEnregistrer, $nomAvecCheminFichier, 0);
+        if (!empty($uploadedFileNames)) {
+            $dom->setPieceJoint01($uploadedFileNames[0] ?? null);
+            $dom->setPieceJoint02($uploadedFileNames[1] ?? null);
+        }
 
-        // 5. fusion du page de garde et des pieces jointes (conversion avant la fusion)
-        $traitementDeFichier->fusionFichers($nomEtCheminFichiersEnregistrer, $nomAvecCheminFichier);
-
-        // 6. copie du pdf fusioné dans DW
-        $this->copyToDW($pdfService, $nomAvecCheminFichier, $nomFichier);
+        $this->copyToDocuware($dom, $pdfService, $finalPdfPath, $finalPdfName);
     }
 
-    private function copyToDW(DomPdfService $pdfService, string  $nomAvecCheminFichier, string  $nomFichier): void
+    private function copyToDocuware(Dom $dom, DomPdfService $pdfService, string  $finalPdfPath, string  $finalPdfName): void
     {
-        $cheminVersDw = $this->getParameter('docuware_directory') . '/ORDRE_DE_MISSION/' . $nomFichier;
-        $pdfService->copyToDW($cheminVersDw, $nomAvecCheminFichier);
+        $docuwarePath = $this->getParameter('docuware_directory') . '/ORDRE_DE_MISSION/' . $finalPdfName;
+        
+        $success = false;
+        $message = 'Copie vers Docuware.';
+        try {
+            $pdfService->copyToDW($docuwarePath, $finalPdfPath);
+            $success = true;
+            $message = 'Copie vers Docuware réussie.';
+            $this->logger->info($message, ['numero_dom' => $dom->getNumeroOrdreMission()]);
+        } catch (\Exception $e) {
+            $message = 'Erreur lors de la copie vers Docuware : ' . $e->getMessage();
+            $this->logger->error($message, ['numero_dom' => $dom->getNumeroOrdreMission(), 'exception' => $e]);
+            throw $e;
+        } finally {
+            $this->historiqueOperationService->enregistrer(
+                $dom->getNumeroOrdreMission(),
+                'DW_COPY',
+                'DOM',
+                $success,
+                $message
+            );
+        }
     }
 
-    private function saveFileUploder(FormInterface $form, Dom $dom)
+    private function saveUploadedFiles(FormInterface $form, Dom $dom): array
     {
         $numDom = $dom->getNumeroOrdreMission();
         $codeAgenceServiceUser = $dom->getAgenceEmetteurId()->getCode() . '' . $dom->getServiceEmetteurId()->getCode();
@@ -256,77 +260,81 @@ class DomSecondController extends AbstractController
             mkdir($path, 0777, true);
         }
 
-        /**
-         * recupère les noms + chemins dans un tableau et les noms dans une autre
-         * @var array $nomEtCheminFichiersEnregistrer
-         * @var array $nomFichierEnregistrer
-         */
-        [$nomEtCheminFichiersEnregistrer, $nomFichierEnregistrer] = $uploader->getFichiers($form, [
-            'repertoire' => $path,
-            'generer_nom_callback' => function (
-                UploadedFile $file,
-                int $index
-            ) use ($nameGenerator, $numDom, $codeAgenceServiceUser) {
-                return $nameGenerator->generateFileUplodeName($file, $numDom, $codeAgenceServiceUser, $index);
-            }
-        ]);
+        $success = false;
+        $message = 'Upload des fichiers.';
+        $uploadedFilesPaths = [];
+        $uploadedFileNames = [];
+        try {
+            [$uploadedFilesPaths, $uploadedFileNames] = $uploader->getFichiers($form, [
+                'repertoire' => $path,
+                'generer_nom_callback' => function (
+                    UploadedFile $file,
+                    int $index
+                ) use ($nameGenerator, $numDom, $codeAgenceServiceUser) {
+                    return $nameGenerator->generateFileUplodeName($file, $numDom, $codeAgenceServiceUser, $index);
+                }
+            ]);
+            $success = true;
+            $message = 'Upload des fichiers réussi : ' . (empty($uploadedFileNames) ? 'aucun fichier' : implode(', ', $uploadedFileNames));
+            $this->logger->info($message, ['numero_dom' => $dom->getNumeroOrdreMission()]);
+        } catch (\Exception $e) {
+            $message = 'Erreur lors de l\'upload des fichiers : ' . $e->getMessage();
+            $this->logger->error($message, ['numero_dom' => $dom->getNumeroOrdreMission(), 'exception' => $e]);
+            throw $e;
+        } finally {
+            $this->historiqueOperationService->enregistrer(
+                $dom->getNumeroOrdreMission(),
+                'FILE_UPLOAD',
+                'DOM',
+                $success,
+                $message
+            );
+        }
 
-        $nomFichier = $nameGenerator->generateMainName($numDom, $codeAgenceServiceUser);
-        $nomAvecCheminFichier = $path . $nomFichier;
+        $finalPdfName = $nameGenerator->generateMainName($numDom, $codeAgenceServiceUser);
+        $finalPdfPath = $path . $finalPdfName;
 
-        return [$nomEtCheminFichiersEnregistrer, $nomFichierEnregistrer, $nomAvecCheminFichier, $nomFichier];
+        return [$uploadedFilesPaths, $uploadedFileNames, $finalPdfPath, $finalPdfName];
     }
 
-    private function recuperationDonnerPremierFormulaire(SessionInterface $session)
+    /**
+     * return FirstFormDto|RedirectResponse
+     */
+    private function getFirstFormDataFromSession(SessionInterface $session)
     {
-        /** @var FirstFormDto $firstFormDto */
         $firstFormDto = $session->get('dom_first_form_data');
         if (!$firstFormDto) {
-            // Handle case where first form data is not in session, e.g., redirect to first form
+            $this->addFlash('warning', 'La session a expiré, veuillez recommencer.');
             return $this->redirectToRoute('dom_first_form');
         }
 
         return $firstFormDto;
     }
 
-    private function serealisationAgence(AgenceRepository $agenceRepository, SerializerInterface $serializer)
+    private function serializeAgences(AgenceRepository $agenceRepository, SerializerInterface $serializer): string
     {
-        // 1. Récupérer toutes les agences avec leurs services
         $agences = $agenceRepository->findAll();
-
-        // 2. Sérialiser les données en JSON en utilisant les groupes que nous avons définis
-        $agencesJson = $serializer->serialize($agences, 'json', ['groups' => 'agence:read']);
-
-        return $agencesJson;
+        return $serializer->serialize($agences, 'json', ['groups' => 'agence:read']);
     }
 
-    private function verifierSiDateExistant(string $matricule,  $dateDebutInput, $dateFinInput): bool
+    private function hasExistingMissionOnDates(string $matricule, \DateTimeInterface $dateDebutInput, \DateTimeInterface $dateFinInput): bool
     {
-        $Dates = $this->domRepository->getInfoDOMMatrSelet($matricule);
+        $existingMissionsDates = $this->domRepository->getInfoDOMMatrSelet($matricule);
 
-        if (empty($Dates)) {
-            return false; // Pas de périodes dans la base
+        if (empty($existingMissionsDates)) {
+            return false;
         }
 
-        // Convertir les dates d'entrée si elles sont en chaînes
-        $dateDebutInputObj = $dateDebutInput instanceof DateTime ? $dateDebutInput : new DateTime($dateDebutInput);
-        $dateFinInputObj = $dateFinInput instanceof DateTime ? $dateFinInput : new DateTime($dateFinInput);
+        foreach ($existingMissionsDates as $missionDates) {
+            $dateDebut = new \DateTime($missionDates['Date_Debut']);
+            $dateFin = new \DateTime($missionDates['Date_Fin']);
 
-        foreach ($Dates as $periode) {
-            // Convertir les dates en objets DateTime pour faciliter la comparaison
-            $dateDebut = new DateTime($periode['Date_Debut']); //date dans la base de donner
-            $dateFin = new DateTime($periode['Date_Fin']); //date dans la base de donner
-            $dateDebutInputObj = $dateDebutInput; // date entrer par l'utilisateur
-            $dateFinInputObj = $dateFinInput; // date entrer par l'utilisateur
-
-            // Vérifier si la date à vérifier est comprise entre la date de début et la date de fin
-            if (($dateFinInputObj >= $dateDebut && $dateFinInputObj <= $dateFin) || ($dateDebutInputObj >= $dateDebut && $dateDebutInputObj <= $dateFin) || ($dateDebutInputObj === $dateFin)) { // Correction des noms de variables
-                $trouve = true;
-
-                return $trouve;
+            // Two ranges [start1, end1] and [start2, end2] overlap if (start1 <= end2) and (start2 <= end1).
+            if (($dateDebutInput <= $dateFin) && ($dateDebut <= $dateFinInput)) {
+                return true;
             }
         }
 
-        return false; // Pas de chevauchement
+        return false;
     }
 }

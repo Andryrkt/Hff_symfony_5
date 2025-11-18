@@ -43,7 +43,7 @@ class TypeDocument
     /**
      * @ORM\Column(type="string", length=10)
      */
-    private $typeDocumenet;
+    private $typeDocument;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -65,14 +65,14 @@ class TypeDocument
         return $this->id;
     }
 
-    public function getTypeDocumenet(): ?string
+    public function getTypeDocument(): ?string
     {
-        return $this->typeDocumenet;
+        return $this->typeDocument;
     }
 
-    public function setTypeDocumenet(string $typeDocumenet): self
+    public function setTypeDocument(string $typeDocument): self
     {
-        $this->typeDocumenet = $typeDocumenet;
+        $this->typeDocument = $typeDocument;
 
         return $this;
     }

@@ -17,6 +17,10 @@ class TypeOperationFixtures extends Fixture
             ['type' => 'SUPPRESSION', 'reference' => 'type_suppression'],
             ['type' => 'CREATION', 'reference' => 'type_creation'],
             ['type' => 'CLOTURE', 'reference' => 'type_cloture'],
+            ['type' => 'FILE_MERGE', 'reference' => 'type_file_merge'],
+            ['type' => 'DB_SAVE', 'reference' => 'type_db_save'],
+            ['type' => 'DW_COPY', 'reference' => 'type_dw_copy'],
+            ['type' => 'FILE_UPLOAD', 'reference' => 'type_file_upload'],
 
         ];
 

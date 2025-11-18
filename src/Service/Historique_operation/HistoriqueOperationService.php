@@ -59,7 +59,7 @@ class HistoriqueOperationService
         }
 
         $typeOperationEntity = $this->typeOperationRepository->findOneBy(['typeOperation' => $typeOperation]);
-        $typeDocumentEntity = $this->typeDocumentRepository->findOneBy(['typeDocumenet' => $typeDocumentCode]);
+        $typeDocumentEntity = $this->typeDocumentRepository->findOneBy(['typeDocument' => $typeDocumentCode]);
 
         if (!$typeOperationEntity) {
             $this->logger->error(sprintf('Type d\'opération "%s" non trouvé pour l\'historique du document "%s".', $typeOperation, $numeroDocument));

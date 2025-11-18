@@ -292,7 +292,7 @@ class Dom
         return $this->matricule;
     }
 
-    public function setMatricule(string $matricule): self
+    public function setMatricule(?string $matricule): self
     {
         $this->matricule = $matricule;
 
