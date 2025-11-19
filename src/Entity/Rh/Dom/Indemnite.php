@@ -35,7 +35,7 @@ class Indemnite
     /**
      * @ORM\ManyToOne(targetEntity=Categorie::class, inversedBy="indemnites")
      */
-    private $categorieId;
+    private $categorie;
 
     /**
      * @ORM\ManyToOne(targetEntity=Rmq::class, inversedBy="indemnites")
@@ -69,14 +69,14 @@ class Indemnite
         return $this;
     }
 
-    public function getCategorieId(): ?Categorie
+    public function getCategorie(): ?Categorie
     {
-        return $this->categorieId;
+        return $this->categorie;
     }
 
-    public function setCategorieId(?Categorie $categorieId): self
+    public function setCategorie(?Categorie $categorie): self
     {
-        $this->categorieId = $categorieId;
+        $this->categorie = $categorie;
 
         return $this;
     }

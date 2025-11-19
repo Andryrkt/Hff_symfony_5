@@ -1,0 +1,19 @@
+# config/packages/test/messenger.yaml
+framework:
+  messenger:
+    # Uniquement la configuration de base, pas de transports
+    # Ne pas définir de transports si vous n'en avez pas besoin
+    # Ou définir un transport par défaut
+    failure_transport: failed
+
+    transports:
+      # Transport sync pour les tests
+      sync: 'sync://'
+      failed: 'sync://'
+
+    routing:
+      # Route tous les messages vers sync en test
+      Symfony\Component\Mailer\Messenger\SendEmailMessage: sync
+      Symfony\Component\Notifier\Message\ChatMessage: sync
+      Symfony\Component\Notifier\Message\SmsMessage: sync
+      '*': sync

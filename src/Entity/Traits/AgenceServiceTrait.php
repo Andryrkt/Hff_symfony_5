@@ -28,9 +28,9 @@ trait AgenceServiceTrait
 
     /**
      * @ORM\ManyToOne(targetEntity=Service::class, inversedBy="domServiceDebiteur")
-     * @ORM\JoinColumn(name="service_debiteur_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="service_debiteur", referencedColumnName="id")
      */
-    private  $serviceDebiteurId;
+    private $serviceDebiteur;
 
     /** ====================================================================
      * GETTERS & SETTERS
@@ -97,21 +97,21 @@ trait AgenceServiceTrait
     }
 
     /**
-     * Get the value of serviceDebiteurId
+     * Get the value of serviceDebiteur
      */
-    public function getServiceDebiteurId()
+    public function getServiceDebiteur()
     {
-        return $this->serviceDebiteurId;
+        return $this->serviceDebiteur;
     }
 
     /**
-     * Set the value of serviceDebiteurId
+     * Set the value of serviceDebiteur
      *
      * @return  self
      */
-    public function setServiceDebiteurId($serviceDebiteurId)
+    public function setServiceDebiteur($serviceDebiteur)
     {
-        $this->serviceDebiteurId = $serviceDebiteurId;
+        $this->serviceDebiteur = $serviceDebiteur;
 
         return $this;
     }

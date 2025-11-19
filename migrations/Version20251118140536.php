@@ -10,17 +10,17 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20251106085014 extends AbstractMigration
+final class Version20251118140536 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return '';
+        return 'suppression mise en place dans une seul migration';
     }
 
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE personnel ADD numero_compte_bancaire NVARCHAR(200)');
+
     }
 
     public function down(Schema $schema): void
@@ -36,6 +36,5 @@ final class Version20251106085014 extends AbstractMigration
         $this->addSql('CREATE SCHEMA db_owner');
         $this->addSql('CREATE SCHEMA db_securityadmin');
         $this->addSql('CREATE SCHEMA dbo');
-        $this->addSql('ALTER TABLE personnel DROP COLUMN numero_compte_bancaire');
     }
 }

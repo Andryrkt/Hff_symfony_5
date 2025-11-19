@@ -38,7 +38,7 @@ class Categorie
     private $description;
 
     /**
-     * @ORM\OneToMany(targetEntity=Indemnite::class, mappedBy="CategorieId")
+     * @ORM\OneToMany(targetEntity=Indemnite::class, mappedBy="categorie")
      */
     private $indemnites;
 
@@ -99,7 +99,7 @@ class Categorie
     {
         if (!$this->indemnites->contains($indemnite)) {
             $this->indemnites[] = $indemnite;
-            $indemnite->setCategorieId($this);
+            $indemnite->setCategorie($this);
         }
 
         return $this;
@@ -109,8 +109,8 @@ class Categorie
     {
         if ($this->indemnites->removeElement($indemnite)) {
             // set the owning side to null (unless already changed)
-            if ($indemnite->getCategorieId() === $this) {
-                $indemnite->setCategorieId(null);
+            if ($indemnite->getCategorie() === $this) {
+                $indemnite->setCategorie(null);
             }
         }
 
