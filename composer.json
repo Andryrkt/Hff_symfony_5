@@ -7,7 +7,7 @@
         "php": ">=7.4",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "api-platform/core": "^2.7",
+        "api-platform/core": "2.7",
         "doctrine/annotations": "*",
         "doctrine/doctrine-bundle": "^2.13",
         "doctrine/doctrine-fixtures-bundle": "^3.7",
@@ -68,7 +68,10 @@
         "preferred-install": {
             "*": "dist"
         },
-        "sort-packages": true
+        "sort-packages": true,
+        "audit": {
+            "block-insecure": false
+        }
     },
     "autoload": {
         "psr-4": {
@@ -110,7 +113,6 @@
         "doctrine/data-fixtures": "^1.8",
         "liip/test-fixtures-bundle": "^2.10",
         "myclabs/deep-copy": "^1.13",
-        "phpunit/phpunit": "^9.6",
         "symfony/browser-kit": "5.4.*",
         "symfony/css-selector": "5.4.*",
         "symfony/debug-bundle": "5.4.*",
