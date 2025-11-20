@@ -172,9 +172,9 @@ class SecondFormType extends AbstractType
     {
         return $this->siteRepository->createQueryBuilder('s')
             ->join('s.indemnites', 'i')
-            ->where('i.categorieId = :categorie')
-            ->andWhere('i.rmqId = :rmq')
-            ->andWhere('i.sousTypeDocumentId = :typeMission')
+            ->where('i.categorie = :categorie')
+            ->andWhere('i.rmq = :rmq')
+            ->andWhere('i.sousTypeDocument = :typeMission')
             ->setParameters([
                 'categorie' => $data->categorie,
                 'rmq' => $data->rmq,

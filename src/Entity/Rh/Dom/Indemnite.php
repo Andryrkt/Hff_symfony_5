@@ -30,7 +30,7 @@ class Indemnite
     /**
      * @ORM\ManyToOne(targetEntity=Site::class, inversedBy="indemnites")
      */
-    private $siteId;
+    private $site;
 
     /**
      * @ORM\ManyToOne(targetEntity=Categorie::class, inversedBy="indemnites")
@@ -40,12 +40,12 @@ class Indemnite
     /**
      * @ORM\ManyToOne(targetEntity=Rmq::class, inversedBy="indemnites")
      */
-    private $rmqId;
+    private $rmq;
 
     /**
      * @ORM\ManyToOne(targetEntity=SousTypeDocument::class, inversedBy="indemnites")
      */
-    private $sousTypeDocumentId;
+    private $sousTypeDocument;
 
     /**
      * @ORM\Column(type="float", nullable=true)
@@ -57,14 +57,14 @@ class Indemnite
         return $this->id;
     }
 
-    public function getSiteId(): ?Site
+    public function getSite(): ?Site
     {
-        return $this->siteId;
+        return $this->site;
     }
 
-    public function setSiteId(?Site $siteId): self
+    public function setSite(?Site $site): self
     {
-        $this->siteId = $siteId;
+        $this->site = $site;
 
         return $this;
     }
@@ -81,26 +81,26 @@ class Indemnite
         return $this;
     }
 
-    public function getRmqId(): ?Rmq
+    public function getRmq(): ?Rmq
     {
-        return $this->rmqId;
+        return $this->rmq;
     }
 
-    public function setRmqId(?Rmq $rmqId): self
+    public function setRmq(?Rmq $rmq): self
     {
-        $this->rmqId = $rmqId;
+        $this->rmq = $rmq;
 
         return $this;
     }
 
-    public function getSousTypeDocumentId(): ?SousTypeDocument
+    public function getSousTypeDocument(): ?SousTypeDocument
     {
-        return $this->sousTypeDocumentId;
+        return $this->sousTypeDocument;
     }
 
-    public function setSousTypeDocumentId(?SousTypeDocument $sousTypeDocumentId): self
+    public function setSousTypeDocument(?SousTypeDocument $sousTypeDocument): self
     {
-        $this->sousTypeDocumentId = $sousTypeDocumentId;
+        $this->sousTypeDocument = $sousTypeDocument;
 
         return $this;
     }

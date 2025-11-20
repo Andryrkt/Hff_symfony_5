@@ -63,6 +63,7 @@ class DomFirstController extends AbstractController
             $this->logger->info('Premier formulaire soumis et valide.');
             // 1. recupération des données du formulaire
             $data = $form->getData();
+
             $this->logger->debug('Données du formulaire', ['data' => $data]);
 
             // 2. stocage des donner dans le session

@@ -26,7 +26,7 @@ class TestEmailCommand extends Command
     {
         $this
             ->setDescription('Envoie un email de test pour vérifier la configuration du mailer.')
-            ->addArgument('to', InputArgument::OPTIONAL, 'Adresse email du destinataire', 'test@example.com');
+            ->addArgument('to', InputArgument::OPTIONAL, 'Adresse email du destinataire', 'hasina.andrianadison@hff.mg');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -35,7 +35,7 @@ class TestEmailCommand extends Command
         $to = $input->getArgument('to');
 
         $email = (new Email())
-            ->from('no-reply@example.com')
+            ->from('noreply.email@hff.mg')
             ->to($to)
             ->subject('Email de test depuis la commande Symfony')
             ->text('Ceci est un email de test envoyé depuis votre application Symfony.')
@@ -44,7 +44,7 @@ class TestEmailCommand extends Command
         try {
             $this->mailer->send($email);
             $io->success(sprintf('Email de test envoyé avec succès à %s !', $to));
-            $io->note('Veuillez vérifier votre boîte de réception Mailtrap.');
+            $io->note('Veuillez vérifier votre boîte de réception.');
 
             return Command::SUCCESS;
         } catch (TransportExceptionInterface $e) {
