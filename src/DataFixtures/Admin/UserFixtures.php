@@ -14,7 +14,7 @@ class UserFixtures extends Fixture implements DependentFixtureInterface
     {
         $users = [
             ['username' => 'test', 'fullname' => 'Utilisateur Test', 'matricule' => '9999', 'email' => 'test@hff.mg', 'roles' => ['ROLE_USER'], 'personnel_ref' => 'personnel_p1', 'reference' => 'user_u1', 'permissions' => ['permission_RH_ORDRE_MISSION_CREATE', 'permission_RH_ORDRE_MISSION_VIEW']],
-            ['username' => 'lanto', 'fullname' => 'Lanto Andrianadison', 'matricule' => '9998', 'email' => 'lanto@hff.mg', 'roles' => ['ROLE_ADMIN'], 'personnel_ref' => 'personnel_p2', 'reference' => 'user_u2', 'permissions' => []]
+            ['username' => 'lanto', 'fullname' => 'Lanto Andrianadison', 'matricule' => '9998', 'email' => 'lanto@hff.mg', 'roles' => ['ROLE_USER'], 'personnel_ref' => 'personnel_p2', 'reference' => 'user_u2', 'permissions' => ['permission_RH_ORDRE_MISSION_CREATE', 'permission_RH_ORDRE_MISSION_VIEW']]
         ];
 
         foreach ($users as $userData) {

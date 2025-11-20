@@ -52,7 +52,7 @@ class TestPermissionFixtures extends Fixture implements DependentFixtureInterfac
             ['code' => 'RH_TEMPORAIRE_CREATE', 'description' => 'Ajouter un employé temporaire', 'application' => 'vignette_rh'],
             ['code' => 'RH_TEMPORAIRE_VIEW', 'description' => 'Consulter la liste des temporaires', 'application' => 'vignette_rh'],
 
-            /** === Matériel === */
+            /** ==== Matériel ==== */
             //BADM
             ['code' => 'MATERIEL_BADM_CREATE', 'description' => 'Créer une demande de mouvement materiel', 'application' => 'vignette_materiel'],
             ['code' => 'MATERIEL_BADM_VIEW', 'description' => 'Consulter les mouvement matériel', 'application' => 'vignette_materiel'],
@@ -63,7 +63,7 @@ class TestPermissionFixtures extends Fixture implements DependentFixtureInterfac
             ['code' => 'MATERIEL_SUIVIE', 'description' => 'Suivi administratif des matériels', 'application' => 'vignette_materiel'],
 
 
-            /** ===  ATELIER  === */
+            /** ====  ATELIER  ==== */
             // demande d'intervention
             ['code' => 'ATELIER_DI_CREATE', 'description' => 'Créer une demande d’intervention', 'application' => 'vignette_atelier'],
             ['code' => 'ATELIER_DI_VIEW', 'description' => 'Consulter les demandes d’intervention', 'application' => 'vignette_atelier'],

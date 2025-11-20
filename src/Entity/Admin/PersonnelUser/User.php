@@ -67,7 +67,7 @@ class User implements UserInterface
     private $poste;
 
     /**
-     * @ORM\OneToOne(targetEntity=Personnel::class,  inversedBy="users", cascade={"persist", "remove"})
+          * @ORM\OneToOne(targetEntity=Personnel::class, inversedBy="users", cascade={"persist", "remove"}, fetch="EAGER")
      * @ORM\JoinColumn(name="personnel_id", referencedColumnName="id")
      */
     private $personnel;
@@ -78,7 +78,7 @@ class User implements UserInterface
     private $userAccesses;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Permission::class, inversedBy="users")
+     * @ORM\ManyToMany(targetEntity=Permission::class, inversedBy="users", fetch="EAGER")
      */
     private $permissionsDirectes;
 

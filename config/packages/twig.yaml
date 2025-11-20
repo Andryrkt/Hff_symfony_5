@@ -12,6 +12,8 @@ twig:
 when@test:
     twig:
         strict_variables: true
+        globals:
+            base_path_fichier: '/test_files' # Valeur placeholder pour le test
 
 when@prod:
     twig:

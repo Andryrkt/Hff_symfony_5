@@ -19,11 +19,6 @@
 	</head>
 
 	<body data-turbo-suppress-warning>
-		<div id="loading-overlays">
-			<div class="spinner-overlay"></div>
-			<div class="text-overlay text-white">Veuillez patienter s'il vous plaît!</div>
-		</div>
-		{% block overlay %}{% endblock %}
 		<div class="main-content">
 			{% block nav %}
 				{% include 'partials/_navbar.html.twig' %}

@@ -83,7 +83,7 @@ class SecondFormDtoFactory
     private function getRmq(User $user): Rmq
     {
         $agenceCode = $user->getAgenceUser()->getCode() ?? '';
-        $codeToSearch = $agenceCode === Agence::CODE_AGENCE_RENTAL ? Agence::CODE_AGENCE_RENTAL : 'STD';
+        $codeToSearch = $agenceCode === (string)Agence::CODE_AGENCE_RENTAL ? (string)Agence::CODE_AGENCE_RENTAL : 'STD';
 
         return $this->em->getRepository(Rmq::class)->findOneBy(['description' => $codeToSearch]);
     }

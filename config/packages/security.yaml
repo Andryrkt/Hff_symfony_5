@@ -2,14 +2,21 @@ security:
   enable_authenticator_manager: true
 
   providers:
+    app_user_provider:
+        entity:
+            class: App\Entity\Admin\PersonnelUser\User
+            property: email # Ou 'username' si vous utilisez un autre champ unique pour l'identification
     ldap_user_provider:
       id: App\Security\LdapUserProvider
+    chain_provider:
+        chain:
+            providers: ['app_user_provider', 'ldap_user_provider']
 
   firewalls:
     main:
       lazy: true
       stateless: false
-      provider: ldap_user_provider
+      provider: chain_provider
       custom_authenticator: App\Security\LdapAuthenticator
       entry_point: App\Security\LdapAuthenticator
       logout:
@@ -17,5 +24,6 @@ security:
         target: app_login
 
   access_control:
+    - { path: ^/admin, roles: ROLE_ADMIN }
     - { path: ^/login, roles: PUBLIC_ACCESS }
     - { path: ^/, roles: IS_AUTHENTICATED_FULLY }

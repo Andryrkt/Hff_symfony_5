@@ -24,8 +24,15 @@ doctrine:
 when@test:
     doctrine:
         dbal:
-            # "TEST_TOKEN" is typically set by ParaTest
-            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+            url: '%env(resolve:DATABASE_URL)%'
+            driver: 'pdo_sqlite'
+            # Le dbname_suffix est utile pour des bases de données distinctes pour chaque test runner, mais moins pertinent pour sqlite in-memory ou fichier
+            # dbname_suffix: '_test%env(default::TEST_TOKEN)%' 
+            # Les options server_version, use_savepoints, options: TrustServerCertificate, Encrypt sont spécifiques à SQLSrv et doivent être omises pour SQLite.
+        orm:
+            auto_generate_proxy_classes: true # Peut être activé pour les tests si nécessaire
+            # Les autres configurations ORM (comme les mappings) restent les mêmes
+
 
 when@prod:
     doctrine:

@@ -19,7 +19,7 @@ class TestPersonnelFixtures extends Fixture implements DependentFixtureInterface
     public function load(ObjectManager $manager): void
     {
         $personnels = [
-            ['nom' => 'TEST', 'prenoms' => 'TEST', 'matricule' => '9999', 'codeBancaire' => null, 'agServIrium' => 'agence_service_administration_inf_DA14', 'reference' => 'personnel_p1'],
+            ['nom' => 'TEST', 'prenoms' => 'TEST', 'matricule' => '9999', 'codeBancaire' => null, 'agServIrium' => 'agence_service_administration_test_inf_DA14', 'reference' => 'personnel_p1'],
             
         ];
 

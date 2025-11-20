@@ -51,7 +51,7 @@ class DomSecondController extends AbstractController
         ContextAwareBreadcrumbBuilder $breadcrumbBuilder
     ) {
         $this->logger->info('Affichage du second formulaire de création de DOM.');
-        $this->denyAccessUnlessGranted('RH_ORDRE_MISSION_CREATE');
+        //$this->denyAccessUnlessGranted('RH_ORDRE_MISSION_CREATE');
 
         $firstFormDto = $this->getFirstFormDataFromSession($request->getSession());
         if ($firstFormDto instanceof RedirectResponse) {

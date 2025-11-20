@@ -67,3 +67,7 @@ php bin/console doctrine:fixtures:load --env=test
 ```
 php bin/console doctrine:fixtures:load --interactive
 ```
+
+
+# pour le prod
+$env:APP_ENV="prod"; symfony serve -d

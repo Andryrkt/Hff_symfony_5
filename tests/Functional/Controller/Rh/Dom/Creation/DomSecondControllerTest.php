@@ -2,47 +2,54 @@
 
 namespace App\Tests\Functional\Controller\Rh\Dom\Creation;
 
-
+use App\Entity\Rh\Dom\Rmq;
+use App\Tests\BaseTestCase;
 use App\Dto\Rh\Dom\FirstFormDto;
-use App\Entity\Admin\PersonnelUser\User;
+use App\DataFixtures\Rh\dom\RmqFixtures;
 use App\Repository\Rh\Dom\DomRepository;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use App\Repository\Admin\PersonnelUser\UserRepository;
+use App\DataFixtures\Test\TestUserFixtures;
+use App\DataFixtures\Test\TestPersonnelFixtures;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class DomSecondControllerTest extends WebTestCase
+class DomSecondControllerTest extends BaseTestCase
 {
+    private $referenceRepository;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+                    $this->referenceRepository = $this->loadTestFixtures([
+                        TestPersonnelFixtures::class, // Assure que le personnel '9999' existe
+                        TestUserFixtures::class,      // Assure que l'utilisateur de test existe et est lié au personnel
+                        RmqFixtures::class,           // Assure que les entités Rmq (STD, 50) existent
+                    ])->getReferenceRepository();
+        
+                    // DEBUG: Check if Rmq 'STD' is found
+                    $em = static::getContainer()->get('doctrine')->getManager();
+                    $rmqStd = $em->getRepository(Rmq::class)->findOneBy(['description' => 'STD']);
+                    if ($rmqStd) {
+                        echo "\nDEBUG: Rmq 'STD' found in test setUp!";
+                    } else {
+                        echo "\nDEBUG: Rmq 'STD' NOT found in test setUp!";
+                    }
+        
+    }
+
     public function testSubmitSecondFormSuccessfully(): void
     {
-        $client = static::createClient();
-
-        // 1. Récupérer un utilisateur de test pour se connecter
-        /** @var UserRepository $userRepository */
-        $userRepository = static::getContainer()->get(UserRepository::class);
-        $testUser = $userRepository->findOneBy(['email' => 'test@hff.mg']); // Remplacez par un utilisateur de test existant
-
-        if (!$testUser) {
-            // Créez un utilisateur de test si nécessaire, ou assurez-vous qu'il existe
-            // Ce code est un placeholder, adaptez-le à votre entité User
-            $testUser = new User();
-            $testUser->setEmail('test@hff.mg');
-            $testUser->setRoles(['ROLE_USER', 'RH_ORDRE_MISSION_CREATE']);
-            // $testUser->setPassword('password'); // Le mot de passe n'est pas utilisé par loginUser
-            $userRepository->add($testUser, true);
-        }
-
-        $client->loginUser($testUser);
-
+        // 1. Récupérer un utilisateur de test via les fixtures (il a la permission RH_ORDRE_MISSION_CREATE)
+        $testUser = $this->referenceRepository->getReference('user_u1');
+        
         // 2. Simuler les données de session du premier formulaire
         $firstFormDto = new FirstFormDto();
         // Remplissez le DTO avec des données valides pour le test
         $firstFormDto->salarier = 'PERMANENT';
         // $firstFormDto->typeMission = '';
         // $firstFormDto->categorie = '';
-        $firstFormDto->matricule = '9999'; 
-        $firstFormDto->nom = '9999'; 
-        $firstFormDto->prenom = '9999'; 
-        $firstFormDto->cin = null; 
+        $firstFormDto->matricule = '9999'; // Garanti par TestPersonnelFixtures
+        $firstFormDto->nom = 'TEST';
+        $firstFormDto->prenom = 'TEST';
+        $firstFormDto->cin = null;
 
 
         $session = static::getContainer()->get('session');
@@ -50,12 +57,12 @@ class DomSecondControllerTest extends WebTestCase
         $session->save();
 
         // 3. Accéder au second formulaire
-        $crawler = $client->request('GET', '/rh/ordre-de-mission/dom-second-form');
+        $crawler = $this->client->request('GET', '/rh/ordre-de-mission/dom-second-form');
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('h1', 'Affichage du second formulaire de création de DOM'); // A adapter au titre réel
+        self::assertSelectorTextContains('h3', 'Nouvelle demande d\'ordre de mission'); // A adapter au titre réel
 
         // 4. Créer un fichier de test pour l'upload
-        $testPdfPath = sys_get_temp_dir().'/test.pdf';
+        $testPdfPath = sys_get_temp_dir() . '/test.pdf';
         file_put_contents($testPdfPath, 'dummy pdf content');
         $uploadedFile = new UploadedFile($testPdfPath, 'test.pdf', 'application/pdf', null, true);
 
@@ -67,13 +74,13 @@ class DomSecondControllerTest extends WebTestCase
             'second_form[pieceJoint01]' => $uploadedFile,
             // ... Remplissez les autres champs nécessaires
         ]);
-        
-        $client->submit($form);
+
+        $this->client->submit($form);
 
         // 6. Vérifier les assertions
         // Vérifier la redirection vers la liste des DOMs
         self::assertResponseRedirects('/rh/ordre-de-mission/liste'); // Adaptez l'URL si nécessaire
-        $crawler = $client->followRedirect();
+        $crawler = $this->client->followRedirect();
 
         // Vérifier le message de succès
         self::assertSelectorExists('.alert-success');
@@ -85,8 +92,8 @@ class DomSecondControllerTest extends WebTestCase
         $dom = $domRepository->findOneBy(['motifDeplacement' => 'Test motif de déplacement']);
         self::assertNotNull($dom);
 
-        // Nettoyage
+        // Nettoyage du fichier temporaire
         unlink($testPdfPath);
-        // Vous pouvez ajouter ici la suppression du DOM créé si nécessaire
+        // La suppression des entités de la BDD est gérée automatiquement par LiipTestFixturesBundle
     }
 }

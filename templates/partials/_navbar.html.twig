@@ -1,4 +1,4 @@
-{% set role_ids = App.user.roleIds %}
+{% set role_ids = app.user.roles %}
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark navbar-dark sticky-top border-bottom" id="main-nav-bar">
 	<div
@@ -29,7 +29,7 @@
 				<!-- Menu utilisateur -->
 				<ul class="navbar-nav ms-lg-auto">
 					<li class="me-3">
-						<a class="app-version" href="{{ App.base_path_fichier }}/version/Versions Intranet.pdf" target="_blank" role="button">
+						<a class="app-version" href="{{ base_path_fichier }}/version/Versions Intranet.pdf" target="_blank" role="button">
 							<i class="fas fas fa-tag"></i>
 							Version: V20251008.3.0.0
 						</a>
@@ -48,13 +48,13 @@
 						</ul>
 					</li>
 					<li class="me-3">
-						<a class="guide-link" href="{{ App.base_path_fichier }}/documentation/Guide utilisateur intranet.pdf" target="_blank" role="button">
+						<a class="guide-link" href="{{ base_path_fichier }}/documentation/Guide utilisateur intranet.pdf" target="_blank" role="button">
 							<i class="fas fa-info pe-2"></i>
 							Guide utilisateur intranet
 						</a>
 					</li>
 					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" id="userName" data-user-first-name="{{ App.user.Personnels.prenoms }}" data-user-last-name="{{ App.user.Personnels.nom }}" ria-expanded="false" style="color: #fbbb01;">
+						<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" id="userName" data-user-first-name="{{ app.user.personnel.prenoms }}" data-user-last-name="{{ app.user.personnel.nom }}" ria-expanded="false" style="color: #fbbb01;">
 							<i class="fas fa-user pe-1"></i>
 							{{ app.user.fullname }}
 						</a>

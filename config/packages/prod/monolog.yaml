@@ -1,0 +1,11 @@
+# monolog:
+#    handlers:
+#        # Ce handler est appelé "notifier" et utilise le composant Notifier de Symfony
+#        notifier:
+#            type: notifier
+#            # Le niveau minimum de log pour déclencher cet handler.
+#            # "error" signifie les erreurs 500 et plus graves.
+#            level: error
+#            # Vous pouvez décommenter la ligne ci-dessous si vous ne voulez être notifié
+#            # que pour les erreurs les plus graves (CRITICAL).
+#            # level: critical

@@ -4,7 +4,7 @@ doctrine:
     url: '%env(resolve:DATABASE_URL)%'
     # Pour SQLite
     driver: pdo_sqlite
-    charset: UTF8
+    # charset: UTF8
     # Optionnel : créer la DB automatiquement
     schema_manager_factory: doctrine.dbal.default_schema_manager_factory
 

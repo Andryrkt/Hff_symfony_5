@@ -32,6 +32,7 @@
         "symfony/ldap": "5.4.*",
         "symfony/mailer": "5.4.*",
         "symfony/mime": "5.4.*",
+        "symfony/monolog-bridge": "5.4.*",
         "symfony/monolog-bundle": "^3.0",
         "symfony/notifier": "5.4.*",
         "symfony/process": "5.4.*",
@@ -49,7 +50,9 @@
         "symfony/webpack-encore-bundle": "^1.17",
         "symfony/yaml": "5.4.*",
         "tecnickcom/tcpdf": "^6.10",
+        "twig/cssinliner-extra": "^3.11",
         "twig/extra-bundle": "^2.12|^3.0",
+        "twig/inky-extra": "^3.11",
         "twig/twig": "^2.12|^3.0"
     },
     "config": {

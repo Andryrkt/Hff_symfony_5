@@ -76,3 +76,8 @@ when@prod:
                 channels: [deprecation]
                 path: php://stderr
                 formatter: monolog.formatter.json
+            notifier:
+                type: service
+                id: App\Logger\NotifierHandler
+                level: error
+                channels: [ "!event" ]

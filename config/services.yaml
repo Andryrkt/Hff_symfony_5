@@ -94,3 +94,9 @@ services:
         - 'Y-m-d H:i:s'
         - true # allowInlineLineBreaks
         - true # ignoreEmptyContextAndExtra
+
+  App\Logger\NotifierHandler:
+    arguments:
+        $notifier: '@notifier'
+        $adminEmail: '%env(ADMIN_EMAIL)%'
+
