@@ -6,6 +6,7 @@ use App\Entity\Rh\Dom\Dom;
 use App\Entity\Rh\Dom\SousTypeDocument;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 
 /**
  * @extends ServiceEntityRepository<Dom>
@@ -93,6 +94,31 @@ class DomRepository extends ServiceEntityRepository
         ;
     }
 
+    public function findPaginatedAndFiltered(int $page = 1, int $limit = 10)
+    {
+        $queryBuilder = $this->createQueryBuilder('d')
+            ->leftJoin('d.sousTypeDocument', 'td')
+            ->leftJoin('d.idStatutDemande', 's');
+
+        //exclude statut
+
+        // Ordre et pagination
+        $queryBuilder->orderBy('d.numeroOrdreMission', 'DESC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
+
+        // Pagination
+        $paginator = new DoctrinePaginator($queryBuilder);
+        $totalItems = count($paginator);
+        $lastPage = ceil($totalItems / $limit);
+
+        return [
+            'data'        => iterator_to_array($paginator->getIterator()), // Convertir en tableau si nécessaire
+            'totalItems'  => $totalItems,
+            'currentPage' => $page,
+            'lastPage'    => $lastPage,
+        ];
+    }
 
     /**
 //     * @return Dom[] Returns an array of Dom objects
