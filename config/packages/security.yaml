@@ -1,6 +1,10 @@
 security:
   enable_authenticator_manager: true
 
+  password_hashers:
+    App\Entity\Admin\PersonnelUser\User:
+      algorithm: auto
+
   providers:
     app_user_provider:
         entity:

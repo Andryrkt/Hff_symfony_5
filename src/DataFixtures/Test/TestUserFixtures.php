@@ -3,10 +3,11 @@
 namespace App\DataFixtures\Test;
 
 use App\Entity\Admin\PersonnelUser\User;
+use App\Entity\Admin\PersonnelUser\Personnel;
+use App\Entity\Admin\ApplicationGroupe\Permission;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class TestUserFixtures extends Fixture implements DependentFixtureInterface
 {
@@ -41,13 +42,12 @@ class TestUserFixtures extends Fixture implements DependentFixtureInterface
             $user->setRoles($userData['roles']);
             $user->setMatricule($userData['matricule']);
 
-
             // Associe le personnel
-            $user->setPersonnel($this->getReference($userData['personnel_ref']));
+            $user->setPersonnel($this->getReference($userData['personnel_ref'], Personnel::class));
 
             // Ajout des permissions directes
             foreach ($userData['permissions'] as $permissionRef) {
-                $permission = $this->getReference($permissionRef);
+                $permission = $this->getReference($permissionRef, Permission::class);
                 $user->addPermissionsDirecte($permission);
             }
 
