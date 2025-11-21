@@ -1,7 +1,7 @@
 import numeral from 'numeral';
 import axios, { AxiosError } from 'axios';
 import '../../../../styles/pages/secondForm.scss';
-import { initAgenceServiceHandlers } from '../../../services/AgenceServiceManager';
+import { initAgenceServiceHandlers } from '../../../utils/AgenceServiceManager';
 import { applyInputRestrictions, debounce } from '../../../utils/form_utils';
 import { FORM_CONSTANTS } from '../../../config/formConstants';
 
