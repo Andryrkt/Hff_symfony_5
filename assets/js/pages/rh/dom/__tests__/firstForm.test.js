@@ -2,6 +2,8 @@
  * @jest-environment jsdom
  */
 
+import { SalarieFieldManager, CategorieFieldManager, MatriculeManager, initFirstForm } from '../firstForm';
+
 describe('firstForm.js - Gestion dynamique des champs', () => {
     let salarieSelect, interneDiv, externeDiv, matriculeInput;
     let typeMissionSelect, categorieFieldContainer, categorieInput;
@@ -45,15 +47,19 @@ describe('firstForm.js - Gestion dynamique des champs', () => {
         categorieFieldContainer = document.getElementById('categorie_field_container');
         categorieInput = document.getElementById('first_form_categorie');
         matriculeNomSelect = document.getElementById('first_form_matriculeNom');
-
-        // Charger le script (simuler le comportement)
-        require('../firstForm.js');
     });
 
     describe('Basculement Salarié Permanent/Temporaire', () => {
         test('Salarié PERMANENT affiche les champs Interne et masque Externe', () => {
+            const elements = {
+                salarieSelect,
+                interneDiv,
+                externeDiv
+            };
+            const manager = new SalarieFieldManager(elements);
+
             salarieSelect.value = 'PERMANENT';
-            salarieSelect.dispatchEvent(new Event('change'));
+            manager.toggle();
 
             expect(interneDiv.style.display).toBe('block');
             expect(externeDiv.style.display).toBe('none');
@@ -72,8 +78,15 @@ describe('firstForm.js - Gestion dynamique des champs', () => {
         });
 
         test('Salarié TEMPORAIRE affiche les champs Externe et masque Interne', () => {
+            const elements = {
+                salarieSelect,
+                interneDiv,
+                externeDiv
+            };
+            const manager = new SalarieFieldManager(elements);
+
             salarieSelect.value = 'TEMPORAIRE';
-            salarieSelect.dispatchEvent(new Event('change'));
+            manager.toggle();
 
             expect(interneDiv.style.display).toBe('none');
             expect(externeDiv.style.display).toBe('block');
@@ -96,16 +109,30 @@ describe('firstForm.js - Gestion dynamique des champs', () => {
 
     describe('Affichage du champ Catégorie', () => {
         test('Type mission MISSION affiche le champ catégorie', () => {
+            const elements = {
+                typeMissionSelect,
+                categorieFieldContainer,
+                categorieInput
+            };
+            const manager = new CategorieFieldManager(elements);
+
             typeMissionSelect.selectedIndex = 0; // MISSION
-            typeMissionSelect.dispatchEvent(new Event('change'));
+            manager.toggle();
 
             expect(categorieFieldContainer.style.display).toBe('block');
             expect(categorieInput.required).toBe(true);
         });
 
         test('Type mission autre masque le champ catégorie', () => {
+            const elements = {
+                typeMissionSelect,
+                categorieFieldContainer,
+                categorieInput
+            };
+            const manager = new CategorieFieldManager(elements);
+
             typeMissionSelect.selectedIndex = 1; // DEPLACEMENT
-            typeMissionSelect.dispatchEvent(new Event('change'));
+            manager.toggle();
 
             expect(categorieFieldContainer.style.display).toBe('none');
             expect(categorieInput.required).toBe(false);
@@ -114,27 +141,58 @@ describe('firstForm.js - Gestion dynamique des champs', () => {
 
     describe('Mise à jour automatique du matricule', () => {
         test('Sélection d\'un employé met à jour le matricule', () => {
+            const elements = {
+                matriculeNomSelect,
+                matriculeInput
+            };
+            const manager = new MatriculeManager(elements);
+
             matriculeNomSelect.selectedIndex = 1; // Jean Dupont
-            matriculeNomSelect.dispatchEvent(new Event('change'));
+            manager.update();
 
             expect(matriculeInput.value).toBe('MAT001');
         });
 
         test('Sélection d\'un autre employé met à jour le matricule', () => {
+            const elements = {
+                matriculeNomSelect,
+                matriculeInput
+            };
+            const manager = new MatriculeManager(elements);
+
             matriculeNomSelect.selectedIndex = 2; // Marie Martin
-            matriculeNomSelect.dispatchEvent(new Event('change'));
+            manager.update();
 
             expect(matriculeInput.value).toBe('MAT002');
         });
 
         test('Désélection efface le matricule', () => {
+            const elements = {
+                matriculeNomSelect,
+                matriculeInput
+            };
+            const manager = new MatriculeManager(elements);
+
             matriculeNomSelect.selectedIndex = 1;
-            matriculeNomSelect.dispatchEvent(new Event('change'));
+            manager.update();
 
             matriculeNomSelect.selectedIndex = 0; // Sélectionner vide
-            matriculeNomSelect.dispatchEvent(new Event('change'));
+            manager.update();
 
             expect(matriculeInput.value).toBe('');
+        });
+    });
+
+    describe('Initialisation complète', () => {
+        test('initFirstForm initialise tous les gestionnaires', () => {
+            const managers = initFirstForm();
+
+            expect(managers).toHaveProperty('salarieManager');
+            expect(managers).toHaveProperty('categorieManager');
+            expect(managers).toHaveProperty('matriculeManager');
+            expect(managers.salarieManager).toBeInstanceOf(SalarieFieldManager);
+            expect(managers.categorieManager).toBeInstanceOf(CategorieFieldManager);
+            expect(managers.matriculeManager).toBeInstanceOf(MatriculeManager);
         });
     });
 });

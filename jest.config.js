@@ -2,7 +2,9 @@ module.exports = {
   testEnvironment: 'jsdom',
   transform: {
     '^.+\\.js$': 'babel-jest',
-    '^.+\\.ts$': 'ts-jest',
+    '^.+\\.ts$': ['ts-jest', {
+      tsconfig: 'tsconfig.test.json'
+    }],
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/assets/$1',

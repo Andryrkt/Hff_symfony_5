@@ -3,7 +3,11 @@
     "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "node",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "allowJs": true,
     "outDir": "./public/build",
     "rootDir": "./assets",
@@ -12,8 +16,24 @@
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "types": ["node", "bootstrap", "select2"]
+    "types": [
+      "node",
+      "bootstrap",
+      "select2",
+      "jest"
+    ]
   },
-  "include": ["assets/**/*", "assets/types/**/*"],
-  "exclude": ["node_modules", "public/build"]
+  "include": [
+    "assets/**/*",
+    "assets/types/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "public/build",
+    "**/__tests__/**",
+    "**/*.test.ts",
+    "**/*.test.js",
+    "**/*.spec.ts",
+    "**/*.spec.js"
+  ]
 }

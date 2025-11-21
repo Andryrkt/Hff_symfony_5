@@ -1,89 +1,169 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // --- Elements for Salarie ---
-    const salarieSelect = document.getElementById('first_form_salarier');
-    const interneDiv = document.getElementById('Interne');
-    const externeDiv = document.getElementById('externe');
-    const matriculeInput = document.getElementById('first_form_matricule');
-    const nomInput = document.getElementById('first_form_nom');
-    const prenomInput = document.getElementById('first_form_prenom');
-    const cinInput = document.getElementById('first_form_cin');
+/**
+ * Gère l'affichage des champs selon le type de salarié
+ */
+export class SalarieFieldManager {
+    constructor(elements) {
+        this.salarieSelect = elements.salarieSelect;
+        this.interneDiv = elements.interneDiv;
+        this.externeDiv = elements.externeDiv;
+    }
 
-    // --- Elements for TypeMission/Categorie ---
-    const typeMissionSelect = document.getElementById('first_form_typeMission');
-    const categorieFieldContainer = document.getElementById('categorie_field_container');
-    const categorieInput = document.getElementById('first_form_categorie');
+    /**
+     * Bascule l'affichage entre champs Interne et Externe
+     */
+    toggle() {
+        if (!this.salarieSelect) return;
 
-    // --- Elements for MatriculeNom ---
-    const matriculeNomSelect = document.getElementById('first_form_matriculeNom');
+        const isTemporaire = this.salarieSelect.value === 'TEMPORAIRE';
+        this.updateFieldVisibility(this.interneDiv, !isTemporaire);
+        this.updateFieldVisibility(this.externeDiv, isTemporaire);
+        this.focusFirstVisibleInput();
+    }
 
-    // --- Logic for Salarie ---
-    function toggleSalarieFields() {
-    if (!salarieSelect) return;
-    const isTemporaire = salarieSelect.value === 'TEMPORAIRE';
+    /**
+     * Met à jour la visibilité et l'état des champs d'un conteneur
+     * @param {HTMLElement} container - Conteneur des champs
+     * @param {boolean} isVisible - Si les champs doivent être visibles
+     */
+    updateFieldVisibility(container, isVisible) {
+        if (!container) return;
 
-    // Gestion de l'affichage
-    if (interneDiv) {
-        interneDiv.style.display = isTemporaire ? 'none' : 'block';
-        // Désactiver les champs requis quand masqués
-        const interneInputs = interneDiv.querySelectorAll('input, select, textarea');
-        interneInputs.forEach(input => {
-            if (isTemporaire) {
-                input.required = false;
-                input.disabled = true; // Empêche la soumission
-            } else {
-                input.required = true; // ou restaurer l'état original
-                input.disabled = false;
-            }
+        container.style.display = isVisible ? 'block' : 'none';
+        container.setAttribute('aria-hidden', String(!isVisible));
+
+        const inputs = container.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.required = isVisible;
+            input.disabled = !isVisible;
+            input.setAttribute('aria-required', String(isVisible));
+            input.setAttribute('aria-disabled', String(!isVisible));
         });
     }
 
-    if (externeDiv) {
-        externeDiv.style.display = isTemporaire ? 'block' : 'none';
-        // Activer/désactiver les champs selon l'état
-        const externeInputs = externeDiv.querySelectorAll('input, select, textarea');
-        externeInputs.forEach(input => {
-            if (isTemporaire) {
-                input.required = true;
-                input.disabled = false;
-            } else {
-                input.required = false;
-                input.disabled = true; // Empêche la soumission
-            }
-        });
+    /**
+     * Met le focus sur le premier champ visible
+     */
+    focusFirstVisibleInput() {
+        setTimeout(() => {
+            const firstVisibleInput = document.querySelector(
+                'input:not([disabled]):not([style*="display: none"])'
+            );
+            if (firstVisibleInput) firstVisibleInput.focus();
+        }, 100);
     }
-
-    // Focus sur le premier champ visible
-    setTimeout(() => {
-        const firstVisibleInput = document.querySelector('input:not([disabled]):not([style*="display: none"])');
-        if (firstVisibleInput) firstVisibleInput.focus();
-    }, 100);
 }
 
-    // --- Logic for Categorie ---
-    function toggleCategorieField() {
-        if (!typeMissionSelect) return;
-        const isMission = typeMissionSelect.options[typeMissionSelect.selectedIndex]?.text === 'MISSION';
-        if (categorieFieldContainer) categorieFieldContainer.style.display = isMission ? 'block' : 'none';
-        if (categorieInput) categorieInput.required = isMission;
+/**
+ * Gère l'affichage du champ catégorie selon le type de mission
+ */
+export class CategorieFieldManager {
+    constructor(elements) {
+        this.typeMissionSelect = elements.typeMissionSelect;
+        this.categorieFieldContainer = elements.categorieFieldContainer;
+        this.categorieInput = elements.categorieInput;
     }
 
-    // --- Logic for MatriculeNom ---
-    function updateMatriculeFromMatriculeNom() {
-        if (!matriculeNomSelect || !matriculeInput) return;
-        const selectedOption = matriculeNomSelect.options[matriculeNomSelect.selectedIndex];
-        if (selectedOption && selectedOption.dataset.matricule) {
-            matriculeInput.value = selectedOption.dataset.matricule;
-        } else {
-            matriculeInput.value = ''; // Clear if no selection or no data-matricule
+    /**
+     * Affiche/masque le champ catégorie selon le type de mission
+     */
+    toggle() {
+        if (!this.typeMissionSelect) return;
+
+        const selectedOption = this.typeMissionSelect.options[
+            this.typeMissionSelect.selectedIndex
+        ];
+        const isMission = selectedOption?.text === 'MISSION';
+
+        if (this.categorieFieldContainer) {
+            this.categorieFieldContainer.style.display = isMission ? 'block' : 'none';
+            this.categorieFieldContainer.setAttribute('aria-hidden', String(!isMission));
+        }
+
+        if (this.categorieInput) {
+            this.categorieInput.required = isMission;
+            this.categorieInput.setAttribute('aria-required', String(isMission));
         }
     }
+}
 
-    // --- Initial calls and event listeners ---
-    toggleSalarieFields();
-    toggleCategorieField();
-    updateMatriculeFromMatriculeNom(); // Initial call might be needed if a value is pre-selected
+/**
+ * Gère la mise à jour automatique du matricule
+ */
+export class MatriculeManager {
+    constructor(elements) {
+        this.matriculeNomSelect = elements.matriculeNomSelect;
+        this.matriculeInput = elements.matriculeInput;
+    }
 
-    if (salarieSelect) salarieSelect.addEventListener('change', toggleSalarieFields);
-    if (typeMissionSelect) typeMissionSelect.addEventListener('change', toggleCategorieField);
-    if (matriculeNomSelect) matriculeNomSelect.addEventListener('change', updateMatriculeFromMatriculeNom);
-});
+    /**
+     * Met à jour le champ matricule selon la sélection
+     */
+    update() {
+        if (!this.matriculeNomSelect || !this.matriculeInput) return;
+
+        const selectedOption = this.matriculeNomSelect.options[
+            this.matriculeNomSelect.selectedIndex
+        ];
+
+        this.matriculeInput.value = selectedOption?.dataset.matricule || '';
+    }
+}
+
+/**
+ * Récupère tous les éléments DOM nécessaires
+ * @returns {Object} Objet contenant tous les éléments
+ */
+function getFormElements() {
+    return {
+        salarieSelect: document.getElementById('first_form_salarier'),
+        interneDiv: document.getElementById('Interne'),
+        externeDiv: document.getElementById('externe'),
+        typeMissionSelect: document.getElementById('first_form_typeMission'),
+        categorieFieldContainer: document.getElementById('categorie_field_container'),
+        categorieInput: document.getElementById('first_form_categorie'),
+        matriculeNomSelect: document.getElementById('first_form_matriculeNom'),
+        matriculeInput: document.getElementById('first_form_matricule'),
+    };
+}
+
+/**
+ * Initialise tous les gestionnaires du formulaire
+ * @returns {Object} Gestionnaires initialisés
+ */
+export function initFirstForm() {
+    const elements = getFormElements();
+
+    const salarieManager = new SalarieFieldManager(elements);
+    const categorieManager = new CategorieFieldManager(elements);
+    const matriculeManager = new MatriculeManager(elements);
+
+    // Appels initiaux pour définir l'état correct
+    salarieManager.toggle();
+    categorieManager.toggle();
+    matriculeManager.update();
+
+    // Ajout des event listeners
+    if (elements.salarieSelect) {
+        elements.salarieSelect.addEventListener('change', () => salarieManager.toggle());
+    }
+
+    if (elements.typeMissionSelect) {
+        elements.typeMissionSelect.addEventListener('change', () => categorieManager.toggle());
+    }
+
+    if (elements.matriculeNomSelect) {
+        elements.matriculeNomSelect.addEventListener('change', () => matriculeManager.update());
+    }
+
+    return { salarieManager, categorieManager, matriculeManager };
+}
+
+// Auto-initialisation en production
+if (typeof window !== 'undefined') {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initFirstForm);
+    } else {
+        // DOM déjà chargé
+        initFirstForm();
+    }
+}

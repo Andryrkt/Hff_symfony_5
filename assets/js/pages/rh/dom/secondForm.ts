@@ -1,66 +1,142 @@
 import numeral from 'numeral';
-
-// assets/js/secondForm.js
-
+import axios, { AxiosError } from 'axios';
 import '../../../../styles/pages/secondForm.scss';
 import { initAgenceServiceHandlers } from '../../../services/AgenceServiceManager';
-import axios from 'axios';
 import { applyInputRestrictions, debounce } from '../../../utils/form_utils';
+import { FORM_CONSTANTS } from '../../../config/formConstants';
+
+// --- Types ---
+
+interface MissionOverlapResponse {
+    overlap: boolean;
+    conflictingMissions?: Array<{
+        id: number;
+        startDate: string;
+        endDate: string;
+    }>;
+}
+
+interface CodeBancaireResponse {
+    codeBancaire: string;
+}
+
+interface IndemniteForfaitaireResponse {
+    montant: string;
+}
+
+// --- Utilitaires de validation ---
+
+/**
+ * Valide qu'une valeur est un nombre positif
+ * @param value - Valeur à valider
+ * @returns Nombre positif ou null si invalide
+ */
+function validatePositiveNumber(value: string): number | null {
+    const num = parseInt(value.replace(/[^\d]/g, ""));
+    return !isNaN(num) && num >= 0 ? num : null;
+}
+
+/**
+ * Vérifie si un élément HTML existe
+ * @param element - Élément à vérifier
+ * @param elementName - Nom de l'élément pour le log
+ * @returns true si l'élément existe
+ */
+function validateElement(element: HTMLElement | null, elementName: string): element is HTMLElement {
+    if (!element) {
+        console.error(`Élément manquant: ${elementName}`);
+        return false;
+    }
+    return true;
+}
 
 // --- Logique de validation ---
 
 /**
- * Vérifie le chevauchement de mission via l'API.
+ * Vérifie le chevauchement de mission via l'API avec gestion d'erreurs robuste
  */
-async function checkMissionOverlap() {
-    const matriculeInput = document.getElementById('second_form_matricule') as HTMLInputElement;
-    const startDateInput = document.getElementById('second_form_dateHeureMission_debut') as HTMLInputElement;
-    const endDateInput = document.getElementById('second_form_dateHeureMission_fin') as HTMLInputElement;
-    const warningMessage = document.getElementById('mission-overlap-warning');
+async function checkMissionOverlap(): Promise<void> {
+    const elements = {
+        matricule: document.getElementById('second_form_matricule') as HTMLInputElement,
+        startDate: document.getElementById('second_form_dateHeureMission_debut') as HTMLInputElement,
+        endDate: document.getElementById('second_form_dateHeureMission_fin') as HTMLInputElement,
+        warning: document.getElementById('mission-overlap-warning') as HTMLElement,
+    };
 
-    if (!matriculeInput || !startDateInput || !endDateInput || !warningMessage) {
-        return; // Ne rien faire si les champs n'existent pas
+    // Validation des éléments
+    if (!validateElement(elements.matricule, 'matricule') ||
+        !validateElement(elements.startDate, 'startDate') ||
+        !validateElement(elements.endDate, 'endDate') ||
+        !validateElement(elements.warning, 'warning')) {
+        return;
     }
 
-    const matricule = matriculeInput.value;
-    const startDate = startDateInput.value;
-    const endDate = endDateInput.value;
+    const { matricule, startDate, endDate, warning } = elements;
 
     // Ne lance la vérification que si tous les champs sont remplis
-    if (matricule && startDate && endDate) {
-        try {
-            const response = await axios.get('/api/validation/mission-overlap', {
-                params: {
-                    matricule,
-                    start_date: startDate,
-                    end_date: endDate
-                }
-            });
+    if (!matricule.value || !startDate.value || !endDate.value) {
+        warning.style.display = 'none';
+        return;
+    }
 
-            if (response.data.overlap) {
-                warningMessage.style.display = 'block';
-            } else {
-                warningMessage.style.display = 'none';
+    try {
+        const response = await axios.get<MissionOverlapResponse>(
+            FORM_CONSTANTS.API_ENDPOINTS.MISSION_OVERLAP,
+            {
+                params: {
+                    matricule: matricule.value,
+                    start_date: startDate.value,
+                    end_date: endDate.value
+                },
+                timeout: FORM_CONSTANTS.API_TIMEOUT,
             }
-        } catch (error) {
-            console.error('Erreur lors de la vérification du chevauchement:', error);
-            warningMessage.style.display = 'none'; // Cacher en cas d'erreur API
+        );
+
+        warning.style.display = response.data.overlap ? 'block' : 'none';
+
+        if (response.data.overlap && response.data.conflictingMissions) {
+            console.info('Missions en conflit:', response.data.conflictingMissions);
         }
-    } else {
-        warningMessage.style.display = 'none'; // Cacher si un champ est vide
+    } catch (error) {
+        handleApiError(error, 'vérification du chevauchement');
+        warning.style.display = 'none';
     }
 }
 
 /**
- * Compare la date de début et de fin et affiche un message d'erreur si nécessaire.
+ * Gère les erreurs API de manière centralisée
+ * @param error - Erreur capturée
+ * @param context - Contexte de l'erreur
  */
-function validateDateRange() {
+function handleApiError(error: unknown, context: string): void {
+    if (axios.isAxiosError(error)) {
+        const axiosError = error as AxiosError;
+
+        if (axiosError.code === 'ECONNABORTED') {
+            console.error(`Timeout lors de la ${context}`);
+        } else if (axiosError.response) {
+            console.error(`Erreur serveur lors de la ${context}:`, axiosError.response.status);
+        } else if (axiosError.request) {
+            console.error(`Pas de réponse du serveur lors de la ${context}`);
+        } else {
+            console.error(`Erreur lors de la ${context}:`, axiosError.message);
+        }
+    } else {
+        console.error(`Erreur inattendue lors de la ${context}:`, error);
+    }
+}
+
+/**
+ * Compare la date de début et de fin et affiche un message d'erreur si nécessaire
+ */
+function validateDateRange(): void {
     const startDateInput = document.getElementById('second_form_dateHeureMission_debut') as HTMLInputElement;
     const endDateInput = document.getElementById('second_form_dateHeureMission_fin') as HTMLInputElement;
-    const errorMessage = document.getElementById('date-error-message');
+    const errorMessage = document.getElementById('date-error-message') as HTMLElement;
 
-    if (!startDateInput || !endDateInput || !errorMessage) {
-        console.warn('Date validation elements not found.');
+    if (!validateElement(startDateInput, 'startDate') ||
+        !validateElement(endDateInput, 'endDate') ||
+        !validateElement(errorMessage, 'errorMessage')) {
         return;
     }
 
@@ -83,33 +159,37 @@ function validateDateRange() {
 }
 
 /**
- * Calcule le nombre de jours entre deux dates et met à jour le champ 'nombreJour'.
+ * Calcule le nombre de jours entre deux dates
+ * @param startDate - Date de début
+ * @param endDate - Date de fin
+ * @returns Nombre de jours (>= 0)
  */
-function calculateNumberOfDays() {
+function calculateDaysBetween(startDate: Date, endDate: Date): number {
+    const timeDifference = endDate.getTime() - startDate.getTime();
+    const dayDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24)) + 1;
+    return dayDifference >= 0 ? dayDifference : 0;
+}
+
+/**
+ * Calcule le nombre de jours entre deux dates et met à jour le champ 'nombreJour'
+ */
+function calculateNumberOfDays(): void {
     const startDateInput = document.getElementById('second_form_dateHeureMission_debut') as HTMLInputElement;
     const endDateInput = document.getElementById('second_form_dateHeureMission_fin') as HTMLInputElement;
     const nombreJourInput = document.getElementById('second_form_nombreJour') as HTMLInputElement;
 
-    if (!startDateInput || !endDateInput || !nombreJourInput) {
+    if (!validateElement(startDateInput, 'startDate') ||
+        !validateElement(endDateInput, 'endDate') ||
+        !validateElement(nombreJourInput, 'nombreJour')) {
         return;
     }
 
     if (startDateInput.value && endDateInput.value) {
         const startDate = new Date(startDateInput.value);
         const endDate = new Date(endDateInput.value);
+        const dayDifference = calculateDaysBetween(startDate, endDate);
 
-        // Calcul de la différence en millisecondes
-        const timeDifference = endDate.getTime() - startDate.getTime();
-
-        // Conversion en jours
-        // Ajout de 1 pour inclure le jour de fin
-        const dayDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24)) + 1;
-
-        if (dayDifference >= 0) {
-            nombreJourInput.value = dayDifference.toString();
-        } else {
-            nombreJourInput.value = ''; // Ou gérer l'erreur si la date de fin est avant la date de début
-        }
+        nombreJourInput.value = dayDifference.toString();
     } else {
         nombreJourInput.value = '';
     }
@@ -120,13 +200,12 @@ function calculateNumberOfDays() {
 }
 
 // Crée une version "debounced" de la fonction de vérification
-const debouncedCheckMissionOverlap = debounce(checkMissionOverlap, 500); // Attend 500ms après la dernière frappe
+const debouncedCheckMissionOverlap = debounce(checkMissionOverlap, FORM_CONSTANTS.DEBOUNCE_DELAY);
 
 /**
- * Initialise les écouteurs d'événements pour la validation des dates.
- * la date de debut ne doit pas supérieur à la date de fin
+ * Initialise les écouteurs d'événements pour la validation des dates
  */
-function initDateValidation() {
+function initDateValidation(): void {
     const matriculeInput = document.getElementById('second_form_matricule');
     const startDateInput = document.getElementById('second_form_dateHeureMission_debut');
     const endDateInput = document.getElementById('second_form_dateHeureMission_fin');
@@ -135,8 +214,8 @@ function initDateValidation() {
         startDateInput.addEventListener('change', validateDateRange);
         endDateInput.addEventListener('change', validateDateRange);
     }
+
     if (matriculeInput) {
-        // On vérifie aussi si le matricule change (pour les formulaires dynamiques)
         matriculeInput.addEventListener('change', debouncedCheckMissionOverlap);
     }
 }
@@ -153,10 +232,14 @@ document.addEventListener('DOMContentLoaded', () => {
     initEmployeeFieldSwitching();
 });
 
+// [Le reste du fichier continue avec les mêmes améliorations...]
+// Note: Pour la longueur, je montre les améliorations principales
+// Les autres fonctions suivent le même pattern
+
 /**
- * Initialise les calculs des totaux.
+ * Initialise les calculs des totaux
  */
-function initTotalCalculations() {
+function initTotalCalculations(): void {
     const nombreJourInput = document.getElementById('second_form_nombreJour') as HTMLInputElement;
     const totalIdemniteDeplacementInput = document.getElementById('second_form_totalIndemniteDeplacement') as HTMLInputElement;
     const idemnityDeplInput = document.getElementById('second_form_idemnityDepl') as HTMLInputElement;
@@ -196,11 +279,11 @@ function initTotalCalculations() {
     }
 
     // --- Total Indemnité de Déplacement ---
-    function updateTotalIndemnity() {
-        const nombreDeJour = parseInt(nombreJourInput.value);
-        const indemnityDepl = parseInt(idemnityDeplInput.value.replace(/[^\d]/g, ""));
+    function updateTotalIndemnity(): void {
+        const nombreDeJour = validatePositiveNumber(nombreJourInput.value);
+        const indemnityDepl = validatePositiveNumber(idemnityDeplInput.value);
 
-        if (!isNaN(nombreDeJour) && !isNaN(indemnityDepl)) {
+        if (nombreDeJour !== null && indemnityDepl !== null) {
             const totalIndemnity = nombreDeJour * indemnityDepl;
             totalIdemniteDeplacementInput.value = formatNumberInt(totalIndemnity);
             const event = new Event("valueAdded");
@@ -218,23 +301,33 @@ function initTotalCalculations() {
     }
 
     // --- Total Indemnité Forfaitaire ---
-    nombreJourInput.addEventListener("input", calculTotalForfaitaire);
+    const debouncedCalculTotalForfaitaire = debounce(calculTotalForfaitaire, 300);
+    nombreJourInput.addEventListener("input", debouncedCalculTotalForfaitaire);
 
-    function calculTotalForfaitaire() {
-        
-        if (supplementJournalierInput.value === "" && indemniteForfaitaireJournaliereInput.value !== "") {
-            const nombreDeJour = parseInt(nombreJourInput.value);
-            const indemniteForfaitaireJournaliere = parseInt(indemniteForfaitaireJournaliereInput.value.replace(/[^\d]/g, ""));
-            totalindemniteForfaitaireInput.value = formatNumberInt(nombreDeJour * indemniteForfaitaireJournaliere);
-        } else if (supplementJournalierInput.value !== "" && indemniteForfaitaireJournaliereInput.value !== "") {
-            const supplementJournalier = parseInt(supplementJournalierInput.value.replace(/[^\d]/g, ""));
-            const nombreDeJour = parseInt(nombreJourInput.value);
-            const indemniteForfaitaireJournaliere = parseInt(indemniteForfaitaireJournaliereInput.value.replace(/[^\d]/g, ""));
-            totalindemniteForfaitaireInput.value = formatNumberInt(nombreDeJour * (indemniteForfaitaireJournaliere + supplementJournalier));
-        } else if (supplementJournalierInput.value !== "") {
-            const supplementJournalier = parseInt(supplementJournalierInput.value.replace(/[^\d]/g, ""));
-            const nombreDeJour = parseInt(nombreJourInput.value);
-            totalindemniteForfaitaireInput.value = formatNumberInt(nombreDeJour * supplementJournalier);
+    function calculTotalForfaitaire(): void {
+        const nombreDeJour = validatePositiveNumber(nombreJourInput.value);
+        const supplementJournalier = validatePositiveNumber(supplementJournalierInput.value);
+        const indemniteForfaitaireJournaliere = validatePositiveNumber(indemniteForfaitaireJournaliereInput.value);
+
+        if (nombreDeJour === null) {
+            totalindemniteForfaitaireInput.value = "";
+            return;
+        }
+
+        let total = 0;
+
+        if (indemniteForfaitaireJournaliere !== null) {
+            total += indemniteForfaitaireJournaliere;
+        }
+
+        if (supplementJournalier !== null) {
+            total += supplementJournalier;
+        }
+
+        if (total > 0) {
+            totalindemniteForfaitaireInput.value = formatNumberInt(nombreDeJour * total);
+        } else {
+            totalindemniteForfaitaireInput.value = "";
         }
 
         const event = new Event("valueAdded");
@@ -243,21 +336,23 @@ function initTotalCalculations() {
 
     supplementJournalierInput.addEventListener("input", () => {
         supplementJournalierInput.value = formatNumberInt(supplementJournalierInput.value);
-        calculTotalForfaitaire();
+        debouncedCalculTotalForfaitaire();
     });
 
     indemniteForfaitaireJournaliereInput.addEventListener("input", () => {
         indemniteForfaitaireJournaliereInput.value = formatNumberInt(indemniteForfaitaireJournaliereInput.value);
-        calculTotalForfaitaire();
+        debouncedCalculTotalForfaitaire();
     });
 
     // --- Total Autres Dépenses ---
-    function calculTotalAutreDepense() {
-        const autreDepense_1 = parseInt(autreDepenseInput_1.value.replace(/[^\d]/g, "")) || 0;
-        const autreDepense_2 = parseInt(autreDepenseInput_2.value.replace(/[^\d]/g, "")) || 0;
-        const autreDepense_3 = parseInt(autreDepenseInput_3.value.replace(/[^\d]/g, "")) || 0;
-        let totaAutreDepense = autreDepense_1 + autreDepense_2 + autreDepense_3;
+    function calculTotalAutreDepense(): void {
+        const autreDepense_1 = validatePositiveNumber(autreDepenseInput_1.value) || 0;
+        const autreDepense_2 = validatePositiveNumber(autreDepenseInput_2.value) || 0;
+        const autreDepense_3 = validatePositiveNumber(autreDepenseInput_3.value) || 0;
+
+        const totaAutreDepense = autreDepense_1 + autreDepense_2 + autreDepense_3;
         totaAutreDepenseInput.value = formatNumberInt(totaAutreDepense);
+
         const event = new Event("valueAdded");
         totaAutreDepenseInput.dispatchEvent(event);
     }
@@ -276,24 +371,24 @@ function initTotalCalculations() {
     });
 
     // --- Calcul Montant Total ---
-    function calculTotal() {
-        const totaAutreDepense = parseInt(totaAutreDepenseInput.value.replace(/[^\d]/g, "")) || 0;
-        const totalIdemniteDeplacement = parseInt(totalIdemniteDeplacementInput.value.replace(/[^\d]/g, "")) || 0;
-        const totalindemniteForfaitaire = parseInt(totalindemniteForfaitaireInput.value.replace(/[^\d]/g, "")) || 0;
-        const totalAmountWarning = document.querySelector("#total-amount-warning") as HTMLInputElement;
+    function calculTotal(): void {
+        const totaAutreDepense = validatePositiveNumber(totaAutreDepenseInput.value) || 0;
+        const totalIdemniteDeplacement = validatePositiveNumber(totalIdemniteDeplacementInput.value) || 0;
+        const totalindemniteForfaitaire = validatePositiveNumber(totalindemniteForfaitaireInput.value) || 0;
+        const totalAmountWarning = document.querySelector("#total-amount-warning") as HTMLElement;
 
-        let montantTotal = totalindemniteForfaitaire + totaAutreDepense - totalIdemniteDeplacement;
+        const montantTotal = totalindemniteForfaitaire + totaAutreDepense - totalIdemniteDeplacement;
 
-        if (sousTypeDocInput.value == 'TROP PERCU') {
+        if (sousTypeDocInput.value === FORM_CONSTANTS.MISSION_TYPES.TROP_PERCU) {
             montantTotalInput.value = "-" + formatNumberInt(montantTotal);
-            totalAmountWarning.style.display = "none";
-        } else if(sousTypeDocInput.value != 'FRAIS EXCEPTIONNEL' && montantTotal > 500000){
-            totalAmountWarning.style.display = "block";
+            if (totalAmountWarning) totalAmountWarning.style.display = "none";
+        } else if (sousTypeDocInput.value !== FORM_CONSTANTS.MISSION_TYPES.FRAIS_EXCEPTIONNEL &&
+            montantTotal > FORM_CONSTANTS.MAX_AMOUNT_WARNING) {
+            if (totalAmountWarning) totalAmountWarning.style.display = "block";
             montantTotalInput.value = formatNumberInt(montantTotal);
-        } else
-            {
+        } else {
             montantTotalInput.value = formatNumberInt(montantTotal);
-            totalAmountWarning.style.display = "none";
+            if (totalAmountWarning) totalAmountWarning.style.display = "none";
         }
     }
 
@@ -303,32 +398,28 @@ function initTotalCalculations() {
 }
 
 /**
- * Gère la validation en temps réel pour le champ 'mode' lorsque 'MOBILE MONEY' est sélectionné.
+ * Gère la validation en temps réel pour le champ 'mode' lorsque 'MOBILE MONEY' est sélectionné
  */
-function handleModeInput(event: Event) {
+function handleModeInput(event: Event): void {
     const input = event.target as HTMLInputElement;
     const modePayementInput = document.getElementById('second_form_modePayement') as HTMLSelectElement;
 
-    if (modePayementInput && modePayementInput.value === 'MOBILE MONEY') {
-        // Remplacer tout ce qui n'est pas un chiffre
+    if (modePayementInput && modePayementInput.value === FORM_CONSTANTS.PAYMENT_MODES.MOBILE_MONEY) {
         const numericValue = input.value.replace(/\D/g, '');
-        // Limiter à 10 chiffres et mettre à jour la valeur
-        input.value = numericValue.slice(0, 10);
+        input.value = numericValue.slice(0, FORM_CONSTANTS.MOBILE_MONEY_MAX_DIGITS);
     }
 }
 
 /**
- * Initialise la mise à jour dynamique du label du champ 'mode' en fonction du 'modePayement'.
+ * Initialise la mise à jour dynamique du label du champ 'mode' en fonction du 'modePayement'
  */
-function initModeLabelUpdate() {
+function initModeLabelUpdate(): void {
     const modePayementInput = document.getElementById('second_form_modePayement') as HTMLSelectElement;
     if (modePayementInput) {
         modePayementInput.addEventListener('change', updateModeLabel);
-        // Appeler une fois au chargement pour définir le label initial
         updateModeLabel();
     }
 
-    // Ajout de l'écouteur pour la validation du champ 'mode'
     const modeInput = document.getElementById('second_form_mode') as HTMLInputElement;
     if (modeInput) {
         modeInput.addEventListener('input', handleModeInput);
@@ -336,77 +427,69 @@ function initModeLabelUpdate() {
 }
 
 /**
- * Met à jour le label du champ 'mode' en fonction de la valeur sélectionnée dans 'modePayement'.
+ * Met à jour le label du champ 'mode' en fonction de la valeur sélectionnée dans 'modePayement'
  */
 async function updateModeLabel(): Promise<void> {
     const modePayementInput = document.getElementById('second_form_modePayement') as HTMLSelectElement;
     const modeLabel = document.querySelector('label[for="second_form_mode"]') as HTMLLabelElement;
     const modeInput = document.getElementById("second_form_mode") as HTMLInputElement;
 
-    if (!modePayementInput || !modeLabel || !modeInput) {
+    if (!validateElement(modePayementInput, 'modePayement') ||
+        !validateElement(modeLabel, 'modeLabel') ||
+        !validateElement(modeInput, 'modeInput')) {
         return;
     }
-    const selectedModePayement = modePayementInput.value;
 
+    const selectedModePayement = modePayementInput.value;
     modeLabel.textContent = selectedModePayement;
 
-    // --- Réinitialiser l'état du champ 'mode' ---
+    // Réinitialiser l'état du champ 'mode'
     modeInput.readOnly = false;
     modeInput.placeholder = '';
 
-    if (selectedModePayement === 'VIREMENT BANCAIRE') {
-        modeInput.readOnly = true; // Verrouiller le champ
+    if (selectedModePayement === FORM_CONSTANTS.PAYMENT_MODES.VIREMENT) {
+        modeInput.readOnly = true;
         const matriculeInput = document.getElementById('second_form_matricule') as HTMLSelectElement;
-        if(matriculeInput) {
+
+        if (matriculeInput && matriculeInput.value) {
             try {
-                const matricule = matriculeInput.value;
-                
-                const response = await axios.get('/api/rh/dom/mode', {
-                    params: {
-                        matricule: matricule,
+                const response = await axios.get<CodeBancaireResponse>(
+                    FORM_CONSTANTS.API_ENDPOINTS.CODE_BANCAIRE,
+                    {
+                        params: { matricule: matriculeInput.value },
+                        timeout: FORM_CONSTANTS.API_TIMEOUT,
                     }
-                });
-                modeInput.value =  response.data.codeBancaire;
+                );
+                modeInput.value = response.data.codeBancaire;
             } catch (error) {
-                console.error("Erreur lors de la recupéraiton du code bancaire de l'utilisateur, voir l'erreur :", error);
-                modeInput.value = ''; // Effacer en cas d'erreur
+                handleApiError(error, 'récupération du code bancaire');
+                modeInput.value = '';
             }
         }
-    } else if (selectedModePayement === 'MOBILE MONEY') {
-        modeInput.value = ''; // Effacer la valeur précédente
-        modeInput.placeholder = 'Numéro sur 10 chiffres'; // Ajouter une indication
+    } else if (selectedModePayement === FORM_CONSTANTS.PAYMENT_MODES.MOBILE_MONEY) {
+        modeInput.value = '';
+        modeInput.placeholder = `Numéro sur ${FORM_CONSTANTS.MOBILE_MONEY_MAX_DIGITS} chiffres`;
     } else {
-        // Pour tous les autres modes, effacer le champ
         modeInput.value = '';
     }
 }
 
-
 /**
- * Initialise la validation des champs de saisie (limite de caractères et majuscules).
+ * Initialise la validation des champs de saisie
  */
-function initInputValidation() {
-    const fieldsToValidate: { [id: string]: number } = {
-        'second_form_motifDeplacement': 60,
-        'second_form_client': 30,
-        'second_form_lieuIntervention': 60,
-        'second_form_motifAutresDepense1': 30,
-        'second_form_motifAutresDepense2': 30,
-        'second_form_motifAutresDepense3': 30
-    };
-
-    for (const id in fieldsToValidate) {
-        const inputElement = document.getElementById(id) as HTMLInputElement;
+function initInputValidation(): void {
+    for (const [id, maxLength] of Object.entries(FORM_CONSTANTS.FIELD_MAX_LENGTHS)) {
+        const inputElement = document.getElementById(`second_form_${id}`) as HTMLInputElement;
         if (inputElement) {
-            applyInputRestrictions(inputElement, fieldsToValidate[id]);
+            applyInputRestrictions(inputElement, maxLength);
         }
     }
 }
 
 /**
- * Initialise la mise à jour du champ indemniteForfaitaire en fonction du site.
+ * Initialise la mise à jour du champ indemniteForfaitaire en fonction du site
  */
-function initIndemniteForfaitaireUpdate() {
+function initIndemniteForfaitaireUpdate(): void {
     const siteInput = document.getElementById('second_form_site');
     if (siteInput) {
         siteInput.addEventListener('change', updateIndemniteForfaitaire);
@@ -414,44 +497,48 @@ function initIndemniteForfaitaireUpdate() {
 }
 
 /**
- * Met à jour le champ indemniteForfaitaire en appelant l'API.
+ * Met à jour le champ indemniteForfaitaire en appelant l'API
  */
-async function updateIndemniteForfaitaire() {
+async function updateIndemniteForfaitaire(): Promise<void> {
     const typeMissionInput = document.getElementById('second_form_typeMission') as HTMLInputElement;
     const categorieInput = document.getElementById('second_form_categorie') as HTMLInputElement;
     const rmqInput = document.getElementById('rmq') as HTMLInputElement;
     const siteInput = document.getElementById('second_form_site') as HTMLInputElement;
     const indemniteForfaitaireInput = document.getElementById('second_form_indemniteForfaitaire') as HTMLInputElement;
 
-    if (!typeMissionInput || !categorieInput || !siteInput || !indemniteForfaitaireInput) {
+    if (!validateElement(typeMissionInput, 'typeMission') ||
+        !validateElement(categorieInput, 'categorie') ||
+        !validateElement(siteInput, 'site') ||
+        !validateElement(indemniteForfaitaireInput, 'indemniteForfaitaire')) {
         return;
     }
 
     const typeMissionId = typeMissionInput.value;
     const categorieId = categorieInput.value;
-    const rmqId = rmqInput.value;
+    const rmqId = rmqInput?.value;
     const siteId = siteInput.value;
 
     if (typeMissionId && categorieId && siteId) {
         try {
-            const response = await axios.get('/api/rh/dom/indemnite-forfaitaire', {
-                params: {
-                    typeMission: typeMissionId,
-                    categorie: categorieId,
-                    rmq: rmqId,
-                    site: siteId
+            const response = await axios.get<IndemniteForfaitaireResponse>(
+                FORM_CONSTANTS.API_ENDPOINTS.INDEMNITE_FORFAITAIRE,
+                {
+                    params: {
+                        typeMission: typeMissionId,
+                        categorie: categorieId,
+                        rmq: rmqId,
+                        site: siteId
+                    },
+                    timeout: FORM_CONSTANTS.API_TIMEOUT,
                 }
-            });
-            indemniteForfaitaireInput.value = response.data.montant;
+            );
 
-            // Déclenche l'événement input pour recalculer le total
+            indemniteForfaitaireInput.value = response.data.montant;
             const event = new Event('input', { bubbles: true });
             indemniteForfaitaireInput.dispatchEvent(event);
         } catch (error) {
-            console.error('Erreur lors de la mise à jour de l\'indemnité forfaitaire:', error);
+            handleApiError(error, 'mise à jour de l\'indemnité forfaitaire');
             indemniteForfaitaireInput.value = '';
-
-            // Déclenche également l'événement en cas d'erreur pour vider le total
             const event = new Event('input', { bubbles: true });
             indemniteForfaitaireInput.dispatchEvent(event);
         }
@@ -459,25 +546,36 @@ async function updateIndemniteForfaitaire() {
 }
 
 /**
- * Initialise le basculement d'affichage des champs matricule et cin en fonction du type de salarié.
+ * Initialise le basculement d'affichage des champs matricule et cin
  */
-function initEmployeeFieldSwitching() {
+function initEmployeeFieldSwitching(): void {
     const formContainer = document.getElementById('form-container');
     const matriculeContainer = document.getElementById('matricule-field-container');
     const cinContainer = document.getElementById('cin-field-container');
 
-    if (!formContainer || !matriculeContainer || !cinContainer) {
-        console.error('One or more required elements for employee field switching are missing.');
+    if (!validateElement(formContainer, 'formContainer') ||
+        !validateElement(matriculeContainer, 'matriculeContainer') ||
+        !validateElement(cinContainer, 'cinContainer')) {
         return;
     }
 
     const salarierType = formContainer.dataset.salarierType;
 
-    if (salarierType === 'PERMANENT') {
-        matriculeContainer.style.display = ''; 
+    if (salarierType === FORM_CONSTANTS.EMPLOYEE_TYPES.PERMANENT) {
+        matriculeContainer.style.display = '';
         cinContainer.style.display = 'none';
     } else {
         matriculeContainer.style.display = 'none';
         cinContainer.style.display = '';
     }
 }
+
+// Export pour les tests
+export {
+    checkMissionOverlap,
+    validateDateRange,
+    calculateNumberOfDays,
+    calculateDaysBetween,
+    validatePositiveNumber,
+    handleApiError,
+};
