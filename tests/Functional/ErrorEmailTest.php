@@ -36,7 +36,7 @@ class ErrorEmailTest extends WebTestCase
 
         // On s'attend à ce que le premier message soit notre e-mail d'erreur
         /** @var \Symfony\Component\Mime\Email $email */
-        $email = $collectedMessages[0]->getMessage();
+        $email = $collectedMessages[0];
 
         // Vérifie le destinataire
         $expectedAdminEmail = $_ENV['ADMIN_EMAIL'] ?? 'votre.email@example.com';
@@ -46,7 +46,7 @@ class ErrorEmailTest extends WebTestCase
         $this->assertStringContainsString('HFF - Erreur Application', $email->getSubject(), 'Le sujet de l\'e-mail devrait contenir "HFF - Erreur Application".');
 
         // Vérifie que le corps de l'e-mail contient le message d'erreur
-        $this->assertStringContainsString('Ceci est une erreur de test simulée', $email->getHtmlBody(), 'Le corps de l'e-mail devrait contenir le message d'erreur simulée.');
+        $this->assertStringContainsString('Ceci est une erreur de test simulée', $email->getHtmlBody(), 'Le corps de l\'e-mail devrait contenir le message d\'erreur simulée.');
 
         // Vérifie le destinataire
         $expectedAdminEmail = $_ENV['ADMIN_EMAIL'] ?? 'votre.email@example.com';
