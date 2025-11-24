@@ -110,7 +110,7 @@ class DomSecondController extends AbstractController
 
         if ($success) {
             $this->addFlash('success', $message);
-            return $this->redirectToRoute('doms_liste');
+            return $this->redirectToRoute('liste_dom_index');
         }
 
         $this->addFlash('warning', $message);

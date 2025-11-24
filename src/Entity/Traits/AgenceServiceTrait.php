@@ -28,9 +28,9 @@ trait AgenceServiceTrait
 
     /**
      * @ORM\ManyToOne(targetEntity=Service::class, inversedBy="domServiceDebiteur")
-     * @ORM\JoinColumn(name="service_debiteur", referencedColumnName="id")
+     * @ORM\JoinColumn(name="service_debiteur_id", referencedColumnName="id")
      */
-    private $serviceDebiteur;
+    private $serviceDebiteurId;
 
     /** ====================================================================
      * GETTERS & SETTERS

@@ -15,9 +15,9 @@ class DomsListeController extends AbstractController
 
     /**
      * affichage de l'architecture de la liste du DOM
-     * @Route("/liste", name="doms_liste")
+     * @Route("/liste-dom", name="liste_dom_index")
      */
-    public function listeDom(DomRepository $domRepository)
+    public function index(DomRepository $domRepository)
     {
         // 1. gerer l'accés
         $this->denyAccessUnlessGranted('RH_ORDRE_MISSION_CREATE');
@@ -25,12 +25,12 @@ class DomsListeController extends AbstractController
         // 2. recupération des données à afficher
         $page = 1;
         $limit = 10;
-        $data = $domRepository->findPaginatedAndFiltered($page, $limit);
+        $paginationData = $domRepository->findPaginatedAndFiltered($page, $limit);
 
         return $this->render(
-            'rh/dom/liste.html.twig',
+            'rh/dom/liste/liste.html.twig',
             [
-                'data' => $data
+                'data' => $paginationData['data']
             ]
         );
     }
