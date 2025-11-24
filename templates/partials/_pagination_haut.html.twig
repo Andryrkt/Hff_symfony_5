@@ -1,0 +1,63 @@
+<div
+	class="d-flex justify-content-between">
+	{# Boutons d'actions #}
+	<div>
+		{% for button in buttons %}
+			<a href="{{ button.href == '#' ? '#' : path(button.href) }}" class="btn btn-sm {{ button.class }} text-white my-3 fw-bold" {% if button.tooltip %} data-bs-toggle="tooltip" title="{{ button.tooltip }}" {% endif %}>
+				{% if button.icon %}
+					<i class="{{ button.icon }}"></i>
+				{% endif %}
+				{{ button.text }}
+			</a>
+		{% endfor %}
+	</div>
+
+	{# Informations de résultats #}
+	<div>
+		<p class="fw-bold my-3" id="nombreResultat">
+			{{ resultCount }}
+			Résultats
+		</p>
+	</div>
+
+	{# Pagination - informations #}
+	<div>
+		<p class="fw-bold my-3" id="nombreResultat">
+			{{ currentPage ~ ' / ' ~ totalPages }}
+			pages
+		</p>
+	</div>
+
+	{# Navigation de pagination #}
+	<div class="navigation">
+		{% set queryParams = criteria %}
+
+		{# Première page #}
+		{% if currentPage > 1 %}
+			<a class="btn btn-dark my-3" href="{{ path(routeName, queryParams|merge({'page': 1})) }}" data-bs-toggle="tooltip" title="Première page">
+				<i class="fas fa-angle-double-left text-warning"></i>
+			</a>
+		{% endif %}
+
+		{# Page précédente #}
+		{% if currentPage > 1 %}
+			<a class="btn btn-dark my-3" href="{{ path(routeName, queryParams|merge({'page': currentPage - 1})) }}" data-bs-toggle="tooltip" title="Page précédente">
+				<i class="fas fa-angle-left text-warning"></i>
+			</a>
+		{% endif %}
+
+		{# Page suivante #}
+		{% if currentPage < totalPages %}
+			<a class="btn btn-dark my-3" href="{{ path(routeName, queryParams|merge({'page': currentPage + 1})) }}" data-bs-toggle="tooltip" title="Page suivante">
+				<i class="fas fa-angle-right text-warning"></i>
+			</a>
+		{% endif %}
+
+		{# Dernière page #}
+		{% if currentPage < totalPages %}
+			<a class="btn btn-dark my-3" href="{{ path(routeName, queryParams|merge({'page': totalPages})) }}" data-bs-toggle="tooltip" title="Dernière page">
+				<i class="fas fa-angle-double-right text-warning"></i>
+			</a>
+		{% endif %}
+	</div>
+</div>

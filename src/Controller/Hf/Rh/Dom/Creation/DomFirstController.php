@@ -49,7 +49,7 @@ class DomFirstController extends AbstractController
         }
 
         //5. rendu de la vue
-        return $this->render('hf/rh/dom/firstForm.html.twig', [
+        return $this->render('hf/rh/dom/creation/firstForm.html.twig', [
             'form' => $form->createView(),
             'breadcrumbs' => $breadcrumbBuilder->build('dom_first_form'),
         ]);

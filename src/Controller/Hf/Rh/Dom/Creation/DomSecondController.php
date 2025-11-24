@@ -72,7 +72,7 @@ class DomSecondController extends AbstractController
             }
         }
 
-        return $this->render('hf/rh/dom/secondForm.html.twig', [
+        return $this->render('hf/rh/dom/creation/secondForm.html.twig', [
             'form'          => $form->createView(),
             'secondFormDto' => $form->getData(),
             'agencesJson'   => $this->serializeAgences($agenceRepository, $serializer),

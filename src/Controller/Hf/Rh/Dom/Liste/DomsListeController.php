@@ -2,6 +2,7 @@
 
 namespace App\Controller\Hf\Rh\Dom\Liste;
 
+use App\Form\Hf\Rh\Dom\Liste\DomSearchType;
 use App\Repository\Hf\Rh\Dom\DomRepository;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,9 +21,15 @@ class DomsListeController extends AbstractController
     public function index(DomRepository $domRepository)
     {
         // 1. gerer l'accés
-        $this->denyAccessUnlessGranted('RH_ORDRE_MISSION_CREATE');
+        $this->denyAccessUnlessGranted('RH_ORDRE_MISSION_VIEW');
 
-        // 2. recupération des données à afficher
+        // 2. creation du formulaire de recherhce
+        $form = $this->createForm(DomSearchType::class, null, [
+            'method' => 'GET'
+        ]);
+
+
+        // 3. recupération des données à afficher
         $page = 1;
         $limit = 10;
         $paginationData = $domRepository->findPaginatedAndFiltered($page, $limit);
@@ -30,7 +37,8 @@ class DomsListeController extends AbstractController
         return $this->render(
             'hf/rh/dom/liste/liste.html.twig',
             [
-                'data' => $paginationData['data']
+                'paginationData' => $paginationData,
+                'form' => $form->createView()
             ]
         );
     }
