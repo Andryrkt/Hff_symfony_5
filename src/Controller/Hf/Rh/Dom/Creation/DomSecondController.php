@@ -10,12 +10,11 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Hf\Rh\Dom\DomCreationHandler;
 use App\Service\Hf\Rh\Dom\DomPdfService;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use App\Repository\Admin\AgenceService\AgenceRepository;
 use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Service\Historique_operation\HistoriqueOperationService;
+use App\Service\Admin\AgenceSerializerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
@@ -27,17 +26,20 @@ class DomSecondController extends AbstractController
     private LoggerInterface $logger;
     private DomCreationHandler $domCreationHandler;
     private HistoriqueOperationService $historiqueOperationService;
+    private AgenceSerializerService $agenceSerializerService;
 
     public function __construct(
         SecondFormDtoFactory $secondFormDtoFactory,
         LoggerInterface $domSecondFormLogger,
         DomCreationHandler $domCreationHandler,
-        HistoriqueOperationService $historiqueOperationService
+        HistoriqueOperationService $historiqueOperationService,
+        AgenceSerializerService $agenceSerializerService
     ) {
         $this->secondFormDtoFactory = $secondFormDtoFactory;
         $this->logger = $domSecondFormLogger;
         $this->domCreationHandler = $domCreationHandler;
         $this->historiqueOperationService = $historiqueOperationService;
+        $this->agenceSerializerService = $agenceSerializerService;
     }
 
     /**
@@ -45,8 +47,6 @@ class DomSecondController extends AbstractController
      */
     public function secondForm(
         Request $request,
-        AgenceRepository $agenceRepository,
-        SerializerInterface $serializer,
         DomPdfService $pdfService,
         ContextAwareBreadcrumbBuilder $breadcrumbBuilder
     ) {
@@ -75,7 +75,7 @@ class DomSecondController extends AbstractController
         return $this->render('hf/rh/dom/creation/secondForm.html.twig', [
             'form'          => $form->createView(),
             'secondFormDto' => $form->getData(),
-            'agencesJson'   => $this->serializeAgences($agenceRepository, $serializer),
+            'agencesJson'   => $this->agenceSerializerService->serializeAllAgences(),
             'breadcrumbs'   => $breadcrumbBuilder->build('dom_second_form'),
         ]);
     }
@@ -129,11 +129,5 @@ class DomSecondController extends AbstractController
         }
 
         return $firstFormDto;
-    }
-
-    private function serializeAgences(AgenceRepository $agenceRepository, SerializerInterface $serializer): string
-    {
-        $agences = $agenceRepository->findAll();
-        return $serializer->serialize($agences, 'json', ['groups' => 'agence:read']);
     }
 }

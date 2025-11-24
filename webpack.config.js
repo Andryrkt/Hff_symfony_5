@@ -7,12 +7,13 @@ if (!Encore.isRuntimeEnvironmentConfigured()) {
 Encore
     .setOutputPath('public/build/')
     .setPublicPath('/build')
-    
+
     // Entrées
     .addEntry('app', './assets/app.ts')
     .addEntry('login', './assets/js/login/login.ts')
     .addEntry('accueil', './assets/js/accueil.js')
     .addEntry('secondForm', './assets/js/pages/rh/dom/secondForm.ts')
+    .addEntry('domListe', './assets/js/pages/rh/dom/domListe.js')
 
     // Split chunks
     .splitEntryChunks()
@@ -54,6 +55,6 @@ Encore
 
     // jQuery
     .autoProvidejQuery()
-;
+    ;
 
 module.exports = Encore.getWebpackConfig();

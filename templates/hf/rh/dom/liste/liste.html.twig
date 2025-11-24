@@ -3,8 +3,13 @@
 {% block title %}Liste des Ordres de Mission
 {% endblock %}
 
+{% block stylesheets %}
+	{{ parent() }}
+	{{ encore_entry_link_tags('domListe') }}
+{% endblock %}
+
 {% block content %}
-	<div class="container">
+	<div class="container" id="agence-service-data" data-agences="{{ agencesJson|e('html_attr') }}">
 		{% include 'partials/flash_messages.html.twig' %}
 
 		<h1>Liste des Ordres de Mission</h1>
@@ -138,4 +143,9 @@
 			totalPages: paginationData['totalPages']
 		} %}
 	</div>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	{{ encore_entry_script_tags('domListe') }}
 {% endblock %}
