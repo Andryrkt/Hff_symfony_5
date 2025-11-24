@@ -78,7 +78,7 @@ services:
     class: Parsedown
     public: true
 
-  App\Service\Rh\Dom\DomPdfService:
+  App\Service\Hf\Rh\Dom\DomPdfService:
     arguments:
       $projectDir: '%kernel.project_dir%'
 

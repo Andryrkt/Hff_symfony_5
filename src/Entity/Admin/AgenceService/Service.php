@@ -11,7 +11,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Admin\PersonnelUser\UserAccess;
 use App\Entity\Admin\AgenceService\AgenceServiceIrium;
 use App\Entity\Admin\AgenceService\Agence;
-use App\Entity\Rh\Dom\Dom;
+use App\Entity\Hf\Rh\Dom\Dom;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Annotation\ApiResource;
 
@@ -65,7 +65,7 @@ class Service
     private $agences;
 
     /**
-     * @ORM\OneToMany(targetEntity=Dom::class, mappedBy="serviceDebiteur")
+     * @ORM\OneToMany(targetEntity=Dom::class, mappedBy="serviceDebiteurId")
      */
     private $domServiceDebiteur;
 

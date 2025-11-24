@@ -2,7 +2,7 @@
 
 namespace App\Entity\Admin\Statut;
 
-use App\Entity\Rh\Dom\Dom;
+use App\Entity\Hf\Rh\Dom\Dom;
 use App\Entity\Traits\TimestampableTrait;
 use App\Repository\Admin\Statut\StatutDemandeRepository;
 use Doctrine\Common\Collections\ArrayCollection;

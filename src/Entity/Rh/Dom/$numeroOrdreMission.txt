@@ -1,5 +1,0 @@
-$numeroOrdreMission
-$nomSessionUtilisateur
-$numeroTel
-$dateDemande
-$idStatutDemande;
