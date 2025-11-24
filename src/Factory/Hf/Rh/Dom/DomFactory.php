@@ -89,7 +89,7 @@ class DomFactory
         $dom->setAgenceEmetteurId($agenceEmetteur);
         $dom->setServiceEmetteurId($serviceEmetteur);
         $dom->setAgenceDebiteurId($secondFormDto->debiteur['agence']);
-        $dom->setServiceDebiteurId($secondFormDto->debiteur['service']);
+        $dom->setServiceDebiteur($secondFormDto->debiteur['service']);
         //fichet et num vehicule
         $dom->setFiche($secondFormDto->fiche);
         $dom->setNumVehicule($secondFormDto->numVehicule);

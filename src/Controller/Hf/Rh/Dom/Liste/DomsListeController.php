@@ -28,7 +28,7 @@ class DomsListeController extends AbstractController
         $paginationData = $domRepository->findPaginatedAndFiltered($page, $limit);
 
         return $this->render(
-            'rh/dom/liste/liste.html.twig',
+            'hf/rh/dom/liste/liste.html.twig',
             [
                 'data' => $paginationData['data']
             ]
