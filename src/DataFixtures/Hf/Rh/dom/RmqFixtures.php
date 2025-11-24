@@ -3,7 +3,7 @@
 namespace App\DataFixtures\Hf\Rh\dom;
 
 
-use App\Entity\Rh\Dom\Rmq;
+use App\Entity\Hf\Rh\Dom\Rmq;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 

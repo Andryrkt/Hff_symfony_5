@@ -31,7 +31,7 @@ class TypeDocumentFixtures extends Fixture
 
         foreach ($typeDocuments as $typeDocumentData) {
             $typeDocument = new TypeDocument();
-            $typeDocument->setTypeDocumenet($typeDocumentData['type'])
+            $typeDocument->setTypeDocument($typeDocumentData['type'])
                 ->setLibelleDocument($typeDocumentData['libelle'])
             ;
             $manager->persist($typeDocument);

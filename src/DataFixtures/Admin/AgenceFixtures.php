@@ -4,10 +4,15 @@ namespace App\DataFixtures\Admin;
 
 use App\Entity\Admin\AgenceService\Agence;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class AgenceFixtures extends Fixture
+class AgenceFixtures extends Fixture implements FixtureGroupInterface
 {
+    public static function getGroups(): array
+    {
+        return ['prod'];
+    }
     public function load(ObjectManager $manager): void
     {
         $agences = [

@@ -4,10 +4,15 @@ namespace App\DataFixtures\Admin;
 
 use App\Entity\Admin\ApplicationGroupe\Vignette;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class VignetteFixtures extends Fixture
+class VignetteFixtures extends Fixture implements FixtureGroupInterface
 {
+    public static function getGroups(): array
+    {
+        return ['prod'];
+    }
     public function load(ObjectManager $manager)
     {
         $vignettes = [

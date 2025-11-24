@@ -3,7 +3,7 @@
 namespace App\DataFixtures\Hf\Rh\dom;
 
 
-use App\Entity\Rh\Dom\Categorie;
+use App\Entity\Hf\Rh\Dom\Categorie;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;

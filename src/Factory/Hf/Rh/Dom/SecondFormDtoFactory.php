@@ -97,6 +97,7 @@ class SecondFormDtoFactory
         ];
 
         $indemites = $this->em->getRepository(Indemnite::class)->findBy($criteria);
+
         $sites = [];
         foreach ($indemites as $value) {
             $sites[] = $value->getSite()->getNomZone();

@@ -4,11 +4,16 @@ namespace App\DataFixtures\Admin;
 
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use App\Entity\Admin\ApplicationGroupe\Permission;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
-class PermissionFixtures extends Fixture implements DependentFixtureInterface
+class PermissionFixtures extends Fixture implements DependentFixtureInterface, FixtureGroupInterface
 {
+    public static function getGroups(): array
+    {
+        return ['prod'];
+    }
     public function getDependencies()
     {
         return [

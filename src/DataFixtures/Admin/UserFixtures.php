@@ -5,11 +5,16 @@ namespace App\DataFixtures\Admin;
 use App\DataFixtures\Admin\PermissionFixtures;
 use App\Entity\Admin\PersonnelUser\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 
-class UserFixtures extends Fixture implements DependentFixtureInterface
+class UserFixtures extends Fixture implements DependentFixtureInterface, FixtureGroupInterface
 {
+    public static function getGroups(): array
+    {
+        return ['prod'];
+    }
     public function load(ObjectManager $manager): void
     {
         $users = [

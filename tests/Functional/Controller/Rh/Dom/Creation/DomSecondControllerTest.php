@@ -2,13 +2,11 @@
 
 namespace App\Tests\Functional\Controller\Rh\Dom\Creation;
 
-use App\Entity\Rh\Dom\Rmq;
+use App\Entity\Hf\Rh\Dom\Rmq;
 use App\Tests\BaseTestCase;
-use App\Dto\Rh\Dom\FirstFormDto;
-use App\DataFixtures\Rh\dom\RmqFixtures;
-use App\Repository\Rh\Dom\DomRepository;
-use App\DataFixtures\Test\TestUserFixtures;
-use App\DataFixtures\Test\TestPersonnelFixtures;
+use App\Dto\Hf\Rh\Dom\FirstFormDto;
+use App\DataFixtures\Hf\Rh\dom\RmqFixtures;
+use App\Repository\Hf\Rh\Dom\DomRepository;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class DomSecondControllerTest extends BaseTestCase
@@ -19,8 +17,8 @@ class DomSecondControllerTest extends BaseTestCase
     {
         parent::setUp();
                     $this->referenceRepository = $this->loadTestFixtures([
-                        TestPersonnelFixtures::class, // Assure que le personnel '9999' existe
-                        TestUserFixtures::class,      // Assure que l'utilisateur de test existe et est lié au personnel
+                        PersonnelFixtures::class, // Assure que le personnel '9999' existe
+                        UserFixtures::class,      // Assure que l'utilisateur de test existe et est lié au personnel
                         RmqFixtures::class,           // Assure que les entités Rmq (STD, 50) existent
                     ])->getReferenceRepository();
         

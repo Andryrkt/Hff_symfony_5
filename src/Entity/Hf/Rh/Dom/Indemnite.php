@@ -45,10 +45,10 @@ class Indemnite
     private $rmq;
 
     /**
- * @ORM\ManyToOne(targetEntity=SousTypeDocument::class, inversedBy="indemnites")
- * @ORM\JoinColumn(name="sousTypeDocumentId", referencedColumnName="id", nullable=true)
- */
-private $sousTypeDocument;
+     * @ORM\ManyToOne(targetEntity=SousTypeDocument::class, inversedBy="indemnites")
+     * @ORM\JoinColumn(name="sousTypeDocumentId", referencedColumnName="id", nullable=true)
+     */
+    private $sousTypeDocument;
 
     /**
      * @ORM\Column(type="float", nullable=true)
