@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DataFixtures\Admin;
+namespace App\DataFixtures\Admin\ApplicationGroupe;
 
 use App\Entity\Admin\ApplicationGroupe\Vignette;
 use Doctrine\Bundle\FixturesBundle\Fixture;

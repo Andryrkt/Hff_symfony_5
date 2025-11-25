@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DataFixtures\Admin;
+namespace App\DataFixtures\Admin\AgenceService;
 
 use App\Entity\Admin\AgenceService\Agence;
 use Doctrine\Bundle\FixturesBundle\Fixture;

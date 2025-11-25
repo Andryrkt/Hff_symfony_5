@@ -1,8 +1,9 @@
 <?php
 
-namespace App\DataFixtures\Admin;
 
-use App\DataFixtures\Admin\PermissionFixtures;
+namespace App\DataFixtures\Admin\PersonnelUser;
+
+use App\DataFixtures\Admin\ApplicationGroupe\PermissionFixtures;
 use App\Entity\Admin\PersonnelUser\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DataFixtures\Admin;
+namespace App\DataFixtures\Admin\Statut;
 
 use App\Entity\Admin\Statut\StatutDemande;
 use Doctrine\Bundle\FixturesBundle\Fixture;

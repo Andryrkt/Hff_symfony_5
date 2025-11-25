@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DataFixtures\Admin;
+namespace App\DataFixtures\Admin\ApplicationGroupe;
 
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -136,10 +136,9 @@ class PermissionFixtures extends Fixture implements DependentFixtureInterface, F
             ;
 
             $manager->persist($permission);
-            $this->addReference('permission_'.$permissionData['code'], $permission);
+            $this->addReference('permission_' . $permissionData['code'], $permission);
         }
 
         $manager->flush();
     }
 }
-

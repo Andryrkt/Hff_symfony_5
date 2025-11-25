@@ -1,16 +1,14 @@
 <?php
 
-namespace App\DataFixtures\Admin;
+namespace App\DataFixtures\Admin\PersonnelUser;
 
 use Doctrine\Persistence\ObjectManager;
-use App\DataFixtures\Admin\UserFixtures;
-use App\DataFixtures\Admin\AgenceFixtures;
-use App\DataFixtures\Admin\ServiceFixtures;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use App\Entity\Admin\PersonnelUser\UserAccess;
-use App\DataFixtures\Admin\ApplicationFixtures;
-use App\DataFixtures\Admin\PermissionFixtures;
+use App\DataFixtures\Admin\AgenceService\AgenceFixtures;
+use App\DataFixtures\Admin\AgenceService\ServiceFixtures;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use App\DataFixtures\Admin\ApplicationGroupe\PermissionFixtures;
 
 class UserAccessFixtures extends Fixture implements DependentFixtureInterface
 {

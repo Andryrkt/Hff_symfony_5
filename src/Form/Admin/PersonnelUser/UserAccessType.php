@@ -13,6 +13,7 @@ use App\Entity\Admin\AgenceService\Agence; // Import Agence entity
 use App\Entity\Admin\AgenceService\Service; // Import Service entity
 use Symfony\Bridge\Doctrine\Form\Type\EntityType; // Import EntityType
 use App\Entity\Admin\ApplicationGroupe\Permission; // Import Permission entity
+use App\Entity\Admin\Historisation\TypeDocument; // Import TypeDocument entity
 
 class UserAccessType extends AbstractType
 {
@@ -98,6 +99,19 @@ class UserAccessType extends AbstractType
                         ->orderBy('v.nom', 'ASC') // Adaptez selon votre entité Vignette
                         ->addOrderBy('p.code', 'ASC');
                 },
+            ])
+            ->add('typeDocument', EntityType::class, [
+                'label' => 'Type de document',
+                'class' => TypeDocument::class,
+                'choice_label' => 'libelleDocument',
+                'multiple' => false,
+                'expanded' => false,
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-select',
+                    'data-controller' => 'tom-select',
+                    'data-placeholder' => 'Sélectionnez un type de document...',
+                ],
             ])
         ;
     }

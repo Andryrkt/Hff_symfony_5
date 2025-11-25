@@ -61,6 +61,7 @@ class UserAccess
 
     /**
      * @ORM\ManyToOne(targetEntity=TypeDocument::class, inversedBy="userAccesses")
+     * @ORM\JoinColumn(name="type_document_id", referencedColumnName="id")
      */
     private $typeDocument;
 

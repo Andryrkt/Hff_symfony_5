@@ -1,12 +1,13 @@
 <?php
 
-namespace App\DataFixtures\Admin;
+namespace App\DataFixtures\Admin\PersonnelUser;
 
-use App\Entity\Admin\PersonnelUser\Personnel;
-use Doctrine\Bundle\FixturesBundle\Fixture;
-use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use App\Entity\Admin\PersonnelUser\Personnel;
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use App\DataFixtures\Admin\AgenceService\AgenceServiceIriumFixtures;
 
 class PersonnelFixtures extends Fixture implements DependentFixtureInterface, FixtureGroupInterface
 {

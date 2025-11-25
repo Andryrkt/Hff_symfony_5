@@ -33,11 +33,13 @@ class HistoriqueOperationDocument
 
     /**
      * @ORM\ManyToOne(targetEntity=TypeOperation::class, inversedBy="historiqueOperationDocuments")
+     * @ORM\JoinColumn(name="typeOperationId", referencedColumnName="id", nullable=true)
      */
     private $typeOperation;
 
     /**
      * @ORM\ManyToOne(targetEntity=TypeDocument::class, inversedBy="historiqueOperationDocuments")
+     * @ORM\JoinColumn(name="type_document_id", referencedColumnName="id", nullable=true)
      */
     private $typeDocument;
 
