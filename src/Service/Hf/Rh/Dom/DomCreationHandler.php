@@ -2,18 +2,20 @@
 
 namespace App\Service\Hf\Rh\Dom;
 
-use App\Dto\Hf\Rh\Dom\SecondFormDto;
-use App\Entity\Hf\Rh\Dom\Dom;
-use App\Entity\Hf\Rh\Dom\SousTypeDocument;
-use App\Factory\Hf\Rh\Dom\DomFactory;
-use App\Repository\Hf\Rh\Dom\DomRepository;
-use App\Service\Historique_operation\HistoriqueOperationService;
-use App\Service\Utils\Fichier\TraitementDeFichier;
-use App\Service\Utils\Fichier\UploderFileService;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use App\Entity\Hf\Rh\Dom\Dom;
+use App\Dto\Hf\Rh\Dom\SecondFormDto;
+use App\Factory\Hf\Rh\Dom\DomFactory;
 use Symfony\Component\Form\FormInterface;
+use App\Entity\Hf\Rh\Dom\SousTypeDocument;
+use App\Repository\Hf\Rh\Dom\DomRepository;
+use App\Service\Utils\Fichier\UploderFileService;
+use App\Service\Utils\Fichier\TraitementDeFichier;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use App\Constants\Admin\Historisation\TypeDocumentConstants;
+use App\Constants\Admin\Historisation\TypeOperationConstants;
+use App\Service\Historique_operation\HistoriqueOperationService;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class DomCreationHandler
 {
@@ -90,8 +92,8 @@ class DomCreationHandler
         } finally {
             $this->historiqueOperationService->enregistrer(
                 $dom->getNumeroOrdreMission(),
-                'DB_SAVE',
-                'DOM',
+                TypeOperationConstants::TYPE_OPERATION_DB_SAVE_NAME,
+                TypeDocumentConstants::TYPE_DOCUMENT_DOM_NAME,
                 $success,
                 $message
             );
@@ -109,7 +111,7 @@ class DomCreationHandler
         try {
             $fileProcessor = new TraitementDeFichier();
             $filesToMerge = $fileProcessor->insertFileAtPosition($uploadedFilesPaths, $finalPdfPath, 0);
-    
+
             $fileProcessor->fusionFichers($filesToMerge, $finalPdfPath);
             $success = true;
             $message = 'Fusion des fichiers réussie.';
@@ -121,8 +123,8 @@ class DomCreationHandler
         } finally {
             $this->historiqueOperationService->enregistrer(
                 $dom->getNumeroOrdreMission(),
-                'FILE_MERGE',
-                'DOM',
+                TypeOperationConstants::TYPE_OPERATION_FILE_MERGE_NAME,
+                TypeDocumentConstants::TYPE_DOCUMENT_DOM_NAME,
                 $success,
                 $message
             );
@@ -140,7 +142,7 @@ class DomCreationHandler
     private function copyToDocuware(Dom $dom, DomPdfService $pdfService, string  $finalPdfPath, string  $finalPdfName): void
     {
         $docuwarePath = $this->params->get('docuware_directory') . '/ORDRE_DE_MISSION/' . $finalPdfName;
-        
+
         $success = false;
         $message = 'Copie vers Docuware.';
         try {
@@ -155,8 +157,8 @@ class DomCreationHandler
         } finally {
             $this->historiqueOperationService->enregistrer(
                 $dom->getNumeroOrdreMission(),
-                'DW_COPY',
-                'DOM',
+                TypeOperationConstants::TYPE_OPERATION_DW_COPY_NAME,
+                TypeDocumentConstants::TYPE_DOCUMENT_DOM_NAME,
                 $success,
                 $message
             );
@@ -200,8 +202,8 @@ class DomCreationHandler
         } finally {
             $this->historiqueOperationService->enregistrer(
                 $dom->getNumeroOrdreMission(),
-                'FILE_UPLOAD',
-                'DOM',
+                TypeOperationConstants::TYPE_OPERATION_FILE_UPLOAD_NAME,
+                TypeDocumentConstants::TYPE_DOCUMENT_DOM_NAME,
                 $success,
                 $message
             );

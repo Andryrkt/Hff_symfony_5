@@ -2,6 +2,7 @@
 
 namespace App\Entity\Admin\PersonnelUser;
 
+use App\Entity\Admin\Historisation\TypeDocument;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Traits\TimestampableTrait;
 use App\Entity\Admin\AgenceService\Agence;
@@ -57,6 +58,11 @@ class UserAccess
      * @ORM\ManyToMany(targetEntity=Permission::class, inversedBy="userAccesses")
      */
     private $permissions;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=TypeDocument::class, inversedBy="userAccesses")
+     */
+    private $typeDocument;
 
     public function __construct()
     {
@@ -150,6 +156,18 @@ class UserAccess
     public function removePermission(Permission $permission): self
     {
         $this->permissions->removeElement($permission);
+
+        return $this;
+    }
+
+    public function getTypeDocument(): ?TypeDocument
+    {
+        return $this->typeDocument;
+    }
+
+    public function setTypeDocument(?TypeDocument $typeDocument): self
+    {
+        $this->typeDocument = $typeDocument;
 
         return $this;
     }

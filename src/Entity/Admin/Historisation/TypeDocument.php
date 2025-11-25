@@ -2,6 +2,7 @@
 
 namespace App\Entity\Admin\Historisation;
 
+use App\Entity\Admin\PersonnelUser\UserAccess;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,24 +15,7 @@ use App\Repository\Admin\Historisation\TypeDocumentRepository;
  */
 class TypeDocument
 {
-
     use TimestampableTrait;
-
-    public const TYPE_DOCUMENT_DIT_NAME = 'DIT';
-    public const TYPE_DOCUMENT_OR_NAME = 'OR';
-    public const TYPE_DOCUMENT_FAC_NAME = 'FAC';
-    public const TYPE_DOCUMENT_RI_NAME = 'RI';
-    public const TYPE_DOCUMENT_TIK_NAME = 'TIK';
-    public const TYPE_DOCUMENT_DA_NAME = 'DA';
-    public const TYPE_DOCUMENT_DOM_NAME = 'DOM';
-    public const TYPE_DOCUMENT_BADM_NAME = 'BADM';
-    public const TYPE_DOCUMENT_CAS_NAME = 'CAS';
-    public const TYPE_DOCUMENT_CDE_NAME = 'CDE';
-    public const TYPE_DOCUMENT_DEV_NAME = 'DEV';
-    public const TYPE_DOCUMENT_BC_NAME = 'BC';
-    public const TYPE_DOCUMENT_AC_NAME = 'AC';
-    public const TYPE_DOCUMENT_SW_NAME = 'SW';
-    public const TYPE_DOCUMENT_MUT_NAME = 'MUT';
 
     /**
      * @ORM\Id
@@ -55,9 +39,15 @@ class TypeDocument
      */
     private $historiqueOperationDocuments;
 
+    /**
+     * @ORM\OneToMany(targetEntity=UserAccess::class, mappedBy="typeDocument")
+     */
+    private $userAccesses;
+
     public function __construct()
     {
         $this->historiqueOperationDocuments = new ArrayCollection();
+        $this->userAccesses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -113,6 +103,36 @@ class TypeDocument
             // set the owning side to null (unless already changed)
             if ($historiqueOperationDocument->getTypeDocument() === $this) {
                 $historiqueOperationDocument->setTypeDocument(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserAccess>
+     */
+    public function getUserAccesses(): Collection
+    {
+        return $this->userAccesses;
+    }
+
+    public function addUserAccess(UserAccess $userAccess): self
+    {
+        if (!$this->userAccesses->contains($userAccess)) {
+            $this->userAccesses[] = $userAccess;
+            $userAccess->setTypeDocument($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserAccess(UserAccess $userAccess): self
+    {
+        if ($this->userAccesses->removeElement($userAccess)) {
+            // set the owning side to null (unless already changed)
+            if ($userAccess->getTypeDocument() === $this) {
+                $userAccess->setTypeDocument(null);
             }
         }
 
