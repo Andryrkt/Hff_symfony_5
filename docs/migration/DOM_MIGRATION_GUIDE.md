@@ -81,6 +81,15 @@ php bin/console app:migrate:dom-data --offset=1000
 
 # Migration des 5000 premiers enregistrements par lots de 100
 php bin/console app:migrate:dom-data --limit=5000 --batch-size=100
+
+# Option 1: Avec limite de mémoire augmentée
+php -d memory_limit=512M bin/console app:migrate:dom-data --batch-size=20 --limit=100
+
+# Option 2: Migration par petits lots
+php bin/console app:migrate:dom-data --batch-size=20 --limit=50
+
+# Option 3: Migration complète avec petits lots
+php -d memory_limit=512M bin/console app:migrate:dom-data --batch-size=20
 ```
 
 ## Mapping des Données

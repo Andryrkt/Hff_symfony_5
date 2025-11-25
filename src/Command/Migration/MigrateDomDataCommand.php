@@ -44,8 +44,13 @@ class MigrateDomDataCommand extends Command
     {
         $this
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Exécute la migration sans persister les données')
-            ->addOption('batch-size', 'b', InputOption::VALUE_REQUIRED, 'Nombre d\'enregistrements à traiter par lot', 100)
-            ->addOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Nombre maximum d\'enregistrements à migrer (pour test)', null)
+            ->addOption(
+                'batch-size',
+                'b',
+                InputOption::VALUE_REQUIRED,
+                'Nombre d\'enregistrements à traiter par lot',
+                50  // Réduit pour éviter les problèmes de mémoire
+            )->addOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Nombre maximum d\'enregistrements à migrer (pour test)', null)
             ->addOption('offset', 'o', InputOption::VALUE_REQUIRED, 'Décalage de départ (pour reprendre une migration)', 0)
             ->setHelp(
                 <<<'HELP'
