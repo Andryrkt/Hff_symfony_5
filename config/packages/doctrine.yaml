@@ -1,14 +1,27 @@
 doctrine:
     dbal:
-        url: '%env(resolve:DATABASE_URL)%'
-        driver: 'pdo_sqlsrv'
-        server_version: '15.0'
-        charset: UTF-8
-        use_savepoints: true
-        # Optimisations de performance pour SQL Server
-        options:
-            "TrustServerCertificate": true
-            "Encrypt": false
+        default_connection: default
+        connections:
+            default:
+                url: '%env(resolve:DATABASE_URL)%'
+                driver: 'pdo_sqlsrv'
+                server_version: '15.0'
+                charset: UTF-8
+                use_savepoints: true
+                # Optimisations de performance pour SQL Server
+                options:
+                    "TrustServerCertificate": true
+                    "Encrypt": false
+            
+            # Connexion vers l'ancienne base de données pour la migration
+            legacy:
+                url: '%env(resolve:DATABASE_LEGACY_URL)%'
+                driver: 'pdo_sqlsrv'
+                server_version: '15.0'
+                charset: UTF-8
+                options:
+                    "TrustServerCertificate": true
+                    "Encrypt": false
     orm:
         auto_generate_proxy_classes: false
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware

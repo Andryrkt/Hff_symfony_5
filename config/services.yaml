@@ -100,3 +100,16 @@ services:
         $notifier: '@notifier'
         $adminEmail: '%env(ADMIN_EMAIL)%'
 
+  # Services de migration de données
+  App\Service\Migration\DomMigrationMapper:
+    arguments:
+      $legacyConnection: '@doctrine.dbal.legacy_connection'
+
+  App\Command\Migration\MigrateDomDataCommand:
+    arguments:
+      $legacyConnection: '@doctrine.dbal.legacy_connection'
+      $mapper: '@App\Service\Migration\DomMigrationMapper'
+      $migrationDomLogger: '@monolog.logger.migration_dom'
+    tags:
+      - { name: 'console.command' }
+

@@ -3,6 +3,7 @@ monolog:
         - deprecation # Deprecations are logged in the dedicated "deprecation" channel when it exists
         - dom_first_form
         - dom_second_form
+        - migration_dom
 
     handlers:
         dom_first:
@@ -17,6 +18,11 @@ monolog:
             level: debug
             channels: [dom_second_form]
             formatter: monolog.formatter.user_log
+        migration_dom:
+            type: stream
+            path: "%kernel.logs_dir%/migrations/migration_dom.log"
+            level: info
+            channels: [migration_dom]
 
 when@dev:
     monolog:
@@ -25,7 +31,7 @@ when@dev:
                 type: stream
                 path: "%kernel.logs_dir%/%kernel.environment%.log"
                 level: debug
-                channels: ["!event"]
+                channels: ["!event", "!migration_dom"]
             # uncomment to get logging in your browser
             # you may have to allow bigger header sizes in your Web server configuration
             #firephp:
