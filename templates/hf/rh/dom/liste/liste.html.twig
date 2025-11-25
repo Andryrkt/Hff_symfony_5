@@ -42,6 +42,8 @@
 			currentPage: paginationData['currentPage'],
 			totalPages: paginationData['lastPage'],
 			resultCount: paginationData['totalItems'],
+			routeName: routeName,
+			criteria: queryParams
 		} %}
 	</div>
 
@@ -140,7 +142,7 @@
 
 		{% include "partials/_pagination_bas.html.twig" with {
 			currentPage: paginationData['currentPage'],
-			totalPages: paginationData['totalPages']
+			totalPages: paginationData['totalItems']
 		} %}
 	</div>
 {% endblock %}

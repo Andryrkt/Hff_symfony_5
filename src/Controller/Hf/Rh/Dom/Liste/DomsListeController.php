@@ -48,7 +48,7 @@ class DomsListeController extends AbstractController
         }
 
         // 4. recupération des données à afficher avec filtrage par agence
-        $page = 1;
+        $page = $request->query->getInt('page', 1);
         $limit = 10;
         $paginationData = $domRepository->findPaginatedAndFiltered($page, $limit, $domSearchDto, $agenceIdsAutorises);
 
@@ -57,7 +57,9 @@ class DomsListeController extends AbstractController
             [
                 'paginationData' => $paginationData,
                 'form' => $form->createView(),
-                'agencesJson'   => $agenceSerializerService->serializeAllAgences()
+                'agencesJson'   => $agenceSerializerService->serializeAllAgences(),
+                'routeName' => 'liste_dom_index',
+                'queryParams' => $request->query->all()
             ]
         );
     }

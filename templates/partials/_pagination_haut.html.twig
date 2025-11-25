@@ -30,7 +30,7 @@
 
 	{# Navigation de pagination #}
 	<div class="navigation">
-		{% set queryParams = criteria %}
+		{% set queryParams = criteria|default({}) %}
 
 		{# Première page #}
 		{% if currentPage > 1 %}
