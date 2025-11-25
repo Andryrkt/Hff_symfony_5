@@ -3,10 +3,11 @@
 namespace App\Repository\Hf\Rh\Dom;
 
 use App\Entity\Hf\Rh\Dom\Dom;
-use App\Entity\Hf\Rh\Dom\SousTypeDocument;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Dto\Hf\Rh\Dom\DomSearchDto;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\Hf\Rh\Dom\SousTypeDocument;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Dom>
@@ -94,11 +95,14 @@ class DomRepository extends ServiceEntityRepository
         ;
     }
 
-    public function findPaginatedAndFiltered(int $page = 1, int $limit = 10)
+    public function findPaginatedAndFiltered(int $page = 1, int $limit = 10, DomSearchDto $domSearchDto, ?array $agenceIds = null)
     {
         $queryBuilder = $this->createQueryBuilder('d')
             ->leftJoin('d.sousTypeDocument', 'td')
             ->leftJoin('d.idStatutDemande', 's');
+
+        // Filtrer par agences autorisées
+        $this->filtredAgenceService($queryBuilder, $agenceIds);
 
         //exclude statut
 
@@ -118,6 +122,88 @@ class DomRepository extends ServiceEntityRepository
             'currentPage' => $page,
             'lastPage'    => $lastPage,
         ];
+    }
+
+    private function filtredStatut($queryBuilder, DomSearchDto $domSearchDto)
+    {
+        // Filtre pour le statut        
+        if (!empty($domSearchDto->statut)) {
+            $queryBuilder->andWhere('s.description LIKE :statut')
+                ->setParameter('statut', '%' . $domSearchDto->statut . '%');
+        } else {
+            $queryBuilder->andWhere('s.description LIKE :excludedStatuses')
+                ->setParameter('excludedStatuses', 'ANNULE%');
+        }
+    }
+
+    private function filtred($queryBuilder, DomSearchDto $domSearchDto)
+    {
+        // Filtre pour le type de document
+        if (!empty($domSearchDto->sousTypeDocument)) {
+            $queryBuilder->andWhere('td.codeSousType LIKE :typeDocument')
+                ->setParameter('typeDocument', '%' . $domSearchDto->sousTypeDocument . '%');
+        }
+
+        // Filtrer selon le numero DOM
+        if (!empty($domSearchDto->numDom)) {
+            $queryBuilder->andWhere('d.numeroOrdreMission = :numDom')
+                ->setParameter('numDom', $domSearchDto->numDom);
+        }
+
+        // Filtre pour le numero matricule
+        if (!empty($domSearchDto->matricule)) {
+            $queryBuilder->andWhere('d.matricule = :matricule')
+                ->setParameter('matricule', $domSearchDto->matricule);
+        }
+
+        // Filtre pour pièce justificatif
+        if (!is_null($domSearchDto->pieceJustificatif)) {
+            $queryBuilder->andWhere('d.pieceJustificatif = :pieceJustificatif')
+                ->setParameter('pieceJustificatif', $domSearchDto->pieceJustificatif);
+        }
+    }
+
+    private function filtredDate($queryBuilder, DomSearchDto $domSearchDto)
+    {
+        // Filtre pour la date de demande (début)
+        if (!(empty($domSearchDto->dateDemande) && empty($domSearchDto->dateDemande['debut']))) {
+            $queryBuilder->andWhere('d.dateDemande >= :dateDemandeDebut')
+                ->setParameter('dateDemandeDebut', $domSearchDto->dateDemande['debut']);
+        }
+
+        // Filtre pour la date de demande (fin)
+        if (!(empty($domSearchDto->dateDemande) && empty($domSearchDto->dateDemande['fin']))) {
+            $queryBuilder->andWhere('d.dateDemande <= :dateDemandeFin')
+                ->setParameter('dateDemandeFin', $domSearchDto->dateDemande['fin']);
+        }
+
+        // Filtre pour la date de mission (début)
+        if (!(empty($domSearchDto->dateMission) && empty($domSearchDto->dateMission['debut']))) {
+            $queryBuilder->andWhere('d.dateDebut >= :dateMissionDebut')
+                ->setParameter('dateMissionDebut', $domSearchDto->dateMission['debut']);
+        }
+
+        // Filtre pour la date de mission (fin)
+        if (!(empty($domSearchDto->dateMission) && empty($domSearchDto->dateMission['fin']))) {
+            $queryBuilder->andWhere('d.dateFin <= :dateMissionFin')
+                ->setParameter('dateMissionFin', $domSearchDto->dateMission['fin']);
+        }
+    }
+
+    /**
+     * Filtre les résultats par agences autorisées.
+     * 
+     * @param $queryBuilder Le query builder Doctrine
+     * @param array|null $agenceIds Les IDs des agences autorisées, null si accès à toutes
+     */
+    private function filtredAgenceService($queryBuilder, ?array $agenceIds): void
+    {
+        // Si $agenceIds est null => l'utilisateur a accès à toutes les agences (admin)
+        // Sinon, filtrer uniquement par les agences autorisées
+        if ($agenceIds !== null && count($agenceIds) > 0) {
+            $queryBuilder->andWhere('d.agenceEmetteurId IN (:agenceIdAutoriser)')
+                ->setParameter('agenceIdAutoriser', $agenceIds);
+        }
     }
 
     /**

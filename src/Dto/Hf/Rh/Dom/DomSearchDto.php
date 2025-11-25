@@ -3,10 +3,11 @@
 namespace App\Dto\Hf\Rh\Dom;
 
 use App\Entity\Hf\Rh\Dom\SousTypeDocument;
+use App\Entity\Admin\Statut\StatutDemande;
 
 class DomSearchDto
 {
-    public ?string $statut = null;
+    public ?StatutDemande $statut = null;
     public ?SousTypeDocument $sousTypeDocument = null;
     public ?string $numDom = null;
     public ?string $matricule = null;
