@@ -3,6 +3,7 @@
 namespace App\Security\Voter;
 
 
+use App\Entity\Hf\Rh\Dom\Dom;
 use App\Entity\Admin\PersonnelUser\User;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -39,6 +40,7 @@ class ObjectVoter extends Voter
 
         // Exemple de mapping permission par type d'objet
         $map = [
+            Dom::class => 'RH_ORDRE_MISSION_',
             // DemandeConge::class => 'RH_CONGE_',
             // BonCommande::class => 'APPRO_BC_',
             // tu peux ajouter d'autres entités ici

@@ -2,117 +2,120 @@
 
 namespace App\Entity\Traits;
 
-use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Admin\AgenceService\Agence;
 use App\Entity\Admin\AgenceService\Service;
+use Doctrine\ORM\Mapping as ORM;
 
+/**
+ * Trait pour ajouter les propriétés agence/service émetteur et débiteur aux entités
+ */
 trait AgenceServiceTrait
 {
     /**
      * @ORM\ManyToOne(targetEntity=Agence::class)
-     * @ORM\JoinColumn(name="agence_emetteur_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="agence_emetteur_id", referencedColumnName="id", nullable=true)
      */
-    private  $agenceEmetteurId;
+    private ?Agence $agenceEmetteurId = null;
 
     /**
      * @ORM\ManyToOne(targetEntity=Service::class)
-     * @ORM\JoinColumn(name="service_emetteur_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="service_emetteur_id", referencedColumnName="id", nullable=true)
      */
-    private  $serviceEmetteurId;
+    private ?Service $serviceEmetteurId = null;
 
     /**
      * @ORM\ManyToOne(targetEntity=Agence::class)
-     * @ORM\JoinColumn(name="agence_debiteur_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="agence_debiteur_id", referencedColumnName="id", nullable=true)
      */
-    private  $agenceDebiteurId;
+    private ?Agence $agenceDebiteurId = null;
 
     /**
      * @ORM\ManyToOne(targetEntity=Service::class, inversedBy="domServiceDebiteur")
-     * @ORM\JoinColumn(name="service_debiteur_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="service_debiteur_id", referencedColumnName="id", nullable=true)
      */
-    private $serviceDebiteur;
+    private ?Service $serviceDebiteur = null;
 
     /** ====================================================================
      * GETTERS & SETTERS
      *====================================================================*/
 
     /**
-     * Get the value of agenceEmetteurId
+     * Récupère l'agence émettrice
+     * @return Agence|null
      */
-    public function getAgenceEmetteurId()
+    public function getAgenceEmetteurId(): ?Agence
     {
         return $this->agenceEmetteurId;
     }
 
     /**
-     * Set the value of agenceEmetteurId
-     *
-     * @return  self
+     * Définit l'agence émettrice
+     * @param Agence|null $agence
+     * @return self
      */
-    public function setAgenceEmetteurId($agenceEmetteurId)
+    public function setAgenceEmetteurId(?Agence $agence): self
     {
-        $this->agenceEmetteurId = $agenceEmetteurId;
-
+        $this->agenceEmetteurId = $agence;
         return $this;
     }
 
     /**
-     * Get the value of serviceEmetteurId
+     * Récupère le service émetteur
+     * @return Service|null
      */
-    public function getServiceEmetteurId()
+    public function getServiceEmetteurId(): ?Service
     {
         return $this->serviceEmetteurId;
     }
 
     /**
-     * Set the value of serviceEmetteurId
-     *
-     * @return  self
+     * Définit le service émetteur
+     * @param Service|null $service
+     * @return self
      */
-    public function setServiceEmetteurId($serviceEmetteurId)
+    public function setServiceEmetteurId(?Service $service): self
     {
-        $this->serviceEmetteurId = $serviceEmetteurId;
-
+        $this->serviceEmetteurId = $service;
         return $this;
     }
 
     /**
-     * Get the value of agenceDebiteurId
+     * Récupère l'agence débitrice
+     * @return Agence|null
      */
-    public function getAgenceDebiteurId()
+    public function getAgenceDebiteurId(): ?Agence
     {
         return $this->agenceDebiteurId;
     }
 
     /**
-     * Set the value of agenceDebiteurId
-     *
-     * @return  self
+     * Définit l'agence débitrice
+     * @param Agence|null $agence
+     * @return self
      */
-    public function setAgenceDebiteurId($agenceDebiteurId)
+    public function setAgenceDebiteurId(?Agence $agence): self
     {
-        $this->agenceDebiteurId = $agenceDebiteurId;
-
+        $this->agenceDebiteurId = $agence;
         return $this;
     }
 
     /**
-     * Get the value of serviceDebiteur
+     * Récupère le service débiteur
+     * @return Service|null
      */
-    public function getServiceDebiteur()
+    public function getServiceDebiteur(): ?Service
     {
         return $this->serviceDebiteur;
     }
 
     /**
-     * Set the value of serviceDebiteur
-     *
-     * @return  self
+     * Définit le service débiteur
+     * @param Service|null $service
+     * @return self
      */
-    public function setServiceDebiteur($serviceDebiteur)
+    public function setServiceDebiteur(?Service $service): self
     {
-        $this->serviceDebiteur = $serviceDebiteur;
-
+        $this->serviceDebiteur = $service;
         return $this;
     }
 }

@@ -3,24 +3,27 @@
 namespace App\Entity\Hf\Rh\Dom;
 
 use App\Entity\Hf\Rh\Dom\Site;
-use App\Entity\Hf\Rh\Dom\Categorie;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Hf\Rh\Dom\SousTypeDocument;
-use App\Repository\Hf\Rh\Dom\DomRepository;
+use App\Entity\Hf\Rh\Dom\Categorie;
+use App\Entity\Traits\CreatedByTrait;
 use App\Entity\Traits\AgenceServiceTrait;
 use App\Entity\Traits\TimestampableTrait;
 use App\Entity\Admin\Statut\StatutDemande;
-use App\Entity\Admin\AgenceService\Service;
+use App\Entity\Hf\Rh\Dom\SousTypeDocument;
+use App\Contract\Entity\CreatedByInterface;
+use App\Repository\Hf\Rh\Dom\DomRepository;
+use App\Contract\Entity\AgenceServiceInterface;
 
 /**
  * @ORM\Entity(repositoryClass=DomRepository::class)
  * @ORM\Table(name="Demande_ordre_mission")
  * @ORM\HasLifecycleCallbacks
  */
-class Dom
+class Dom implements CreatedByInterface, AgenceServiceInterface
 {
     use TimestampableTrait;
     use AgenceServiceTrait;
+    use CreatedByTrait;
 
     public const CODE_APPLICATION = 'DOM';
 
@@ -259,7 +262,7 @@ class Dom
     /**
      * @ORM\ManyToOne(targetEntity=Site::class, inversedBy="doms")
      */
-     private $siteId;
+    private $siteId;
 
     /**
      * @ORM\ManyToOne(targetEntity=Categorie::class, inversedBy="doms", cascade={"persist"})

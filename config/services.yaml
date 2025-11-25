@@ -113,3 +113,8 @@ services:
     tags:
       - { name: 'console.command' }
 
+  # Listener pour définir automatiquement createdBy lors de la création d'entités
+  App\EventListener\CreatedByListener:
+    tags:
+      - { name: doctrine.event_listener, event: prePersist }
+
