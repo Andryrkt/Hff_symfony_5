@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Admin;
+namespace App\Controller\Admin\Historisation;
 
 use App\Entity\Admin\Historisation\TypeOperation;
 use App\Form\Admin\TypeOperationType;
@@ -81,7 +81,7 @@ class TypeOperationController extends AbstractController
      */
     public function delete(Request $request, TypeOperation $typeOperation, TypeOperationRepository $typeOperationRepository): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$typeOperation->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $typeOperation->getId(), $request->request->get('_token'))) {
             $typeOperationRepository->remove($typeOperation, true);
         }
 

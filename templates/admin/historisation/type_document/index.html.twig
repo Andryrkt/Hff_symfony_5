@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TypeDocument index
+{% endblock %}
+
+{% block content %}
+	<div class="container">
+		<h1>TypeDocument index</h1>
+
+		<a href="{{ path('app_admin_historisation_type_document_new') }}" class="btn btn-primary mb-3">Créer</a>
+
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Id</th>
+					<th>TypeDocument</th>
+					<th>LibelleDocument</th>
+					<th>CreatedAt</th>
+					<th>UpdatedAt</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for type_document in type_documents %}
+					<tr>
+						<td>{{ type_document.id }}</td>
+						<td>{{ type_document.typeDocument }}</td>
+						<td>{{ type_document.libelleDocument }}</td>
+						<td>{{ type_document.createdAt ? type_document.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+						<td>{{ type_document.updatedAt ? type_document.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+						<td>
+							<a href="{{ path('app_admin_historisation_type_document_show', {'id': type_document.id}) }}" class="btn btn-sm btn-info">Afficher</a>
+							<a href="{{ path('app_admin_historisation_type_document_edit', {'id': type_document.id}) }}" class="btn btn-sm btn-warning">Éditer</a>
+						</td>
+					</tr>
+				{% else %}
+					<tr>
+						<td colspan="6">Aucun enregistrement trouvé</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+{% endblock %}

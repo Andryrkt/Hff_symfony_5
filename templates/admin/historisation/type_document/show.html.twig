@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}TypeDocument
+{% endblock %}
+
+{% block content %}
+	<div class="container">
+		<h1>TypeDocument</h1>
+		<table class="table table-striped">
+			<tbody>
+				<tr>
+					<th>Id</th>
+					<td>{{ type_document.id }}</td>
+				</tr>
+				<tr>
+					<th>TypeDocument</th>
+					<td>{{ type_document.typeDocument }}</td>
+				</tr>
+				<tr>
+					<th>LibelleDocument</th>
+					<td>{{ type_document.libelleDocument }}</td>
+				</tr>
+				<tr>
+					<th>CreatedAt</th>
+					<td>{{ type_document.createdAt ? type_document.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+				</tr>
+				<tr>
+					<th>UpdatedAt</th>
+					<td>{{ type_document.updatedAt ? type_document.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<a href="{{ path('app_admin_historisation_type_document_index') }}" class="btn btn-secondary mb-3">Retour à la liste</a>
+
+		<a href="{{ path('app_admin_historisation_type_document_edit', {'id': type_document.id}) }}" class="btn btn-warning">Éditer</a>
+
+		{{ include('admin/historisation/type_document/_delete_form.html.twig') }}
+	</div>
+{% endblock %}
