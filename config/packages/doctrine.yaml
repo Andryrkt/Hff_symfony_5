@@ -2,6 +2,9 @@ doctrine:
     dbal:
         default_connection: default
         connections:
+            # ==================================================
+            # CONNEXION PRINCIPALE (Application)
+            # ==================================================
             default:
                 url: '%env(resolve:DATABASE_URL)%'
                 driver: 'pdo_sqlsrv'
@@ -13,9 +16,35 @@ doctrine:
                     "TrustServerCertificate": true
                     "Encrypt": false
             
-            # Connexion vers l'ancienne base de données pour la migration
+            # ==================================================
+            # CONNEXION LEGACY 1 - ## SQL SERVER - 192.168.0.28
+            # ==================================================
             legacy:
                 url: '%env(resolve:DATABASE_LEGACY_URL)%'
+                driver: 'pdo_sqlsrv'
+                server_version: '15.0'
+                charset: UTF-8
+                options:
+                    "TrustServerCertificate": true
+                    "Encrypt": false
+
+            # ==================================================
+            # CONNEXION LEGACY 2 - ## SQL SERVER - 192.168.0.26 - HFF
+            # ==================================================
+            legacy_hff:
+                url: '%env(resolve:DATABASE_LEGACY_HFF_URL)%'
+                driver: 'pdo_sqlsrv'
+                server_version: '15.0'
+                charset: UTF-8
+                options:
+                    "TrustServerCertificate": true
+                    "Encrypt": false
+
+            # ==================================================
+            # CONNEXION LEGACY 3 - ## SQL SERVER - 192.168.0.26 - AIRWAYS
+            # ==================================================
+            legacy_airways:
+                url: '%env(resolve:DATABASE_LEGACY_AIRWAYS_URL)%'
                 driver: 'pdo_sqlsrv'
                 server_version: '15.0'
                 charset: UTF-8

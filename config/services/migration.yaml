@@ -1,0 +1,26 @@
+services:
+  # Services de migration de données
+  App\Service\Migration\Hf\Rh\Dom\DomMigrationMapper:
+    arguments:
+      $logger: '@monolog.logger.migration_dom'
+
+  App\Service\Migration\Admin\PersonnelUser\PersonnelMigrationMapper:
+    arguments:
+      $logger: '@monolog.logger.migration_dom'
+
+  App\Command\Migration\MigrateDomDataCommand:
+    arguments:
+      $legacyConnection: '@doctrine.dbal.legacy_connection'
+      $mapper: '@App\Service\Migration\Hf\Rh\Dom\DomMigrationMapper'
+      $migrationDomLogger: '@monolog.logger.migration_dom'
+    tags:
+      - { name: 'console.command' }
+
+  App\Command\Migration\MigratePersonnelDataCommand:
+    arguments:
+      $legacyHffConnection: '@doctrine.dbal.legacy_hff_connection'
+      $legacyAirwaysConnection: '@doctrine.dbal.legacy_airways_connection'
+      $mapper: '@App\Service\Migration\Admin\PersonnelUser\PersonnelMigrationMapper'
+      $migrationLogger: '@monolog.logger.migration_dom'
+    tags:
+      - { name: 'console.command' }

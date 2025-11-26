@@ -4,7 +4,6 @@ namespace App\Service\Migration\Hf\Rh\Dom;
 
 use Psr\Log\LoggerInterface;
 use App\Entity\Hf\Rh\Dom\Dom;
-use Doctrine\ORM\EntityManagerInterface;
 use App\Service\Migration\Utils\DateTimeConverter;
 use App\Service\Migration\Utils\EntityRelationMapper;
 
@@ -13,18 +12,16 @@ use App\Service\Migration\Utils\EntityRelationMapper;
  */
 class DomMigrationMapper
 {
-    private EntityManagerInterface $em;
+
     private EntityRelationMapper $relationMapper;
     private DateTimeConverter $dateTimeConverter;
     private LoggerInterface $logger;
 
     public function __construct(
-        EntityManagerInterface $em,
         EntityRelationMapper $relationMapper,
         DateTimeConverter $dateTimeConverter,
         LoggerInterface $logger
     ) {
-        $this->em = $em;
         $this->relationMapper = $relationMapper;
         $this->dateTimeConverter = $dateTimeConverter;
         $this->logger = $logger;

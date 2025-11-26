@@ -2,8 +2,8 @@
 
 namespace App\Command\Migration;
 
-use App\Entity\Hf\Rh\Dom\Dom;
-use App\Service\Migration\Hf\Rh\Dom\DomMigrationMapper;
+use App\Entity\Admin\PersonnelUser\Personnel;
+use App\Service\Migration\Admin\PersonnelUser\PersonnelMigrationMapper;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -15,29 +15,32 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Commande de migration des données DOM depuis l'ancienne base de données
+ * Commande de migration des données Personnel depuis l'ancienne base de données
  */
-class MigrateDomDataCommand extends Command
+class MigratePersonnelDataCommand extends Command
 {
-    protected static $defaultName = 'app:migrate:dom-data';
-    protected static $defaultDescription = 'Migre les données DOM de l\'ancienne base vers la nouvelle structure';
+    protected static $defaultName = 'app:migrate:personnel-data';
+    protected static $defaultDescription = 'Migre les données Personnel de l\'ancienne base vers la nouvelle structure';
 
     private EntityManagerInterface $em;
-    private Connection $legacyConnection;
-    private DomMigrationMapper $mapper;
+    private Connection $legacyHffConnection;
+    private Connection $legacyAirwaysConnection;
+    private PersonnelMigrationMapper $mapper;
     private LoggerInterface $logger;
 
     public function __construct(
         EntityManagerInterface $em,
-        Connection $legacyConnection,
-        DomMigrationMapper $mapper,
-        LoggerInterface $migrationDomLogger
+        Connection $legacyHffConnection,
+        Connection $legacyAirwaysConnection,
+        PersonnelMigrationMapper $mapper,
+        LoggerInterface $migrationLogger
     ) {
         parent::__construct();
         $this->em = $em;
-        $this->legacyConnection = $legacyConnection;
+        $this->legacyHffConnection = $legacyHffConnection;
+        $this->legacyAirwaysConnection = $legacyAirwaysConnection;
         $this->mapper = $mapper;
-        $this->logger = $migrationDomLogger;
+        $this->logger = $migrationLogger;
     }
 
     protected function configure(): void
@@ -49,24 +52,29 @@ class MigrateDomDataCommand extends Command
                 'b',
                 InputOption::VALUE_REQUIRED,
                 'Nombre d\'enregistrements à traiter par lot',
-                50  // Réduit pour éviter les problèmes de mémoire
-            )->addOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Nombre maximum d\'enregistrements à migrer (pour test)', null)
+                50
+            )
+            ->addOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Nombre maximum d\'enregistrements à migrer (pour test)', null)
             ->addOption('offset', 'o', InputOption::VALUE_REQUIRED, 'Décalage de départ (pour reprendre une migration)', 0)
+            ->addOption('update', 'u', InputOption::VALUE_NONE, 'Met à jour les enregistrements existants au lieu de les ignorer')
             ->setHelp(
                 <<<'HELP'
-Cette commande migre les données de la table Demande_ordre_mission de l'ancienne base de données
-vers la nouvelle structure de l'entité Dom.
+Cette commande migre les données de la table personnels de l'ancienne base de données
+vers la nouvelle structure de l'entité Personnel.
 
 Exemples d'utilisation:
 
   # Test avec 10 enregistrements en mode dry-run
-  php bin/console app:migrate:dom-data --dry-run --limit=10
+  php bin/console app:migrate:personnel-data --dry-run --limit=10
 
   # Migration complète avec lots de 50
-  php bin/console app:migrate:dom-data --batch-size=50
+  php bin/console app:migrate:personnel-data --batch-size=50
 
   # Reprendre une migration à partir de l'enregistrement 1000
-  php bin/console app:migrate:dom-data --offset=1000
+  php bin/console app:migrate:personnel-data --offset=1000
+
+  # Mettre à jour les enregistrements existants
+  php bin/console app:migrate:personnel-data --update
 HELP
             );
     }
@@ -78,17 +86,23 @@ HELP
         $batchSize = (int) $input->getOption('batch-size');
         $limit = $input->getOption('limit') ? (int) $input->getOption('limit') : null;
         $offset = (int) $input->getOption('offset');
+        $updateExisting = $input->getOption('update');
 
-        $io->title('Migration des données DOM');
+        $io->title('Migration des données Personnel');
 
         if ($dryRun) {
             $io->warning('Mode DRY-RUN activé - Aucune donnée ne sera persistée');
+        }
+
+        if ($updateExisting) {
+            $io->note('Mode UPDATE activé - Les enregistrements existants seront mis à jour');
         }
 
         // Statistiques
         $stats = [
             'total' => 0,
             'success' => 0,
+            'updated' => 0,
             'errors' => 0,
             'skipped' => 0,
         ];
@@ -124,27 +138,46 @@ HELP
                     $stats['total']++;
 
                     try {
-                        // Mappe les données
-                        $dom = $this->mapper->mapOldToNew($legacyData);
+                        // Vérifie si le personnel existe déjà (par matricule)
+                        $existingPersonnel = $this->mapper->findExistingByMatricule($legacyData['matricule'] ?? null);
 
-                        if ($dom === null) {
+                        if ($existingPersonnel && !$updateExisting) {
                             $stats['skipped']++;
-                            $this->logger->warning('Enregistrement ignoré (mapping failed)', [
-                                'old_id' => $legacyData['ID_Demande_Ordre_Mission'] ?? 'unknown',
+                            $this->logger->info('Personnel déjà existant (ignoré)', [
+                                'matricule' => $legacyData['matricule'] ?? 'N/A',
                             ]);
+                            $progressBar->advance();
                             continue;
+                        }
+
+                        if ($existingPersonnel && $updateExisting) {
+                            // Mise à jour
+                            $personnel = $this->mapper->updateExisting($existingPersonnel, $legacyData);
+                            $stats['updated']++;
+                        } else {
+                            // Création
+                            $personnel = $this->mapper->mapOldToNew($legacyData);
+
+                            if ($personnel === null) {
+                                $stats['skipped']++;
+                                $this->logger->warning('Enregistrement ignoré (mapping failed)', [
+                                    'old_id' => $legacyData['id'] ?? 'unknown',
+                                ]);
+                                $progressBar->advance();
+                                continue;
+                            }
                         }
 
                         // Persiste si pas en mode dry-run
                         if (!$dryRun) {
-                            $this->em->persist($dom);
+                            $this->em->persist($personnel);
                         }
 
                         $stats['success']++;
                     } catch (\Exception $e) {
                         $stats['errors']++;
                         $this->logger->error('Erreur lors de la migration d\'un enregistrement', [
-                            'old_id' => $legacyData['ID_Demande_Ordre_Mission'] ?? 'unknown',
+                            'old_id' => $legacyData['id'] ?? 'unknown',
                             'error' => $e->getMessage(),
                             'trace' => $e->getTraceAsString(),
                         ]);
@@ -181,7 +214,7 @@ HELP
             return Command::SUCCESS;
         } catch (\Exception $e) {
             $io->error('Erreur fatale lors de la migration: ' . $e->getMessage());
-            $this->logger->critical('Erreur fatale lors de la migration DOM', [
+            $this->logger->critical('Erreur fatale lors de la migration Personnel', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
@@ -194,14 +227,26 @@ HELP
      */
     private function countLegacyRecords(?int $limit, int $offset): int
     {
-        $sql = 'SELECT COUNT(*) as total FROM Demande_ordre_mission';
+        $finDuMois = new \DateTime('last day of this month');
+
+        $sqlHff = "SELECT COUNT(*) as total FROM DP_SALARIE
+            where DP_SALARIE.FILTRE ='PRESENTS/ACTIFS'
+            and  CONVERT(VARCHAR(12),DATEDEPAIE, 23) = $finDuMois";
+        $sqlAirways = "SELECT COUNT(*) as total FROM DP_SALARIE
+            where DP_SALARIE.FILTRE ='PRESENTS/ACTIFS'
+            and  CONVERT(VARCHAR(12),DATEDEPAIE, 23) = $finDuMois";
+
+
 
         if ($limit !== null) {
-            // Note: SQL Server ne supporte pas LIMIT directement
-            return min($limit, (int) $this->legacyConnection->fetchOne($sql));
+            $nombreHff = $this->legacyHffConnection->fetchOne($sqlHff);
+            $nombreAirways = $this->legacyAirwaysConnection->fetchOne($sqlAirways);
+            return min($limit, (int) $nombreHff + (int) $nombreAirways);
         }
 
-        return (int) $this->legacyConnection->fetchOne($sql);
+        $nombreHff = $this->legacyHffConnection->fetchOne($sqlHff);
+        $nombreAirways = $this->legacyAirwaysConnection->fetchOne($sqlAirways);
+        return (int) $nombreHff + (int) $nombreAirways;
     }
 
     /**
@@ -212,13 +257,13 @@ HELP
         // SQL Server utilise OFFSET/FETCH au lieu de LIMIT
         $sql = <<<SQL
             SELECT *
-            FROM Demande_ordre_mission
-            ORDER BY ID_Demande_Ordre_Mission
+            FROM personnels
+            ORDER BY id
             OFFSET :offset ROWS
             FETCH NEXT :limit ROWS ONLY
         SQL;
 
-        return $this->legacyConnection->fetchAllAssociative($sql, [
+        return $this->legacyHffConnection->fetchAllAssociative($sql, [
             'offset' => $offset,
             'limit' => $limit,
         ]);
@@ -233,7 +278,8 @@ HELP
 
         $tableData = [
             ['Total traité', $stats['total']],
-            ['Succès', sprintf('<fg=green>%d</>', $stats['success'])],
+            ['Succès (nouveaux)', sprintf('<fg=green>%d</>', $stats['success'] - $stats['updated'])],
+            ['Mis à jour', sprintf('<fg=blue>%d</>', $stats['updated'])],
             ['Erreurs', $stats['errors'] > 0 ? sprintf('<fg=red>%d</>', $stats['errors']) : '0'],
             ['Ignorés', $stats['skipped'] > 0 ? sprintf('<fg=yellow>%d</>', $stats['skipped']) : '0'],
         ];

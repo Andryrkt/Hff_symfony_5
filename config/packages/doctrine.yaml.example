@@ -1,0 +1,149 @@
+# ============================================
+# EXEMPLE DE CONFIGURATION DOCTRINE
+# Connexions multiples vers bases SQL Server
+# ============================================
+#
+# Ce fichier montre comment configurer doctrine.yaml
+# pour gérer plusieurs connexions vers différentes bases de données.
+#
+# Ajoutez ces configurations dans votre fichier:
+# config/packages/doctrine.yaml
+
+doctrine:
+    dbal:
+        # Connexion par défaut (base principale de l'application)
+        default_connection: default
+        
+        connections:
+            # ========================================
+            # CONNEXION PRINCIPALE (Application)
+            # ========================================
+            default:
+                url: '%env(resolve:DATABASE_URL)%'
+                driver: 'pdo_sqlsrv'
+                server_version: '15.0'
+                charset: UTF-8
+                use_savepoints: true
+                options:
+                    "TrustServerCertificate": true
+                    "Encrypt": false
+            
+            # ========================================
+            # CONNEXION LEGACY 1 - DOM
+            # ========================================
+            # Pour migrer les données de Demande_ordre_mission
+            legacy:
+                url: '%env(resolve:DATABASE_LEGACY_URL)%'
+                driver: 'pdo_sqlsrv'
+                server_version: '15.0'
+                charset: UTF-8
+                options:
+                    "TrustServerCertificate": true
+                    "Encrypt": false
+            
+            # ========================================
+            # CONNEXION LEGACY 2 - PERSONNEL
+            # ========================================
+            # Pour migrer les données de personnels
+            legacy_personnel:
+                url: '%env(resolve:DATABASE_LEGACY_PERSONNEL_URL)%'
+                driver: 'pdo_sqlsrv'
+                server_version: '15.0'
+                charset: UTF-8
+                options:
+                    "TrustServerCertificate": true
+                    "Encrypt": false
+            
+            # ========================================
+            # CONNEXION LEGACY 3 - AUTRES DONNÉES
+            # ========================================
+            # Pour migrer d'autres données (Agences, Services, etc.)
+            legacy_other:
+                url: '%env(resolve:DATABASE_LEGACY_OTHER_URL)%'
+                driver: 'pdo_sqlsrv'
+                server_version: '15.0'
+                charset: UTF-8
+                options:
+                    "TrustServerCertificate": true
+                    "Encrypt": false
+
+    orm:
+        auto_generate_proxy_classes: false
+        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
+        auto_mapping: true
+        mappings:
+            App:
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Entity'
+                prefix: 'App\Entity'
+                alias: App
+
+# ============================================
+# CONFIGURATION DES SERVICES
+# ============================================
+#
+# Dans config/services.yaml, configurez l'injection des connexions :
+
+# services:
+#     # Configuration pour MigrateDomDataCommand
+#     App\Command\Migration\MigrateDomDataCommand:
+#         arguments:
+#             $legacyConnection: '@doctrine.dbal.legacy_connection'
+#             $migrationDomLogger: '@monolog.logger.migration'
+#     
+#     # Configuration pour MigratePersonnelDataCommand
+#     App\Command\Migration\MigratePersonnelDataCommand:
+#         arguments:
+#             $legacyConnection: '@doctrine.dbal.legacy_personnel_connection'
+#             $migrationLogger: '@monolog.logger.migration'
+#     
+#     # Configuration pour les services de migration
+#     App\Service\Migration\Utils\LegacyDataFetcher:
+#         arguments:
+#             $legacyConnection: '@doctrine.dbal.legacy_connection'
+#     
+#     # Si vous avez besoin d'un LegacyDataFetcher pour Personnel
+#     App\Service\Migration\Utils\PersonnelLegacyDataFetcher:
+#         arguments:
+#             $legacyConnection: '@doctrine.dbal.legacy_personnel_connection'
+
+# ============================================
+# COMMANDES UTILES
+# ============================================
+#
+# Tester les connexions :
+# php bin/console dbal:run-sql "SELECT @@VERSION" --connection=default
+# php bin/console dbal:run-sql "SELECT @@VERSION" --connection=legacy
+# php bin/console dbal:run-sql "SELECT @@VERSION" --connection=legacy_personnel
+# php bin/console dbal:run-sql "SELECT @@VERSION" --connection=legacy_other
+#
+# Lister les connexions disponibles :
+# php bin/console debug:container --tag=doctrine.dbal.connection
+#
+# Tester une requête sur une table spécifique :
+# php bin/console dbal:run-sql "SELECT TOP 5 * FROM personnels" --connection=legacy_personnel
+# php bin/console dbal:run-sql "SELECT TOP 5 * FROM Demande_ordre_mission" --connection=legacy
+
+# ============================================
+# NOTES IMPORTANTES
+# ============================================
+#
+# 1. Nommage des services de connexion :
+#    - Connection 'default' → Service '@doctrine.dbal.default_connection'
+#    - Connection 'legacy' → Service '@doctrine.dbal.legacy_connection'
+#    - Connection 'legacy_personnel' → Service '@doctrine.dbal.legacy_personnel_connection'
+#    - Connection 'legacy_other' → Service '@doctrine.dbal.legacy_other_connection'
+#
+# 2. Si toutes vos tables sont dans la MÊME base :
+#    Vous pouvez utiliser la même connexion pour tout :
+#    - Supprimez legacy_personnel et legacy_other
+#    - Utilisez uniquement 'legacy' partout
+#    - Dans services.yaml, utilisez '@doctrine.dbal.legacy_connection' pour tous les services
+#
+# 3. Performance :
+#    - Utilisez use_savepoints: true pour de meilleures performances avec les transactions
+#    - Configurez des pools de connexions si nécessaire
+#
+# 4. Sécurité :
+#    - En production, utilisez des connexions en lecture seule pour les bases legacy
+#    - Limitez les permissions des utilisateurs SQL aux tables nécessaires
