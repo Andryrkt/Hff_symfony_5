@@ -244,4 +244,23 @@ class HomeCardService
         $cards = $this->getHomeCards();
         return $cards[$index] ?? null;
     }
+
+    public function getCardByName(string $name): ?HomeCard
+    {
+        $vignette = $this->vignetteRepository->findOneForHomeCard($name);
+
+        if (!$vignette || !$this->security->isGranted('APPLICATION_ACCESS', $vignette)) {
+            return null;
+        }
+
+        $cardData = $this->getCardData($vignette->getNom());
+
+        return new HomeCard(
+            $vignette->getNom(),
+            $vignette->getDescription() ?? '',
+            $cardData['icon'],
+            $cardData['color'],
+            $this->getLinksForVignette($vignette->getNom())
+        );
+    }
 }

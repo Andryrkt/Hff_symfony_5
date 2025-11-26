@@ -28,9 +28,9 @@ class HomeController extends AbstractController
     /**
      * @Route("/api/home/card/{id}", name="api_home_card", methods={"GET"})
      */
-    public function getCardContent(int $id, HomeCardService $homeCardService, UrlGeneratorInterface $urlGenerator): JsonResponse
+    public function getCardContent(string $id, HomeCardService $homeCardService, UrlGeneratorInterface $urlGenerator): JsonResponse
     {
-        $card = $homeCardService->getCardByIndex($id);
+        $card = $homeCardService->getCardByName($id);
 
         if (!$card) {
             return $this->json(['error' => 'Card not found'], 404);
