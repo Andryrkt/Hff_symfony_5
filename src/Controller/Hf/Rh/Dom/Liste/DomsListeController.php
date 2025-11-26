@@ -57,7 +57,7 @@ class DomsListeController extends AbstractController
             [
                 'paginationData' => $paginationData,
                 'form' => $form->createView(),
-                'agencesJson'   => $agenceSerializerService->serializeAllAgences(),
+                'agencesJson'   => $agenceSerializerService->serializeAgencesForDropdown(),
                 'routeName' => 'liste_dom_index',
                 'queryParams' => $request->query->all()
             ]

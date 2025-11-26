@@ -34,19 +34,19 @@ class Agence
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"agence:read", "service:read"})
+     * @Groups({"agence:read", "service:read", "agence:dropdown"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=10, unique=true)
-     * @Groups({"agence:read", "service:read"})
+     * @Groups({"agence:read", "service:read", "agence:dropdown"})
      */
     private $code;
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Groups({"agence:read", "service:read"})
+     * @Groups({"agence:read", "service:read", "agence:dropdown"})
      */
     private $nom;
 

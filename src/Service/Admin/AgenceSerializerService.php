@@ -36,6 +36,18 @@ class AgenceSerializerService
     }
 
     /**
+     * Sérialise toutes les agences au format JSON avec le groupe 'agence:read'.
+     * Utilise une requête optimisée (JOIN FETCH) pour inclure les services sans problème N+1.
+     *
+     * @return string JSON des agences
+     */
+    public function serializeAgencesForDropdown(): string
+    {
+        $agences = $this->agenceRepository->findAllWithServices();
+        return $this->serializer->serialize($agences, 'json', ['groups' => 'agence:read']);
+    }
+
+    /**
      * Sérialise toutes les agences au format JSON avec des groupes de sérialisation personnalisés
      *
      * @param array $groups Groupes de sérialisation à utiliser

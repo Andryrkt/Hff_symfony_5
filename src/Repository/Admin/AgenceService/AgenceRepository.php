@@ -39,6 +39,21 @@ class AgenceRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * Récupère toutes les agences avec leurs services pré-chargés (Eager Loading)
+     * pour éviter le problème N+1.
+     *
+     * @return Agence[]
+     */
+    public function findAllWithServices(): array
+    {
+        return $this->createQueryBuilder('a')
+            ->leftJoin('a.services', 's')
+            ->addSelect('s')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Agence[] Returns an array of Agence objects
     //     */

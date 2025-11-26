@@ -75,7 +75,7 @@ class DomSecondController extends AbstractController
         return $this->render('hf/rh/dom/creation/secondForm.html.twig', [
             'form'          => $form->createView(),
             'secondFormDto' => $form->getData(),
-            'agencesJson'   => $this->agenceSerializerService->serializeAllAgences(),
+            'agencesJson'   => $this->agenceSerializerService->serializeAgencesForDropdown(),
             'breadcrumbs'   => $breadcrumbBuilder->build('dom_second_form'),
         ]);
     }
