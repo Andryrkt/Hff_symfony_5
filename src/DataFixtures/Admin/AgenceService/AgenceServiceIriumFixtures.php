@@ -91,7 +91,7 @@ class AgenceServiceIriumFixtures extends Fixture implements DependentFixtureInte
             ['agence' => 'agence_energie_durable', 'service' => 'service_vat', 'code' => '91-VAT', 'societe' => 'HF', 'codeSage' => '', 'responsable' => ''],
             ['agence' => 'agence_energie_durable', 'service' => 'service_blk', 'code' => '91-BLK', 'societe' => 'HF', 'codeSage' => 'OD33', 'responsable' => ''],
             ['agence' => 'agence_energie_durable', 'service' => 'service_eng', 'code' => '91-ENG', 'societe' => 'HF', 'codeSage' => 'OD10', 'responsable' => ''],
-            ['agence' => 'agence_energie_durable', 'service' => 'service_slr', 'code' => '91-SLR', 'societe' => 'HF', 'codeSage' => '', 'responsable' => ''],
+            ['agence' => 'agence_energie_durable', 'service' => 'service_slr', 'code' => '91-SLR', 'societe' => 'HF', 'codeSage' => 'OD34', 'responsable' => ''],
 
             // energie jirama 92
             ['agence' => 'agence_energie_jirama', 'service' => 'service_mah', 'code' => '92-MAH', 'societe' => 'HF', 'codeSage' => 'TD11', 'responsable' => ''],

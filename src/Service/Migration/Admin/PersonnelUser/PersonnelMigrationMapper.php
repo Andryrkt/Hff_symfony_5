@@ -2,11 +2,10 @@
 
 namespace App\Service\Migration\Admin\PersonnelUser;
 
-use App\Entity\Admin\PersonnelUser\Personnel;
-use App\Entity\Admin\AgenceService\AgenceServiceIrium;
-use App\Service\Migration\Utils\DateTimeConverter;
-use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Admin\PersonnelUser\Personnel;
+use App\Service\Migration\Utils\EntityRelationMapper;
 
 /**
  * Service de mapping pour la migration des données Personnel
@@ -14,17 +13,17 @@ use Psr\Log\LoggerInterface;
 class PersonnelMigrationMapper
 {
     private EntityManagerInterface $em;
-    private DateTimeConverter $dateTimeConverter;
     private LoggerInterface $logger;
+    private EntityRelationMapper $relationMapper;
 
     public function __construct(
         EntityManagerInterface $em,
-        DateTimeConverter $dateTimeConverter,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        EntityRelationMapper $relationMapper
     ) {
         $this->em = $em;
-        $this->dateTimeConverter = $dateTimeConverter;
         $this->logger = $logger;
+        $this->relationMapper = $relationMapper;
     }
 
     /**
@@ -37,7 +36,7 @@ class PersonnelMigrationMapper
     {
         try {
             // Vérification des champs obligatoires
-            if (empty($oldData['nom']) || empty($oldData['prenoms'])) {
+            if (empty($oldData['Nom']) || empty($oldData['Prenoms'])) {
                 $this->logger->warning('Personnel ignoré : nom ou prénoms manquants', [
                     'old_id' => $oldData['id'] ?? 'unknown',
                     'data' => $oldData,
@@ -70,20 +69,20 @@ class PersonnelMigrationMapper
     private function mapSimpleFields(Personnel $personnel, array $oldData): void
     {
         // Champs obligatoires
-        $personnel->setNom($oldData['nom']);
-        $personnel->setPrenoms($oldData['prenoms']);
+        $personnel->setNom($oldData['Nom']);
+        $personnel->setPrenoms($oldData['Prenoms']);
 
         // Champs optionnels
-        if (isset($oldData['matricule'])) {
-            $personnel->setMatricule((int) $oldData['matricule']);
+        if (isset($oldData['Matricule'])) {
+            $personnel->setMatricule((int) $oldData['Matricule']);
         }
 
         if (isset($oldData['societe'])) {
             $personnel->setSociete($oldData['societe']);
         }
 
-        if (isset($oldData['numero_compte_bancaire'])) {
-            $personnel->setNumeroCompteBancaire($oldData['numero_compte_bancaire']);
+        if (isset($oldData['Numero_Compte_Bancaire'])) {
+            $personnel->setNumeroCompteBancaire($oldData['Numero_Compte_Bancaire']);
         }
     }
 
@@ -94,7 +93,8 @@ class PersonnelMigrationMapper
     {
         // Relation avec AgenceServiceIrium
         if (!empty($oldData['agence_service_irium_id'])) {
-            $agenceServiceIrium = $this->mapAgenceServiceIrium($oldData['agence_service_irium_id']);
+            $agenceServiceIrium = $this->relationMapper->mapAgenceServiceIrium($oldData['agence_service_irium_id']);
+
             if ($agenceServiceIrium) {
                 $personnel->setAgenceServiceIrium($agenceServiceIrium);
             }
@@ -104,21 +104,6 @@ class PersonnelMigrationMapper
         // car elle nécessite une migration spécifique des utilisateurs
     }
 
-    /**
-     * Mappe la relation AgenceServiceIrium
-     */
-    private function mapAgenceServiceIrium(int $id): ?AgenceServiceIrium
-    {
-        $agenceServiceIrium = $this->em->getRepository(AgenceServiceIrium::class)->find($id);
-
-        if (!$agenceServiceIrium) {
-            $this->logger->warning('AgenceServiceIrium non trouvé', [
-                'id' => $id,
-            ]);
-        }
-
-        return $agenceServiceIrium;
-    }
 
     /**
      * Trouve un Personnel existant par matricule pour éviter les doublons

@@ -11,6 +11,7 @@ use App\Entity\Admin\AgenceService\Agence;
 use App\Entity\Admin\Statut\StatutDemande;
 use App\Entity\Hf\Rh\Dom\SousTypeDocument;
 use App\Entity\Admin\AgenceService\Service;
+use App\Entity\Admin\AgenceService\AgenceServiceIrium;
 
 /**
  * Service dédié au mapping des relations entre entités
@@ -41,20 +42,15 @@ class EntityRelationMapper
             return null;
         }
 
-        // D'abord essayer par ID
-        $statut = $this->em->getRepository(StatutDemande::class)
-            ->find($oldData['ID_Statut_Demande']);
-
-        if (!$statut) {
-            $codeStatut = $this->legacyDataFetcher->getStatutDemandeCode($oldData['ID_Statut_Demande']);
-            if ($codeStatut) {
-                $statut = $this->em->getRepository(StatutDemande::class)
-                    ->findOneBy([
-                        'codeApplication' => 'DOM',
-                        'codeStatut' => $codeStatut
-                    ]);
-            }
+        $codeStatut = $this->legacyDataFetcher->getStatutDemandeCode($oldData['ID_Statut_Demande']);
+        if ($codeStatut) {
+            $statut = $this->em->getRepository(StatutDemande::class)
+                ->findOneBy([
+                    'codeApplication' => 'DOM',
+                    'codeStatut' => $codeStatut
+                ]);
         }
+
 
         if (!$statut) {
             $this->logger->warning('StatutDemande non trouvé', [
@@ -76,18 +72,13 @@ class EntityRelationMapper
             return null;
         }
 
-        // D'abord essayer par ID
-        $sousType = $this->em->getRepository(SousTypeDocument::class)
-            ->find($oldData['Sous_Type_Document']);
-
-        // Si pas trouvé, récupérer le code depuis l'ancienne base
-        if (!$sousType) {
-            $codeSousType = $this->legacyDataFetcher->getSousTypeDocumentCode($oldData['Sous_Type_Document']);
-            if ($codeSousType) {
-                $sousType = $this->em->getRepository(SousTypeDocument::class)
-                    ->findOneBy(['codeSousType' => $codeSousType]);
-            }
+        // récupérer le code depuis l'ancienne base
+        $codeSousType = $this->legacyDataFetcher->getSousTypeDocumentCode($oldData['Sous_Type_Document']);
+        if ($codeSousType) {
+            $sousType = $this->em->getRepository(SousTypeDocument::class)
+                ->findOneBy(['codeSousType' => $codeSousType]);
         }
+
 
         if (!$sousType) {
             $this->logger->warning('SousTypeDocument non trouvé', [
@@ -104,19 +95,14 @@ class EntityRelationMapper
      */
     public function mapSite(array $oldData): ?Site
     {
-        if (empty($oldData['site_id'])) {
+        if (empty($oldData['Site'])) { // il existe déjà le nomZone du site dans l'ancien table
             return null;
         }
 
-        // D'abord essayer par ID
-        $site = $this->em->getRepository(Site::class)
-            ->find($oldData['site_id']);
 
         // Si pas trouvé et qu'on a le champ Site (string), chercher par nomZone
-        if (!$site && !empty($oldData['Site'])) {
-            $site = $this->em->getRepository(Site::class)
-                ->findOneBy(['nomZone' => $oldData['Site']]);
-        }
+        $site = $this->em->getRepository(Site::class)
+            ->findOneBy(['nomZone' => $oldData['Site']]);
 
         if (!$site) {
             $this->logger->warning('Site non trouvé', [
@@ -134,19 +120,14 @@ class EntityRelationMapper
      */
     public function mapCategorie(array $oldData): ?Categorie
     {
-        if (empty($oldData['category_id'])) {
+        if (empty($oldData['Categorie'])) { // il existe déjà le descritpion du categorie dans l'ancien table
             return null;
         }
 
-        // D'abord essayer par ID
-        $categorie = $this->em->getRepository(Categorie::class)
-            ->find($oldData['category_id']);
 
         // Si pas trouvé et qu'on a le champ Categorie (string), chercher par description
-        if (!$categorie && !empty($oldData['Categorie'])) {
-            $categorie = $this->em->getRepository(Categorie::class)
-                ->findOneBy(['description' => $oldData['Categorie']]);
-        }
+        $categorie = $this->em->getRepository(Categorie::class)
+            ->findOneBy(['description' => $oldData['Categorie']]);
 
         if (!$categorie) {
             $this->logger->warning('Categorie non trouvée', [
@@ -164,16 +145,13 @@ class EntityRelationMapper
      */
     public function mapAgence(int $id): ?Agence
     {
-        $agence = $this->em->getRepository(Agence::class)->find($id);
-
         // Si pas trouvé, récupérer le code depuis l'ancienne base
-        if (!$agence) {
-            $codeAgence = $this->legacyDataFetcher->getAgenceCode($id);
-            if ($codeAgence) {
-                $agence = $this->em->getRepository(Agence::class)
-                    ->findOneBy(['code' => $codeAgence]);
-            }
+        $codeAgence = $this->legacyDataFetcher->getAgenceCode($id);
+        if ($codeAgence) {
+            $agence = $this->em->getRepository(Agence::class)
+                ->findOneBy(['code' => $codeAgence]);
         }
+
 
         if (!$agence) {
             $this->logger->warning('Agence non trouvée', ['id' => $id]);
@@ -186,39 +164,16 @@ class EntityRelationMapper
      * Mappe un Service
      * Stratégie : ID → Code (via legacy DB)
      */
-    public function mapService(int $id, bool $logDetails = false): ?Service
+    public function mapService(int $id): ?Service
     {
-        $service = $this->em->getRepository(Service::class)->find($id);
 
-        if ($service && $logDetails) {
-            $this->logger->info('Service trouvé par ID', [
-                'id' => $id,
-                'service_id' => $service->getId(),
-            ]);
+        $codeService = $this->legacyDataFetcher->getServiceCode($id);
+
+        if ($codeService) {
+            $service = $this->em->getRepository(Service::class)
+                ->findOneBy(['code' => $codeService]);
         }
 
-        if (!$service) {
-            $codeService = $this->legacyDataFetcher->getServiceCode($id);
-
-            if ($logDetails) {
-                $this->logger->info('Code service récupéré depuis legacy', [
-                    'id' => $id,
-                    'code_service' => $codeService,
-                ]);
-            }
-
-            if ($codeService) {
-                $service = $this->em->getRepository(Service::class)
-                    ->findOneBy(['code' => $codeService]);
-
-                if ($service && $logDetails) {
-                    $this->logger->info('Service trouvé par code', [
-                        'code_service' => $codeService,
-                        'service_id' => $service->getId(),
-                    ]);
-                }
-            }
-        }
 
         if (!$service) {
             $this->logger->warning('Service non trouvé', ['id' => $id]);
@@ -244,5 +199,25 @@ class EntityRelationMapper
         }
 
         return $user;
+    }
+
+    /**
+     * Mappe un agence service Irium
+     */
+    public function mapAgenceServiceIrium(int $id): ?AgenceServiceIrium
+    {
+        $agenceServiceIrium = null;
+        $codeAgenceService = $this->legacyDataFetcher->getCodeAgenceService($id);
+
+        if ($codeAgenceService) {
+            $agenceServiceIrium = $this->em->getRepository(AgenceServiceIrium::class)
+                ->findOneBy(['code' => $codeAgenceService]);
+        }
+
+        if (!$agenceServiceIrium) {
+            $this->logger->warning('agenceServiceIrium non trouvé', ['old_id' => $id]);
+        }
+
+        return $agenceServiceIrium;
     }
 }

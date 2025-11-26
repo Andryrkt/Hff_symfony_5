@@ -22,7 +22,7 @@ class LegacyDataFetcher
     }
 
     /**
-     * Récupère le code Statut depuis l'ancienne base
+     * Récupère le code Statut depuis l'ancienne base - Statut_demande
      */
     public function getStatutDemandeCode(int $id): ?string
     {
@@ -42,7 +42,7 @@ class LegacyDataFetcher
     }
 
     /**
-     * Récupère le code SousTypeDocument depuis l'ancienne base
+     * Récupère le code SousTypeDocument depuis l'ancienne base - Sous_type_document
      */
     public function getSousTypeDocumentCode(int $id): ?string
     {
@@ -62,7 +62,8 @@ class LegacyDataFetcher
     }
 
     /**
-     * Récupère le code Agence depuis l'ancienne base
+     * Récupère le code Agence depuis l'ancienne base - agences
+     * ex: 80
      */
     public function getAgenceCode(int $id): ?string
     {
@@ -82,7 +83,8 @@ class LegacyDataFetcher
     }
 
     /**
-     * Récupère le code Service depuis l'ancienne base
+     * Récupère le code Service depuis l'ancienne base - services
+     * ex: INF
      */
     public function getServiceCode(int $id): ?string
     {
@@ -96,6 +98,31 @@ class LegacyDataFetcher
             $this->logger->error('Erreur récupération code Service', [
                 'id' => $id,
                 'error' => $e->getMessage(),
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Récupère le code agence - code service depuis l'ancien base - Agence_Service_Irium
+     * ex: 80-INF
+     */
+    public function getCodeAgenceService(int $id): ?string
+    {
+        try {
+            $result = $this->legacyConnection->fetchAssociative(
+                "SELECT CONCAT_WS('-', agence_ips, service_ips) AS ag_serv 
+                FROM Agence_Service_Irium 
+                WHERE id = :id",
+                ['id' => $id]
+            );
+
+            return $result['ag_serv'] ?? null;
+        } catch (\Exception $e) {
+            $this->logger->error('Erreur lors de la récupération du code agence-service', [
+                'id' => $id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
             return null;
         }

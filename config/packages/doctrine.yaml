@@ -29,10 +29,10 @@ doctrine:
                     "Encrypt": false
 
             # ==================================================
-            # CONNEXION LEGACY 2 - ## SQL SERVER - 192.168.0.26 - HFF
+            # CONNEXION LEGACY 2 - ## SQL SERVER - SRV-SAGERH\\HFF26 - HFF
             # ==================================================
             legacy_hff:
-                url: '%env(resolve:DATABASE_LEGACY_HFF_URL)%'
+                url: '%env(resolve:DATABASE_LEGACY_PERSONNEL_HFF_URL)%'
                 driver: 'pdo_sqlsrv'
                 server_version: '15.0'
                 charset: UTF-8
@@ -41,10 +41,10 @@ doctrine:
                     "Encrypt": false
 
             # ==================================================
-            # CONNEXION LEGACY 3 - ## SQL SERVER - 192.168.0.26 - AIRWAYS
+            # CONNEXION LEGACY 3 - ## SQL SERVER - SRV-SAGERH\\HFF26 - AIRWAYS
             # ==================================================
             legacy_airways:
-                url: '%env(resolve:DATABASE_LEGACY_AIRWAYS_URL)%'
+                url: '%env(resolve:DATABASE_LEGACY_PERSONNEL_AIRWAYS_URL)%'
                 driver: 'pdo_sqlsrv'
                 server_version: '15.0'
                 charset: UTF-8

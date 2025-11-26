@@ -2,7 +2,7 @@
 
 namespace App\Command\Migration;
 
-use App\Entity\Admin\PersonnelUser\Personnel;
+
 use App\Service\Migration\Admin\PersonnelUser\PersonnelMigrationMapper;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,22 +23,19 @@ class MigratePersonnelDataCommand extends Command
     protected static $defaultDescription = 'Migre les données Personnel de l\'ancienne base vers la nouvelle structure';
 
     private EntityManagerInterface $em;
-    private Connection $legacyHffConnection;
-    private Connection $legacyAirwaysConnection;
+    private Connection $legacyConnection;
     private PersonnelMigrationMapper $mapper;
     private LoggerInterface $logger;
 
     public function __construct(
         EntityManagerInterface $em,
-        Connection $legacyHffConnection,
-        Connection $legacyAirwaysConnection,
+        Connection $legacyConnection,
         PersonnelMigrationMapper $mapper,
         LoggerInterface $migrationLogger
     ) {
         parent::__construct();
         $this->em = $em;
-        $this->legacyHffConnection = $legacyHffConnection;
-        $this->legacyAirwaysConnection = $legacyAirwaysConnection;
+        $this->legacyConnection = $legacyConnection;
         $this->mapper = $mapper;
         $this->logger = $migrationLogger;
     }
@@ -144,7 +141,7 @@ HELP
                         if ($existingPersonnel && !$updateExisting) {
                             $stats['skipped']++;
                             $this->logger->info('Personnel déjà existant (ignoré)', [
-                                'matricule' => $legacyData['matricule'] ?? 'N/A',
+                                'matricule' => $legacyData['Matricule'] ?? 'N/A',
                             ]);
                             $progressBar->advance();
                             continue;
@@ -227,47 +224,44 @@ HELP
      */
     private function countLegacyRecords(?int $limit, int $offset): int
     {
-        $finDuMois = new \DateTime('last day of this month');
-
-        $sqlHff = "SELECT COUNT(*) as total FROM DP_SALARIE
-            where DP_SALARIE.FILTRE ='PRESENTS/ACTIFS'
-            and  CONVERT(VARCHAR(12),DATEDEPAIE, 23) = $finDuMois";
-        $sqlAirways = "SELECT COUNT(*) as total FROM DP_SALARIE
-            where DP_SALARIE.FILTRE ='PRESENTS/ACTIFS'
-            and  CONVERT(VARCHAR(12),DATEDEPAIE, 23) = $finDuMois";
+        $sql = "SELECT COUNT(*) as total FROM Personnel";
 
 
 
         if ($limit !== null) {
-            $nombreHff = $this->legacyHffConnection->fetchOne($sqlHff);
-            $nombreAirways = $this->legacyAirwaysConnection->fetchOne($sqlAirways);
-            return min($limit, (int) $nombreHff + (int) $nombreAirways);
+            $nombre = $this->legacyConnection->fetchOne($sql);
+            return min($limit, (int) $nombre);
         }
 
-        $nombreHff = $this->legacyHffConnection->fetchOne($sqlHff);
-        $nombreAirways = $this->legacyAirwaysConnection->fetchOne($sqlAirways);
-        return (int) $nombreHff + (int) $nombreAirways;
+        $nombre = $this->legacyConnection->fetchOne($sql);
+        return (int) $nombre;
     }
 
     /**
-     * Récupère un lot d'enregistrements de l'ancienne base
+     * Récupère un lot d'enregistrements de l'ancienne base de données
+     * 
+     * @param int $limit Nombre maximum d'enregistrements à récupérer
+     * @param int $offset Position de départ pour la pagination
+     * @return array Tableau unique contenant tous les enregistrements fusionnés
+     * @throws \RuntimeException Si une erreur de base de données survient
      */
     private function fetchLegacyRecords(int $limit, int $offset): array
     {
-        // SQL Server utilise OFFSET/FETCH au lieu de LIMIT
         $sql = <<<SQL
-            SELECT *
-            FROM personnels
-            ORDER BY id
-            OFFSET :offset ROWS
-            FETCH NEXT :limit ROWS ONLY
+                SELECT *
+                FROM Personnel
+                ORDER BY id
+                OFFSET :offset ROWS
+                FETCH NEXT :limit ROWS ONLY
         SQL;
 
-        return $this->legacyHffConnection->fetchAllAssociative($sql, [
+        $parameters = [
             'offset' => $offset,
             'limit' => $limit,
-        ]);
+        ];
+        return  $this->legacyConnection->fetchAllAssociative($sql, $parameters);
     }
+
 
     /**
      * Affiche les statistiques de migration
