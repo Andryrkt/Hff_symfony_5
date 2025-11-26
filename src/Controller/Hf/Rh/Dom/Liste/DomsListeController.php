@@ -49,7 +49,7 @@ class DomsListeController extends AbstractController
 
         // 4. recupération des données à afficher avec filtrage par agence
         $page = $request->query->getInt('page', 1);
-        $limit = 10;
+        $limit = 50;
         $paginationData = $domRepository->findPaginatedAndFiltered($page, $limit, $domSearchDto, $agenceIdsAutorises);
 
         return $this->render(

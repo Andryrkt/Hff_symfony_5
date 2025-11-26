@@ -103,6 +103,14 @@ services:
         $notifier: '@notifier'
         $adminEmail: '%env(ADMIN_EMAIL)%'
 
+  # Configuration explicite pour AgenceSerializerService
+  App\Service\Admin\AgenceSerializerService:
+    arguments:
+      $agenceRepository: '@App\Repository\Admin\AgenceService\AgenceRepository'
+      $serializer: '@serializer'
+      $cache: '@cache.app'
+      $logger: '@monolog.logger'
+
   # Listener pour définir automatiquement createdBy lors de la création d'entités
   App\EventListener\CreatedByListener:
     tags:

@@ -48,10 +48,18 @@ class SecondFormDtoFactory
         }
 
         if ($firstFormDto->typeMission) {
-            $firstFormDto->typeMission = $this->em->merge($firstFormDto->typeMission);
+            // Réattacher l'entité au contexte Doctrine si elle est détachée (vient de la session)
+            $firstFormDto->typeMission = $this->em->find(
+                SousTypeDocument::class,
+                $firstFormDto->typeMission->getId()
+            );
         }
         if ($firstFormDto->categorie) {
-            $firstFormDto->categorie = $this->em->merge($firstFormDto->categorie);
+            // Réattacher l'entité au contexte Doctrine si elle est détachée (vient de la session)
+            $firstFormDto->categorie = $this->em->find(
+                get_class($firstFormDto->categorie),
+                $firstFormDto->categorie->getId()
+            );
         }
 
         $dto->dateDemande = new DateTime('now');

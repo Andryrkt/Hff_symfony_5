@@ -15,6 +15,7 @@ use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Service\Historique_operation\HistoriqueOperationService;
 use App\Service\Admin\AgenceSerializerService;
+use App\Service\Debug\PerformanceDiagnosticService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
@@ -27,19 +28,22 @@ class DomSecondController extends AbstractController
     private DomCreationHandler $domCreationHandler;
     private HistoriqueOperationService $historiqueOperationService;
     private AgenceSerializerService $agenceSerializerService;
+    private PerformanceDiagnosticService $performanceDiagnostic;
 
     public function __construct(
         SecondFormDtoFactory $secondFormDtoFactory,
         LoggerInterface $domSecondFormLogger,
         DomCreationHandler $domCreationHandler,
         HistoriqueOperationService $historiqueOperationService,
-        AgenceSerializerService $agenceSerializerService
+        AgenceSerializerService $agenceSerializerService,
+        PerformanceDiagnosticService $performanceDiagnostic
     ) {
         $this->secondFormDtoFactory = $secondFormDtoFactory;
         $this->logger = $domSecondFormLogger;
         $this->domCreationHandler = $domCreationHandler;
         $this->historiqueOperationService = $historiqueOperationService;
         $this->agenceSerializerService = $agenceSerializerService;
+        $this->performanceDiagnostic = $performanceDiagnostic;
     }
 
     /**
@@ -50,17 +54,34 @@ class DomSecondController extends AbstractController
         DomPdfService $pdfService,
         ContextAwareBreadcrumbBuilder $breadcrumbBuilder
     ) {
-        $this->logger->info('Affichage du second formulaire de création de DOM.');
+        // Démarrer le diagnostic de performance
+        $this->performanceDiagnostic->startTimer('TOTAL_PAGE_LOAD');
+        $this->logger->info('🚀 Début du chargement du second formulaire de DOM');
         //$this->denyAccessUnlessGranted('RH_ORDRE_MISSION_CREATE');
 
-        $firstFormDto = $this->getFirstFormDataFromSession($request->getSession());
+        // Mesure: Récupération des données de session
+        $firstFormDto = $this->performanceDiagnostic->measure(
+            'SESSION_RETRIEVE',
+            fn() => $this->getFirstFormDataFromSession($request->getSession())
+        );
+
         if ($firstFormDto instanceof RedirectResponse) {
             $this->logger->warning('Données du premier formulaire non trouvées en session.');
             return $firstFormDto;
         }
 
-        $secondFormDto = $this->secondFormDtoFactory->create($firstFormDto);
-        $form = $this->createForm(SecondFormType::class, $secondFormDto);
+        // Mesure: Création du SecondFormDto
+        $secondFormDto = $this->performanceDiagnostic->measure(
+            'DTO_FACTORY_CREATE',
+            fn() => $this->secondFormDtoFactory->create($firstFormDto)
+        );
+
+        // Mesure: Création du formulaire Symfony
+        $form = $this->performanceDiagnostic->measure(
+            'FORM_CREATE',
+            fn() => $this->createForm(SecondFormType::class, $secondFormDto)
+        );
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -72,11 +93,34 @@ class DomSecondController extends AbstractController
             }
         }
 
+        // Mesure: Sérialisation des agences
+        $agencesJson = $this->performanceDiagnostic->measure(
+            'AGENCES_SERIALIZATION',
+            fn() => $this->agenceSerializerService->serializeAgencesForDropdown()
+        );
+
+        // Mesure: Construction du breadcrumb
+        $breadcrumbs = $this->performanceDiagnostic->measure(
+            'BREADCRUMB_BUILD',
+            fn() => $breadcrumbBuilder->build('dom_second_form')
+        );
+
+        // Mesure: Création de la vue du formulaire
+        $this->performanceDiagnostic->startTimer('FORM_CREATE_VIEW');
+        $formView = $form->createView();
+        $this->performanceDiagnostic->stopTimer('FORM_CREATE_VIEW');
+
+        // Arrêter le timer total et logger le résumé
+        $this->performanceDiagnostic->stopTimer('TOTAL_PAGE_LOAD');
+        $this->performanceDiagnostic->logSummary();
+
+        $this->logger->info('✅ Fin du chargement du second formulaire de DOM');
+
         return $this->render('hf/rh/dom/creation/secondForm.html.twig', [
-            'form'          => $form->createView(),
+            'form'          => $formView,
             'secondFormDto' => $form->getData(),
-            'agencesJson'   => $this->agenceSerializerService->serializeAgencesForDropdown(),
-            'breadcrumbs'   => $breadcrumbBuilder->build('dom_second_form'),
+            'agencesJson'   => $agencesJson,
+            'breadcrumbs'   => $breadcrumbs,
         ]);
     }
 
