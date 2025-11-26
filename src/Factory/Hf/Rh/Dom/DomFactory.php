@@ -2,6 +2,7 @@
 
 namespace App\Factory\Hf\Rh\Dom;
 
+use App\Constants\Admin\Historisation\TypeDocumentConstants;
 use App\Dto\Hf\Rh\Dom\SecondFormDto;
 use App\Entity\Hf\Rh\Dom\Dom;
 use App\Repository\Admin\AgenceService\AgenceRepository;
@@ -34,7 +35,7 @@ class DomFactory
         $dom = new Dom();
         /** @var User $user */
         $user = $this->security->getUser();
-        $statut = $this->statutDemandeRepository->findOneBy(['codeApplication' => Dom::CODE_APPLICATION, 'description' => 'OUVERT']);
+        $statut = $this->statutDemandeRepository->findOneBy(['codeApplication' => TypeDocumentConstants::TYPE_DOCUMENT_DOM_CODE, 'description' => 'OUVERT']);
         $numTel = $secondFormDto->modePayement === "MOBILE MONEY" ? $secondFormDto->mode : null;
         $matricule = $secondFormDto->salarier === "TEMPORAIRE" ? $secondFormDto->cin : $secondFormDto->matricule;
         $agenceEmetteur = $user->getAgenceUser();
@@ -46,7 +47,7 @@ class DomFactory
 
 
         $dom->setDateDemande($secondFormDto->dateDemande);
-        $dom->setNumeroOrdreMission($this->numeroGeneratorService->autoGenerateNumero(Dom::CODE_APPLICATION, true));
+        $dom->setNumeroOrdreMission($this->numeroGeneratorService->autoGenerateNumero(TypeDocumentConstants::TYPE_DOCUMENT_DOM_CODE, true));
         $dom->setMatricule($matricule);
         $dom->setNomSessionUtilisateur($user->getUserIdentifier());
         //Date debut et fin mission / et nombre de jour

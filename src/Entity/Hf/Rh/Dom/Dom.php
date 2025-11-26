@@ -13,10 +13,22 @@ use App\Entity\Hf\Rh\Dom\SousTypeDocument;
 use App\Contract\Entity\CreatedByInterface;
 use App\Repository\Hf\Rh\Dom\DomRepository;
 use App\Contract\Entity\AgenceServiceInterface;
+use App\Constants\Hf\Rh\Dom\StatutDomConstants;
+
 
 /**
  * @ORM\Entity(repositoryClass=DomRepository::class)
- * @ORM\Table(name="Demande_ordre_mission")
+ * @ORM\Table(
+ *     name="Demande_ordre_mission",
+ *     indexes={
+ *         @ORM\Index(name="idx_numero_ordre_mission", columns={"numero_ordre_mission"}),
+ *         @ORM\Index(name="idx_matricule", columns={"matricule"}),
+ *         @ORM\Index(name="idx_date_demande", columns={"date_demande"}),
+ *         @ORM\Index(name="idx_date_debut", columns={"date_debut"}),
+ *         @ORM\Index(name="idx_agence_emetteur", columns={"agence_emetteur_id"}),
+ *         @ORM\Index(name="idx_statut_agence", columns={"id_statut_demande_id", "agence_emetteur_id"})
+ *     }
+ * )
  * @ORM\HasLifecycleCallbacks
  */
 class Dom implements CreatedByInterface, AgenceServiceInterface
@@ -24,8 +36,6 @@ class Dom implements CreatedByInterface, AgenceServiceInterface
     use TimestampableTrait;
     use AgenceServiceTrait;
     use CreatedByTrait;
-
-    public const CODE_APPLICATION = 'DOM';
 
     /**
      * @ORM\Id
@@ -247,7 +257,7 @@ class Dom implements CreatedByInterface, AgenceServiceInterface
     /**
      * @ORM\Column(type="boolean", nullable=true)
      */
-    private $pieceJustificatif; // TODO: à verifier
+    private $pieceJustificatif = false;
 
     /**
      * @ORM\ManyToOne(targetEntity=StatutDemande::class, inversedBy="doms")
@@ -843,5 +853,37 @@ class Dom implements CreatedByInterface, AgenceServiceInterface
         $this->categoryId = $categoryId;
 
         return $this;
+    }
+
+    /**
+     * Retourne la classe CSS appropriée pour le statut de la demande
+     * Utilise StatutDomConstants pour centraliser la logique
+     * 
+     * @return string
+     */
+    public function getStatutCssClass(): string
+    {
+        if (!$this->idStatutDemande) {
+            return '';
+        }
+
+        $description = trim($this->idStatutDemande->getDescription());
+        return StatutDomConstants::getCssClass($description);
+    }
+
+    /**
+     * Retourne le style CSS inline pour le statut de la demande
+     * Utilise StatutDomConstants pour centraliser la logique
+     * 
+     * @return string
+     */
+    public function getStatutCssStyle(): string
+    {
+        if (!$this->idStatutDemande) {
+            return '';
+        }
+
+        $description = trim($this->idStatutDemande->getDescription());
+        return StatutDomConstants::getCssStyle($description);
     }
 }

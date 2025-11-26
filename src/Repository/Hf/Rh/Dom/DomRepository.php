@@ -97,27 +97,33 @@ class DomRepository extends ServiceEntityRepository
 
     public function findPaginatedAndFiltered(int $page = 1, int $limit = 10, DomSearchDto $domSearchDto, ?array $agenceIds = null)
     {
+        // Créer le QueryBuilder avec les jointures et chargement eager des relations
         $queryBuilder = $this->createQueryBuilder('d')
             ->leftJoin('d.sousTypeDocument', 'td')
-            ->leftJoin('d.idStatutDemande', 's');
+            ->addSelect('td')  // Évite le problème N+1
+            ->leftJoin('d.idStatutDemande', 's')
+            ->addSelect('s');  // Évite le problème N+1
 
-        // Filtrer par agences autorisées
+        // 1. Filtrer par agences autorisées (sécurité)
         $this->filtredAgenceService($queryBuilder, $agenceIds);
 
-        //exclude statut
+        // 2. Appliquer les filtres de recherche
+        $this->filtred($queryBuilder, $domSearchDto);
+        $this->filtredDate($queryBuilder, $domSearchDto);
+        $this->filtredStatut($queryBuilder, $domSearchDto);
 
-        // Ordre et pagination
+        // 3. Ordre et pagination
         $queryBuilder->orderBy('d.numeroOrdreMission', 'DESC')
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
 
-        // Pagination
+        // 4. Exécuter avec Paginator
         $paginator = new DoctrinePaginator($queryBuilder);
         $totalItems = count($paginator);
         $lastPage = ceil($totalItems / $limit);
 
         return [
-            'data'        => iterator_to_array($paginator->getIterator()), // Convertir en tableau si nécessaire
+            'data'        => iterator_to_array($paginator->getIterator()),
             'totalItems'  => $totalItems,
             'currentPage' => $page,
             'lastPage'    => $lastPage,
@@ -131,7 +137,7 @@ class DomRepository extends ServiceEntityRepository
             $queryBuilder->andWhere('s.description LIKE :statut')
                 ->setParameter('statut', '%' . $domSearchDto->statut . '%');
         } else {
-            $queryBuilder->andWhere('s.description LIKE :excludedStatuses')
+            $queryBuilder->andWhere('s.description NOT LIKE :excludedStatuses')
                 ->setParameter('excludedStatuses', 'ANNULE%');
         }
     }

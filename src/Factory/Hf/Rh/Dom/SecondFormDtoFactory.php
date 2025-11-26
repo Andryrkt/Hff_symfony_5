@@ -3,20 +3,21 @@
 namespace App\Factory\Hf\Rh\Dom;
 
 use DateTime;
+use App\Entity\Hf\Rh\Dom\Dom;
 use App\Entity\Hf\Rh\Dom\Rmq;
 use App\Entity\Hf\Rh\Dom\Site;
 use App\Dto\Hf\Rh\Dom\FirstFormDto;
 use App\Entity\Hf\Rh\Dom\Indemnite;
 use App\Dto\Hf\Rh\Dom\SecondFormDto;
-use App\Entity\Hf\Rh\Dom\SousTypeDocument;
 use App\Entity\Admin\PersonnelUser\User;
 use App\Service\Utils\FormattingService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Admin\AgenceService\Agence;
+use App\Entity\Hf\Rh\Dom\SousTypeDocument;
 use App\Entity\Admin\PersonnelUser\Personnel;
-use App\Entity\Hf\Rh\Dom\Dom;
 use App\Service\Utils\NumeroGeneratorService;
 use Symfony\Component\Security\Core\Security;
+use App\Constants\Admin\Historisation\TypeDocumentConstants;
 
 class SecondFormDtoFactory
 {
@@ -82,7 +83,7 @@ class SecondFormDtoFactory
         $dto->debiteur = ['agence' => $agence, 'service' => $service];
 
         // autres
-        $dto->numeroOrdreMission = $this->numeroGeneratorService->autoGenerateNumero(Dom::CODE_APPLICATION, true);
+        $dto->numeroOrdreMission = $this->numeroGeneratorService->autoGenerateNumero(TypeDocumentConstants::TYPE_DOCUMENT_DOM_CODE, true);
         $dto->mailUser = $user->getEmail();
 
         return $dto;

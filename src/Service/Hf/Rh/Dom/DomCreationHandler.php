@@ -93,7 +93,7 @@ class DomCreationHandler
             $this->historiqueOperationService->enregistrer(
                 $dom->getNumeroOrdreMission(),
                 TypeOperationConstants::TYPE_OPERATION_DB_SAVE_NAME,
-                TypeDocumentConstants::TYPE_DOCUMENT_DOM_NAME,
+                TypeDocumentConstants::TYPE_DOCUMENT_DOM_CODE,
                 $success,
                 $message
             );
@@ -124,7 +124,7 @@ class DomCreationHandler
             $this->historiqueOperationService->enregistrer(
                 $dom->getNumeroOrdreMission(),
                 TypeOperationConstants::TYPE_OPERATION_FILE_MERGE_NAME,
-                TypeDocumentConstants::TYPE_DOCUMENT_DOM_NAME,
+                TypeDocumentConstants::TYPE_DOCUMENT_DOM_CODE,
                 $success,
                 $message
             );
@@ -158,7 +158,7 @@ class DomCreationHandler
             $this->historiqueOperationService->enregistrer(
                 $dom->getNumeroOrdreMission(),
                 TypeOperationConstants::TYPE_OPERATION_DW_COPY_NAME,
-                TypeDocumentConstants::TYPE_DOCUMENT_DOM_NAME,
+                TypeDocumentConstants::TYPE_DOCUMENT_DOM_CODE,
                 $success,
                 $message
             );
@@ -203,7 +203,7 @@ class DomCreationHandler
             $this->historiqueOperationService->enregistrer(
                 $dom->getNumeroOrdreMission(),
                 TypeOperationConstants::TYPE_OPERATION_FILE_UPLOAD_NAME,
-                TypeDocumentConstants::TYPE_DOCUMENT_DOM_NAME,
+                TypeDocumentConstants::TYPE_DOCUMENT_DOM_CODE,
                 $success,
                 $message
             );

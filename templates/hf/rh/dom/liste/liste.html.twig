@@ -72,32 +72,6 @@
 			</thead>
 			<tbody>
 				{% for item in paginationData['data'] %}
-
-					{% set classeStatutDom = '' %}
-					{% set styleStatutDom = '' %}
-					{% set styleStatutDom = '' %}
-
-					{% if item.idStatutDemande.description | trim == 'OUVERT' %}
-						{% set classeStatutDom ='bg-warning bg-gradient text-center' %}
-					{% elseif item.idStatutDemande.description | trim == 'PAYE'  %}
-						{% set classeStatutDom ='bg-success bg-gradient' %}
-					{% elseif  item.idStatutDemande.description | trim == 'ATTENTE PAIEMENT' %}
-						{% set classeStatutDom ='bg-success' %}
-						{% set styleStatutDom = '--bs-bg-opacity: .5;' %}
-					{% elseif item.idStatutDemande.description | trim == 'CONTROLE SERVICE' %}
-						{% set classeStatutDom ='bg-info' %}
-					{% elseif item.idStatutDemande.description | trim == 'A VALIDER SERVICE EMETTEUR' %}
-						{% set classeStatutDom ='bg-primary' %}
-						{% set styleStatutDom = '--bs-bg-opacity: .5;' %}
-					{% elseif item.idStatutDemande.description | trim == 'VALIDE' or item.idStatutDemande.description | trim == 'VALIDE COMPTABILITE' or item.idStatutDemande.description | trim == 'VALIDATION RH' or item.idStatutDemande.description | trim == 'VALIDATION DG' %}
-						{% set classeStatutDom ='bg-success' %}
-					{% elseif item.idStatutDemande.description | trim == 'ANNULE CHEF DE SERVICE' or item.idStatutDemande.description | trim == 'ANNULE COMPTABILITE' or item.idStatutDemande.description | trim == 'ANNULE SECRETARIAT RH' or item.idStatutDemande.description | trim == 'ANNULE' %}
-						{% set classeStatutDom ='bg-danger' %}
-					{% else %}
-						{% set classeStatutDom = '' %}
-					{% endif %}
-
-
 					<tr>
 						{# Début Action #}
 						<td style="padding: 0px;" class="align-middle">
@@ -116,8 +90,10 @@
 						</td>
 						{# Fin Actions #}
 
-						{# >>>===== DEBUT Statut  =======#}
-						<td class="{{ classeStatutDom }}" style="{{ styleStatutDom }}">{{ item.idStatutDemande.description }}</td>
+						{# >>>===== DEBUT Statut  =======
+												   La logique CSS est maintenant gérée par les méthodes getStatutCssClass() et getStatutCssStyle() de l'entité Dom
+												#}
+						<td class="{{ item.statutCssClass }}" style="{{ item.statutCssStyle }}">{{ item.idStatutDemande.description }}</td>
 						{# <<<===== FIN Statut ==== #}
 						<td>{{ item.sousTypeDocument.codeSousType }}</td>
 						<td>

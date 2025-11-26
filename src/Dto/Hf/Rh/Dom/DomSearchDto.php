@@ -16,5 +16,5 @@ class DomSearchDto
 
     public ?array $debiteur = null;
     public ?array $emetteur = null;
-    public bool $pieceJustificatif;
+    public ?bool $pieceJustificatif = null;
 }
