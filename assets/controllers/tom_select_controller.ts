@@ -48,52 +48,20 @@ export default class extends Controller {
             return;
         }
 
+        // Initial setup
         this.updateGroupSelectionStates();
         this.addGroupHeaderClickListeners();
 
-        // Réattacher les événements pour les mises à jour
+        // Re-attach listeners and update state on changes
         this.tomSelect.on('change', () => {
             this.updateGroupSelectionStates();
         });
-    }
 
-    getOptGroups() {
-        // Récupérer les groupes depuis les optgroups du select original
-        const optgroups: any[] = [];
-        const originalOptgroups = (this.element as HTMLSelectElement).querySelectorAll('optgroup');
-        
-        originalOptgroups.forEach((optgroup, index) => {
-            optgroups.push({
-                id: optgroup.label || `group-${index}`,
-                label: optgroup.label
-            });
+        // Re-attach listeners when dropdown opens (in case of re-render)
+        this.tomSelect.on('dropdown_open', () => {
+            this.addGroupHeaderClickListeners();
+            this.updateGroupSelectionStates();
         });
-
-        return optgroups;
-    }
-
-    getOptions() {
-        // Récupérer les options depuis le select original
-        const options: any[] = [];
-        const originalOptions = (this.element as HTMLSelectElement).querySelectorAll('option');
-        
-        originalOptions.forEach((option) => {
-            if (option.value) {
-                const optgroup = option.closest('optgroup');
-                const optionData: any = {
-                    value: option.value,
-                    text: option.textContent || option.value
-                };
-
-                if (optgroup && optgroup.label) {
-                    optionData.group = optgroup.label;
-                }
-
-                options.push(optionData);
-            }
-        });
-
-        return options;
     }
 
     updateGroupSelectionStates() {
@@ -103,35 +71,34 @@ export default class extends Controller {
 
         const selectedItems = new Set(this.tomSelect.items);
         const dropdown = this.tomSelect.dropdown_content;
-
-        // Sélectionner tous les en-têtes de groupe
-        const groupHeaders = dropdown.querySelectorAll('.ts-dropdown-optgroup');
+        const groupHeaders = dropdown.querySelectorAll('.optgroup-header');
 
         groupHeaders.forEach((header) => {
-            const htmlHeader = header as HTMLElement; // Conversion en HTMLElement
-            const groupLabel = htmlHeader.textContent?.trim();
+            const htmlHeader = header as HTMLElement;
+            const groupLabel = htmlHeader.textContent?.trim().replace(/\s*\(\d+\/\d+\)$/, ''); // Remove existing count if any
             if (!groupLabel) return;
 
-            // Trouver toutes les options de ce groupe
+            // Find the parent optgroup div
+            const optgroup = htmlHeader.closest('.optgroup');
+            if (!optgroup) return;
+
+            // Find all options in this group
+            const options = optgroup.querySelectorAll('.option');
             const groupOptions: string[] = [];
-            const nextElement = htmlHeader.nextElementSibling;
             
-            if (nextElement && nextElement.classList.contains('ts-dropdown-optgroup-content')) {
-                const options = nextElement.querySelectorAll('.option');
-                options.forEach(option => {
-                    const value = option.getAttribute('data-value');
-                    if (value) {
-                        groupOptions.push(value);
-                    }
-                });
-            }
+            options.forEach(option => {
+                const value = option.getAttribute('data-value');
+                if (value) {
+                    groupOptions.push(value);
+                }
+            });
 
             const totalOptions = groupOptions.length;
             if (totalOptions === 0) return;
 
             const selectedInGroup = groupOptions.filter(opt => selectedItems.has(opt)).length;
 
-            // Mettre à jour les classes visuelles
+            // Update visual classes
             htmlHeader.classList.remove('fully-selected', 'partially-selected', 'no-selection');
 
             if (selectedInGroup === 0) {
@@ -142,14 +109,20 @@ export default class extends Controller {
                 htmlHeader.classList.add('partially-selected');
             }
 
-            // Ajouter un indicateur visuel
-            const countSpan = htmlHeader.querySelector('.selection-count') || document.createElement('span');
-            countSpan.className = 'selection-count';
-            countSpan.textContent = ` (${selectedInGroup}/${totalOptions})`;
-            
-            if (!htmlHeader.querySelector('.selection-count')) {
+            // Update count
+            // First, restore original text without count
+            const textNode = Array.from(htmlHeader.childNodes).find(node => node.nodeType === Node.TEXT_NODE);
+            if (textNode) {
+                textNode.textContent = groupLabel;
+            }
+
+            let countSpan = htmlHeader.querySelector('.selection-count');
+            if (!countSpan) {
+                countSpan = document.createElement('span');
+                countSpan.className = 'selection-count';
                 htmlHeader.appendChild(countSpan);
             }
+            countSpan.textContent = ` (${selectedInGroup}/${totalOptions})`;
         });
     }
 
@@ -159,38 +132,34 @@ export default class extends Controller {
         }
 
         const dropdown = this.tomSelect.dropdown_content;
-        const groupHeaders = dropdown.querySelectorAll('.ts-dropdown-optgroup');
+        const groupHeaders = dropdown.querySelectorAll('.optgroup-header');
 
         groupHeaders.forEach(header => {
-            const htmlHeader = header as HTMLElement; // Conversion en HTMLElement
+            const htmlHeader = header as HTMLElement;
             
-            // Éviter les doublons d'écouteurs
-            header.removeEventListener('click', this.onGroupHeaderClick.bind(this));
-            header.addEventListener('click', this.onGroupHeaderClick.bind(this));
+            // Remove existing listener to avoid duplicates
+            htmlHeader.removeEventListener('click', this.onGroupHeaderClick);
+            htmlHeader.addEventListener('click', this.onGroupHeaderClick);
             
-            // Style pour indiquer que c'est cliquable
             htmlHeader.style.cursor = 'pointer';
-            htmlHeader.style.fontWeight = 'bold';
+            htmlHeader.style.userSelect = 'none';
         });
     }
 
-    onGroupHeaderClick(event: Event) {
+    // Use arrow function to bind 'this' automatically
+    onGroupHeaderClick = (event: Event) => {
         if (!this.tomSelect) return;
 
-        const header = event.currentTarget as HTMLElement; // Déjà HTMLElement
-        const dropdown = this.tomSelect.dropdown_content;
-        
-        if (!dropdown) return;
+        event.preventDefault();
+        event.stopPropagation();
 
-        // Trouver le contenu du groupe suivant
-        const groupContent = header.nextElementSibling;
-        if (!groupContent || !groupContent.classList.contains('ts-dropdown-optgroup-content')) {
-            return;
-        }
+        const header = event.currentTarget as HTMLElement;
+        const optgroup = header.closest('.optgroup');
+        if (!optgroup) return;
 
-        // Récupérer toutes les valeurs du groupe
+        const options = optgroup.querySelectorAll('.option');
         const groupOptions: string[] = [];
-        const options = groupContent.querySelectorAll('.option');
+        
         options.forEach(option => {
             const value = option.getAttribute('data-value');
             if (value) {
@@ -203,23 +172,19 @@ export default class extends Controller {
         const selectedItems = new Set(this.tomSelect.items);
         const allSelected = groupOptions.every(opt => selectedItems.has(opt));
 
+        // Toggle selection
         if (allSelected) {
-            // Désélectionner tout le groupe
-            groupOptions.forEach(opt => {
-                this.tomSelect.removeItem(opt, true);
-            });
+            groupOptions.forEach(opt => this.tomSelect.removeItem(opt, true));
         } else {
-            // Sélectionner tout le groupe
             groupOptions.forEach(opt => {
                 if (!selectedItems.has(opt)) {
-                    this.tomSelect.addItem(opt);
+                    this.tomSelect.addItem(opt, true);
                 }
             });
         }
-
-        // Mettre à jour l'état visuel
-        setTimeout(() => {
-            this.updateGroupSelectionStates();
-        }, 50);
+        
+        // Refresh items once at the end to improve performance
+        this.tomSelect.refreshItems();
+        this.updateGroupSelectionStates();
     }
 }
