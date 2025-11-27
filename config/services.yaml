@@ -116,3 +116,14 @@ services:
     tags:
       - { name: doctrine.event_listener, event: prePersist }
 
+  App\Command\Delete\DeletePersonnelDataCommand:
+    bind:
+      $logger: '@monolog.logger.migration_personnel_delete'
+
+  App\Command\Delete\DeleteUserDataCommand:
+    bind:
+      $logger: '@monolog.logger.migration_user_delete'
+
+  App\Command\Delete\DeleteDomDataCommand:
+    bind:
+      $logger: '@monolog.logger.migration_dom_delete'

@@ -6,7 +6,11 @@ services:
 
   App\Service\Migration\Admin\PersonnelUser\PersonnelMigrationMapper:
     arguments:
-      $logger: '@monolog.logger.migration_dom'
+      $logger: '@monolog.logger.migration_personnel'
+
+  App\Service\Migration\Admin\PersonnelUser\UserMigrationMapper:
+    arguments:
+      $logger: '@monolog.logger.migration_user'
 
   App\Command\Migration\MigrateDomDataCommand:
     arguments:
@@ -22,6 +26,15 @@ services:
       $legacyHffConnection: '@doctrine.dbal.legacy_hff_connection'
       $legacyAirwaysConnection: '@doctrine.dbal.legacy_airways_connection'
       $mapper: '@App\Service\Migration\Admin\PersonnelUser\PersonnelMigrationMapper'
-      $migrationLogger: '@monolog.logger.migration_dom'
+      $migrationLogger: '@monolog.logger.migration_personnel'
+    tags:
+      - { name: 'console.command' }
+
+  App\Command\Migration\MigrateUserDataCommand:
+    arguments:
+      $em: '@doctrine.orm.entity_manager'
+      $legacyFetcher: '@App\Service\Migration\Utils\LegacyDataFetcher'
+      $mapper: '@App\Service\Migration\Admin\PersonnelUser\UserMigrationMapper'
+      $migrationLogger: '@monolog.logger.migration_user'
     tags:
       - { name: 'console.command' }
