@@ -134,8 +134,8 @@ HELP
                     $stats['total']++;
 
                     try {
-                        // Vérifie si le user existe déjà (par login)
-                        $existingUser = $this->mapper->findExistingByUsername($legacyData['nom_utilisateur'] ?? '');
+                        // Vérifie si le user existe déjà (par login ou matricule)
+                        $existingUser = $this->mapper->findExistingUser($legacyData);
 
                         if ($existingUser && !$updateExisting) {
                             $stats['skipped']++;

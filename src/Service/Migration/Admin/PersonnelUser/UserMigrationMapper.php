@@ -67,11 +67,29 @@ class UserMigrationMapper
     }
 
     /**
-     * Trouve un User existant par username pour éviter les doublons
+     * Trouve un User existant par username ou matricule pour éviter les doublons
      */
-    public function findExistingByUsername(string $username): ?User
+    public function findExistingUser(array $legacyData): ?User
     {
-        return $this->em->getRepository(User::class)->findOneBy(['username' => $username]);
+        $repo = $this->em->getRepository(User::class);
+
+        // 1. Recherche par username
+        if (!empty($legacyData['nom_utilisateur'])) {
+            $user = $repo->findOneBy(['username' => $legacyData['nom_utilisateur']]);
+            if ($user) {
+                return $user;
+            }
+        }
+
+        // 2. Recherche par matricule
+        if (!empty($legacyData['matricule'])) {
+            $user = $repo->findOneBy(['matricule' => $legacyData['matricule']]);
+            if ($user) {
+                return $user;
+            }
+        }
+
+        return null;
     }
 
     /**

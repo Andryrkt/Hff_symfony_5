@@ -128,7 +128,7 @@ class EntityRelationMapper
 
         // Si pas trouvé et qu'on a le champ Categorie (string), chercher par description
         $categorie = $this->em->getRepository(Categorie::class)
-            ->findOneBy(['description' => $oldData['Categorie']]);
+            ->findOneBy(['description' => trim($oldData['Categorie'])]);
 
         if (!$categorie) {
             $this->logger->warning('Categorie non trouvée', [

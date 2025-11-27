@@ -17,7 +17,7 @@ class SiteFixtures extends Fixture
             ['nomZone' => 'ZONES ENCLAVEES', 'reference' => 'dom_site_zone_enclavees'],
             ['nomZone' => 'ZONES TOURISTIQUES', 'reference' => 'dom_site_zones_touristiques'],
             ['nomZone' => 'FORT-DAUPHIN', 'reference' => 'dom_site_fort_dauphin'],
-            ['nomZone' => 'AUTRES SITE ENCLAVES', 'reference' => 'dom_site_autres_site_enclaves'],
+            ['nomZone' => 'AUTRES SITES ENCLAVES', 'reference' => 'dom_site_autres_site_enclaves'],
             ['nomZone' => 'HORS TANA', 'reference' => 'dom_site_hors_tana'],
             ['nomZone' => 'TANA', 'reference' => 'dom_site_tana']
         ];

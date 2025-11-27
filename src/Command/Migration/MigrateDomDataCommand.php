@@ -114,6 +114,8 @@ HELP
             // Migration par lots
             $currentOffset = $offset;
             $processedCount = 0;
+            $processedNumeros = [];
+            $skippedRecords = [];
 
             while ($processedCount < $totalCount) {
                 $currentBatchSize = min($batchSize, $totalCount - $processedCount);
@@ -125,15 +127,41 @@ HELP
                     $stats['total']++;
 
                     try {
-                        // Vérifie si le DOM existe déjà (par numero_ordre_mission)
+                        $numeroOrdreMission = $legacyData['Numero_Ordre_Mission'] ?? null;
+
+                        // Vérifie si déjà traité dans ce lot ou les précédents (pour éviter les doublons dans le même flux)
+                        if ($numeroOrdreMission && isset($processedNumeros[$numeroOrdreMission])) {
+                            $stats['skipped']++;
+                            $skippedRecords[] = [
+                                'id' => $legacyData['ID_Demande_Ordre_Mission'] ?? 'unknown',
+                                'numero_ordre_mission' => $numeroOrdreMission,
+                                'reason' => 'Doublon dans le flux (batch)'
+                            ];
+                            $this->logger->info('DOM doublon dans le flux (ignoré)', [
+                                'numero_ordre_mission' => $numeroOrdreMission,
+                                'old_id' => $legacyData['ID_Demande_Ordre_Mission'] ?? 'unknown',
+                            ]);
+                            $progressBar->advance();
+                            continue;
+                        }
+
+                        // Vérifie si le DOM existe déjà (par numero_ordre_mission) dans la BDD
                         $existingDom = $this->em->getRepository(Dom::class)->findOneBy([
-                            'numeroOrdreMission' => $legacyData['Numero_Ordre_Mission'] ?? null
+                            'numeroOrdreMission' => $numeroOrdreMission
                         ]);
 
                         if ($existingDom) {
                             $stats['skipped']++;
+                            if ($numeroOrdreMission) {
+                                $processedNumeros[$numeroOrdreMission] = true;
+                            }
+                            $skippedRecords[] = [
+                                'id' => $legacyData['ID_Demande_Ordre_Mission'] ?? 'unknown',
+                                'numero_ordre_mission' => $numeroOrdreMission,
+                                'reason' => 'Existe déjà en BDD'
+                            ];
                             $this->logger->info('DOM déjà existant (ignoré)', [
-                                'numero_ordre_mission' => $legacyData['Numero_Ordre_Mission'] ?? 'N/A',
+                                'numero_ordre_mission' => $numeroOrdreMission,
                                 'old_id' => $legacyData['ID_Demande_Ordre_Mission'] ?? 'unknown',
                             ]);
                             $progressBar->advance();
@@ -154,6 +182,10 @@ HELP
                         // Persiste si pas en mode dry-run
                         if (!$dryRun) {
                             $this->em->persist($dom);
+                        }
+
+                        if ($numeroOrdreMission) {
+                            $processedNumeros[$numeroOrdreMission] = true;
                         }
 
                         $stats['success']++;
@@ -181,6 +213,32 @@ HELP
 
             $progressBar->finish();
             $io->newLine(2);
+
+            // Génération du fichier CSV des rejetés
+            if (!empty($skippedRecords)) {
+                $projectDir = dirname(__DIR__, 3);
+                $logDir = $projectDir . '/var/log';
+                if (!is_dir($logDir)) {
+                    mkdir($logDir, 0777, true);
+                }
+
+                $filename = sprintf('skipped_dom_migration_%s.csv', date('Y-m-d_H-i-s'));
+                $filePath = $logDir . '/' . $filename;
+
+                $fp = fopen($filePath, 'w');
+                fputcsv($fp, ['ID_Legacy', 'Numero_Ordre_Mission', 'Raison']);
+
+                foreach ($skippedRecords as $record) {
+                    fputcsv($fp, $record);
+                }
+
+                fclose($fp);
+
+                $io->warning(sprintf(
+                    'Des enregistrements ont été ignorés. La liste a été sauvegardée dans : %s',
+                    $filePath
+                ));
+            }
 
             // Affiche les statistiques
             $this->displayStats($io, $stats, $dryRun);

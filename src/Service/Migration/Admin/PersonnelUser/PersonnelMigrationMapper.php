@@ -35,14 +35,6 @@ class PersonnelMigrationMapper
     public function mapOldToNew(array $oldData): ?Personnel
     {
         try {
-            // Vérification des champs obligatoires
-            if (empty($oldData['Nom']) || empty($oldData['Prenoms'])) {
-                $this->logger->warning('Personnel ignoré : nom ou prénoms manquants', [
-                    'old_id' => $oldData['id'] ?? 'unknown',
-                    'data' => $oldData,
-                ]);
-                return null;
-            }
 
             $personnel = new Personnel();
 
