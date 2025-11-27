@@ -1,0 +1,90 @@
+<?php
+
+namespace App\Controller\Admin\ApplicationGroupe;
+
+use App\Entity\Admin\ApplicationGroupe\Permission;
+use App\Form\Admin\ApplicationGroupe\PermissionType;
+use App\Repository\Admin\ApplicationGroupe\PermissionRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
+/**
+ * @Route("/admin/application/groupe/permission")
+ */
+class PermissionController extends AbstractController
+{
+    /**
+     * @Route("/", name="app_admin_application_groupe_permission_index", methods={"GET"})
+     */
+    public function index(PermissionRepository $permissionRepository): Response
+    {
+        return $this->render('admin/application_groupe/permission/index.html.twig', [
+            'permissions' => $permissionRepository->findAll(),
+        ]);
+    }
+
+    /**
+     * @Route("/new", name="app_admin_application_groupe_permission_new", methods={"GET", "POST"})
+     */
+    public function new(Request $request, PermissionRepository $permissionRepository): Response
+    {
+        $permission = new Permission();
+        $form = $this->createForm(PermissionType::class, $permission);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $permissionRepository->add($permission, true);
+
+            return $this->redirectToRoute('app_admin_application_groupe_permission_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->renderForm('admin/application_groupe/permission/new.html.twig', [
+            'permission' => $permission,
+            'form' => $form,
+        ]);
+    }
+
+    /**
+     * @Route("/{id}", name="app_admin_application_groupe_permission_show", methods={"GET"})
+     */
+    public function show(Permission $permission): Response
+    {
+        return $this->render('admin/application_groupe/permission/show.html.twig', [
+            'permission' => $permission,
+        ]);
+    }
+
+    /**
+     * @Route("/{id}/edit", name="app_admin_application_groupe_permission_edit", methods={"GET", "POST"})
+     */
+    public function edit(Request $request, Permission $permission, PermissionRepository $permissionRepository): Response
+    {
+        $form = $this->createForm(PermissionType::class, $permission);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $permissionRepository->add($permission, true);
+
+            return $this->redirectToRoute('app_admin_application_groupe_permission_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->renderForm('admin/application_groupe/permission/edit.html.twig', [
+            'permission' => $permission,
+            'form' => $form,
+        ]);
+    }
+
+    /**
+     * @Route("/{id}", name="app_admin_application_groupe_permission_delete", methods={"POST"})
+     */
+    public function delete(Request $request, Permission $permission, PermissionRepository $permissionRepository): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$permission->getId(), $request->request->get('_token'))) {
+            $permissionRepository->remove($permission, true);
+        }
+
+        return $this->redirectToRoute('app_admin_application_groupe_permission_index', [], Response::HTTP_SEE_OTHER);
+    }
+}
