@@ -10,8 +10,8 @@ class StatutDemandeFixtures extends Fixture
 {
     public function load(ObjectManager $manager)
     {
-        // Statuts DOM (Dossier)
         $statuts = [
+            /** =========== Statuts DOM ===============*/
             // Statuts OUVERT
             ['code' => 'OUV', 'description' => 'OUVERT'],
             ['code' => 'OUV', 'description' => 'ATTENTE PAIEMENT'],
@@ -41,6 +41,10 @@ class StatutDemandeFixtures extends Fixture
             ['code' => 'ANN', 'description' => 'ANNULE COMPTABILITE'],
             ['code' => 'ANN', 'description' => 'ANNULE SECRETARIAT RH'],
             ['code' => 'ANN', 'description' => 'ANNULE RH'],
+
+            /** =========== Statuts BADM ===============*/
+
+            /** =========== Statuts DIT ===============*/
         ];
 
         foreach ($statuts as $statutData) {

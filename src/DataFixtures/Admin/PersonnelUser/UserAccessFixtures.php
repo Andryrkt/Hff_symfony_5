@@ -14,49 +14,49 @@ class UserAccessFixtures extends Fixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $manager)
     {
-        $userAccesss = [
-            //pour user test
-            ['user' => 'user_u1', 'agence' => 'agence_administration', 'service' => 'service_inf', 'allAgence' => false, 'allService' => false, 'permissions' => ['permission_RH_ORDRE_MISSION_CREATE', 'permission_RH_ORDRE_MISSION_VIEW']],
-            // pour user lanto
-            ['user' => 'user_u2', 'agence' => null, 'service' => null, 'allAgence' => true, 'allService' => true, 'permissions' => ['permission_RH_ORDRE_MISSION_CREATE', 'permission_RH_ORDRE_MISSION_VIEW']],
-        ];
+        // $userAccesss = [
+        //     //pour user test
+        //     ['user' => 'user_u1', 'agence' => 'agence_administration', 'service' => 'service_inf', 'allAgence' => false, 'allService' => false, 'permissions' => ['permission_RH_ORDRE_MISSION_CREATE', 'permission_RH_ORDRE_MISSION_VIEW']],
+        //     // pour user lanto
+        //     ['user' => 'user_u2', 'agence' => null, 'service' => null, 'allAgence' => true, 'allService' => true, 'permissions' => ['permission_RH_ORDRE_MISSION_CREATE', 'permission_RH_ORDRE_MISSION_VIEW']],
+        // ];
 
 
-        foreach ($userAccesss as $userAccessData) {
-            $userAccess = new UserAccess();
+        // foreach ($userAccesss as $userAccessData) {
+        //     $userAccess = new UserAccess();
 
-            $userAccess->setUsers($this->getReference($userAccessData['user']));
-            if ($userAccessData['agence'] !== null) {
-                $userAccess->setAgence($this->getReference($userAccessData['agence']));
-            } else {
-                $userAccess->setAgence(null);
-            }
-            if ($userAccessData['service'] !== null) {
-                $userAccess->setService($this->getReference($userAccessData['service']));
-            } else {
-                $userAccess->setService(null);
-            }
-            $userAccess->setAllAgence($userAccessData['allAgence']);
-            $userAccess->setAllService($userAccessData['allService']);
+        //     $userAccess->setUsers($this->getReference($userAccessData['user']));
+        //     if ($userAccessData['agence'] !== null) {
+        //         $userAccess->setAgence($this->getReference($userAccessData['agence']));
+        //     } else {
+        //         $userAccess->setAgence(null);
+        //     }
+        //     if ($userAccessData['service'] !== null) {
+        //         $userAccess->setService($this->getReference($userAccessData['service']));
+        //     } else {
+        //         $userAccess->setService(null);
+        //     }
+        //     $userAccess->setAllAgence($userAccessData['allAgence']);
+        //     $userAccess->setAllService($userAccessData['allService']);
 
-            foreach ($userAccessData['permissions'] as $permissionRef) {
-                $permission = $this->getReference($permissionRef);
-                $userAccess->addPermission($permission);
-            }
+        //     foreach ($userAccessData['permissions'] as $permissionRef) {
+        //         $permission = $this->getReference($permissionRef);
+        //         $userAccess->addPermission($permission);
+        //     }
 
-            $manager->persist($userAccess);
-        }
+        //     $manager->persist($userAccess);
+        // }
 
-        $manager->flush();
+        // $manager->flush();
     }
 
     public function getDependencies()
     {
-        return [
-            UserFixtures::class,
-            AgenceFixtures::class,
-            ServiceFixtures::class,
-            PermissionFixtures::class
-        ];
+        // return [
+        //     UserFixtures::class,
+        //     AgenceFixtures::class,
+        //     ServiceFixtures::class,
+        //     PermissionFixtures::class
+        // ];
     }
 }
