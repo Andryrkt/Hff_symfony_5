@@ -7,7 +7,6 @@ use App\Entity\Traits\TimestampableTrait;
 use App\Entity\Admin\AgenceService\Agence;
 use App\Entity\Admin\AgenceService\Service;
 use Doctrine\Common\Collections\Collection;
-use App\Entity\Admin\ApplicationGroupe\Group;
 use App\Entity\Admin\PersonnelUser\Personnel;
 use App\Entity\Admin\PersonnelUser\UserAccess;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,7 +17,12 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
- * @ORM\Table(name="`user`")
+ * @ORM\Table(name="`user`",
+ * indexes={
+ *         @ORM\Index(name="idx_username", columns={"username"}),
+ *         @ORM\Index(name="idx_matricule", columns={"matricule"})
+ *     }
+ * )
  * @ORM\HasLifecycleCallbacks
  */
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -53,7 +57,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $email;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true, unique=true)
      */
     private $matricule;
 
@@ -68,7 +72,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $poste;
 
     /**
-          * @ORM\OneToOne(targetEntity=Personnel::class, inversedBy="users", cascade={"persist", "remove"}, fetch="EAGER")
+     * @ORM\OneToOne(targetEntity=Personnel::class, inversedBy="users", cascade={"persist", "remove"}, fetch="EAGER")
      * @ORM\JoinColumn(name="personnel_id", referencedColumnName="id")
      */
     private $personnel;

@@ -14,6 +14,11 @@ use App\Entity\Admin\PersonnelUser\User;
 /**
  * @Broadcast()
  * @ORM\Entity(repositoryClass=PersonnelRepository::class)
+ * @ORM\Table(name="personnel",
+ * indexes={
+ *         @ORM\Index(name="idx_matricule", columns={"matricule"})
+ *     }
+ * )
  * @ORM\HasLifecycleCallbacks
  */
 class Personnel
@@ -50,7 +55,7 @@ class Personnel
 
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="integer", nullable=true, unique=true)
      */
     private $matricule;
 
@@ -64,9 +69,7 @@ class Personnel
      */
     private $numeroCompteBancaire;
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function getId(): ?int
     {

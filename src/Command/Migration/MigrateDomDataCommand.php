@@ -2,8 +2,9 @@
 
 namespace App\Command\Migration;
 
-use App\Entity\Hf\Rh\Dom\Dom;
+
 use App\Service\Migration\Hf\Rh\Dom\DomMigrationMapper;
+use App\Entity\Hf\Rh\Dom\Dom;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -124,6 +125,21 @@ HELP
                     $stats['total']++;
 
                     try {
+                        // Vérifie si le DOM existe déjà (par numero_ordre_mission)
+                        $existingDom = $this->em->getRepository(Dom::class)->findOneBy([
+                            'numeroOrdreMission' => $legacyData['Numero_Ordre_Mission'] ?? null
+                        ]);
+
+                        if ($existingDom) {
+                            $stats['skipped']++;
+                            $this->logger->info('DOM déjà existant (ignoré)', [
+                                'numero_ordre_mission' => $legacyData['Numero_Ordre_Mission'] ?? 'N/A',
+                                'old_id' => $legacyData['ID_Demande_Ordre_Mission'] ?? 'unknown',
+                            ]);
+                            $progressBar->advance();
+                            continue;
+                        }
+
                         // Mappe les données
                         $dom = $this->mapper->mapOldToNew($legacyData);
 

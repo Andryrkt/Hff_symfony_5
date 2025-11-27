@@ -45,7 +45,7 @@ class Dom implements CreatedByInterface, AgenceServiceInterface
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=11)
+     * @ORM\Column(type="string", length=11, unique=true)
      */
     private $numeroOrdreMission;
 
