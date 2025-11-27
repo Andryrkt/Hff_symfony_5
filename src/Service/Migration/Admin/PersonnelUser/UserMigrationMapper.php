@@ -2,21 +2,26 @@
 
 namespace App\Service\Migration\Admin\PersonnelUser;
 
+use App\Entity\Admin\PersonnelUser\Personnel;
 use Psr\Log\LoggerInterface;
 use App\Entity\Admin\PersonnelUser\User;
+use App\Service\Migration\Utils\EntityRelationMapper;
 use Doctrine\ORM\EntityManagerInterface;
 
 class UserMigrationMapper
 {
     private EntityManagerInterface $em;
+    private EntityRelationMapper $relationMapper;
     private LoggerInterface $logger;
 
     public function __construct(
         EntityManagerInterface $em,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        EntityRelationMapper $relationMapper
     ) {
         $this->em = $em;
         $this->logger = $logger;
+        $this->relationMapper = $relationMapper;
     }
 
     public function mapOldToNew(array $oldData): ?User
@@ -42,15 +47,41 @@ class UserMigrationMapper
 
     private function mapSimpleFields(User $user, array $oldData): void
     {
-        $user->setUsername($oldData['Username'] ?? '');
-        $user->setEmail($oldData['Email'] ?? '');
-        $user->setRoles($oldData['Roles'] ?? []);
+        $user->setUsername($oldData['nom_utilisateur'] ?? '');
+        $user->setEmail($oldData['mail'] ?? '');
+        $user->setRoles(["ROLE_USER"]);
+        $user->setMatricule($oldData['matricule'] ?? '');
     }
 
     private function mapRelations(User $user, array $oldData): void
     {
-        // Relations
-        // $user->setAgence($this->em->getRepository(Agence::class)->find($oldData['Agence_ID']));
-        // $user->setService($this->em->getRepository(Service::class)->find($oldData['Service_ID']));
+        //personnel
+        $personnel = $this->em->getRepository(Personnel::class)->findOneBy(['matricule' => $oldData['matricule']]);
+        if ($personnel) {
+            $user->setPersonnel($personnel);
+        }
+
+        // fullname
+        $fullname = $this->relationMapper->mapFullName($oldData['matricule']);
+        $user->setFullname($fullname);
+    }
+
+    /**
+     * Trouve un User existant par username pour éviter les doublons
+     */
+    public function findExistingByUsername(string $username): ?User
+    {
+        return $this->em->getRepository(User::class)->findOneBy(['username' => $username]);
+    }
+
+    /**
+     * Met à jour un User existant
+     */
+    public function updateExisting(User $user, array $oldData): User
+    {
+        $this->mapSimpleFields($user, $oldData);
+        $this->mapRelations($user, $oldData);
+
+        return $user;
     }
 }

@@ -127,4 +127,45 @@ class LegacyDataFetcher
             return null;
         }
     }
+
+    /**
+     * Compte le nombre d'utilisateurs dans l'ancienne base
+     */
+    public function countLegacyUsers(): int
+    {
+        $sql = "SELECT COUNT(*) as total FROM users";
+        return (int) $this->legacyConnection->fetchOne($sql);
+    }
+
+    /**
+     * Récupère un lot d'utilisateurs de l'ancienne base de données
+     */
+    public function getLegacyUsers(int $limit, int $offset): array
+    {
+        $sql = <<<SQL
+                SELECT *
+                FROM users
+                ORDER BY id
+                OFFSET :offset ROWS
+                FETCH NEXT :limit ROWS ONLY
+        SQL;
+
+        $parameters = [
+            'offset' => $offset,
+            'limit' => $limit,
+        ];
+        return  $this->legacyConnection->fetchAllAssociative($sql, $parameters);
+    }
+
+
+    /**
+     * Recupère le nom et prenom de l'utilisateur dans l'ancient base de donnée
+     */
+    public function getFullName(int $matricule): array
+    {
+        return $this->legacyConnection->fetchAllAssociative(
+            " SELECT CONCAT( p.Nom, ' ', p.Prenoms) as fullname  from Personnel p where p.Matricule = :matricule ",
+            ['matricule' => $matricule]
+        );
+    }
 }

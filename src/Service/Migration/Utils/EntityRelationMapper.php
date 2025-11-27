@@ -11,6 +11,7 @@ use App\Entity\Admin\AgenceService\Agence;
 use App\Entity\Admin\Statut\StatutDemande;
 use App\Entity\Hf\Rh\Dom\SousTypeDocument;
 use App\Entity\Admin\AgenceService\Service;
+use App\Entity\Admin\PersonnelUser\Personnel;
 use App\Entity\Admin\AgenceService\AgenceServiceIrium;
 
 /**
@@ -219,5 +220,10 @@ class EntityRelationMapper
         }
 
         return $agenceServiceIrium;
+    }
+
+    public function mapFullName(int $matricule): ?string
+    {
+        return $this->legacyDataFetcher->getFullName($matricule) ? $this->legacyDataFetcher->getFullName($matricule)[0]['fullname'] : null;
     }
 }
