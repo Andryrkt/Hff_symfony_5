@@ -33,22 +33,35 @@
 			{# Formulaire pour ajouter un accès #}
 			<div class="mt-3">
 				<h6>Ajouter un accès</h6>
-				<form method="post" action="{{ path('admin_user_add_access', {'id': user.id}) }}" data-turbo-frame="user_access_list_for_user_{{ user.id }}">
-					<div class="row g-2 align-items-center">
-						<div class="col-auto">
-							<select name="access_id" class="form-select form-select-sm" required>
-								<option value="">Sélectionner un accès</option>
-								{% for availableAccess in availableAccesses %}
-									<option value="{{ availableAccess.id }}">{{ availableAccess.name }}</option>
-								{% endfor %}
-							</select>
+				{{ form_start(form, {'attr': {'data-turbo-frame': 'user_access_list_for_user_' ~ user.id}}) }}
+				<div class="row g-2 align-items-center">
+					<div class="col-md-3">
+						{{ form_widget(form.agence, {'attr': {'class': 'form-select form-select-sm'}}) }}
+					</div>
+					<div class="col-md-3">
+						{{ form_widget(form.service, {'attr': {'class': 'form-select form-select-sm'}}) }}
+					</div>
+					<div class="col-md-3">
+						{{ form_widget(form.typeDocument, {'attr': {'class': 'form-select form-select-sm'}}) }}
+					</div>
+					<div class="col-md-12">
+						<div class="form-check form-check-inline">
+							{{ form_widget(form.allAgence) }}
+							{{ form_label(form.allAgence) }}
 						</div>
-						<div class="col-auto">
-							<button type="submit" class="btn btn-sm btn-success">Ajouter</button>
+						<div class="form-check form-check-inline">
+							{{ form_widget(form.allService) }}
+							{{ form_label(form.allService) }}
 						</div>
 					</div>
-					<input type="hidden" name="_token" value="{{ csrf_token('add_access_' ~ user.id) }}">
-				</form>
+					<div class="col-md-12">
+						{{ form_widget(form.permissions, {'attr': {'class': 'form-select form-select-sm', 'style': 'height: 100px'}}) }}
+					</div>
+					<div class="col-auto mt-2">
+						<button type="submit" class="btn btn-sm btn-success">Ajouter</button>
+					</div>
+				</div>
+				{{ form_end(form) }}
 			</div>
 		</div>
 	{% else %}
@@ -58,22 +71,35 @@
 			{# Formulaire pour ajouter un accès #}
 			<div class="mt-3">
 				<h6>Ajouter un accès</h6>
-				<form method="post" action="{{ path('admin_user_add_access', {'id': user.id}) }}" data-turbo-frame="user_access_list_for_user_{{ user.id }}">
-					<div class="row g-2 align-items-center justify-content-center">
-						<div class="col-auto">
-							<select name="access_id" class="form-select form-select-sm" required>
-								<option value="">Sélectionner un accès</option>
-								{% for availableAccess in availableAccesses %}
-									<option value="{{ availableAccess.id }}">{{ availableAccess.name }}</option>
-								{% endfor %}
-							</select>
+				{{ form_start(form, {'attr': {'data-turbo-frame': 'user_access_list_for_user_' ~ user.id}}) }}
+				<div class="row g-2 align-items-center justify-content-center">
+					<div class="col-md-3">
+						{{ form_widget(form.agence, {'attr': {'class': 'form-select form-select-sm'}}) }}
+					</div>
+					<div class="col-md-3">
+						{{ form_widget(form.service, {'attr': {'class': 'form-select form-select-sm'}}) }}
+					</div>
+					<div class="col-md-3">
+						{{ form_widget(form.typeDocument, {'attr': {'class': 'form-select form-select-sm'}}) }}
+					</div>
+					<div class="col-md-12">
+						<div class="form-check form-check-inline">
+							{{ form_widget(form.allAgence) }}
+							{{ form_label(form.allAgence) }}
 						</div>
-						<div class="col-auto">
-							<button type="submit" class="btn btn-sm btn-success">Ajouter</button>
+						<div class="form-check form-check-inline">
+							{{ form_widget(form.allService) }}
+							{{ form_label(form.allService) }}
 						</div>
 					</div>
-					<input type="hidden" name="_token" value="{{ csrf_token('add_access_' ~ user.id) }}">
-				</form>
+					<div class="col-md-12">
+						{{ form_widget(form.permissions, {'attr': {'class': 'form-select form-select-sm', 'style': 'height: 100px'}}) }}
+					</div>
+					<div class="col-auto mt-2">
+						<button type="submit" class="btn btn-sm btn-success">Ajouter</button>
+					</div>
+				</div>
+				{{ form_end(form) }}
 			</div>
 		</div>
 	{% endif %}

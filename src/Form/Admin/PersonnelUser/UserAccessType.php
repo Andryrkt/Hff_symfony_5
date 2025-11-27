@@ -19,8 +19,8 @@ class UserAccessType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('users', EntityType::class, [
+        if ($options['display_users']) {
+            $builder->add('users', EntityType::class, [
                 'class' => User::class,
                 'choice_label' => 'fullname', // Display the fullname of the user
                 'multiple' => false,
@@ -30,7 +30,10 @@ class UserAccessType extends AbstractType
                     'data-controller' => 'tom-select',
                     'data-placeholder' => 'Sélectionnez un utilisateur...',
                 ],
-            ])
+            ]);
+        }
+
+        $builder
             ->add('agence', EntityType::class, [
                 'label' => 'Agence cible',
                 'class' => Agence::class,
@@ -120,6 +123,9 @@ class UserAccessType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => UserAccess::class,
+            'display_users' => true,
         ]);
+
+        $resolver->setAllowedTypes('display_users', 'bool');
     }
 }

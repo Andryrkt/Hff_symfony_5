@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\Admin\PersonnelUser\UserRepository;
 use App\Repository\Admin\PersonnelUser\UserAccessRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Form\Admin\PersonnelUser\UserAccessType;
 
 
 /**
@@ -27,7 +28,7 @@ class UserController extends AbstractController
     public function index(UserRepository $userRepository): Response
     {
         return $this->render('admin/personnel_user/user/index.html.twig', [
-            'users' => $userRepository->findAll(),
+            'users' => $userRepository->findBy([], ['id' => 'DESC']),
         ]);
     }
 
@@ -141,13 +142,30 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/access", name="admin_user_manage_access", methods={"GET"})
+     * @Route("/{id}/access", name="admin_user_manage_access", methods={"GET", "POST"})
      */
-    public function manageAccess(User $user, UserAccessRepository $userAccessRepository): Response
+    public function manageAccess(User $user, Request $request, UserAccessRepository $userAccessRepository, EntityManagerInterface $em): Response
     {
+        $userAccess = new UserAccess();
+        $userAccess->setUsers($user);
+
+        $form = $this->createForm(UserAccessType::class, $userAccess, [
+            'display_users' => false,
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($userAccess);
+            $em->flush();
+
+            $this->addFlash('success', 'Accès ajouté avec succès.');
+            return $this->redirectToRoute('admin_user_manage_access', ['id' => $user->getId()]);
+        }
+
         return $this->render('admin/personnel_user/user/manage_access.html.twig', [
             'user' => $user,
-            'user_accesses' => $userAccessRepository->findBy(['users' => $user]),
+            'accesses' => $userAccessRepository->findBy(['users' => $user]),
+            'form' => $form->createView(),
         ]);
     }
 
@@ -191,22 +209,24 @@ class UserController extends AbstractController
             // Récupérer les accès de l'utilisateur
             $accesses = $user->getUserAccesses() ?? [];
 
-            // Récupérer tous les accès disponibles pour le formulaire
-            $availableAccesses = $accessRepo->findAll();
+            // Créer le formulaire pour un nouvel accès
+            $newAccess = new UserAccess();
+            $newAccess->setUsers($user);
+            $form = $this->createForm(UserAccessType::class, $newAccess, [
+                'action' => $this->generateUrl('admin_user_add_access', ['id' => $user->getId()]),
+                'display_users' => false,
+            ]);
 
             return $this->render('admin/personnel_user/user/_access_list.html.twig', [
                 'user' => $user,
                 'accesses' => $accesses,
-                'availableAccesses' => $availableAccesses,
+                'form' => $form->createView(),
             ]);
         } catch (\Exception $e) {
-            // Logger l'erreur
-            // $this->logger->error('Erreur accès utilisateur: ' . $e->getMessage());
-
             return $this->render('admin/personnel_user/user/_access_error.html.twig', [
                 'user' => $user,
-                'message' => 'Erreur lors du chargement des accès'
-            ], new Response('', 500));
+                'message' => 'Erreur lors du chargement des accès: ' . $e->getMessage()
+            ], new Response('', 200));
         }
     }
 
@@ -222,23 +242,32 @@ class UserController extends AbstractController
                 ], new Response('', 404));
             }
 
-            $accessId = $request->request->get('access_id');
-            $access = $em->getRepository(UserAccess::class)->find($accessId);
+            $userAccess = new UserAccess();
+            $userAccess->setUsers($user);
 
-            if (!$access) {
-                throw new \Exception('Accès non trouvé');
+            $form = $this->createForm(UserAccessType::class, $userAccess, [
+                'display_users' => false,
+            ]);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $em->persist($userAccess);
+                $em->flush();
+
+                // Recharger la liste des accès
+                return $this->redirectToRoute('admin_user_access_for_user', ['id' => $user->getId()]);
             }
 
-            // Ajouter l'accès à l'utilisateur
-            $user->addUserAccess($access);
-            $em->flush();
-
-            // Recharger la liste des accès
-            return $this->redirectToRoute('admin_user_access_for_user', ['id' => $user->getId()]);
+            // En cas d'erreur de validation, on réaffiche la liste avec le formulaire et ses erreurs
+            return $this->render('admin/personnel_user/user/_access_list.html.twig', [
+                'user' => $user,
+                'accesses' => $user->getUserAccesses(),
+                'form' => $form->createView(),
+            ]);
         } catch (\Exception $e) {
             return $this->render('admin/personnel_user/user/_access_error.html.twig', [
                 'user' => $user,
-                'message' => 'Erreur lors de l\'ajout de l\'accès'
+                'message' => 'Erreur lors de l\'ajout de l\'accès: ' . $e->getMessage()
             ], new Response('', 500));
         }
     }

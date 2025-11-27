@@ -20,7 +20,7 @@ class TypeOperationController extends AbstractController
      */
     public function index(TypeOperationRepository $typeOperationRepository): Response
     {
-        return $this->render('admin/type_operation/index.html.twig', [
+        return $this->render('admin/historisation/type_operation/index.html.twig', [
             'type_operations' => $typeOperationRepository->findAll(),
         ]);
     }
@@ -40,7 +40,7 @@ class TypeOperationController extends AbstractController
             return $this->redirectToRoute('app_admin_type_operation_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('admin/type_operation/new.html.twig', [
+        return $this->render('admin/historisation/type_operation/new.html.twig', [
             'type_operation' => $typeOperation,
             'form' => $form->createView(),
         ]);
@@ -51,7 +51,7 @@ class TypeOperationController extends AbstractController
      */
     public function show(TypeOperation $typeOperation): Response
     {
-        return $this->render('admin/type_operation/show.html.twig', [
+        return $this->render('admin/historisation/type_operation/show.html.twig', [
             'type_operation' => $typeOperation,
         ]);
     }
@@ -70,7 +70,7 @@ class TypeOperationController extends AbstractController
             return $this->redirectToRoute('app_admin_type_operation_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('admin/type_operation/edit.html.twig', [
+        return $this->render('admin/historisation/type_operation/edit.html.twig', [
             'type_operation' => $typeOperation,
             'form' => $form->createView(),
         ]);

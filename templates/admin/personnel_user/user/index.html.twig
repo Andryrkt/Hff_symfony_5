@@ -4,69 +4,69 @@
 {% endblock %}
 
 {% block content %}
-	<h1>Liste des utilisateurs</h1>
-	<a href="{{ path('admin_user_new') }}" class="btn btn-primary mb-3">Ajouter un utilisateur</a>
-	<table class="table table-striped">
-		<thead>
-			<tr>
-				<th>ID</th>
-				<th>Nom d'utilisateur</th>
-				<th>Nom complet</th>
-				<th>Email</th>
-				<th>Matricule</th>
-				<th>Rôles</th>
-				<th>Accès</th>
-				<th>Actions</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for user in users %}
+	<div class="container">
+		<h1>Liste des utilisateurs</h1>
+		<a href="{{ path('admin_user_new') }}" class="btn btn-primary mb-3">Ajouter un utilisateur</a>
+		<table class="table table-striped">
+			<thead>
 				<tr>
-					<td>{{ user.id }}</td>
-					<td>{{ user.username }}</td>
-					<td>{{ user.fullname }}</td>
-					<td>{{ user.email }}</td>
-					<td>{{ user.matricule }}</td>
-					<td data-controller="user-roles" data-user-roles-user-id="{{ user.id }}">
-						<span data-user-roles-target="display">{{ user.roles|join(', ') }}</span>
-						<form data-user-roles-target="form" hidden>
-							<input type="text" name="roles" value="{{ user.roles|join(', ') }}" class="form-control"/>
-							<button type="submit" data-action="user-roles#save" class="btn btn-sm btn-success">Save</button>
-							<button type="button" data-action="user-roles#cancel" class="btn btn-sm btn-secondary">Cancel</button>
-						</form>
-						<button type="button" data-action="user-roles#edit" data-user-roles-target="editButton" class="btn btn-sm btn-primary">Éditer les rôles</button>
-					</td>
-					<td>
-						<a class="btn btn-sm btn-info" data-bs-toggle="collapse" href="#user-access-list-{{ user.id }}" role="button" aria-expanded="false" aria-controls="user-access-list-{{ user.id }}">
-							Gérer les accès
-						</a>
-					</td>
-					<td>
-						<a href="{{ path('admin_user_profile', {'id': user.id}) }}" class="btn btn-sm btn-info">Profil</a>
-						<a href="{{ path('admin_user_edit', {'id': user.id}) }}" class="btn btn-sm btn-warning">Modifier</a>
-						<form method="post" action="{{ path('admin_user_delete', {'id': user.id}) }}" style="display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">
-							<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
-							<button class="btn btn-sm btn-danger">Supprimer</button>
-						</form>
-					</td>
+					<th>ID</th>
+					<th>Nom d'utilisateur</th>
+					<th>Matricule</th>
+					<th>Email</th>
+					<th>Rôles</th>
+					<th>Accès</th>
+					<th>Actions</th>
 				</tr>
-				<tr class="collapse" id="user-access-list-{{ user.id }}">
-					<td colspan="8">
-						<turbo-frame id="user_access_list_for_user_{{ user.id }}" src="{{ path('admin_user_access_for_user', {'id': user.id}) }}" loading="lazy">
-							<div class="text-center text-muted py-3">
-								<div class="spinner-border spinner-border-sm" role="status">
-									<span class="visually-hidden">Chargement...</span>
+			</thead>
+			<tbody>
+				{% for user in users %}
+					<tr>
+						<td>{{ user.id }}</td>
+						<td>{{ user.username }}</td>
+						<td>{{ user.matricule }}</td>
+						<td>{{ user.email }}</td>
+						<td data-controller="user-roles" data-user-roles-user-id="{{ user.id }}">
+							<span data-user-roles-target="display">{{ user.roles|join(', ') }}</span>
+							<form data-user-roles-target="form" hidden>
+								<input type="text" name="roles" value="{{ user.roles|join(', ') }}" class="form-control"/>
+								<button type="submit" data-action="user-roles#save" data-user-roles-target="saveButton" class="btn btn-sm btn-success">Enregistrer</button>
+								<button type="button" data-action="user-roles#cancel" data-user-roles-target="cancelButton" class="btn btn-sm btn-secondary">Annuler</button>
+							</form>
+							<button type="button" data-action="user-roles#edit" data-user-roles-target="editButton" class="btn btn-sm btn-primary">Éditer les rôles</button>
+						</td>
+						<td>
+							<a class="btn btn-sm btn-info" href="{{ path('admin_user_manage_access', {'id': user.id}) }}">
+								Gérer les accès
+							</a>
+						</td>
+						<td>
+							<a href="{{ path('admin_user_profile', {'id': user.id}) }}" class="btn btn-sm btn-info">Profil</a>
+							<a href="{{ path('admin_user_edit', {'id': user.id}) }}" class="btn btn-sm btn-warning">Modifier</a>
+							<form method="post" action="{{ path('admin_user_delete', {'id': user.id}) }}" style="display:inline-block;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">
+								<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+								<button class="btn btn-sm btn-danger">Supprimer</button>
+							</form>
+						</td>
+					</tr>
+					<tr class="collapse" id="user-access-list-{{ user.id }}">
+						<td colspan="7">
+							<turbo-frame id="user_access_list_for_user_{{ user.id }}" src="{{ path('admin_user_access_for_user', {'id': user.id}) }}">
+								<div class="text-center text-muted py-3">
+									<div class="spinner-border spinner-border-sm" role="status">
+										<span class="visually-hidden">Chargement...</span>
+									</div>
+									<small>Chargement de la liste des accès...</small>
 								</div>
-								<small>Chargement de la liste des accès...</small>
-							</div>
-						</turbo-frame>
-					</td>
-				</tr>
-			{% else %}
-				<tr>
-					<td colspan="10">Aucun utilisateur trouvé.</td>
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+							</turbo-frame>
+						</td>
+					</tr>
+				{% else %}
+					<tr>
+						<td colspan="10">Aucun utilisateur trouvé.</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
 {% endblock %}

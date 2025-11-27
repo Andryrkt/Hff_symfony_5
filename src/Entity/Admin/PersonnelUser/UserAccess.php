@@ -172,4 +172,30 @@ class UserAccess
 
         return $this;
     }
+
+    public function getName(): string
+    {
+        $parts = [];
+        if ($this->allAgence) {
+            $parts[] = 'Toutes les agences';
+        } elseif ($this->agence) {
+            $parts[] = 'Agence: ' . $this->agence->getNom();
+        }
+
+        if ($this->allService) {
+            $parts[] = 'Tous les services';
+        } elseif ($this->service) {
+            $parts[] = 'Service: ' . $this->service->getNom();
+        }
+
+        if ($this->typeDocument) {
+            $parts[] = 'Doc: ' . $this->typeDocument->getLibelleDocument();
+        }
+
+        if (empty($parts)) {
+            return 'Accès #' . $this->id;
+        }
+
+        return implode(' - ', $parts);
+    }
 }
