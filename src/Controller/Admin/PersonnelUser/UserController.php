@@ -25,9 +25,6 @@ class UserController extends AbstractController
     /**
      * @Route("/", name="admin_user_index", methods={"GET"})
      */
-    /**
-     * @Route("/", name="admin_user_index", methods={"GET"})
-     */
     public function index(Request $request, UserRepository $userRepository): Response
     {
         $query = $request->query->get('q');
@@ -36,6 +33,10 @@ class UserController extends AbstractController
         return $this->render('admin/personnel_user/user/index.html.twig', [
             'users' => $users,
             'query' => $query,
+            'breadcrumbs' => [
+                ['label' => 'Accueil', 'url' => $this->generateUrl('app_home')],
+                ['label' => 'Utilisateurs'],
+            ],
         ]);
     }
 
@@ -173,6 +174,11 @@ class UserController extends AbstractController
             'user' => $user,
             'accesses' => $userAccessRepository->findBy(['users' => $user]),
             'form' => $form->createView(),
+            'breadcrumbs' => [
+                ['label' => 'Accueil', 'url' => $this->generateUrl('app_home')],
+                ['label' => 'Utilisateurs', 'url' => $this->generateUrl('admin_user_index')],
+                ['label' => 'Gérer les accès - ' . $user->getFullname()],
+            ],
         ]);
     }
 
