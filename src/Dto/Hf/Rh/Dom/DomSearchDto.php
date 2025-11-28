@@ -17,4 +17,9 @@ class DomSearchDto
     public ?array $debiteur = null;
     public ?array $emetteur = null;
     public ?bool $pieceJustificatif = null;
+
+    // Pagination et tri
+    public int $limit = 50;
+    public string $sortBy = 'numeroOrdreMission';
+    public string $sortOrder = 'DESC';
 }

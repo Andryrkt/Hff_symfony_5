@@ -97,6 +97,32 @@ class DomRepository extends ServiceEntityRepository
 
     public function findPaginatedAndFiltered(int $page = 1, int $limit = 10, DomSearchDto $domSearchDto, ?array $agenceIds = null)
     {
+        // Mapping des colonnes triables (whitelist de sécurité)
+        $sortableColumns = [
+            'numeroOrdreMission' => 'd.numeroOrdreMission',
+            'matricule' => 'd.matricule',
+            'dateDemande' => 'd.dateDemande',
+            'dateDebut' => 'd.dateDebut',
+            'dateFin' => 'd.dateFin',
+            'typeDocument' => 'td.libelleSousType',
+            'statut' => 's.description',
+        ];
+
+        // Récupérer les paramètres de tri depuis le DTO
+        $sortBy = $domSearchDto->sortBy ?? 'numeroOrdreMission';
+        $sortOrder = strtoupper($domSearchDto->sortOrder ?? 'DESC');
+
+        // Validation de sécurité
+        if (!isset($sortableColumns[$sortBy])) {
+            $sortBy = 'numeroOrdreMission'; // Valeur par défaut sécurisée
+        }
+        if (!in_array($sortOrder, ['ASC', 'DESC'])) {
+            $sortOrder = 'DESC'; // Valeur par défaut sécurisée
+        }
+
+        // Récupérer la limite depuis le DTO
+        $limit = $domSearchDto->limit ?? 50;
+
         // Créer le QueryBuilder avec les jointures et chargement eager des relations
         $queryBuilder = $this->createQueryBuilder('d')
             ->leftJoin('d.sousTypeDocument', 'td')
@@ -113,7 +139,7 @@ class DomRepository extends ServiceEntityRepository
         $this->filtredStatut($queryBuilder, $domSearchDto);
 
         // 3. Ordre et pagination
-        $queryBuilder->orderBy('d.numeroOrdreMission', 'DESC')
+        $queryBuilder->orderBy($sortableColumns[$sortBy], $sortOrder)
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
 

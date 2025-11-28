@@ -47,10 +47,25 @@ class DomsListeController extends AbstractController
             $domSearchDto = $form->getData();
         }
 
+        // Récupérer le paramètre limit depuis l'URL (pour le sélecteur JavaScript)
+        $limitFromUrl = $request->query->getInt('limit', 0);
+        if ($limitFromUrl > 0) {
+            $domSearchDto->limit = $limitFromUrl;
+        }
+
+        // Récupérer les paramètres de tri depuis l'URL
+        $sortByFromUrl = $request->query->get('sortBy');
+        $sortOrderFromUrl = $request->query->get('sortOrder');
+        if ($sortByFromUrl) {
+            $domSearchDto->sortBy = $sortByFromUrl;
+        }
+        if ($sortOrderFromUrl) {
+            $domSearchDto->sortOrder = $sortOrderFromUrl;
+        }
+
         // 4. recupération des données à afficher avec filtrage par agence
         $page = $request->query->getInt('page', 1);
-        $limit = 50;
-        $paginationData = $domRepository->findPaginatedAndFiltered($page, $limit, $domSearchDto, $agenceIdsAutorises);
+        $paginationData = $domRepository->findPaginatedAndFiltered($page, $domSearchDto->limit, $domSearchDto, $agenceIdsAutorises);
 
         return $this->render(
             'hf/rh/dom/liste/liste.html.twig',
@@ -59,7 +74,9 @@ class DomsListeController extends AbstractController
                 'form' => $form->createView(),
                 'agencesJson'   => $agenceSerializerService->serializeAgencesForDropdown(),
                 'routeName' => 'liste_dom_index',
-                'queryParams' => $request->query->all()
+                'queryParams' => $request->query->all(),
+                'currentSort' => $domSearchDto->sortBy,
+                'currentOrder' => $domSearchDto->sortOrder,
             ]
         );
     }

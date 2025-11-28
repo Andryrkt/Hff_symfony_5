@@ -1,5 +1,7 @@
 {% extends 'base.html.twig' %}
 
+{% import 'macros/_sortable_macros.html.twig' as sortable %}
+
 {% block title %}Liste des Ordres de Mission
 {% endblock %}
 
@@ -17,6 +19,8 @@
 		{% include "hf/rh/dom/liste/_formulaireRecherche.html.twig" with{
 			form : form
 		}%}
+
+
 		{% include "partials/_pagination_haut.html.twig" with {
 			buttons: [
 			{
@@ -55,15 +59,15 @@
 					<th>
 						<i class="fas fa-ellipsis-vertical"></i>
 					</th>
-					<th>Statut</th>
-					<th>Sous type</th>
-					<th>N° DOM</th>
-					<th>Date de demande</th>
+					{{ sortable.header('Statut', 'statut', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
+					{{ sortable.header('Sous type', 'typeDocument', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
+					{{ sortable.header('N° DOM', 'numeroOrdreMission', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
+					{{ sortable.header('Date de demande', 'dateDemande', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
 					<th>Motif de déplacemnt</th>
-					<th class="text-center">Matricule</th>
+					{{ sortable.header('Matricule', 'matricule', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
 					<th>Agence\Service</th>
-					<th>Date de début</th>
-					<th>Date de fin</th>
+					{{ sortable.header('Date de début', 'dateDebut', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
+					{{ sortable.header('Date de fin', 'dateFin', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
 					<th>Client</th>
 					<th>Lieu d'intervention</th>
 					<th>Total général payer</th>
@@ -90,9 +94,7 @@
 						</td>
 						{# Fin Actions #}
 
-						{# >>>===== DEBUT Statut  =======
-												   La logique CSS est maintenant gérée par les méthodes getStatutCssClass() et getStatutCssStyle() de l'entité Dom
-												#}
+						{# >>>===== DEBUT Statut  ======= La logique CSS est maintenant gérée par les méthodes getStatutCssClass() et getStatutCssStyle() de l'entité Dom #}
 						<td class="{{ item.statutCssClass }}" style="{{ item.statutCssStyle }}">{{ item.idStatutDemande.description }}</td>
 						{# <<<===== FIN Statut ==== #}
 						<td>{{ item.sousTypeDocument.codeSousType }}</td>

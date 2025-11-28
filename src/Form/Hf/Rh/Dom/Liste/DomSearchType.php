@@ -13,9 +13,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Repository\Admin\Statut\StatutDemandeRepository;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 
 
@@ -89,6 +89,23 @@ class DomSearchType extends AbstractType
                 'service_label' => 'Service Débiteur',
                 'agence_placeholder' => '-- Agence Débiteur --',
                 'service_placeholder' => '-- Service Débiteur --',
+            ])
+            ->add('limit', ChoiceType::class, [
+                'label' => 'Résultats par page',
+                'choices' => [
+                    '10' => 10,
+                    '25' => 25,
+                    '50' => 50,
+                    '100' => 100,
+                ],
+                'required' => false,
+                'attr' => ['class' => 'form-control-sm'],
+            ])
+            ->add('sortBy', HiddenType::class, [
+                'required' => false,
+            ])
+            ->add('sortOrder', HiddenType::class, [
+                'required' => false,
             ])
         ;
     }

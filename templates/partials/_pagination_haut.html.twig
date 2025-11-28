@@ -28,6 +28,17 @@
 		</p>
 	</div>
 
+	{# Sélecteur de limite de pagination #}
+	<div class="p-3">
+		<label for="limit-selector" class="form-label">Résultats par page :</label>
+		<select id="limit-selector" class="form-select form-select-sm" style="width: auto; display: inline-block;">
+			<option value="10" {{ (queryParams.limit ?? 50) == 10 ? 'selected' : '' }}>10</option>
+			<option value="25" {{ (queryParams.limit ?? 50) == 25 ? 'selected' : '' }}>25</option>
+			<option value="50" {{ (queryParams.limit ?? 50) == 50 ? 'selected' : '' }}>50</option>
+			<option value="100" {{ (queryParams.limit ?? 50) == 100 ? 'selected' : '' }}>100</option>
+		</select>
+	</div>
+
 	{# Navigation de pagination #}
 	<div class="navigation">
 		{% set queryParams = criteria|default({}) %}
@@ -61,3 +72,13 @@
 		{% endif %}
 	</div>
 </div>
+
+
+<script>
+	document.getElementById('limit-selector').addEventListener('change', function () {
+const currentUrl = new URL(window.location.href);
+currentUrl.searchParams.set('limit', this.value);
+currentUrl.searchParams.set('page', '1'); // Reset to page 1 when changing limit
+window.location.href = currentUrl.toString();
+});
+</script>
