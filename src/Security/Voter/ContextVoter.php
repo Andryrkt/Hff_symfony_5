@@ -7,6 +7,7 @@ use App\Entity\Admin\PersonnelUser\User;
 use App\Entity\Admin\AgenceService\Agence;
 use App\Entity\Admin\AgenceService\Service;
 use App\Entity\Admin\PersonnelUser\UserAccess;
+use App\Entity\Hf\Rh\Dom\Dom;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -49,14 +50,36 @@ class ContextVoter extends Voter
         }
 
         // 2️⃣ Vérifie les accès étendus
+        $targetAppCode = $this->getApplicationCodeForSubject($subject); // ex: DOM
         foreach ($user->getUserAccesses() as $access) {
-            if ($this->matchAccess($access, $agence, $service)) {
-                return true;
+            $accessApp = $access->getTypeDocument();
+
+            // Cas 1 : accès global (typedocument = null) → accepté partout
+            if ($accessApp === null) {
+                if ($this->matchAccess($access, $agence, $service)) {
+                    return true;
+                }
+                continue;
+            }
+
+            // Cas 2 : l'accès est lié à une type document
+            if ($accessApp->getTypeDocument() === $targetAppCode) {
+                if ($this->matchAccess($access, $agence, $service)) {
+                    return true;
+                }
             }
         }
 
         // 3️⃣ Par défaut, non autorisé
         return false;
+    }
+
+    private function getApplicationCodeForSubject(object $subject): ?string
+    {
+        if (get_class($subject) === Dom::class) {
+            return 'DOM';
+        }
+        return null;
     }
 
     private function matchAccess(UserAccess $access, ?Agence $agence, ?Service $service): bool
