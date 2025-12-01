@@ -7,7 +7,6 @@ use App\Form\Hf\Rh\Dom\Liste\DomSearchType;
 use App\Repository\Hf\Rh\Dom\DomRepository;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\Admin\AgenceSerializerService;
-use App\Service\Security\AgenceAccessService;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -26,14 +25,10 @@ class DomsListeController extends AbstractController
     public function index(
         Request $request,
         DomRepository $domRepository,
-        AgenceSerializerService $agenceSerializerService,
-        AgenceAccessService $agenceAccessService
+        AgenceSerializerService $agenceSerializerService
     ) {
         // 1. gerer l'accés
         $this->denyAccessUnlessGranted('RH_ORDRE_MISSION_VIEW');
-
-        // 2. Récupérer les agences autorisées pour l'utilisateur connecté
-        $agenceIdsAutorises = $agenceAccessService->getAuthorizedAgenceIds($this->getUser());
 
         $domSearchDto = new DomSearchDto();
         // 3. creation du formulaire de recherhce
@@ -65,7 +60,7 @@ class DomsListeController extends AbstractController
 
         // 4. recupération des données à afficher avec filtrage par agence
         $page = $request->query->getInt('page', 1);
-        $paginationData = $domRepository->findPaginatedAndFiltered($page, $domSearchDto->limit, $domSearchDto, $agenceIdsAutorises);
+        $paginationData = $domRepository->findPaginatedAndFiltered($page, $domSearchDto->limit, $domSearchDto);
 
         return $this->render(
             'hf/rh/dom/liste/liste.html.twig',

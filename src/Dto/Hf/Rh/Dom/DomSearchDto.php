@@ -14,8 +14,8 @@ class DomSearchDto
     public array $dateDemande = [];
     public array $dateMission = [];
 
-    public ?array $debiteur = null;
-    public ?array $emetteur = null;
+    public array $debiteur = [];
+    public array $emetteur = [];
     public ?bool $pieceJustificatif = null;
 
     // Pagination et tri

@@ -3,9 +3,15 @@
 namespace App\Repository\Hf\Rh\Dom;
 
 use App\Entity\Hf\Rh\Dom\Dom;
+use Doctrine\ORM\QueryBuilder;
 use App\Dto\Hf\Rh\Dom\DomSearchDto;
+use App\Entity\Admin\PersonnelUser\User;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Entity\Hf\Rh\Dom\SousTypeDocument;
+use Symfony\Component\Security\Core\Security;
+use App\Service\Security\ContextAccessService;
+use App\Repository\Traits\DynamicContextFilterTrait;
+use App\Constants\Admin\Historisation\TypeDocumentConstants;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
@@ -19,15 +25,21 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
  */
 class DomRepository extends ServiceEntityRepository
 {
+    use DynamicContextFilterTrait;
 
     private const TYPE_MISSION_ECARTER = [
         SousTypeDocument::CODE_COMPLEMENT,
         SousTypeDocument::CODE_TROP_PERCU
     ];
 
-    public function __construct(ManagerRegistry $registry)
+    private ContextAccessService $contextAccessService;
+    private Security $security;
+
+    public function __construct(ManagerRegistry $registry, ContextAccessService $contextAccessService, Security $security)
     {
         parent::__construct($registry, Dom::class);
+        $this->contextAccessService = $contextAccessService;
+        $this->security = $security;
     }
 
     public function add(Dom $entity, bool $flush = false): void
@@ -95,7 +107,7 @@ class DomRepository extends ServiceEntityRepository
         ;
     }
 
-    public function findPaginatedAndFiltered(int $page = 1, int $limit = 10, DomSearchDto $domSearchDto, ?array $agenceIds = null)
+    public function findPaginatedAndFiltered(int $page = 1, int $limit = 10, DomSearchDto $domSearchDto)
     {
         // Mapping des colonnes triables (whitelist de sécurité)
         $sortableColumns = [
@@ -123,20 +135,18 @@ class DomRepository extends ServiceEntityRepository
         // Récupérer la limite depuis le DTO
         $limit = $domSearchDto->limit ?? 50;
 
-        // Créer le QueryBuilder avec les jointures et chargement eager des relations
+        // 1. Créer le QueryBuilder avec les jointures et chargement eager des relations
         $queryBuilder = $this->createQueryBuilder('d')
             ->leftJoin('d.sousTypeDocument', 'td')
             ->addSelect('td')  // Évite le problème N+1
             ->leftJoin('d.idStatutDemande', 's')
             ->addSelect('s');  // Évite le problème N+1
 
-        // 1. Filtrer par agences autorisées (sécurité)
-        $this->filtredAgenceService($queryBuilder, $agenceIds);
-
         // 2. Appliquer les filtres de recherche
         $this->filtred($queryBuilder, $domSearchDto);
         $this->filtredDate($queryBuilder, $domSearchDto);
         $this->filtredStatut($queryBuilder, $domSearchDto);
+        $this->filtredAgenceService($queryBuilder, $domSearchDto);
 
         // 3. Ordre et pagination
         $queryBuilder->orderBy($sortableColumns[$sortBy], $sortOrder)
@@ -156,7 +166,11 @@ class DomRepository extends ServiceEntityRepository
         ];
     }
 
-    private function filtredStatut($queryBuilder, DomSearchDto $domSearchDto)
+    /**
+     * Filtre pour le statut
+     * *on n'affiche pas les DOM qui a le statut annulé sauf si on le recherche
+     */
+    private function filtredStatut(QueryBuilder $queryBuilder, DomSearchDto $domSearchDto)
     {
         // Filtre pour le statut        
         if (!empty($domSearchDto->statut)) {
@@ -168,7 +182,7 @@ class DomRepository extends ServiceEntityRepository
         }
     }
 
-    private function filtred($queryBuilder, DomSearchDto $domSearchDto)
+    private function filtred(QueryBuilder $queryBuilder, DomSearchDto $domSearchDto)
     {
         // Filtre pour le type de document
         if (!empty($domSearchDto->sousTypeDocument)) {
@@ -195,7 +209,7 @@ class DomRepository extends ServiceEntityRepository
         }
     }
 
-    private function filtredDate($queryBuilder, DomSearchDto $domSearchDto)
+    private function filtredDate(QueryBuilder $queryBuilder, DomSearchDto $domSearchDto)
     {
         // Filtre pour la date de demande (début)
         if (!(empty($domSearchDto->dateDemande) && empty($domSearchDto->dateDemande['debut']))) {
@@ -223,43 +237,43 @@ class DomRepository extends ServiceEntityRepository
     }
 
     /**
-     * Filtre les résultats par agences autorisées.
+     * Filtre les résultats par agences et service Emetteur et Débiteur.
+     * * filtre  selon le UserAccess de l'utilisateur connecter(sécurité)
      * 
      * @param $queryBuilder Le query builder Doctrine
-     * @param array|null $agenceIds Les IDs des agences autorisées, null si accès à toutes
      */
-    private function filtredAgenceService($queryBuilder, ?array $agenceIds): void
+    private function filtredAgenceService(QueryBuilder $queryBuilder, DomSearchDto $domSearchDto)
     {
-        // Si $agenceIds est null => l'utilisateur a accès à toutes les agences (admin)
-        // Sinon, filtrer uniquement par les agences autorisées
-        if ($agenceIds !== null && count($agenceIds) > 0) {
-            $queryBuilder->andWhere('d.agenceEmetteurId IN (:agenceIdAutoriser)')
-                ->setParameter('agenceIdAutoriser', $agenceIds);
+        // filtre selon l'agence et service autorisées de l'utilisateur dans ContextVoter
+        $this->applyDynamicContextFilter(
+            $queryBuilder,
+            'd',
+            TypeDocumentConstants::TYPE_DOCUMENT_DOM_CODE,
+            $this->getDocumentFilterConfig([], [])
+        );
+
+        // filtre selon l'agence emetteur
+        if (!empty($domSearchDto->emetteur) && !empty($domSearchDto->emetteur['agence'])) {
+            $queryBuilder->andWhere('d.agenceEmetteurId = :agEmet')
+                ->setParameter('agEmet', $domSearchDto->emetteur['agence']->getId());
+        }
+
+        // filtre selon le service emetteur
+        if (!empty($domSearchDto->emetteur) && !empty($domSearchDto->emetteur['service'])) {
+            $queryBuilder->andWhere('d.serviceEmetteurId = :agServEmet')
+                ->setParameter('agServEmet', $domSearchDto->emetteur['service']->getId());
+        }
+
+        // filtre selon l'agence debiteur
+        if (!empty($domSearchDto->debiteur) && !empty($domSearchDto->debiteur['agence'])) {
+            $queryBuilder->andWhere('d.agenceDebiteurId = :agDebit')
+                ->setParameter('agDebit', $domSearchDto->debiteur['agence']->getId());
+        }
+
+        // filtre selon le service debiteur
+        if (!empty($domSearchDto->debiteur) && !empty($domSearchDto->debiteur['service'])) {
+            $queryBuilder->andWhere('d.serviceDebiteur = :serviceDebiteur')
+                ->setParameter('serviceDebiteur', $domSearchDto->debiteur['service']->getId());
         }
     }
-
-    /**
-//     * @return Dom[] Returns an array of Dom objects
-//     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('d')
-    //            ->andWhere('d.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('d.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Dom
-    //    {
-    //        return $this->createQueryBuilder('d')
-    //            ->andWhere('d.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }

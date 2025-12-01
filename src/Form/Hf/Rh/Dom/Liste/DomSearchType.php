@@ -75,7 +75,7 @@ class DomSearchType extends AbstractType
             ->add('emetteur', AgenceServiceType::class, [
                 'label' => false,
                 'required' => false,
-                'mapped' => false,
+                'mapped' => true,
                 'agence_label' => 'Agence Emetteur',
                 'service_label' => 'Service Emetteur',
                 'agence_placeholder' => '-- Agence Emetteur --',
@@ -84,29 +84,29 @@ class DomSearchType extends AbstractType
             ->add('debiteur', AgenceServiceType::class, [
                 'label' => false,
                 'required' => false,
-                'mapped' => false,
+                'mapped' => true,
                 'agence_label' => 'Agence Débiteur',
                 'service_label' => 'Service Débiteur',
                 'agence_placeholder' => '-- Agence Débiteur --',
                 'service_placeholder' => '-- Service Débiteur --',
             ])
-            ->add('limit', ChoiceType::class, [
-                'label' => 'Résultats par page',
-                'choices' => [
-                    '10' => 10,
-                    '25' => 25,
-                    '50' => 50,
-                    '100' => 100,
-                ],
-                'required' => false,
-                'attr' => ['class' => 'form-control-sm'],
-            ])
-            ->add('sortBy', HiddenType::class, [
-                'required' => false,
-            ])
-            ->add('sortOrder', HiddenType::class, [
-                'required' => false,
-            ])
+            // ->add('limit', ChoiceType::class, [
+            //     'label' => 'Résultats par page',
+            //     'choices' => [
+            //         '10' => 10,
+            //         '25' => 25,
+            //         '50' => 50,
+            //         '100' => 100,
+            //     ],
+            //     'required' => false,
+            //     'attr' => ['class' => 'form-control-sm'],
+            // ])
+            // ->add('sortBy', HiddenType::class, [
+            //     'required' => false,
+            // ])
+            // ->add('sortOrder', HiddenType::class, [
+            //     'required' => false,
+            // ])
         ;
     }
 
