@@ -175,7 +175,7 @@ class DomRepository extends ServiceEntityRepository
         // Filtre pour le statut        
         if (!empty($domSearchDto->statut)) {
             $queryBuilder->andWhere('s.description LIKE :statut')
-                ->setParameter('statut', '%' . $domSearchDto->statut . '%');
+                ->setParameter('statut', '%' . $domSearchDto->statut->getDescription() . '%');
         } else {
             $queryBuilder->andWhere('s.description NOT LIKE :excludedStatuses')
                 ->setParameter('excludedStatuses', 'ANNULE%');
@@ -187,7 +187,7 @@ class DomRepository extends ServiceEntityRepository
         // Filtre pour le type de document
         if (!empty($domSearchDto->sousTypeDocument)) {
             $queryBuilder->andWhere('td.codeSousType LIKE :typeDocument')
-                ->setParameter('typeDocument', '%' . $domSearchDto->sousTypeDocument . '%');
+                ->setParameter('typeDocument', '%' . $domSearchDto->sousTypeDocument->getCodeSousType() . '%');
         }
 
         // Filtrer selon le numero DOM
@@ -249,7 +249,7 @@ class DomRepository extends ServiceEntityRepository
             $queryBuilder,
             'd',
             TypeDocumentConstants::TYPE_DOCUMENT_DOM_CODE,
-            $this->getDocumentFilterConfig([], [])
+            $this->getDocumentFilterConfig(['agenceDebiteurId'])
         );
 
         // filtre selon l'agence emetteur
