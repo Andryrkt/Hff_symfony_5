@@ -28,22 +28,19 @@ class DomSecondController extends AbstractController
     private DomCreationHandler $domCreationHandler;
     private HistoriqueOperationService $historiqueOperationService;
     private AgenceSerializerService $agenceSerializerService;
-    private PerformanceDiagnosticService $performanceDiagnostic;
 
     public function __construct(
         SecondFormDtoFactory $secondFormDtoFactory,
         LoggerInterface $domSecondFormLogger,
         DomCreationHandler $domCreationHandler,
         HistoriqueOperationService $historiqueOperationService,
-        AgenceSerializerService $agenceSerializerService,
-        PerformanceDiagnosticService $performanceDiagnostic
+        AgenceSerializerService $agenceSerializerService
     ) {
         $this->secondFormDtoFactory = $secondFormDtoFactory;
         $this->logger = $domSecondFormLogger;
         $this->domCreationHandler = $domCreationHandler;
         $this->historiqueOperationService = $historiqueOperationService;
         $this->agenceSerializerService = $agenceSerializerService;
-        $this->performanceDiagnostic = $performanceDiagnostic;
     }
 
     /**
@@ -55,15 +52,11 @@ class DomSecondController extends AbstractController
         ContextAwareBreadcrumbBuilder $breadcrumbBuilder
     ) {
         // Démarrer le diagnostic de performance
-        $this->performanceDiagnostic->startTimer('TOTAL_PAGE_LOAD');
-        $this->logger->info('🚀 Début du chargement du second formulaire de DOM');
-        //$this->denyAccessUnlessGranted('RH_ORDRE_MISSION_CREATE');
+
+        $this->denyAccessUnlessGranted('RH_ORDRE_MISSION_CREATE');
 
         // Mesure: Récupération des données de session
-        $firstFormDto = $this->performanceDiagnostic->measure(
-            'SESSION_RETRIEVE',
-            fn() => $this->getFirstFormDataFromSession($request->getSession())
-        );
+        $firstFormDto = $this->getFirstFormDataFromSession($request->getSession());
 
         if ($firstFormDto instanceof RedirectResponse) {
             $this->logger->warning('Données du premier formulaire non trouvées en session.');
@@ -71,16 +64,10 @@ class DomSecondController extends AbstractController
         }
 
         // Mesure: Création du SecondFormDto
-        $secondFormDto = $this->performanceDiagnostic->measure(
-            'DTO_FACTORY_CREATE',
-            fn() => $this->secondFormDtoFactory->create($firstFormDto)
-        );
+        $secondFormDto =  $this->secondFormDtoFactory->create($firstFormDto);
 
         // Mesure: Création du formulaire Symfony
-        $form = $this->performanceDiagnostic->measure(
-            'FORM_CREATE',
-            fn() => $this->createForm(SecondFormType::class, $secondFormDto)
-        );
+        $form = $this->createForm(SecondFormType::class, $secondFormDto);
 
         $form->handleRequest($request);
 
@@ -93,34 +80,16 @@ class DomSecondController extends AbstractController
             }
         }
 
-        // Mesure: Sérialisation des agences
-        $agencesJson = $this->performanceDiagnostic->measure(
-            'AGENCES_SERIALIZATION',
-            fn() => $this->agenceSerializerService->serializeAgencesForDropdown()
-        );
-
-        // Mesure: Construction du breadcrumb
-        $breadcrumbs = $this->performanceDiagnostic->measure(
-            'BREADCRUMB_BUILD',
-            fn() => $breadcrumbBuilder->build('dom_second_form')
-        );
-
         // Mesure: Création de la vue du formulaire
-        $this->performanceDiagnostic->startTimer('FORM_CREATE_VIEW');
         $formView = $form->createView();
-        $this->performanceDiagnostic->stopTimer('FORM_CREATE_VIEW');
-
-        // Arrêter le timer total et logger le résumé
-        $this->performanceDiagnostic->stopTimer('TOTAL_PAGE_LOAD');
-        $this->performanceDiagnostic->logSummary();
 
         $this->logger->info('✅ Fin du chargement du second formulaire de DOM');
 
         return $this->render('hf/rh/dom/creation/secondForm.html.twig', [
             'form'          => $formView,
             'secondFormDto' => $form->getData(),
-            'agencesJson'   => $agencesJson,
-            'breadcrumbs'   => $breadcrumbs,
+            'agencesJson'   => $this->agenceSerializerService->serializeAgencesForDropdown(),
+            'breadcrumbs'   => $breadcrumbBuilder->build('dom_second_form'),
         ]);
     }
 
