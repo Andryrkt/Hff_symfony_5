@@ -2,10 +2,37 @@
 
 namespace App\Service\Navigation\Hf;
 
-
+use App\Repository\Admin\ApplicationGroupe\VignetteRepository;
+use Symfony\Component\Security\Core\Security;
 
 class BaseBreadcrumbBuilder
 {
+    protected $vignetteRepository;
+    protected $security;
+
+    public function __construct(VignetteRepository $vignetteRepository, Security $security)
+    {
+        $this->vignetteRepository = $vignetteRepository;
+        $this->security = $security;
+    }
+
+    /**
+     * Filtre les sous-menus en fonction des permissions de l'utilisateur
+     * Vérifie l'accès à la vignette correspondante
+     */
+    protected function filterSubmenuByPermissions(string $vignetteName, array $submenu): array
+    {
+        // Récupérer la vignette correspondante
+        $vignette = $this->vignetteRepository->findOneForHomeCard($vignetteName);
+
+        // Si la vignette n'existe pas ou si l'utilisateur n'a pas accès, retourner un tableau vide
+        if (!$vignette || !$this->security->isGranted('APPLICATION_ACCESS', $vignette)) {
+            return [];
+        }
+
+        // Si l'utilisateur a accès, retourner le sous-menu complet
+        return $submenu;
+    }
     protected function domSubmenu(): array
     {
         return [
@@ -380,79 +407,82 @@ class BaseBreadcrumbBuilder
 
     protected function accueilSubmenu(): array
     {
-        return [
+        return array_filter([
             /** =============== Documentation ===================== */
             [
                 'label' => 'documentation',
                 'route' => null, // C'est un conteneur de sous-menu
-                'submenu' => $this->documentationSubmenu()
+                'submenu' => $this->filterSubmenuByPermissions('Documentation', $this->documentationSubmenu())
             ],
             /** ======== Reporting ========== */
             [
                 'label' => 'Reporting',
                 'route' => null, // C'est un conteneur de sous-menu
-                'submenu' => $this->reportingSubmenu()
+                'submenu' => $this->filterSubmenuByPermissions('Reporting', $this->reportingSubmenu())
             ],
             /** ======== Compta ========== */
             [
                 'label' => 'Compta',
                 'route' => null, // C'est un conteneur de sous-menu
-                'submenu' => $this->comptaSubmenu()
+                'submenu' => $this->filterSubmenuByPermissions('Compta', $this->comptaSubmenu())
             ],
             /** ======== RH ========== */
             [
                 'label' => 'rh',
                 'route' => null, // C'est un conteneur de sous-menu
-                'submenu' => $this->rhSubmenu()
+                'submenu' => $this->filterSubmenuByPermissions('RH', $this->rhSubmenu())
             ],
             /** ======== Matériel ========== */
             [
                 'label' => 'Matériel',
                 'route' => null, // C'est un conteneur de sous-menu
-                'submenu' => $this->materielSubmenu()
+                'submenu' => $this->filterSubmenuByPermissions('Matériel', $this->materielSubmenu())
             ],
             /** ======== Atelier ========== */
             [
                 'label' => 'Atelier',
                 'route' => null, // C'est un conteneur de sous-menu
-                'submenu' => $this->atelierSubmenu()
+                'submenu' => $this->filterSubmenuByPermissions('Atelier', $this->atelierSubmenu())
             ],
             /** ======== Magasin ========== */
             [
                 'label' => 'Magasin',
                 'route' => null, // C'est un conteneur de sous-menu
-                'submenu' => $this->magainSubmenu()
+                'submenu' => $this->filterSubmenuByPermissions('Magasin', $this->magainSubmenu())
             ],
             /** ======== Appro ========== */
             [
                 'label' => 'Appro',
                 'route' => null, // C'est un conteneur de sous-menu
-                'submenu' => $this->approSubmenu()
+                'submenu' => $this->filterSubmenuByPermissions('Appro', $this->approSubmenu())
             ],
             /** ======== IT ========== */
             [
                 'label' => 'IT',
                 'route' => null, // C'est un conteneur de sous-menu
-                'submenu' => $this->itSubmenu()
+                'submenu' => $this->filterSubmenuByPermissions('IT', $this->itSubmenu())
             ],
             /** ======== POL ========== */
             [
                 'label' => 'POL',
                 'route' => null, // C'est un conteneur de sous-menu
-                'submenu' => $this->polSubmenu()
+                'submenu' => $this->filterSubmenuByPermissions('POL', $this->polSubmenu())
             ],
             /** ======== Energie ========== */
             [
                 'label' => 'Energie',
                 'route' => null, // C'est un conteneur de sous-menu
-                'submenu' => $this->energieSubmenu()
+                'submenu' => $this->filterSubmenuByPermissions('Energie', $this->energieSubmenu())
             ],
             /** ======== HSE ========== */
             [
                 'label' => 'HSE',
                 'route' => null, // C'est un conteneur de sous-menu
-                'submenu' => $this->hseSubmenu()
+                'submenu' => $this->filterSubmenuByPermissions('HSE', $this->hseSubmenu())
             ],
-        ];
+        ], function ($item) {
+            // Filtrer les éléments dont le sous-menu est vide (pas d'accès)
+            return !empty($item['submenu']);
+        });
     }
 }

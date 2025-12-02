@@ -14,8 +14,6 @@
 	<div class="container" id="agence-service-data" data-agences="{{ agencesJson|e('html_attr') }}">
 		{% include 'partials/flash_messages.html.twig' %}
 
-		<h1>Liste des Ordres de Mission</h1>
-
 		{% include "hf/rh/dom/liste/_formulaireRecherche.html.twig" with{
 			form : form
 		}%}

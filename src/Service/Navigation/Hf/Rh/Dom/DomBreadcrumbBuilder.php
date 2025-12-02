@@ -5,31 +5,37 @@ namespace App\Service\Navigation\Hf\Rh\Dom;
 use App\Service\Navigation\BreadcrumbBuilder;
 use App\Service\Navigation\Hf\BaseBreadcrumbBuilder;
 use App\Contract\Navigation\BreadcrumbBuilderInterface;
+use App\Repository\Admin\ApplicationGroupe\VignetteRepository;
+use Symfony\Component\Security\Core\Security;
 
 class DomBreadcrumbBuilder extends BaseBreadcrumbBuilder implements BreadcrumbBuilderInterface
 {
     private $breadcrumb;
 
-    public function __construct(BreadcrumbBuilder $breadcrumb)
-    {
+    public function __construct(
+        BreadcrumbBuilder $breadcrumb,
+        VignetteRepository $vignetteRepository,
+        Security $security
+    ) {
+        parent::__construct($vignetteRepository, $security);
         $this->breadcrumb = $breadcrumb;
     }
 
     public function supports(string $context): bool
     {
-        return in_array($context, ['dom_first_form', 'dom_second_form', 'dom_liste']);
+        return in_array($context, ['dom_first_form', 'dom_second_form', 'liste_dom_index']);
     }
 
     public function build(array $parameters = []): array
     {
-        $context = $parameters['context'] ?? 'dom_liste';
+        $context = $parameters['context'] ?? 'liste_dom_index';
 
         switch ($context) {
             case 'dom_first_form':
                 return $this->buildFirstFormBreadcrumb();
             case 'dom_second_form':
                 return $this->buildSecondFormBreadcrumb();
-            case 'dom_liste':
+            case 'liste_dom_index':
                 return $this->buildListeBreadcrumb();
             default:
                 throw new \InvalidArgumentException("Unsupported product context: {$context}");
