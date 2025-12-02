@@ -20,7 +20,8 @@
       "node",
       "bootstrap",
       "select2",
-      "jest"
+      "jest",
+      "webpack-env"
     ]
   },
   "include": [

@@ -1,32 +1,49 @@
-<nav aria-label="breadcrumb" class="mb-3 position-relative">
-	<ol class="breadcrumb bg-light p-2 rounded shadow-sm mb-0">
-		{% for item in breadcrumb %}
-			<li class="breadcrumb-item {% if loop.last %}active{% endif %} position-relative dropdown">
-				{% if not loop.last %}
-					{% if item.url %}
-						<a class="text-decoration-none text-primary dropdown-toggle" href="{{ item.url }}" role="button">
-							{{ item.label }}
-						</a>
-					{% else %}
-						<span class="text-secondary">{{ item.label }}</span>
-					{% endif %}
+{% macro render_submenu(items, parent_id) %}
+    {% from _self import render_submenu %}
+    {% for item in items %}
+        {% set has_submenu = item.submenu is defined and item.submenu|length > 0 %}
+        {% set item_id = parent_id ~ '-' ~ loop.index %}
+        <li class="{% if has_submenu %}dropend{% endif %}">
+            <a class="dropdown-item {% if has_submenu %}dropdown-toggle{% endif %}" href="{{ item.url|default('#') }}"
+               id="dropdown-{{ item_id }}"
+               {% if has_submenu %}data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"{% endif %}>
+                {% if item.icon is defined %}<i class="{{ item.icon }} me-1"></i>{% endif %}{{ item.label }}
+            </a>
+            {% if has_submenu %}
+                <ul class="dropdown-menu" aria-labelledby="dropdown-{{ item_id }}">
+                    {{ render_submenu(item.submenu, item_id) }}
+                </ul>
+            {% endif %}
+        </li>
+    {% endfor %}
+{% endmacro %}
 
-					{# sous-menu affiché au survol #}
-					{% if item.submenu is defined and item.submenu|length > 0 %}
-						<ul class="dropdown-menu shadow-sm">
-							{% for sub in item.submenu %}
-								<li>
-									<a class="dropdown-item" href="{{ path(sub.route, sub.params|default({})) }}">
-										{{ sub.label }}
-									</a>
-								</li>
-							{% endfor %}
-						</ul>
-					{% endif %}
-				{% else %}
-					<span class="text-dark fw-semibold">{{ item.label }}</span>
-				{% endif %}
-			</li>
-		{% endfor %}
-	</ol>
+<nav aria-label="breadcrumb" class="mb-3 position-relative">
+    <ol class="breadcrumb bg-light p-2 rounded shadow-sm mb-0">
+        {% from _self import render_submenu %}
+        {% for item in breadcrumb %}
+            {% set has_submenu = item.submenu is defined and item.submenu|length > 0 %}
+            {% set item_id = 'breadcrumb-' ~ loop.index %}
+            <li class="breadcrumb-item{% if loop.last and not has_submenu %} active{% endif %}{% if has_submenu %} dropdown{% endif %}" {% if loop.last and not has_submenu %}aria-current="page"{% endif %}>
+
+                {% if item.url and (not loop.last or has_submenu) %}
+                     <a class="text-decoration-none text-primary {% if has_submenu %}dropdown-toggle{% endif %}" href="{{ item.url }}"
+                       id="dropdown-{{ item_id }}"
+                       {% if has_submenu %}role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"{% endif %}>
+                        {% if item.icon is defined %}<i class="{{ item.icon }} me-1"></i>{% endif %}{{ item.label }}
+                    </a>
+                {% else %}
+                    <span class="{{ loop.last ? 'text-dark fw-semibold' : 'text-secondary' }}">
+                        {% if item.icon is defined %}<i class="{{ item.icon }} me-1"></i>{% endif %}{{ item.label }}
+                    </span>
+                {% endif %}
+
+                {% if has_submenu %}
+                    <ul class="dropdown-menu" aria-labelledby="dropdown-{{ item_id }}">
+                        {{ render_submenu(item.submenu, item_id) }}
+                    </ul>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ol>
 </nav>

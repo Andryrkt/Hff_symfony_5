@@ -8,6 +8,7 @@ use App\Repository\Hf\Rh\Dom\DomRepository;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\Admin\AgenceSerializerService;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
@@ -25,7 +26,8 @@ class DomsListeController extends AbstractController
     public function index(
         Request $request,
         DomRepository $domRepository,
-        AgenceSerializerService $agenceSerializerService
+        AgenceSerializerService $agenceSerializerService,
+        ContextAwareBreadcrumbBuilder $breadcrumbBuilder
     ) {
         // 1. gerer l'accés
         $this->denyAccessUnlessGranted('RH_ORDRE_MISSION_VIEW');
@@ -72,6 +74,7 @@ class DomsListeController extends AbstractController
                 'queryParams' => $request->query->all(),
                 'currentSort' => $domSearchDto->sortBy,
                 'currentOrder' => $domSearchDto->sortOrder,
+                'breadcrumbs' => $breadcrumbBuilder->build('liste_dom_index'),
             ]
         );
     }

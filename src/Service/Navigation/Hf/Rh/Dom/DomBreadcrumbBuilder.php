@@ -2,10 +2,11 @@
 
 namespace App\Service\Navigation\Hf\Rh\Dom;
 
-use App\Contract\Navigation\BreadcrumbBuilderInterface;
 use App\Service\Navigation\BreadcrumbBuilder;
+use App\Service\Navigation\Hf\BaseBreadcrumbBuilder;
+use App\Contract\Navigation\BreadcrumbBuilderInterface;
 
-class DomBreadcrumbBuilder implements BreadcrumbBuilderInterface
+class DomBreadcrumbBuilder extends BaseBreadcrumbBuilder implements BreadcrumbBuilderInterface
 {
     private $breadcrumb;
 
@@ -35,32 +36,35 @@ class DomBreadcrumbBuilder implements BreadcrumbBuilderInterface
         }
     }
 
-    private function buildFirstFormBreadcrumb(): array
+    private function buildBaseBreadcrumb(): BreadcrumbBuilder
     {
+
         return $this->breadcrumb
             ->clear()
-            ->add('Accueil', 'app_home')
-            ->add('Ordre de Mission', 'dom_first_form')
-            ->add('Dom - Étape 1')
+            ->add('Accueil', 'app_home', [], $this->accueilSubmenu())
+            ->add('RH', null, [], $this->rhSubmenu())
+            ->add('Ordre de mission', null, [], $this->domSubmenu())
+        ;
+    }
+
+    private function buildFirstFormBreadcrumb(): array
+    {
+        return $this->buildBaseBreadcrumb()
+            ->add("Création d'ordre de mission - Étape 1")
             ->get();
     }
 
     private function buildSecondFormBreadcrumb(): array
     {
-        return $this->breadcrumb
-            ->clear()
-            ->add('Accueil', 'app_home')
-            ->add('Ordre de Mission', 'dom_first_form')
-            ->add('Dom -Étape 2')
+        return $this->buildBaseBreadcrumb()
+            ->add("Création d'ordre de mission -Étape 2")
             ->get();
     }
 
     private function buildListeBreadcrumb(): array
     {
-        return $this->breadcrumb
-            ->clear()
-            ->add('Accueil', 'app_home')
-            ->add('Ordre de Mission', 'dom_liste')
+        return $this->buildBaseBreadcrumb()
+            ->add("Liste de consultation de demande d'ordre de mission")
             ->get();
     }
 }

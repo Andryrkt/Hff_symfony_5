@@ -50,7 +50,11 @@ Encore
     // })
 
     // Loaders
-    .enableSassLoader()
+    .enableSassLoader((options) => {
+        options.sassOptions = {
+            silenceDeprecations: ['legacy-js-api'],
+        };
+    })
     .enableTypeScriptLoader()
 
     // jQuery

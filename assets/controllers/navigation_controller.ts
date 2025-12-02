@@ -28,8 +28,6 @@ export default class extends Controller {
      */
     private initializeNavigation() {
         this.setupSidebarToggle();
-        this.setupDropdowns();
-        this.setupUserMenu();
     }
 
     /**
@@ -39,26 +37,6 @@ export default class extends Controller {
         const sidebarToggle = document.querySelector('[data-bs-toggle="collapse"]');
         if (sidebarToggle) {
             sidebarToggle.addEventListener('click', this.handleSidebarToggle.bind(this));
-        }
-    }
-
-    /**
-     * Configure les dropdowns
-     */
-    private setupDropdowns() {
-        const dropdowns = document.querySelectorAll('.dropdown-toggle');
-        dropdowns.forEach(dropdown => {
-            dropdown.addEventListener('click', this.handleDropdownClick.bind(this));
-        });
-    }
-
-    /**
-     * Configure le menu utilisateur
-     */
-    private setupUserMenu() {
-        const userMenu = document.getElementById('userName');
-        if (userMenu) {
-            userMenu.addEventListener('click', this.handleUserMenuClick.bind(this));
         }
     }
 
@@ -79,31 +57,6 @@ export default class extends Controller {
     }
 
     /**
-     * Gère les clics sur les dropdowns
-     */
-    private handleDropdownClick(event: Event) {
-        const dropdown = event.currentTarget as HTMLElement;
-        const isExpanded = dropdown.getAttribute('aria-expanded') === 'true';
-
-        // Fermer tous les autres dropdowns
-        document.querySelectorAll('.dropdown-toggle[aria-expanded="true"]').forEach(otherDropdown => {
-            if (otherDropdown !== dropdown) {
-                otherDropdown.setAttribute('aria-expanded', 'false');
-            }
-        });
-
-        dropdown.setAttribute('aria-expanded', (!isExpanded).toString());
-    }
-
-    /**
-     * Gère les clics sur le menu utilisateur
-     */
-    private handleUserMenuClick(event: Event) {
-        console.log('User menu clicked');
-        // Logique spécifique au menu utilisateur si nécessaire
-    }
-
-    /**
      * Affiche/masque la sidebar
      */
     toggleSidebar() {
@@ -111,15 +64,6 @@ export default class extends Controller {
         if (sidebar) {
             sidebar.classList.toggle('d-none');
         }
-    }
-
-    /**
-     * Ferme tous les dropdowns ouverts
-     */
-    closeAllDropdowns() {
-        document.querySelectorAll('.dropdown-toggle[aria-expanded="true"]').forEach(dropdown => {
-            dropdown.setAttribute('aria-expanded', 'false');
-        });
     }
 
     /**

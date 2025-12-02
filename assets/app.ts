@@ -21,7 +21,9 @@ import "select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css";
 // Import des utilitaires
 import { ChronometerManager } from "./js/utils/chronometer";
 import { SessionManager } from "./js/utils/session";
+import { SubmenuManager } from "./js/utils/submenuManager";
 import { ToastManager } from "./js/utils/toast";
+import { initFirstForm } from "./js/pages/rh/dom/firstForm.js";
 
 // Import des styles supplémentaires
 import './styles/home.css';
@@ -42,17 +44,17 @@ class App {
      */
     private async init(): Promise<void> {
         console.log('🚀 Initialisation de l\'application...');
-        
+
         try {
             // Charge automatiquement tous les contrôleurs Stimulus
             await this.loadStimulusControllers();
-            
+
             // Initialise les autres fonctionnalités
             this.initManagers();
             this.bindEvents();
-            
+
             console.log('🎯 Application prête !');
-            
+
         } catch (error) {
             console.error('❌ Erreur lors de l\'initialisation:', error);
         }
@@ -73,6 +75,7 @@ class App {
         new ChronometerManager().init();
         new SessionManager().init();
         new ToastManager().init();
+        new SubmenuManager().init();
     }
 
     /**
@@ -80,18 +83,20 @@ class App {
      */
     private bindEvents(): void {
         document.addEventListener('DOMContentLoaded', () => this.onDomReady());
-        
+
         if (typeof window.Turbo !== 'undefined') {
             document.addEventListener('turbo:load', () => this.onTurboLoad());
         }
     }
 
     private onDomReady(): void {
-        this.initSelect2();
+        // this.initSelect2();
+        // this.initFirstForm();
     }
 
     private onTurboLoad(): void {
-        this.initSelect2();
+        // this.initSelect2();
+        // this.initFirstForm();
     }
 
     private initSelect2(): void {
@@ -109,6 +114,10 @@ class App {
                 }
             }
         });
+    }
+
+    private initFirstForm(): void {
+        initFirstForm();
     }
 
     /**
@@ -133,7 +142,5 @@ declare global {
 
 // Initialisation
 const app = App.getInstance();
-
-import "./js/pages/rh/dom/firstForm.js";
 
 export default app;

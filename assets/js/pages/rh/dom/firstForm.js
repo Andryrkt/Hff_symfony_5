@@ -133,6 +133,11 @@ function getFormElements() {
 export function initFirstForm() {
     const elements = getFormElements();
 
+    // Clause de garde : ne rien faire si le formulaire n'est pas sur la page
+    if (!elements.salarieSelect) {
+        return;
+    }
+
     const salarieManager = new SalarieFieldManager(elements);
     const categorieManager = new CategorieFieldManager(elements);
     const matriculeManager = new MatriculeManager(elements);
@@ -156,14 +161,4 @@ export function initFirstForm() {
     }
 
     return { salarieManager, categorieManager, matriculeManager };
-}
-
-// Auto-initialisation en production
-if (typeof window !== 'undefined') {
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initFirstForm);
-    } else {
-        // DOM déjà chargé
-        initFirstForm();
-    }
 }

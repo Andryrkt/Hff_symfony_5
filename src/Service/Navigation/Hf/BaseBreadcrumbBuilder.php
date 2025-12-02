@@ -1,0 +1,458 @@
+<?php
+
+namespace App\Service\Navigation\Hf;
+
+
+
+class BaseBreadcrumbBuilder
+{
+    protected function domSubmenu(): array
+    {
+        return [
+            ['label' => 'Nouvelle demande', 'route' => 'dom_first_form'],
+            ['label' => 'Consultation', 'route' => 'liste_dom_index']
+        ];
+    }
+
+    protected function mutationSubmenu(): array
+    {
+        return [
+            ['label' => 'Nouvelle demande', 'route' => '#'],
+            ['label' => 'Consultation', 'route' => '#']
+        ];
+    }
+
+    protected function congeSubmenu(): array
+    {
+        return [
+            ['label' => 'Nouvelle demande', 'route' => '#'],
+            ['label' => 'Consultation', 'route' => '#']
+        ];
+    }
+
+    protected function temporaireSubmenu(): array
+    {
+        return [
+            ['label' => 'Nouvelle demande', 'route' => '#'],
+            ['label' => 'Consultation', 'route' => '#']
+        ];
+    }
+
+    protected function rhSubmenu(): array
+    {
+        return  [
+            /** ======== Ordre de mission (DOM) ========== */
+            [
+                'label' => 'Ordre de Mission',
+                'route' => null, // C'est un conteneur de sous-menu
+                'submenu' => $this->domSubmenu()
+            ],
+            /** ======== Mutation ========== */
+            [
+                'label' => 'Mutation',
+                'route' => null,
+                'submenu' => $this->mutationSubmenu()
+            ],
+            /** ======== Congé ========== */
+            [
+                'label' => 'Congé',
+                'route' => null,
+                'submenu' => $this->congeSubmenu()
+            ],
+            /** ======== Temporaire ========== */
+            [
+                'label' => 'Temporaire',
+                'route' => null,
+                'submenu' => $this->temporaireSubmenu()
+            ]
+        ];
+    }
+
+    protected function comptaSubmenu(): array
+    {
+        return [
+            // ======== Cours de change ========== 
+            [
+                'label' => 'Cours de change',
+                'route' => '#'
+            ],
+            // ======== Demande de paiement ========== 
+            [
+                'label' => 'Demande de paiement',
+                'route' => null,
+                'submenu' => [
+                    ['label' => 'Nouvelle demande', 'route' => '#'],
+                    ['label' => 'Consultation', 'route' => '#']
+                ]
+            ],
+            // ======== Bon de caisse ========== 
+            [
+                'label' => 'Bon de caisse',
+                'route' => null,
+                'submenu' => [
+                    ['label' => 'Nouvelle demande', 'route' => '#'],
+                    ['label' => 'Consultation', 'route' => '#']
+                ]
+            ]
+        ];
+    }
+
+    protected function reportingSubmenu(): array
+    {
+        return [
+            // ======== Reporting Power BI ========== 
+            [
+                'label' => 'Reporting Power BI',
+                'route' => '#'
+            ],
+            // ======== Reporting Excel ========== 
+            [
+                'label' => 'Reporting Excel',
+                'route' => '#'
+            ]
+        ];
+    }
+
+    protected function documentationSubmenu(): array
+    {
+        return [
+            // ======== Annuaire ==========
+            [
+                'label' => 'Annuaire',
+                'route' => '#'
+            ],
+            // ======== Plan analytique Hff ========== 
+            [
+                'label' => 'Plan analytique Hff',
+                'route' => '#'
+            ],
+            // ======== Documentation interne ========== 
+            [
+                'label' => 'Documentation interne',
+                'route' => '#'
+            ],
+            // ======== Contrat ========== 
+            [
+                'label' => 'Contrat',
+                'route' => null,
+                'submenu' => [
+                    ['label' => 'Nouvelle contrat', 'route' => '#'],
+                    ['label' => 'Consultation', 'route' => '#']
+                ]
+            ]
+        ];
+    }
+
+    protected function materielSubmenu(): array
+    {
+        return [
+            // ======== Mouvemnet matériel ========== 
+            [
+                'label' => 'Mouvemnet matériel',
+                'route' => null,
+                'submenu' => [
+                    ['label' => 'Nouvelle demande', 'route' => '#'],
+                    ['label' => 'Consultation', 'route' => '#']
+                ]
+            ],
+            // ======== Casier ========== 
+            [
+                'label' => 'Casier',
+                'route' => null,
+                'submenu' => [
+                    ['label' => 'Nouvelle demande', 'route' => '#'],
+                    ['label' => 'Consultation', 'route' => '#']
+                ]
+            ],
+            // ======== Commandes matériel ========== 
+            [
+                'label' => 'Commandes matériel',
+                'route' => '#',
+            ],
+            // ======== Suivi administratif des matériels ========== 
+            [
+                'label' => 'Suivi administratif des matériels',
+                'route' => '#',
+            ],
+        ];
+    }
+
+    protected function atelierSubmenu(): array
+    {
+        return [
+            // ======== Demande d'intervention ========== 
+            [
+                'label' => 'Demande d\'intervention',
+                'route' => null,
+                'submenu' => [
+                    ['label' => 'Nouvelle demande', 'route' => '#'],
+                    ['label' => 'Consultation', 'route' => '#']
+                ]
+            ],
+            // ======== Glossaire OR ========== 
+            [
+                'label' => 'Glossaire OR',
+                'route' => '#',
+            ],
+            // ======== Glossaire OR ========== 
+            [
+                'label' => 'Glossaire OR',
+                'route' => '#',
+            ],
+            // ======== Planning  ========== 
+            [
+                'label' => 'Planning',
+                'route' => '#',
+            ],
+            // ======== Planning détaillé ========== 
+            [
+                'label' => 'Planning détaillé',
+                'route' => '#',
+            ],
+            // ======== Planning interne Atelier ========== 
+            [
+                'label' => 'Planning interne Atelier',
+                'route' => '#',
+            ],
+            // ======== Satisfaction client (Atelier excellence survey) ========== 
+            [
+                'label' => 'Satisfaction client (Atelier excellence survey)',
+                'route' => '#',
+            ]
+        ];
+    }
+
+    protected function magainSubmenu(): array
+    {
+        return [
+            // ======== OR ========== 
+            [
+                'label' => 'OR',
+                'route' => null,
+                'submenu' => [
+                    ['label' => 'Liste à traiter', 'route' => '#'],
+                    ['label' => 'Liste à livrer', 'route' => '#']
+                ]
+            ],
+            // ======== CIS ========== 
+            [
+                'label' => 'CIS',
+                'route' => null,
+                'submenu' => [
+                    ['label' => 'Liste à traiter', 'route' => '#'],
+                    ['label' => 'Liste à livrer', 'route' => '#']
+                ]
+            ],
+            // ======== INVENTAIRE ========== 
+            [
+                'label' => 'INVENTAIRE',
+                'route' => null,
+                'submenu' => [
+                    ['label' => 'Liste inventaire', 'route' => '#'],
+                    ['label' => 'Inventaire détaillé', 'route' => '#']
+                ]
+            ],
+            // ======== SORTIE DE PIECES ========== 
+            [
+                'label' => 'SORTIE DE PIECES',
+                'route' => null,
+                'submenu' => [
+                    ['label' => 'Nouvelle demande', 'route' => '#']
+                ]
+            ],
+            // ======== DEMATERIALISATION ========== 
+            [
+                'label' => 'OR',
+                'route' => null,
+                'submenu' => [
+                    ['label' => 'Devis', 'route' => '#'],
+                    ['label' => 'Commandes clients', 'route' => '#'],
+                    ['label' => 'Planning magasin', 'route' => '#']
+                ]
+            ],
+            // ======== Soumission commandes fournisseurs ========== 
+            [
+                'label' => 'Soumission commandes fournisseurs',
+                'route' => '#',
+            ],
+            // ======== Liste des non placées ========== 
+            [
+                'label' => 'Liste des non placées',
+                'route' => '#',
+            ]
+        ];
+    }
+
+    protected function approSubmenu(): array
+    {
+        return [
+            // ======== Nouvelle DA ========== 
+            [
+                'label' => 'Nouvelle DA',
+                'route' => '#',
+            ],
+            // ======== Consultation des DA ========== 
+            [
+                'label' => 'Consultation des DA',
+                'route' => '#',
+            ],
+            // ======== Liste des commandes fournisseurs ========== 
+            [
+                'label' => 'Liste des commandes fournisseurs',
+                'route' => '#',
+            ],
+        ];
+    }
+
+    protected function itSubmenu(): array
+    {
+        return [
+            // ======== Nouvelle demande ========== 
+            [
+                'label' => 'Nouvelle demande',
+                'route' => '#',
+            ],
+            // ======== Consultation ========== 
+            [
+                'label' => 'Consultation',
+                'route' => '#',
+            ],
+            // ======== Planning ========== 
+            [
+                'label' => 'Planning',
+                'route' => '#',
+            ],
+        ];
+    }
+
+    protected function polSubmenu(): array
+    {
+        return [
+            // ======== Nouvelle DLUB ========== 
+            [
+                'label' => 'Nouvelle DLUB',
+                'route' => '#',
+            ],
+            // ======== Consultation DLUB ========== 
+            [
+                'label' => 'Consultation DLUB',
+                'route' => '#',
+            ],
+            // ======== Liste des commandes fournisseur ========== 
+            [
+                'label' => 'Liste des commandes fournisseur',
+                'route' => '#',
+            ],
+            // ======== Pneumatiques ========== 
+            [
+                'label' => 'Pneumatiques',
+                'route' => '#',
+            ],
+        ];
+    }
+
+    protected function energieSubmenu(): array
+    {
+        return [
+            // ======== Rapport de production centrale ========== 
+            [
+                'label' => 'Rapport de production centrale',
+                'route' => '#',
+            ]
+        ];
+    }
+
+    protected function hseSubmenu(): array
+    {
+        return [
+            // ======== Rapport d'incident ========== 
+            [
+                'label' => 'Rapport d\'incident',
+                'route' => '#',
+            ],
+            // ======== Documentation ========== 
+            [
+                'label' => 'Documentation',
+                'route' => '#',
+            ]
+        ];
+    }
+
+    protected function accueilSubmenu(): array
+    {
+        return [
+            /** =============== Documentation ===================== */
+            [
+                'label' => 'documentation',
+                'route' => null, // C'est un conteneur de sous-menu
+                'submenu' => $this->documentationSubmenu()
+            ],
+            /** ======== Reporting ========== */
+            [
+                'label' => 'Reporting',
+                'route' => null, // C'est un conteneur de sous-menu
+                'submenu' => $this->reportingSubmenu()
+            ],
+            /** ======== Compta ========== */
+            [
+                'label' => 'Compta',
+                'route' => null, // C'est un conteneur de sous-menu
+                'submenu' => $this->comptaSubmenu()
+            ],
+            /** ======== RH ========== */
+            [
+                'label' => 'rh',
+                'route' => null, // C'est un conteneur de sous-menu
+                'submenu' => $this->rhSubmenu()
+            ],
+            /** ======== Matériel ========== */
+            [
+                'label' => 'Matériel',
+                'route' => null, // C'est un conteneur de sous-menu
+                'submenu' => $this->materielSubmenu()
+            ],
+            /** ======== Atelier ========== */
+            [
+                'label' => 'Atelier',
+                'route' => null, // C'est un conteneur de sous-menu
+                'submenu' => $this->atelierSubmenu()
+            ],
+            /** ======== Magasin ========== */
+            [
+                'label' => 'Magasin',
+                'route' => null, // C'est un conteneur de sous-menu
+                'submenu' => $this->magainSubmenu()
+            ],
+            /** ======== Appro ========== */
+            [
+                'label' => 'Appro',
+                'route' => null, // C'est un conteneur de sous-menu
+                'submenu' => $this->approSubmenu()
+            ],
+            /** ======== IT ========== */
+            [
+                'label' => 'IT',
+                'route' => null, // C'est un conteneur de sous-menu
+                'submenu' => $this->itSubmenu()
+            ],
+            /** ======== POL ========== */
+            [
+                'label' => 'POL',
+                'route' => null, // C'est un conteneur de sous-menu
+                'submenu' => $this->polSubmenu()
+            ],
+            /** ======== Energie ========== */
+            [
+                'label' => 'Energie',
+                'route' => null, // C'est un conteneur de sous-menu
+                'submenu' => $this->energieSubmenu()
+            ],
+            /** ======== HSE ========== */
+            [
+                'label' => 'HSE',
+                'route' => null, // C'est un conteneur de sous-menu
+                'submenu' => $this->hseSubmenu()
+            ],
+        ];
+    }
+}

@@ -16,15 +16,44 @@ class BreadcrumbBuilder
 
     public function add(string $label, ?string $route = null, array $params = [], array $submenu = []): self
     {
-        $url = $route ? $this->urlGenerator->generate($route, $params) : null;
+        $url = null;
+        if ($route === '#') {
+            $url = '#';
+        } elseif ($route) {
+            $url = $this->urlGenerator->generate($route, $params);
+        }
 
         $this->items[] = [
             'label' => $label,
             'url' => $url,
-            'submenu' => $submenu, // sous-menu optionnel
+            'submenu' => $this->processSubmenu($submenu), // Traiter les sous-menus récursivement
         ];
 
         return $this;
+    }
+
+    private function processSubmenu(array $submenu): array
+    {
+        $processed = [];
+        foreach ($submenu as $item) {
+            $route = $item['route'] ?? null;
+            $params = $item['params'] ?? [];
+            $nestedSubmenu = $item['submenu'] ?? [];
+
+            $url = null;
+            if ($route === '#') {
+                $url = '#';
+            } elseif ($route) {
+                $url = $this->urlGenerator->generate($route, $params);
+            }
+            
+            $processed[] = [
+                'label' => $item['label'],
+                'url' => $url,
+                'submenu' => $this->processSubmenu($nestedSubmenu), // Appel récursif
+            ];
+        }
+        return $processed;
     }
 
     public function get(): array

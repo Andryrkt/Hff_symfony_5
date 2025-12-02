@@ -54,13 +54,13 @@
 						</a>
 					</li>
 					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" id="userName" data-user-first-name="{{ app.user.personnel.prenoms }}" data-user-last-name="{{ app.user.personnel.nom }}" ria-expanded="false" style="color: #fbbb01;">
+						<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" id="userName" data-user-first-name="{{ app.user.personnel.prenoms }}" data-user-last-name="{{ app.user.personnel.nom }}" aria-expanded="false" style="color: #fbbb01;">
 							<i class="fas fa-user pe-1"></i>
 							{{ app.user.fullname }}
 						</a>
 						<ul class="dropdown-menu dropdown-menu-end">
 							<li>
-								<a class="dropdown-item text-danger" href="{{ path('app_logout') }}" id="logoutLink">
+								<a class="dropdown-item text-danger" href="{{ path('app_logout') }}" id="logoutLink" data-turbo="false">
 									<i class="fas fa-power-off pe-2"></i>
 									Se déconnecter
 								</a>
