@@ -2,6 +2,7 @@
 
 namespace App\Controller\Hf\Rh\Dom\Liste;
 
+use App\Controller\Base\AbstractExcelExportController;
 use App\Dto\Hf\Rh\Dom\DomSearchDto;
 use App\Service\Utils\Export\ExcelService;
 use App\Repository\Hf\Rh\Dom\DomRepository;
@@ -9,25 +10,34 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
+ * Contrôleur d'export Excel pour les DOM (Demandes d'Ordre de Mission)
+ * 
  * @Route("/rh/ordre-de-mission")
  */
-class DomExportExcelController extends AbstractController
+final class DomExportExcelController extends AbstractExcelExportController
 {
+    private ?SessionInterface $session = null;
+    private ?DomRepository $domRepository = null;
+
     /**
      * Export des données dans un fichier excel
      * @Route("/export-excel-dom", name="dom_export_excel")
      */
     public function export(ExcelService $excelService, Request $request, DomRepository $domRepository): Response
     {
-        $data = [$this->header(), ...$this->body($request->getSession(), $domRepository)];
+        // Stocker les dépendances pour utilisation dans getRows()
+        $this->session = $request->getSession();
+        $this->domRepository = $domRepository;
 
-        return $excelService->exportToBrowser($data, 'utilisateurs_2025');
+        return $this->exportToExcel($excelService);
     }
 
-    private function header(): array
+    /**
+     * {@inheritdoc}
+     */
+    public function getHeaders(): array
     {
         return [
             "Statut",
@@ -46,11 +56,15 @@ class DomExportExcelController extends AbstractController
         ];
     }
 
-    private function body(SessionInterface $session, DomRepository $domRepository)
+    /**
+     * {@inheritdoc}
+     */
+    public function getRows(): array
     {
-        $doms = $domRepository->findFilteredExcel($this->getDomSearchDto($session));
+        $doms = $this->domRepository->findFilteredExcel($this->getDomSearchDto($this->session));
         $data = [];
-        foreach ($doms as  $dom) {
+
+        foreach ($doms as $dom) {
             $data[] = [
                 $dom->getIdStatutDemande() ? $dom->getIdStatutDemande()->getDescription() : '',
                 $dom->getSousTypeDocument() ? $dom->getSousTypeDocument()->getCodeSousType() : '',
@@ -67,9 +81,21 @@ class DomExportExcelController extends AbstractController
                 $dom->getDevis()
             ];
         }
+
         return $data;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getFilename(): string
+    {
+        return 'dom_export_' . date('Y-m-d');
+    }
+
+    /**
+     * Récupère le DTO de recherche depuis la session
+     */
     private function getDomSearchDto(SessionInterface $session): ?DomSearchDto
     {
         $domSearchDto = $session->get('dom_search_dto');

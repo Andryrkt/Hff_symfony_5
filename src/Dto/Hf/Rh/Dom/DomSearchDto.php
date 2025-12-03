@@ -13,12 +13,12 @@ class DomSearchDto implements PaginationDtoInterface
     public ?SousTypeDocument $sousTypeDocument = null;
     public ?string $numDom = null;
     public ?string $matricule = null;
-    public array $dateDemande = [];
+    public ?bool $pieceJustificatif = null;
     public array $dateMission = [];
 
+    public array $dateDemande = [];
     public array $debiteur = [];
     public array $emetteur = [];
-    public ?bool $pieceJustificatif = null;
 
     // Pagination et tri
     public int $limit = 50;
