@@ -1,23 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller\Hf\Rh\Dom\Liste;
 
 use App\Dto\Hf\Rh\Dom\DomSearchDto;
 use App\Form\Hf\Rh\Dom\Liste\DomSearchType;
 use App\Repository\Hf\Rh\Dom\DomRepository;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use App\Service\Admin\AgenceSerializerService;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
+use App\Controller\Traits\PaginationAndSortingTrait;
 
 /**
  * @Route("/rh/ordre-de-mission")
  */
 class DomsListeController extends AbstractController
 {
-
-    private AgenceSerializerService $agenceSerializerService;
+    use PaginationAndSortingTrait;
 
     /**
      * affichage de l'architecture de la liste du DOM
@@ -28,7 +32,7 @@ class DomsListeController extends AbstractController
         DomRepository $domRepository,
         AgenceSerializerService $agenceSerializerService,
         ContextAwareBreadcrumbBuilder $breadcrumbBuilder
-    ) {
+    ): Response {
         // 1. gerer l'accés
         $this->denyAccessUnlessGranted('RH_ORDRE_MISSION_VIEW');
 
@@ -44,24 +48,8 @@ class DomsListeController extends AbstractController
             $domSearchDto = $form->getData();
         }
 
-        // Récupérer le paramètre limit depuis l'URL (pour le sélecteur JavaScript)
-        $limitFromUrl = $request->query->getInt('limit', 0);
-        if ($limitFromUrl > 0) {
-            $domSearchDto->limit = $limitFromUrl;
-        }
-
-        // Récupérer les paramètres de tri depuis l'URL
-        $sortByFromUrl = $request->query->get('sortBy');
-        $sortOrderFromUrl = $request->query->get('sortOrder');
-        if ($sortByFromUrl) {
-            $domSearchDto->sortBy = $sortByFromUrl;
-        }
-        if ($sortOrderFromUrl) {
-            $domSearchDto->sortOrder = $sortOrderFromUrl;
-        }
-
         // 4. recupération des données à afficher avec filtrage par agence
-        $page = $request->query->getInt('page', 1);
+        $page = $this->handlePaginationAndSorting($request, $domSearchDto);
         $paginationData = $domRepository->findPaginatedAndFiltered($page, $domSearchDto->limit, $domSearchDto);
 
         return $this->render(
@@ -69,7 +57,7 @@ class DomsListeController extends AbstractController
             [
                 'paginationData' => $paginationData,
                 'form' => $form->createView(),
-                'agencesJson'   => $agenceSerializerService->serializeAgencesForDropdown(),
+                'agencesJson' => $agenceSerializerService->serializeAgencesForDropdown(),
                 'routeName' => 'liste_dom_index',
                 'queryParams' => $request->query->all(),
                 'currentSort' => $domSearchDto->sortBy,
