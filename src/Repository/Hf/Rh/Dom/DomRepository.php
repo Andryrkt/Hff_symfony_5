@@ -165,6 +165,50 @@ class DomRepository extends ServiceEntityRepository
             'lastPage'    => $lastPage,
         ];
     }
+    public function findFilteredExcel(DomSearchDto $domSearchDto)
+    {
+        // Mapping des colonnes triables (whitelist de sécurité)
+        $sortableColumns = [
+            'numeroOrdreMission' => 'd.numeroOrdreMission',
+            'matricule' => 'd.matricule',
+            'dateDemande' => 'd.dateDemande',
+            'dateDebut' => 'd.dateDebut',
+            'dateFin' => 'd.dateFin',
+            'typeDocument' => 'td.libelleSousType',
+            'statut' => 's.description',
+        ];
+
+        // Récupérer les paramètres de tri depuis le DTO
+        $sortBy = $domSearchDto->sortBy ?? 'numeroOrdreMission';
+        $sortOrder = strtoupper($domSearchDto->sortOrder ?? 'DESC');
+
+        // Validation de sécurité
+        if (!isset($sortableColumns[$sortBy])) {
+            $sortBy = 'numeroOrdreMission'; // Valeur par défaut sécurisée
+        }
+        if (!in_array($sortOrder, ['ASC', 'DESC'])) {
+            $sortOrder = 'DESC'; // Valeur par défaut sécurisée
+        }
+
+        // 1. Créer le QueryBuilder avec les jointures et chargement eager des relations
+        $queryBuilder = $this->createQueryBuilder('d')
+            ->leftJoin('d.sousTypeDocument', 'td')
+            ->addSelect('td')  // Évite le problème N+1
+            ->leftJoin('d.idStatutDemande', 's')
+            ->addSelect('s');  // Évite le problème N+1
+
+        // 2. Appliquer les filtres de recherche
+        $this->filtred($queryBuilder, $domSearchDto);
+        $this->filtredDate($queryBuilder, $domSearchDto);
+        $this->filtredStatut($queryBuilder, $domSearchDto);
+        $this->filtredAgenceService($queryBuilder, $domSearchDto);
+
+        // 3. Ordre et pagination
+        $queryBuilder->orderBy($sortableColumns[$sortBy], $sortOrder);
+
+
+        return $queryBuilder->getQuery()->getResult();
+    }
 
     /**
      * Filtre pour le statut

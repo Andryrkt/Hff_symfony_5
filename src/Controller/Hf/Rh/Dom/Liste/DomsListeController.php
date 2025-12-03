@@ -32,6 +32,7 @@ class DomsListeController extends AbstractController
         DomRepository $domRepository,
         AgenceSerializerService $agenceSerializerService,
         ContextAwareBreadcrumbBuilder $breadcrumbBuilder
+
     ): Response {
         // 1. gerer l'accés
         $this->denyAccessUnlessGranted('RH_ORDRE_MISSION_VIEW');
@@ -46,6 +47,9 @@ class DomsListeController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $domSearchDto = $form->getData();
+            // stocage des donner dans le session
+            $session = $request->getSession();
+            $session->set('dom_search_dto', $domSearchDto);
         }
 
         // 4. recupération des données à afficher avec filtrage par agence
