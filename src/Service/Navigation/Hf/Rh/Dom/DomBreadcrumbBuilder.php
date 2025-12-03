@@ -8,7 +8,7 @@ use App\Contract\Navigation\BreadcrumbBuilderInterface;
 use App\Repository\Admin\ApplicationGroupe\VignetteRepository;
 use Symfony\Component\Security\Core\Security;
 
-class DomBreadcrumbBuilder extends BaseBreadcrumbBuilder implements BreadcrumbBuilderInterface
+final class DomBreadcrumbBuilder extends BaseBreadcrumbBuilder implements BreadcrumbBuilderInterface
 {
     private $breadcrumb;
 

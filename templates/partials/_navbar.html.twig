@@ -34,16 +34,16 @@
 							Version: V20251008.3.0.0
 						</a>
 					</li>
-					<li class="nav-item dropdown me-3">
-						<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+					<li class="nav-item custom-dropdown me-3">
+						<a class="nav-link custom-dropdown-toggle" href="#" role="button" aria-expanded="false">
 							<i class="fas fa-book pe-2"></i>Documentation
 						</a>
-						<ul class="dropdown-menu">
+						<ul class="custom-dropdown-menu">
 							<li>
-								<a class="dropdown-item" href="{{ path('app_documentation_editor_list') }}">Création de docuemntation</a>
+								<a class="custom-dropdown-item" href="{{ path('app_documentation_editor_list') }}">Création de docuemntation</a>
 							</li>
 							<li>
-								<a class="dropdown-item" href="{{ path('app_documentation_voters') }}">Voters</a>
+								<a class="custom-dropdown-item" href="{{ path('app_documentation_voters') }}">Voters</a>
 							</li>
 						</ul>
 					</li>
@@ -53,126 +53,126 @@
 							Guide utilisateur intranet
 						</a>
 					</li>
-					<li class="nav-item dropdown">
-						<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" id="userName" data-user-first-name="{{ app.user.personnel.prenoms }}" data-user-last-name="{{ app.user.personnel.nom }}" aria-expanded="false" style="color: #fbbb01;">
+					<li class="nav-item custom-dropdown user-dropdown">
+						<a class="nav-link custom-dropdown-toggle" href="#" role="button" id="userName" data-user-first-name="{{ app.user.personnel.prenoms }}" data-user-last-name="{{ app.user.personnel.nom }}" aria-expanded="false" style="color: #fbbb01;">
 							<i class="fas fa-user pe-1"></i>
 							{{ app.user.fullname }}
 						</a>
-						<ul class="dropdown-menu dropdown-menu-end">
+						<ul class="custom-dropdown-menu dropdown-menu-end">
 							<li>
-								<a class="dropdown-item text-danger" href="{{ path('app_logout') }}" id="logoutLink" data-turbo="false">
+								<a class="custom-dropdown-item text-danger" href="{{ path('app_logout') }}" id="logoutLink" data-turbo="false">
 									<i class="fas fa-power-off pe-2"></i>
 									Se déconnecter
 								</a>
 							</li>
-							<li class="dropstart">
-								<a class="dropdown-item dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="color: #fbbb01;">
+							<li class="custom-dropstart">
+								<a class="custom-dropdown-item custom-dropdown-toggle" href="#" role="button" aria-expanded="false" style="color: #fbbb01;">
 									<i class="fas fa-shield-alt pe-2"></i>
 									Administrateur
 								</a>
-								<ul class="dropdown-menu p-3" style="min-width: 720px;">
+								<ul class="custom-dropdown-menu dropdown-menu-mega p-3 admin-mega-menu" style="min-width: 720px;">
 									<div
 										class="row g-3">
 
 										<!-- Colonne 1 -->
 										<div class="col-md-4">
-											<li class="dropdown-header">
+											<li class="custom-dropdown-header">
 												<i class="fa-solid fa-user-shield me-2"></i>Accès & Sécurité</li>
 											<li>
-												<a class="dropdown-item" href="{{ path("admin_user_index")}}">
+												<a class="custom-dropdown-item" href="{{ path("admin_user_index")}}">
 													<i class="fa-solid fa-user me-2"></i>Utilisateurs</a>
 											</li>
 											<li>
-												<a class="dropdown-item" href="{{ path("admin_user_access_new")}}">
+												<a class="custom-dropdown-item" href="{{ path("admin_user_access_new")}}">
 													<i class="fa-solid fa-users-gear me-2"></i>User accès</a>
 											</li>
 											<li>
-												<a class="dropdown-item" href="{{ path("app_admin_application_groupe_role_index")}}">
+												<a class="custom-dropdown-item" href="{{ path("app_admin_application_groupe_role_index")}}">
 													<i class="fa-solid fa-users-gear me-2"></i>Rôles</a>
 											</li>
 											<li>
-												<a class="dropdown-item" href="{{path('app_admin_application_groupe_permission_index')}}">
+												<a class="custom-dropdown-item" href="{{path('app_admin_application_groupe_permission_index')}}">
 													<i class="fa-solid fa-key me-2"></i>Permissions</a>
 											</li>
 
-											<li class="dropdown-header mt-2">
+											<li class="custom-dropdown-header mt-2">
 												<i class="fa-solid fa-cubes me-2"></i>Applications & Intégrations</li>
 											<li>
-												<a class="dropdown-item" href="#">
+												<a class="custom-dropdown-item" href="#">
 													<i class="fa-solid fa-layer-group me-2"></i>Applications</a>
 											</li>
 											<li>
-												<a class="dropdown-item" href="#">
+												<a class="custom-dropdown-item" href="#">
 													<i class="fa-solid fa-building-circle-arrow-right me-2"></i>Agence Service Irium</a>
 											</li>
 										</div>
 
 										<!-- Colonne 2 -->
 										<div class="col-md-4">
-											<li class="dropdown-header">
+											<li class="custom-dropdown-header">
 												<i class="fa-solid fa-sitemap me-2"></i>Organisation</li>
 											<li>
-												<a class="dropdown-item" href="#">
+												<a class="custom-dropdown-item" href="#">
 													<i class="fa-solid fa-building me-2"></i>Sociétés</a>
 											</li>
 											<li>
-												<a class="dropdown-item" href="{{ path("admin_agence_index")}}">
+												<a class="custom-dropdown-item" href="{{ path("admin_agence_index")}}">
 													<i class="fa-solid fa-city me-2"></i>Agences</a>
 											</li>
 											<li>
-												<a class="dropdown-item" href="{{ path("admin_service_index")}}">
+												<a class="custom-dropdown-item" href="{{ path("admin_service_index")}}">
 													<i class="fa-solid fa-briefcase me-2"></i>Services</a>
 											</li>
 											<li>
-												<a class="dropdown-item" href="{{ path("admin_agence_service_index")}}">
+												<a class="custom-dropdown-item" href="{{ path("admin_agence_service_index")}}">
 													<i class="fa-solid fa-briefcase me-2"></i>Agence Service Irium</a>
 											</li>
 											<li>
-												<a class="dropdown-item" href="{{ path("app_admin_personnel_user_personnel_index")}}">
+												<a class="custom-dropdown-item" href="{{ path("app_admin_personnel_user_personnel_index")}}">
 													<i class="fa-solid fa-id-card me-2"></i>Personnels</a>
 											</li>
 											<li>
-												<a class="dropdown-item" href="#">
+												<a class="custom-dropdown-item" href="#">
 													<i class="fa-solid fa-address-book me-2"></i>Contacts d'agence</a>
 											</li>
 										</div>
 
 										<!-- Colonne 3 -->
 										<div class="col-md-4">
-											<li class="dropdown-header">
+											<li class="custom-dropdown-header">
 												<i class="fa-solid fa-clock-rotate-left me-2"></i>Historique</li>
 											<li>
-												<a class="dropdown-item" href="{{path("app_admin_historisation_type_document_index")}}">
+												<a class="custom-dropdown-item" href="{{path("app_admin_historisation_type_document_index")}}">
 													<i class="fa-solid fa-eye me-2"></i>Type Document</a>
 											</li>
 											<li>
-												<a class="dropdown-item" href="{{path("app_admin_type_operation_index")}}">
+												<a class="custom-dropdown-item" href="{{path("app_admin_type_operation_index")}}">
 													<i class="fa-solid fa-eye me-2"></i>Type Operation</a>
 											</li>
 											<li>
-												<a class="dropdown-item" href="#">
+												<a class="custom-dropdown-item" href="#">
 													<i class="fa-solid fa-eye me-2"></i>Consultation de pages</a>
 											</li>
 											<li>
-												<a class="dropdown-item" href="#">
+												<a class="custom-dropdown-item" href="#">
 													<i class="fa-solid fa-file-circle-check me-2"></i>Historique des opérations</a>
 											</li>
 
-											<li class="dropdown-header mt-2">
+											<li class="custom-dropdown-header mt-2">
 												<i class="fa-solid fa-ticket me-2"></i>Tickets</li>
 											<li>
-												<a class="dropdown-item" href="#">
+												<a class="custom-dropdown-item" href="#">
 													<i class="fa-solid fa-list me-2"></i>Toutes les catégories</a>
 											</li>
 
-											<li class="dropdown-header mt-2">
+											<li class="custom-dropdown-header mt-2">
 												<i class="fa-solid fa-database me-2"></i>Référentiels</li>
 											<li>
-												<a class="dropdown-item" href="#">
+												<a class="custom-dropdown-item" href="#">
 													<i class="fa-solid fa-file-lines me-2"></i>Types de document</a>
 											</li>
 											<li>
-												<a class="dropdown-item" href="#">
+												<a class="custom-dropdown-item" href="#">
 													<i class="fa-solid fa-toggle-on me-2"></i>Statuts d’application</a>
 											</li>
 										</div>

@@ -23,6 +23,7 @@ import { ChronometerManager } from "./js/utils/chronometer";
 import { SessionManager } from "./js/utils/session";
 import { SubmenuManager } from "./js/utils/submenuManager";
 import { ToastManager } from "./js/utils/toast";
+import { CustomDropdown } from "./js/utils/customDropdown";
 import { initFirstForm } from "./js/pages/rh/dom/firstForm.js";
 
 // Import des styles supplémentaires
@@ -82,7 +83,11 @@ class App {
      * Lie les événements globaux
      */
     private bindEvents(): void {
-        document.addEventListener('DOMContentLoaded', () => this.onDomReady());
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.onDomReady());
+        } else {
+            this.onDomReady();
+        }
 
         if (typeof window.Turbo !== 'undefined') {
             document.addEventListener('turbo:load', () => this.onTurboLoad());
@@ -92,11 +97,13 @@ class App {
     private onDomReady(): void {
         // this.initSelect2();
         // this.initFirstForm();
+        new CustomDropdown();
     }
 
     private onTurboLoad(): void {
         // this.initSelect2();
         // this.initFirstForm();
+        new CustomDropdown();
     }
 
     private initSelect2(): void {
