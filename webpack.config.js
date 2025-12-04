@@ -12,8 +12,7 @@ Encore
     // 2. Entry principal (toujours chargé partout)
     .addEntry('app', './assets/app.ts')
 
-    // Entrées
-    .addEntry('login', './assets/js/login/login.ts')
+    // Entrées spécifiques (pages avec des besoins particuliers)
     .addEntry('domListe', './assets/js/pages/rh/dom/domListe.js')
 
     // Split chunks

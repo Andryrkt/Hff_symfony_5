@@ -24,6 +24,7 @@ export class StimulusAutoloader {
             { name: 'tom-select', import: () => import('../controllers/tom_select_controller') },
             { name: 'first-form', import: () => import('../controllers/first_form_controller') },
             { name: 'second-form', import: () => import('../controllers/second_form_controller') },
+            { name: 'login', import: () => import('../controllers/login_controller') },
         ];
 
         let loadedCount = 0;
