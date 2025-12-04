@@ -12,7 +12,7 @@ export class StimulusAutoloader {
      */
     async autoload(): Promise<void> {
         console.log('🔍 Chargement des contrôleurs Stimulus...');
-        
+
         // Liste explicite de tous les contrôleurs
         const controllers = [
             { name: 'hello', import: () => import('../controllers/hello_controller') },
@@ -22,6 +22,7 @@ export class StimulusAutoloader {
             { name: 'clickable', import: () => import('../controllers/inline_edit_controller') },
             { name: 'user-access', import: () => import('../controllers/user_access_controller') },
             { name: 'tom-select', import: () => import('../controllers/tom_select_controller') },
+            { name: 'first-form', import: () => import('../controllers/first_form_controller') },
         ];
 
         let loadedCount = 0;

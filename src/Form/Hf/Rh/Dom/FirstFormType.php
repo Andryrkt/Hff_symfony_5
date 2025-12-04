@@ -91,18 +91,17 @@ class FirstFormType extends AbstractType
                 'matricule',
                 TextType::class,
                 [
-                    'label' => 'Matricule',
+                    'label' => 'Matricule *',
                     'attr' => [
                         'readonly' => true
-                    ],
-                    'required' => true
+                    ]
                 ]
             )
             ->add(
                 'nom',
                 TextType::class,
                 [
-                    'label' => 'Nom',
+                    'label' => 'Nom *',
                     'required' => true
                 ]
             )
@@ -110,7 +109,7 @@ class FirstFormType extends AbstractType
                 'prenom',
                 TextType::class,
                 [
-                    'label' => 'Prénoms',
+                    'label' => 'Prénoms *',
                     'required' => true
                 ]
             )
@@ -118,7 +117,7 @@ class FirstFormType extends AbstractType
                 'cin',
                 TextType::class,
                 [
-                    'label' => 'CIN',
+                    'label' => 'CIN *',
                     'required' => true,
                 ]
             )
@@ -149,14 +148,14 @@ class FirstFormType extends AbstractType
                 EntityType::class,
                 [
                     'mapped' => false,
-                    'label' => 'Matricule et nom',
+                    'label' => 'Matricule et nom *',
                     'class' => Personnel::class,
                     'placeholder' => '-- choisir un personnel --',
                     'choice_label' => function (Personnel $personnel): string {
                         return $personnel->getMatricule() . ' ' . $personnel->getNom() . ' ' . $personnel->getPrenoms();
                     },
-                    'multiple' => false, // Explicitly set to false
-                    'required' => true,
+                    'multiple' => false,
+                    'required' => false, // Validation gérée manuellement par first_form_controller.ts
                     'attr' => [
                         'data-controller' => 'tom-select',
                         'data-placeholder' => '-- choisir un personnel --'
