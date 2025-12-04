@@ -12,9 +12,6 @@ Encore
     // 2. Entry principal (toujours chargé partout)
     .addEntry('app', './assets/app.ts')
 
-    // Entrées spécifiques (pages avec des besoins particuliers)
-    .addEntry('domListe', './assets/js/pages/rh/dom/domListe.js')
-
     // Split chunks
     .splitEntryChunks()
     .enableSingleRuntimeChunk()
@@ -25,7 +22,6 @@ Encore
         to: 'images/[path][name].[hash:8].[ext]',
         pattern: /\.(png|jpg|jpeg|gif|ico|svg|webp)$/
     })
-
 
     // Copie des polices Font Awesome depuis node_modules
     .copyFiles({
@@ -39,15 +35,6 @@ Encore
     .enableBuildNotifications()
     .enableSourceMaps(!Encore.isProduction())
     .enableVersioning(Encore.isProduction())
-
-    // Babel - NOTE: This is commented out because a .babelrc file is present.
-    // .configureBabel((config) => {
-    //     config.plugins.push('@babel/plugin-proposal-class-properties');
-    // })
-    // .configureBabelPresetEnv((config) => {
-    //     config.useBuiltIns = 'usage';
-    //     config.corejs = 3;
-    // })
 
     // Loaders
     .enableSassLoader((options) => {

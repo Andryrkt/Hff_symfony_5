@@ -25,6 +25,7 @@ export class StimulusAutoloader {
             { name: 'first-form', import: () => import('../controllers/first_form_controller') },
             { name: 'second-form', import: () => import('../controllers/second_form_controller') },
             { name: 'login', import: () => import('../controllers/login_controller') },
+            { name: 'dom-liste', import: () => import('../controllers/dom_liste_controller') },
         ];
 
         let loadedCount = 0;

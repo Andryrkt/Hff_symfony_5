@@ -5,13 +5,8 @@
 {% block title %}Liste des Ordres de Mission
 {% endblock %}
 
-{% block stylesheets %}
-	{{ parent() }}
-	{{ encore_entry_link_tags('domListe') }}
-{% endblock %}
-
 {% block content %}
-	<div class="container" id="agence-service-data" data-agences="{{ agencesJson|e('html_attr') }}">
+	<div class="container" id="agence-service-data" data-agences="{{ agencesJson|e('html_attr') }}" data-controller="dom-liste">
 		{% include 'partials/flash_messages.html.twig' %}
 
 		{% include "hf/rh/dom/liste/_formulaireRecherche.html.twig" with{
@@ -115,9 +110,4 @@
 			totalPages: paginationData['totalItems']
 		} %}
 	</div>
-{% endblock %}
-
-{% block javascripts %}
-	{{ parent() }}
-	{{ encore_entry_script_tags('domListe') }}
 {% endblock %}
