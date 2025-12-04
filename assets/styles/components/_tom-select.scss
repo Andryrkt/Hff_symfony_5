@@ -1,39 +1,42 @@
 /* Styles pour les groupes de permissions (vignettes) */
-.ts-dropdown.custom-ts-dropdown .ts-optgroup-header {
-    cursor: pointer;
-    padding: 8px 12px; /* Adjusted padding */
+.ts-dropdown .optgroup-header {
+    cursor: pointer !important;
+    padding: 8px 12px;
+    /* Adjusted padding */
     font-weight: 600;
     border-bottom: 2px solid #dee2e6;
     background-color: #f8f9fa;
     margin-top: 5px;
     transition: all 0.2s ease;
     position: relative;
-    font-size: 0.875em; /* Smaller font size */
+    font-size: 0.875em;
+    /* Smaller font size */
+    user-select: none;
 }
 
-.ts-dropdown.custom-ts-dropdown .ts-optgroup-header:hover {
+.ts-dropdown .optgroup-header:hover {
     background-color: #e9ecef;
 }
 
 /* États de sélection des groupes */
-.ts-dropdown.custom-ts-dropdown .ts-optgroup-header.fully-selected {
+.ts-dropdown .optgroup-header.fully-selected {
     background-color: #d4edda;
     color: #155724;
     border-left: 4px solid #28a745;
 }
 
-.ts-dropdown.custom-ts-dropdown .ts-optgroup-header.partially-selected {
+.ts-dropdown .optgroup-header.partially-selected {
     background-color: #fff3cd;
     color: #856404;
     border-left: 4px solid #ffc107;
 }
 
-.ts-dropdown.custom-ts-dropdown .ts-optgroup-header.no-selection {
+.ts-dropdown .optgroup-header.no-selection {
     border-left: 4px solid #6c757d;
 }
 
 /* Indicateurs visuels */
-.ts-dropdown.custom-ts-dropdown .ts-optgroup-header::after {
+.ts-dropdown .optgroup-header::after {
     content: "✓";
     position: absolute;
     right: 12px;
@@ -44,11 +47,11 @@
     transition: opacity 0.2s ease;
 }
 
-.ts-dropdown.custom-ts-dropdown .ts-optgroup-header.fully-selected::after {
+.ts-dropdown .optgroup-header.fully-selected::after {
     opacity: 1;
 }
 
-.ts-dropdown.custom-ts-dropdown .ts-optgroup-header.partially-selected::after {
+.ts-dropdown .optgroup-header.partially-selected::after {
     content: "–";
     opacity: 1;
 }
@@ -57,7 +60,8 @@
 .ts-dropdown .ts-option {
     padding: 6px 12px 6px 20px;
     border-left: 3px solid transparent;
-    font-size: 0.875em; /* Smaller font size */
+    font-size: 0.875em;
+    /* Smaller font size */
 }
 
 .ts-dropdown .ts-option.selected {
@@ -67,9 +71,11 @@
 
 /* Zone de sélection */
 .ts-control {
-    min-height: 38px; /* Reduced min-height */
+    min-height: 38px;
+    /* Reduced min-height */
     border: 1px solid #ced4da;
-    font-size: 0.875em; /* Smaller font size for selected items/input */
+    font-size: 0.875em;
+    /* Smaller font size for selected items/input */
 }
 
 .ts-control .item {
@@ -77,19 +83,22 @@
     color: white;
     border: none;
     border-radius: 3px;
-    font-size: 0.875em; /* Ensure selected items also have smaller font */
+    font-size: 0.875em;
+    /* Ensure selected items also have smaller font */
 }
 
 /* Style du champ de recherche */
 .ts-dropdown .ts-input {
     border: 1px solid #ced4da;
     border-radius: 4px;
-    padding: 6px 10px; /* Adjusted padding */
+    padding: 6px 10px;
+    /* Adjusted padding */
     margin: 8px;
     width: calc(100% - 16px);
     box-shadow: none;
     transition: border-color 0.2s ease;
-    font-size: 0.875em; /* Smaller font size */
+    font-size: 0.875em;
+    /* Smaller font size */
 }
 
 .ts-dropdown .ts-input:focus {
