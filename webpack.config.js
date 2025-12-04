@@ -14,8 +14,6 @@ Encore
 
     // Entrées
     .addEntry('login', './assets/js/login/login.ts')
-    .addEntry('accueil', './assets/js/accueil.js')
-    .addEntry('secondForm', './assets/js/pages/rh/dom/secondForm.ts')
     .addEntry('domListe', './assets/js/pages/rh/dom/domListe.js')
 
     // Split chunks

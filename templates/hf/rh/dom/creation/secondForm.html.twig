@@ -6,7 +6,7 @@
 
 {% block stylesheets %}
 	{{ parent() }}
-	{{ encore_entry_link_tags('secondForm') }}
+
 {% endblock %}
 
 {% import "macros/form_macros.html.twig" as formMacros %}
@@ -16,7 +16,7 @@
 		{% include 'partials/flash_messages.html.twig' %}
 	</div>
 
-	<div class="container mt-6 mb-4" id="agence-service-data" data-agences="{{ agencesJson|e('html_attr') }}">
+	<div class="container mt-6 mb-4" id="agence-service-data" data-agences="{{ agencesJson|e('html_attr') }}" data-controller="second-form">
 		<div class="card p-2">
 			<div class="card-body">
 				<div class="row">
@@ -37,30 +37,16 @@
 				<input type="hidden" id="rmq" value="{{secondFormDto.rmq.id}}">
 
 				<div class="row">
-
 					<div class="col-12 col-md-2">
-
 						{{ form_row(form.dateDemande)}}
-
 					</div>
-
 				</div>
-
-
 				<div class="row">
-
 					<div
-
 						class="col-12 col-md-6">
-
-
 						<!-- DEBUT Debiteur selecte -->
-
 						<label for="" class="col-4  fw-bold">Agence service débiteur</label>
-
-
 						<div class="row">
-
 							{{ formMacros.debiteurOuEmetteurFields(form, 'debiteur', {
 
                                 layout: 'horizontal',
@@ -387,6 +373,5 @@
 
 	{{ parent() }}
 
-	{{ encore_entry_script_tags('secondForm') }}
 
 {% endblock %}
