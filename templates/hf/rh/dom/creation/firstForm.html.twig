@@ -47,11 +47,9 @@
 					{{ form_row(form.cin)}}
 				</div>
 				<div class="row">
-					<div class="mt-2">
-						<button type="submit" class="btn btn-info fw-bold">
-							Suivant
-							<i class="fas fa-arrow-right"></i>
-						</button>
+					<div class="d-flex justify-content-end mt-2">
+						{% import "macros/actions.html.twig" as actions %}
+						{{ actions.submit_button('Suivant', 'fas fa-arrow-right', 'btn-info') }}
 					</div>
 				</div>
 				{{ form_end(form)}}

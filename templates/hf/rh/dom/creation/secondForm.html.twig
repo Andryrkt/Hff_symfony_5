@@ -363,13 +363,9 @@
 
 					<div class="mt-2 ">
 
-						<button type="submit" name="Envoyer" class="btn btn-info md-5 fw-bold" data-bs-toggle="tooltip">
+						{% import "macros/actions.html.twig" as actions %}
 
-							<i class="fa fa-print"></i>
-
-							Envoyer
-
-						</button>
+						{{ actions.submit_button('Envoyer', 'fa fa-print', 'btn-info md-5') }}
 
 					</div>
 

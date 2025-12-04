@@ -5,11 +5,14 @@ if (!Encore.isRuntimeEnvironmentConfigured()) {
 }
 
 Encore
+    // 1. Répertoires
     .setOutputPath('public/build/')
     .setPublicPath('/build')
 
-    // Entrées
+    // 2. Entry principal (toujours chargé partout)
     .addEntry('app', './assets/app.ts')
+
+    // Entrées
     .addEntry('login', './assets/js/login/login.ts')
     .addEntry('accueil', './assets/js/accueil.js')
     .addEntry('secondForm', './assets/js/pages/rh/dom/secondForm.ts')
