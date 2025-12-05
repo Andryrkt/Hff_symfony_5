@@ -16,9 +16,9 @@ export class StimulusAutoloader {
         // Liste explicite de tous les contrôleurs
         const controllers = [
             // Contrôleurs génériques (UI components)
-            { name: 'modal', import: () => import('@controllers/modal_controller') },
-            { name: 'navigation', import: () => import('@controllers/navigation_controller') },
-            { name: 'clickable', import: () => import('@controllers/inline_edit_controller') },
+            { name: 'modal', import: () => import('@controllers/components/modal_controller') },
+            { name: 'navigation', import: () => import('@controllers/components/navigation_controller') },
+            { name: 'clickable', import: () => import('@controllers/components/inline_edit_controller') },
 
             // Contrôleurs de pages - Login
             { name: 'login', import: () => import('@controllers/pages/login/login_controller') },
