@@ -20,6 +20,7 @@ export class StimulusAutoloader {
             { name: 'modal', import: () => import('@controllers/components/modal_controller') },
             { name: 'navigation', import: () => import('@controllers/components/navigation_controller') },
             { name: 'clickable', import: () => import('@controllers/components/inline_edit_controller') },
+            { name: 'tom-select', import: () => import('@controllers/components/tom_select_controller') },
         ];
 
         // Contrôleurs de page - chargés à la demande (lazy loading)
