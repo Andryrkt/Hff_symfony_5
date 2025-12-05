@@ -15,17 +15,23 @@ export class StimulusAutoloader {
 
         // Liste explicite de tous les contrôleurs
         const controllers = [
-            { name: 'hello', import: () => import('../controllers/hello_controller') },
-            { name: 'modal', import: () => import('../controllers/modal_controller') },
-            { name: 'navigation', import: () => import('../controllers/navigation_controller') },
-            { name: 'user-roles', import: () => import('../controllers/user_roles_controller') },
-            { name: 'clickable', import: () => import('../controllers/inline_edit_controller') },
-            { name: 'user-access', import: () => import('../controllers/user_access_controller') },
-            { name: 'tom-select', import: () => import('../controllers/tom_select_controller') },
-            { name: 'first-form', import: () => import('../controllers/first_form_controller') },
-            { name: 'second-form', import: () => import('../controllers/second_form_controller') },
-            { name: 'login', import: () => import('../controllers/login_controller') },
-            { name: 'dom-liste', import: () => import('../controllers/dom_liste_controller') },
+            // Contrôleurs génériques (UI components)
+            { name: 'hello', import: () => import('@controllers/hello_controller') },
+            { name: 'modal', import: () => import('@controllers/modal_controller') },
+            { name: 'navigation', import: () => import('@controllers/navigation_controller') },
+            { name: 'clickable', import: () => import('@controllers/inline_edit_controller') },
+
+            // Contrôleurs de pages - Login
+            { name: 'login', import: () => import('@controllers/pages/login/login_controller') },
+
+            // Contrôleurs de pages - DOM (Ordres de Mission)
+            { name: 'first-form', import: () => import('@controllers/pages/hf/rh/dom/first_form_controller') },
+            { name: 'second-form', import: () => import('@controllers/pages/hf/rh/dom/second_form_controller') },
+            { name: 'dom-liste', import: () => import('@controllers/pages/hf/rh/dom/dom_liste_controller') },
+
+            // Contrôleurs de pages - Admin
+            { name: 'user-roles', import: () => import('@controllers/pages/admin/user_roles_controller') },
+            { name: 'user-access', import: () => import('@controllers/pages/admin/user_access_controller') },
         ];
 
         let loadedCount = 0;

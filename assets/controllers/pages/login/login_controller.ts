@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus";
-import '../styles/login/login.scss';
+import '@styles/login/login.scss';
 
 export default class extends Controller {
     static targets = ["password", "toggleIcon", "toggleContainer"];

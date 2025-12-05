@@ -2,39 +2,47 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ESNext",
-    "moduleResolution": "node",
-    "lib": [
-      "ES2020",
-      "DOM",
-      "DOM.Iterable"
-    ],
-    "allowJs": true,
-    "outDir": "./public/build",
-    "rootDir": "./assets",
-    "strict": true,
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "strict": false,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "types": [
-      "node",
-      "bootstrap",
-      "select2",
-      "jest",
-      "webpack-env"
-    ]
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "allowJs": true,
+    "noImplicitAny": false,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "assets/*"
+      ],
+      "@controllers/*": [
+        "assets/controllers/*"
+      ],
+      "@styles/*": [
+        "assets/styles/*"
+      ],
+      "@js/*": [
+        "assets/js/*"
+      ],
+      "@utils/*": [
+        "assets/js/utils/*"
+      ],
+      "@config/*": [
+        "assets/js/config/*"
+      ]
+    }
   },
   "include": [
-    "assets/**/*",
-    "assets/types/**/*"
+    "assets/**/*"
   ],
   "exclude": [
     "node_modules",
-    "public/build",
+    "public",
     "**/__tests__/**",
     "**/*.test.ts",
-    "**/*.test.js",
-    "**/*.spec.ts",
-    "**/*.spec.js"
+    "**/*.test.js"
   ]
 }

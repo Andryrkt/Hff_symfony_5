@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus";
-import '../styles/pages/domListe.scss';
-import { initAgenceServiceHandlers } from '../js/utils/AgenceServiceManager';
+import '@styles/pages/domListe.scss';
+import { initAgenceServiceHandlers } from '@utils/AgenceServiceManager';
 
 export default class extends Controller {
     connect() {

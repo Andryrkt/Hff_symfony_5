@@ -1,4 +1,5 @@
 const Encore = require('@symfony/webpack-encore');
+const path = require('path');
 
 if (!Encore.isRuntimeEnvironmentConfigured()) {
     Encore.configureRuntimeEnvironment(process.env.NODE_ENV || 'dev');
@@ -11,6 +12,16 @@ Encore
 
     // 2. Entry principal (toujours chargé partout)
     .addEntry('app', './assets/app.ts')
+
+    // 3. Aliases pour simplifier les imports
+    .addAliases({
+        '@': path.resolve(__dirname, 'assets'),
+        '@controllers': path.resolve(__dirname, 'assets/controllers'),
+        '@styles': path.resolve(__dirname, 'assets/styles'),
+        '@js': path.resolve(__dirname, 'assets/js'),
+        '@utils': path.resolve(__dirname, 'assets/js/utils'),
+        '@config': path.resolve(__dirname, 'assets/js/config'),
+    })
 
     // Split chunks
     .splitEntryChunks()

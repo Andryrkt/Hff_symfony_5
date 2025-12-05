@@ -1,10 +1,10 @@
 import { Controller } from "@hotwired/stimulus";
 import numeral from 'numeral';
 import axios, { AxiosError } from 'axios';
-import '../styles/pages/secondForm.scss';
-import { initAgenceServiceHandlers } from '../js/utils/AgenceServiceManager';
-import { applyInputRestrictions, debounce } from '../js/utils/form_utils';
-import { FORM_CONSTANTS } from '../js/config/formConstants';
+import '@styles/pages/secondForm.scss';
+import { initAgenceServiceHandlers } from '@utils/AgenceServiceManager';
+import { applyInputRestrictions, debounce } from '@utils/form_utils';
+import { FORM_CONSTANTS } from '@config/formConstants';
 
 // --- Types ---
 
