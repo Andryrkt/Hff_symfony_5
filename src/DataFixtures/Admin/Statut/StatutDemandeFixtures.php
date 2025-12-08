@@ -8,7 +8,7 @@ use Doctrine\Persistence\ObjectManager;
 
 class StatutDemandeFixtures extends Fixture
 {
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $statuts = [
             /** =========== Statuts DOM ===============*/

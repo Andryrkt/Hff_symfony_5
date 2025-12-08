@@ -12,7 +12,7 @@ use App\DataFixtures\Admin\ApplicationGroupe\PermissionFixtures;
 
 class UserAccessFixtures extends Fixture implements DependentFixtureInterface
 {
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         // $userAccesss = [
         //     //pour user test

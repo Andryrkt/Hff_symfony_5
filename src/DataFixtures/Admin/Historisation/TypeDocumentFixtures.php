@@ -8,7 +8,7 @@ use Doctrine\Persistence\ObjectManager;
 
 class TypeDocumentFixtures extends Fixture
 {
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $typeDocuments = [
             ['type' => 'DIT', 'libelle' => 'DEMANDE INTERVENTION', 'reference' => 'type_dit'],

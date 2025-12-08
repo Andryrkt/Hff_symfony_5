@@ -12,7 +12,7 @@ use App\Entity\Admin\PersonnelUser\UserAccess;
 use App\Entity\Admin\AgenceService\AgenceServiceIrium;
 use App\Entity\Admin\AgenceService\Service;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
+
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
@@ -63,7 +63,6 @@ class Agence
     /**
      * @ORM\ManyToMany(targetEntity=Service::class, inversedBy="agences")
      * @ORM\JoinTable(name="agence_service")
-     * @ApiSubresource
      * @Groups({"agence:read"})
      */
     private $services;

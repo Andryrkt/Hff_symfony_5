@@ -9,7 +9,7 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 
 class SiteFixtures extends Fixture
 {
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $sites = [
             ['nomZone' => 'AUTRES VILLES', 'reference' => 'dom_site_autres_villes'],

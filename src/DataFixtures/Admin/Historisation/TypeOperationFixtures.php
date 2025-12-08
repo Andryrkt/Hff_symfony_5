@@ -8,7 +8,7 @@ use Doctrine\Persistence\ObjectManager;
 
 class TypeOperationFixtures extends Fixture
 {
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $typeOperations = [
             ['type' => 'SOUMISSION', 'reference' => 'type_soumission'],

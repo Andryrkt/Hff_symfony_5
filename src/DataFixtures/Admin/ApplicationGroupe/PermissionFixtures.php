@@ -21,7 +21,7 @@ class PermissionFixtures extends Fixture implements DependentFixtureInterface, F
         ];
     }
 
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $permissions = [
             /** === Documentation === */

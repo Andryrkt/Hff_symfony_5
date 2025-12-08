@@ -13,7 +13,7 @@ class VignetteFixtures extends Fixture implements FixtureGroupInterface
     {
         return ['prod'];
     }
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $vignettes = [
             ['nom' => 'Documentation', 'description' => 'module de gestion de documentation', 'reference' => 'vignette_documentation'],

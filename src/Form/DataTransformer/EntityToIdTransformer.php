@@ -37,7 +37,7 @@ class EntityToIdTransformer implements DataTransformerInterface
      * @param  string $id
      * @throws TransformationFailedException if object (entity) is not found.
      */
-    public function reverseTransform($id)
+    public function reverseTransform($id): mixed
     {
         // no issue number? It's optional, so that's ok
         if (!$id) {
