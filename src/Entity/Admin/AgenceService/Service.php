@@ -65,7 +65,7 @@ class Service
     private $agences;
 
     /**
-     * @ORM\OneToMany(targetEntity=Dom::class, mappedBy="serviceDebiteurId")
+     * @ORM\OneToMany(targetEntity=Dom::class, mappedBy="serviceDebiteur")
      */
     private $domServiceDebiteur;
 
