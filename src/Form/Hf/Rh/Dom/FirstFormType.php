@@ -23,15 +23,17 @@ use App\Repository\Admin\PersonnelUser\PersonnelRepository;
 class FirstFormType extends AbstractType
 {
     private $security;
+    private $personnelRepository;
 
     const SALARIE = [
         'PERMANENT' => 'PERMANENT',
         'TEMPORAIRE' => 'TEMPORAIRE',
     ];
 
-    public function __construct(EntityManagerInterface $em, Security $security)
+    public function __construct(EntityManagerInterface $em, Security $security, PersonnelRepository $personnelRepository)
     {
         $this->security = $security;
+        $this->personnelRepository = $personnelRepository;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -145,72 +147,26 @@ class FirstFormType extends AbstractType
             )
             ->add(
                 'matriculeNom',
-                EntityType::class,
+                ChoiceType::class,
                 [
                     'mapped' => false,
                     'label' => 'Matricule et nom *',
-                    'class' => Personnel::class,
+                    'choices' => $this->personnelRepository->findChoicesForUser($this->security->getUser()),
                     'placeholder' => '-- choisir un personnel --',
-                    'choice_label' => function (Personnel $personnel): string {
-                        return $personnel->getMatricule() . ' ' . $personnel->getNom() . ' ' . $personnel->getPrenoms();
-                    },
                     'multiple' => false,
                     'required' => false, // Validation gérée manuellement par first_form_controller.ts
                     'attr' => [
                         'data-controller' => 'tom-select',
                         'data-placeholder' => '-- choisir un personnel --'
                     ],
-                    'choice_attr' => function (Personnel $personnel) {
-                        return ['data-matricule' => $personnel->getMatricule()];
-                    },
-                    'query_builder' => function (PersonnelRepository $repo) use ($options) {
-                        $qb = $repo->createQueryBuilder('p');
-                        $user = $this->security->getUser();
-
-                        if ($user instanceof User) {
-                            $userAccesses = $user->getUserAccesses();
-
-                            $agenceIds = [];
-                            $serviceIds = [];
-                            $allAgence = false;
-                            $allService = false;
-
-                            foreach ($userAccesses as $userAccess) {
-                                if ($userAccess->getAllAgence()) {
-                                    $allAgence = true;
-                                    break;
-                                }
-                                if ($userAccess->getAgence()) {
-                                    $agenceIds[] = $userAccess->getAgence()->getId();
-                                }
-                            }
-
-                            foreach ($userAccesses as $userAccess) {
-                                if ($userAccess->getAllService()) {
-                                    $allService = true;
-                                    break;
-                                }
-                                if ($userAccess->getService()) {
-                                    $serviceIds[] = $userAccess->getService()->getId();
-                                }
-                            }
-
-                            if (!$allAgence && !empty($agenceIds)) {
-                                $qb->andWhere('p.agence IN (:agenceIds)')
-                                    ->setParameter('agenceIds', $agenceIds);
-                            }
-
-                            if (!$allService && !empty($serviceIds)) {
-                                $qb->andWhere('p.service IN (:serviceIds)')
-                                    ->setParameter('serviceIds', $serviceIds);
-                            }
-                        }
-
-                        return $qb->orderBy('p.matricule', 'ASC');
+                    'choice_attr' => function ($val, $key, $index) {
+                        // $key est le Label (ex: "8450 NOM Prenom")
+                        // On extrait le matricule pour le data-attribute
+                        $matricule = explode(' ', $key)[0] ?? '';
+                        return ['data-matricule' => $matricule];
                     },
                 ]
-            )
-        ;
+            );
     }
 
 
