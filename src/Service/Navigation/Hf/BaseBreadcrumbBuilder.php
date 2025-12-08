@@ -20,10 +20,24 @@ class BaseBreadcrumbBuilder
      * Filtre les sous-menus en fonction des permissions de l'utilisateur
      * Vérifie l'accès à la vignette correspondante
      */
+    private array $localVignetteCache = [];
+
+    /**
+     * Filtre les sous-menus en fonction des permissions de l'utilisateur
+     * Vérifie l'accès à la vignette correspondante
+     */
     protected function filterSubmenuByPermissions(string $vignetteName, array $submenu): array
     {
-        // Récupérer la vignette correspondante
-        $vignette = $this->vignetteRepository->findOneForHomeCard($vignetteName);
+        // Chargement initial du cache local si vide
+        if (empty($this->localVignetteCache)) {
+            $vignettes = $this->vignetteRepository->findForHomeCards();
+            foreach ($vignettes as $v) {
+                $this->localVignetteCache[$v->getNom()] = $v;
+            }
+        }
+
+        // Récupérer la vignette depuis le cache local (plus de requête SQL ici)
+        $vignette = $this->localVignetteCache[$vignetteName] ?? null;
 
         // Si la vignette n'existe pas ou si l'utilisateur n'a pas accès, retourner un tableau vide
         if (!$vignette || !$this->security->isGranted('APPLICATION_ACCESS', $vignette)) {
