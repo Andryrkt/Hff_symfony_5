@@ -9,6 +9,7 @@ use App\Form\Common\AgenceServiceType;
 use Symfony\Component\Form\AbstractType;
 use App\Entity\Admin\Statut\StatutDemande;
 use App\Entity\Hf\Rh\Dom\SousTypeDocument;
+use App\Form\Common\LightAgenceServiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -72,7 +73,7 @@ class DomSearchType extends AbstractType
                 'choices'     => ['NON' => false, 'OUI' => true],
                 'required'    => false
             ])
-            ->add('emetteur', AgenceServiceType::class, [
+            ->add('emetteur', LightAgenceServiceType::class, [
                 'label' => false,
                 'required' => false,
                 'mapped' => true,
@@ -80,8 +81,10 @@ class DomSearchType extends AbstractType
                 'service_label' => 'Service Emetteur',
                 'agence_placeholder' => '-- Agence Emetteur --',
                 'service_placeholder' => '-- Service Emetteur --',
+                'agence_class' => 'agenceEmetteur', // Class used by JS/Macro
+                'service_class' => 'serviceEmetteur', // Class used by JS/Macro
             ])
-            ->add('debiteur', AgenceServiceType::class, [
+            ->add('debiteur', LightAgenceServiceType::class, [
                 'label' => false,
                 'required' => false,
                 'mapped' => true,
@@ -89,6 +92,8 @@ class DomSearchType extends AbstractType
                 'service_label' => 'Service Débiteur',
                 'agence_placeholder' => '-- Agence Débiteur --',
                 'service_placeholder' => '-- Service Débiteur --',
+                'agence_class' => 'agenceDebiteur',
+                'service_class' => 'serviceDebiteur',
             ])
             // ->add('limit', ChoiceType::class, [
             //     'label' => 'Résultats par page',

@@ -9,6 +9,8 @@ interface Service {
 
 interface Agence {
     id: number | string;
+    code: string;
+    nom: string;
     services: Service[];
 }
 
@@ -108,6 +110,34 @@ function optionParDefaut(selectElement: HTMLSelectElement | null, placeholder: s
     }
 }
 
+function populateAgenceOptions(selectElement: HTMLSelectElement): void {
+    const currentValue = selectElement.value;
+
+    // Attempt to preserve placeholder text from the server-rendered HTML
+    let placeholderText = "-- Choisir une Agence --";
+    if (selectElement.options.length > 0 && selectElement.options[0].value === "") {
+        placeholderText = selectElement.options[0].text;
+    }
+
+    supprimLesOptions(selectElement);
+
+    optionParDefaut(selectElement, placeholderText);
+
+    if (Array.isArray(agencesData)) {
+        agencesData.forEach((agence) => {
+            const option = document.createElement("option");
+            option.value = String(agence.id);
+            option.text = agence.code + " " + agence.nom;
+            selectElement.add(option);
+        });
+    }
+
+    // Restore selection
+    if (currentValue) {
+        selectElement.value = currentValue;
+    }
+}
+
 // --- Initialization ---
 
 export function initAgenceServiceHandlers(): void {
@@ -136,9 +166,12 @@ export function initAgenceServiceHandlers(): void {
         }
     });
 
+    // Populate Agence Options initially
     for (const key in configAgenceService) {
         const config = configAgenceService[key];
         if (config && config.agenceInput) {
+            populateAgenceOptions(config.agenceInput);
+
             optionParDefaut(config.serviceInput, "-- Choisir un Service --");
             config.agenceInput.addEventListener("change", () =>
                 handleAgenceChange(key)

@@ -12,7 +12,7 @@
     "sourceMap": true,
     "allowJs": true,
     "noImplicitAny": false,
-    "noEmit": true,
+    "noEmit": false,
     "baseUrl": ".",
     "paths": {
       "@/*": [
