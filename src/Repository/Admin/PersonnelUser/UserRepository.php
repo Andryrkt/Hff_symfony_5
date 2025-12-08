@@ -79,4 +79,21 @@ class UserRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    public function findWithAccesses(int $userId): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.userAccesses', 'ua')
+            ->addSelect('ua')
+            ->leftJoin('ua.agence', 'a')
+            ->addSelect('a')
+            ->leftJoin('ua.service', 's')
+            ->addSelect('s')
+            ->leftJoin('ua.typeDocument', 'td')
+            ->addSelect('td')
+            ->where('u.id = :id')
+            ->setParameter('id', $userId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

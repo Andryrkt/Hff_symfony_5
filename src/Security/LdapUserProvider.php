@@ -110,7 +110,7 @@ class LdapUserProvider implements UserProviderInterface
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_class($user)));
         }
 
-        $reloadedUser = $this->userRepository->find($user->getId());
+        $reloadedUser = $this->userRepository->findWithAccesses($user->getId());
 
         if (null === $reloadedUser) {
             $e = new UserNotFoundException('User with id ' . $user->getId() . ' not found.');

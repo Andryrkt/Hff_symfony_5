@@ -20,6 +20,21 @@ class ContextAccessService
      *     serviceIds: int[]|null
      * }
      */
+    private array $cache = [];
+
+    /**
+     * Retourne les agences/services autorisés pour un utilisateur DANS UNE TYPE DOCUMENT donnée.
+     *
+     * @param User              $user
+     * @param TypeDocument|string $application  Soit l'entité TypeDocument, soit son code (ex: 'DOM')
+     *
+     * @return array{
+     *     allAgences: bool,
+     *     allServices: bool,
+     *     agenceIds: int[]|null,
+     *     serviceIds: int[]|null
+     * }
+     */
     public function getContextAccess(
         User $user,
         $application // peut être un Objet de type document ou le code de cette objet *on ne peut pas donner un type car on est dans php 7.4
@@ -31,9 +46,15 @@ class ContextAccessService
             $appCode = $application->getTypeDocument();
         }
 
+        // --- Memoization Key ---
+        $cacheKey = $user->getId() . '_' . $appCode;
+        if (isset($this->cache[$cacheKey])) {
+            return $this->cache[$cacheKey];
+        }
+
         // 1. Admin = accès total partout
         if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
-            return [
+            return $this->cache[$cacheKey] = [
                 'allAgences'  => true,
                 'allServices' => true,
                 'agenceIds'   => null,
@@ -62,7 +83,7 @@ class ContextAccessService
             // Sinon → accès ignoré pour cette application
         }
 
-        return [
+        return $this->cache[$cacheKey] = [
             'allAgences'  => $hasAllAgences,
             'allServices' => $hasAllServices,
             'agenceIds'   => $hasAllAgences ? null : array_unique($agenceIds),
