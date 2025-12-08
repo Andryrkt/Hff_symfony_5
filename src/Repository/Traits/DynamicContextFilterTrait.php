@@ -54,9 +54,10 @@ trait DynamicContextFilterTrait
                 }
 
                 if ($orConditions !== []) {
-                    $queryBuilder
-                        ->andWhere($queryBuilder->expr()->orX(...$orConditions))
-                        ->setParameters($parameters);
+                    $queryBuilder->andWhere($queryBuilder->expr()->orX(...$orConditions));
+                    foreach ($parameters as $key => $value) {
+                        $queryBuilder->setParameter($key, $value);
+                    }
                 }
             }
         }
