@@ -19,18 +19,15 @@
 	</head>
 
 	<body data-turbo-suppress-warning>
-		<div id="loading-overlays">
-			<div class="spinner-overlay"></div>
-			<div class="text-overlay text-white">Veuillez patienter s'il vous plaît!</div>
-		</div>
-		{% block overlay %}{% endblock %}
 		<div class="main-content">
 			{% block nav %}
 				{% include 'partials/_navbar.html.twig' %}
-				{% include 'partials/_breadcrumb.html.twig' with { breadcrumb: breadcrumb } %}
+				{% if breadcrumbs is defined and breadcrumbs is not empty %}
+					{% include 'partials/_breadcrumb.html.twig' with { breadcrumb: breadcrumbs } %}
+				{% endif %}
 			{% endblock %}
 
-			<div class="container">
+			<div>
 				{% block bandeau %}
 					<!-- Bandeau sur la page d'accueil -->
 				{% endblock %}
@@ -40,7 +37,7 @@
 			</div>
 		</div>
 
-		{% include "partials/_footer.html.twig" %}
+		{# {% include "partials/_footer.html.twig" %} #}
 
 
 		{% block javascripts %}

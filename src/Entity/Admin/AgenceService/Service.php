@@ -11,6 +11,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Admin\PersonnelUser\UserAccess;
 use App\Entity\Admin\AgenceService\AgenceServiceIrium;
 use App\Entity\Admin\AgenceService\Agence;
+use App\Entity\Hf\Rh\Dom\Dom;
 use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Annotation\ApiResource;
 
@@ -32,19 +33,19 @@ class Service
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"service:read"})
+     * @Groups({"service:read", "agence:read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=10)
-     * @Groups({"service:read"})
+     * @Groups({"service:read", "agence:read"})
      */
     private $code;
 
     /**
      * @ORM\Column(type="string", length=100)
-     * @Groups({"service:read"})
+     * @Groups({"service:read", "agence:read"})
      */
     private $nom;
 
@@ -63,12 +64,23 @@ class Service
      */
     private $agences;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Dom::class, mappedBy="serviceDebiteur")
+     */
+    private $domServiceDebiteur;
+
 
     public function __construct()
     {
         $this->agenceServiceIriums = new ArrayCollection();
         $this->userAccesses = new ArrayCollection();
         $this->agences = new ArrayCollection();
+        $this->domServiceDebiteur = new ArrayCollection();
+    }
+
+    public function getCodeNom(string $separateur): string
+    {
+        return $this->getCode() . $separateur . $this->getNom();
     }
 
     public function getId(): ?int
@@ -182,4 +194,33 @@ class Service
         return $this;
     }
 
+    /**
+     * @return Collection<int, Dom>
+     */
+    public function getDomServiceDebiteur(): Collection
+    {
+        return $this->domServiceDebiteur;
+    }
+
+    public function addDomServiceDebiteur(Dom $domServiceDebiteur): self
+    {
+        if (!$this->domServiceDebiteur->contains($domServiceDebiteur)) {
+            $this->domServiceDebiteur[] = $domServiceDebiteur;
+            $domServiceDebiteur->setServiceDebiteur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDomServiceDebiteur(Dom $domServiceDebiteur): self
+    {
+        if ($this->domServiceDebiteur->removeElement($domServiceDebiteur)) {
+            // set the owning side to null (unless already changed)
+            if ($domServiceDebiteur->getServiceDebiteur() === $this) {
+                $domServiceDebiteur->setServiceDebiteur(null);
+            }
+        }
+
+        return $this;
+    }
 }

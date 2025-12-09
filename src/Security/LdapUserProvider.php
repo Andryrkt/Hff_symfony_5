@@ -2,14 +2,17 @@
 
 namespace App\Security;
 
+use App\Entity\Admin\PersonnelUser\Personnel;
 use App\Entity\Admin\PersonnelUser\User;
-use App\Repository\Admin\PersonnelUser\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Ldap\LdapInterface;
+use App\Repository\Admin\PersonnelUser\UserRepository;
 use Symfony\Component\Security\Core\User\UserInterface;
+use App\Repository\Admin\PersonnelUser\PersonnelRepository;
+use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 
 class LdapUserProvider implements UserProviderInterface
@@ -23,7 +26,7 @@ class LdapUserProvider implements UserProviderInterface
     private $userRepository;
     private $em;
 
-    private $personnelRepository;
+
 
     public function __construct(
         LdapInterface $ldap,
@@ -33,8 +36,7 @@ class LdapUserProvider implements UserProviderInterface
         string $searchDn,
         string $searchPassword,
         UserRepository $userRepository,
-        EntityManagerInterface $em,
-        \App\Repository\Admin\PersonnelUser\PersonnelRepository $personnelRepository
+        EntityManagerInterface $em
     ) {
         $this->ldap = $ldap;
         $this->baseDn = $baseDn;
@@ -44,7 +46,6 @@ class LdapUserProvider implements UserProviderInterface
         $this->searchPassword = $searchPassword;
         $this->userRepository = $userRepository;
         $this->em = $em;
-        $this->personnelRepository = $personnelRepository;
     }
 
     public function loadUserByIdentifier(string $identifier): UserInterface
@@ -69,14 +70,26 @@ class LdapUserProvider implements UserProviderInterface
         $user = $this->userRepository->findOneBy(['username' => $identifier]);
 
         if (!$user) {
-            $user = new User();
-            $user->setUsername($identifier);
+            $user = $this->createUser($entry, $identifier);
         }
 
-        // Synchronisation des données LDAP
+        return $user;
+    }
+
+    private function createUser(Entry $entry, string $identifier): User
+    {
+        $personnel = $this->em->getRepository(Personnel::class)->findOneBy([
+            'nom' => $entry->getAttribute('sn')[0] ?? null
+        ]);
+
+        $user = new User();
+        $user->setUsername($identifier);
         $user->setFullname($entry->getAttribute('cn')[0] ?? null);
         $user->setEmail($entry->getAttribute('mail')[0] ?? null);
         $user->setRoles([$this->defaultRoles]);
+        $user->setPoste($entry->getAttribute('description')[0] ?? null);
+        $user->setMatricule($personnel ? $personnel->getMatricule() : null);
+        $user->setPersonnel($personnel);
 
 
         $this->em->persist($user);
@@ -84,6 +97,7 @@ class LdapUserProvider implements UserProviderInterface
 
         return $user;
     }
+
 
     public function loadUserByUsername(string $username): UserInterface
     {
@@ -96,7 +110,7 @@ class LdapUserProvider implements UserProviderInterface
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_class($user)));
         }
 
-        $reloadedUser = $this->userRepository->find($user->getId());
+        $reloadedUser = $this->userRepository->findWithAccesses($user->getId());
 
         if (null === $reloadedUser) {
             $e = new UserNotFoundException('User with id ' . $user->getId() . ' not found.');

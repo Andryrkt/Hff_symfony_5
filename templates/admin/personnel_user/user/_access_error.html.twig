@@ -1,0 +1,11 @@
+<turbo-frame id="user_access_list_for_user_{{ user.id|default(0) }}">
+    <div class="alert alert-danger">
+        <h6>Erreur</h6>
+        <p class="mb-0">{{ message|default('Une erreur est survenue lors du chargement des accès.') }}</p>
+        <button class="btn btn-sm btn-outline-secondary mt-2" 
+                data-action="click->user-access#retry"
+                data-user-access-user-id="{{ user.id|default(0) }}">
+            Réessayer
+        </button>
+    </div>
+</turbo-frame>

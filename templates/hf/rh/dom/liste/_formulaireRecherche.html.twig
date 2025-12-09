@@ -1,0 +1,46 @@
+{% import "macros/form_macros.html.twig" as formMacros %}
+{% import "macros/actions.html.twig" as actions %}
+
+<div class="accordion" id="accordionExample">
+	<div class="accordion-item">
+		<h2 class="accordion-header">
+			<button class="accordion-button enteteAccordion" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+				Formulaire de recherche
+			</button>
+		</h2>
+		<div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+			<div class="accordion-body">
+				{{ form_start(form, {'method': 'GET'}) }}
+				<div class="row">
+					<div class="col col-md-2">
+						{{ form_row(form.statut) }}
+						{{ form_row(form.sousTypeDocument) }}
+						{{ form_row(form.pieceJustificatif) }}
+					</div>
+					<div class="col col-md-2">
+						{{form_row(form.numDom)}}
+						{{form_row(form.matricule)}}
+					</div>
+
+					<div class="col col-md-2">
+						{{ form_row(form.dateDemande.debut)}}
+						{{ form_row(form.dateDemande.fin)}}
+					</div>
+					<div class="col col-md-2">
+						{{ form_row(form.dateMission.debut)}}
+						{{ form_row(form.dateMission.fin)}}
+					</div>
+					<div class="col col-md-2">
+						{{ formMacros.debiteurOuEmetteurFields(form, 'debiteur') }}
+					</div>
+					<div class="col col-md-2">
+						{{ formMacros.debiteurOuEmetteurFields(form, 'emetteur') }}
+					</div>
+
+					{{ actions.filter_buttons(path('liste_dom_index')) }}
+				</div>
+				{{ form_end(form) }}
+			</div>
+		</div>
+	</div>
+</div>

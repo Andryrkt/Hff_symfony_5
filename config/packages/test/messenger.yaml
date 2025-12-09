@@ -1,0 +1,17 @@
+# config/packages/test/messenger.yaml
+framework:
+  messenger:
+    failure_transport: sync
+
+    transports:
+      # Transport in-memory pour les tests d'emails
+      in_memory_email: 'in-memory://'
+      sync: 'sync://'
+      failed: 'sync://'
+
+    routing:
+      # Route tous les messages vers sync en test, sauf les emails
+      Symfony\Component\Mailer\Messenger\SendEmailMessage: in_memory_email
+      Symfony\Component\Notifier\Message\ChatMessage: sync
+      Symfony\Component\Notifier\Message\SmsMessage: sync
+      '*': sync

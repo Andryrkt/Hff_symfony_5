@@ -1,0 +1,108 @@
+/* Styles pour les groupes de permissions (vignettes) */
+.ts-dropdown .optgroup-header {
+    cursor: pointer !important;
+    padding: 8px 12px;
+    /* Adjusted padding */
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+    background-color: #f8f9fa;
+    margin-top: 5px;
+    transition: all 0.2s ease;
+    position: relative;
+    font-size: 0.875em;
+    /* Smaller font size */
+    user-select: none;
+}
+
+.ts-dropdown .optgroup-header:hover {
+    background-color: #e9ecef;
+}
+
+/* États de sélection des groupes */
+.ts-dropdown .optgroup-header.fully-selected {
+    background-color: #d4edda;
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+
+.ts-dropdown .optgroup-header.partially-selected {
+    background-color: #fff3cd;
+    color: #856404;
+    border-left: 4px solid #ffc107;
+}
+
+.ts-dropdown .optgroup-header.no-selection {
+    border-left: 4px solid #6c757d;
+}
+
+/* Indicateurs visuels */
+.ts-dropdown .optgroup-header::after {
+    content: "✓";
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.ts-dropdown .optgroup-header.fully-selected::after {
+    opacity: 1;
+}
+
+.ts-dropdown .optgroup-header.partially-selected::after {
+    content: "–";
+    opacity: 1;
+}
+
+/* Options individuelles */
+.ts-dropdown .ts-option {
+    padding: 6px 12px 6px 20px;
+    border-left: 3px solid transparent;
+    font-size: 0.875em;
+    /* Smaller font size */
+}
+
+.ts-dropdown .ts-option.selected {
+    background-color: #e7f1ff;
+    border-left-color: #007bff;
+}
+
+/* Zone de sélection */
+.ts-control {
+    min-height: 38px;
+    /* Reduced min-height */
+    border: 1px solid #ced4da;
+    font-size: 0.875em;
+    /* Smaller font size for selected items/input */
+}
+
+.ts-control .item {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    font-size: 0.875em;
+    /* Ensure selected items also have smaller font */
+}
+
+/* Style du champ de recherche */
+.ts-dropdown .ts-input {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 6px 10px;
+    /* Adjusted padding */
+    margin: 8px;
+    width: calc(100% - 16px);
+    box-shadow: none;
+    transition: border-color 0.2s ease;
+    font-size: 0.875em;
+    /* Smaller font size */
+}
+
+.ts-dropdown .ts-input:focus {
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}

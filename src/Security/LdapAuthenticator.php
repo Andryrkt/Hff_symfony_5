@@ -37,7 +37,7 @@ class LdapAuthenticator extends AbstractAuthenticator implements AuthenticationE
         $this->searchPassword = $searchPassword;
     }
 
-    public function start(Request $request, AuthenticationException $authException = null): Response
+    public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         return new RedirectResponse('/login');
     }

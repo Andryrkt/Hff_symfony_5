@@ -5,6 +5,8 @@ namespace App\Controller\Admin\PersonnelUser;
 use App\Entity\Admin\PersonnelUser\UserAccess;
 use App\Form\Admin\PersonnelUser\UserAccessType;
 use App\Repository\Admin\PersonnelUser\UserAccessRepository;
+use App\Repository\Admin\PersonnelUser\UserRepository;
+use App\Entity\Admin\PersonnelUser\User; // ADDED: Missing use statement for User entity
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +22,7 @@ class UserAccessController extends AbstractController
      */
     public function index(UserAccessRepository $userAccessRepository): Response
     {
-        return $this->render('admin/personnelUser/userAccess/index.html.twig', [
+        return $this->render('admin/personnel_user/userAccess/index.html.twig', [
             'user_accesses' => $userAccessRepository->findAll(),
         ]);
     }
@@ -28,9 +30,18 @@ class UserAccessController extends AbstractController
     /**
      * @Route("/new", name="admin_user_access_new", methods={"GET", "POST"})
      */
-    public function new(Request $request, UserAccessRepository $userAccessRepository): Response
+    public function new(Request $request, UserAccessRepository $userAccessRepository, UserRepository $userRepository): Response
     {
         $userAccess = new UserAccess();
+
+        $userId = $request->query->get('user_id');
+        if ($userId) {
+            $user = $userRepository->find($userId);
+            if ($user) {
+                $userAccess->setUsers($user);
+            }
+        }
+
         $form = $this->createForm(UserAccessType::class, $userAccess);
         $form->handleRequest($request);
 
@@ -40,7 +51,7 @@ class UserAccessController extends AbstractController
             return $this->redirectToRoute('admin_user_access_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->renderForm('admin/personnelUser/userAccess/new.html.twig', [
+        return $this->renderForm('admin/personnel_user/userAccess/new.html.twig', [
             'user_access' => $userAccess,
             'form' => $form,
         ]);
@@ -51,7 +62,7 @@ class UserAccessController extends AbstractController
      */
     public function show(UserAccess $userAccess): Response
     {
-        return $this->render('admin/personnelUser/userAccess/show.html.twig', [
+        return $this->render('admin/personnel_user/userAccess/show.html.twig', [
             'user_access' => $userAccess,
         ]);
     }
@@ -70,7 +81,7 @@ class UserAccessController extends AbstractController
             return $this->redirectToRoute('admin_user_access_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->renderForm('admin/personnelUser/userAccess/edit.html.twig', [
+        return $this->renderForm('admin/personnel_user/userAccess/edit.html.twig', [
             'user_access' => $userAccess,
             'form' => $form,
         ]);
@@ -86,5 +97,16 @@ class UserAccessController extends AbstractController
         }
 
         return $this->redirectToRoute('admin_user_access_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    /**
+     * @Route("/user/{id}", name="admin_user_access_for_user", methods={"GET"})
+     */
+    public function listForUser(User $user, UserAccessRepository $userAccessRepository): Response
+    {
+        return $this->render('admin/personnel_user/userAccess/_list_for_user.html.twig', [
+            'user_accesses' => $userAccessRepository->findBy(['users' => $user]),
+            'user' => $user,
+        ]);
     }
 }

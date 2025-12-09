@@ -1,14 +1,25 @@
 @use "variables";
 @use "base";
 @use "components/title";
-@use "components/select2";
+@use "components/tom-select";
 @use "components/navigation";
 @use "components/chronometer";
 @use "components/sidebar";
+@use "components/sortable_header";
 @use "components/dropdown-grid";
+@use "components/breadcrumb";
+@use "components/navbar_hover_dropdown";
+@use "components/custom-dropdown";
+@import "./pages/erreur/erreur.css";
 /* @import "./accueil.scss"; */
 
 /* ===== IMPORTS ===== */
 @import "~bootstrap/dist/css/bootstrap.min.css";
-@import "~select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css";
+@import "~tom-select/dist/css/tom-select.bootstrap5.css";
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Nandinagari&display=swap");
+
+.enteteAccordion {
+  background-color: #fbbb01 !important;
+  color: #212529 !important;
+  font-size: 0.75rem !important;
+}

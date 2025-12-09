@@ -1,0 +1,61 @@
+{# templates/admin/personnel_user/userAccess/_list_for_user.html.twig #}
+<turbo-frame id="user_access_list_for_user_{{ user.id }}">
+    <div class="card my-3">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Accès pour {{ user.fullname | default('') }}</h5>
+                <a href="{{ path('admin_user_access_new', {'user_id': user.id}) }}" class="btn btn-sm btn-primary">Ajouter un accès</a>
+            </div>
+            <hr>
+            <table class="table table-sm table-hover">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Agence</th>
+                        <th>Service</th>
+                        <th>Toutes Agences</th>
+                        <th>Tous Services</th>
+                        <th>Permissions</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="user_accesses_for_user_{{ user.id }">
+                {% for user_access in user_accesses %}
+                    {# Ligne principale #}
+                    <tr data-bs-toggle="collapse" data-bs-target="#collapse-{{ user_access.id }}" style="cursor: pointer;" class="clickable-row">
+                        <td>{{ user_access.id }}</td>
+                        <td>{{ user_access.agence.nom | default('-') }}</td>
+                        <td>{{ user_access.service.nom | default('-') }}</td>
+                        <td>{{ user_access.allAgence ? 'Oui' : 'Non' }}</td>
+                        <td>{{ user_access.allService ? 'Oui' : 'Non' }}</td>
+                        <td>
+                            {{ user_access.permissions|length }} permission(s)
+                        </td>
+                        <td>
+                            <a href="{{ path('admin_user_access_show', {'id': user_access.id}) }}" class="btn btn-sm btn-outline-info">Détail</a>
+                        </td>
+                    </tr>
+
+                    {# Ligne du formulaire en collapse #}
+                    <tr class="collapse" id="collapse-{{ user_access.id }}">
+                        <td colspan="7">
+                            <div class="p-3 bg-light border rounded">
+                                <turbo-frame id="form-{{ user_access.id }}" src="{{ path('admin_user_access_edit', {'id': user_access.id}) }}" loading="lazy">
+                                    <div class="text-center text-muted py-3">
+                                        <small>Chargement du formulaire...</small>
+                                    </div>
+                                </turbo-frame>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">Aucun accès défini pour cet utilisateur.</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</turbo-frame>
+

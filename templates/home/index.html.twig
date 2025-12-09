@@ -6,9 +6,7 @@
 
 {% block content %}
 
-	{% include "home/shared/_card.html.twig" with { cards: cards } %}
-
-	<h1>Bienvenu
-		{{ app.user.username }}
-		!</h1>
-</h1>{% endblock %}
+	<div class="container">
+		{% include "home/shared/_card.html.twig" with { cards: cards } %}
+	</div>
+{% endblock %}

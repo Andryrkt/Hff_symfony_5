@@ -63,4 +63,65 @@ class PersonnelRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    /**
+     * Retourne un tableau [Label => ID] pour le champ ChoiceType
+     * Optimisé pour éviter l'hydratation de milliers d'objets.
+     */
+    public function findChoicesForUser($user): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->leftJoin('p.agenceServiceIrium', 'asi')
+            ->leftJoin('asi.agence', 'a')
+            ->leftJoin('asi.service', 's')
+            ->select('p.id, p.matricule, p.nom, p.prenoms')
+            ->orderBy('p.matricule', 'ASC');
+
+        // Filtrage selon les droits de l'utilisateur
+        if ($user && method_exists($user, 'getUserAccesses')) {
+            $userAccesses = $user->getUserAccesses();
+            $agenceIds = [];
+            $serviceIds = [];
+            $allAgence = false;
+            $allService = false;
+
+            foreach ($userAccesses as $userAccess) {
+                if ($userAccess->getAllAgence()) {
+                    $allAgence = true;
+                } elseif ($userAccess->getAgence()) {
+                    $agenceIds[] = $userAccess->getAgence()->getId();
+                }
+
+                if ($userAccess->getAllService()) {
+                    $allService = true;
+                } elseif ($userAccess->getService()) {
+                    $serviceIds[] = $userAccess->getService()->getId();
+                }
+            }
+
+            // Si pas accès à toutes les agences, on filtre par les IDs autorisés
+            // On utilise 'a.id' (l'agence liée via agenceServiceIrium)
+            if (!$allAgence && !empty($agenceIds)) {
+                $qb->andWhere('a.id IN (:agenceIds)')
+                    ->setParameter('agenceIds', $agenceIds);
+            }
+
+            // Si pas accès à tous les services
+            if (!$allService && !empty($serviceIds)) {
+                $qb->andWhere('s.id IN (:serviceIds)')
+                    ->setParameter('serviceIds', $serviceIds);
+            }
+        }
+
+        $results = $qb->getQuery()->getArrayResult();
+        $choices = [];
+
+        foreach ($results as $row) {
+            $label = $row['matricule'] . ' ' . $row['nom'] . ' ' . $row['prenoms'];
+            // ChoiceType attend [Label => Value] ou juste les valeurs si choice_label est utilisé
+            // Mais ici on prépare le tableau final [Label => ID]
+            $choices[$label] = $row['id'];
+        }
+
+        return $choices;
+    }
 }

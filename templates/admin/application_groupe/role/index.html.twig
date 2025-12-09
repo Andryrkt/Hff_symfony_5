@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des rôles
+{% endblock %}
+
+{% block content %}
+	<div class="container">
+		<h1 class="mb-4">
+			<i class="fas fa-user-shield"></i>
+			Liste des rôles
+		</h1>
+
+		<div class="alert alert-info" role="alert">
+			<i class="fas fa-info-circle"></i>
+			Les rôles définissent les niveaux d'accès des utilisateurs dans l'application.
+		</div>
+
+		<div class="card shadow-sm">
+			<div class="card-body">
+				<table class="table table-hover table-striped">
+					<thead class="table-dark">
+						<tr>
+							<th>Code</th>
+							<th>Label</th>
+							<th>Description</th>
+							<th>Niveau</th>
+							<th class="text-center">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for role in roles %}
+							<tr>
+								<td>
+									<code class="text-primary">{{ role.code }}</code>
+								</td>
+								<td>
+									<strong>{{ role.label }}</strong>
+								</td>
+								<td>{{ role.description }}</td>
+								<td>
+									<span class="badge bg-{{ role.level >= 10 ? 'danger' : 'secondary' }}">
+										Niveau
+										{{ role.level }}
+									</span>
+								</td>
+								<td class="text-center">
+									<a href="{{ path('app_admin_application_groupe_role_show', {'code': role.code}) }}" class="btn btn-sm btn-info" title="Voir les détails">
+										<i class="fas fa-eye"></i>
+										Voir
+									</a>
+								</td>
+							</tr>
+						{% else %}
+							<tr>
+								<td colspan="5" class="text-center text-muted">Aucun rôle trouvé.</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="mt-3">
+			<a href="{{ path('app_admin_application_groupe_permission_index') }}" class="btn btn-secondary">
+				<i class="fas fa-arrow-left"></i>
+				Retour aux permissions
+			</a>
+		</div>
+	</div>
+{% endblock %}

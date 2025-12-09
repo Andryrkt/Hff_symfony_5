@@ -1,14 +1,56 @@
 doctrine:
     dbal:
-        url: '%env(resolve:DATABASE_URL)%'
-        driver: 'pdo_sqlsrv'
-        server_version: '15.0'
-        charset: UTF-8
-        use_savepoints: true
-        # Optimisations de performance pour SQL Server
-        options:
-            "TrustServerCertificate": true
-            "Encrypt": false
+        default_connection: default
+        connections:
+            # ==================================================
+            # CONNEXION PRINCIPALE (Application)
+            # ==================================================
+            default:
+                url: '%env(resolve:DATABASE_URL)%'
+                driver: 'pdo_sqlsrv'
+                server_version: '15.0'
+                charset: UTF-8
+                use_savepoints: true
+                # Optimisations de performance pour SQL Server
+                options:
+                    "TrustServerCertificate": true
+                    "Encrypt": false
+            
+            # ==================================================
+            # CONNEXION LEGACY 1 - ## SQL SERVER - 192.168.0.28
+            # ==================================================
+            legacy:
+                url: '%env(resolve:DATABASE_LEGACY_URL)%'
+                driver: 'pdo_sqlsrv'
+                server_version: '15.0'
+                charset: UTF-8
+                options:
+                    "TrustServerCertificate": true
+                    "Encrypt": false
+
+            # ==================================================
+            # CONNEXION LEGACY 2 - ## SQL SERVER - SRV-SAGERH\\HFF26 - HFF
+            # ==================================================
+            legacy_hff:
+                url: '%env(resolve:DATABASE_LEGACY_PERSONNEL_HFF_URL)%'
+                driver: 'pdo_sqlsrv'
+                server_version: '15.0'
+                charset: UTF-8
+                options:
+                    "TrustServerCertificate": true
+                    "Encrypt": false
+
+            # ==================================================
+            # CONNEXION LEGACY 3 - ## SQL SERVER - SRV-SAGERH\\HFF26 - AIRWAYS
+            # ==================================================
+            legacy_airways:
+                url: '%env(resolve:DATABASE_LEGACY_PERSONNEL_AIRWAYS_URL)%'
+                driver: 'pdo_sqlsrv'
+                server_version: '15.0'
+                charset: UTF-8
+                options:
+                    "TrustServerCertificate": true
+                    "Encrypt": false
     orm:
         auto_generate_proxy_classes: false
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
@@ -24,13 +66,23 @@ doctrine:
 when@test:
     doctrine:
         dbal:
-            # "TEST_TOKEN" is typically set by ParaTest
-            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+            url: '%env(resolve:DATABASE_URL)%'
+            driver: 'pdo_sqlite'
+            # Le dbname_suffix est utile pour des bases de données distinctes pour chaque test runner, mais moins pertinent pour sqlite in-memory ou fichier
+            # dbname_suffix: '_test%env(default::TEST_TOKEN)%' 
+            # Les options server_version, use_savepoints, options: TrustServerCertificate, Encrypt sont spécifiques à SQLSrv et doivent être omises pour SQLite.
+        orm:
+            auto_generate_proxy_classes: true # Peut être activé pour les tests si nécessaire
+            # Les autres configurations ORM (comme les mappings) restent les mêmes
+
 
 when@prod:
     doctrine:
         orm:
             auto_generate_proxy_classes: false
+            metadata_cache_driver:
+                type: pool
+                pool: doctrine.system_cache_pool
             proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
             query_cache_driver:
                 type: pool

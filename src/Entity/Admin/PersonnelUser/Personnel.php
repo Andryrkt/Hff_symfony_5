@@ -14,6 +14,11 @@ use App\Entity\Admin\PersonnelUser\User;
 /**
  * @Broadcast()
  * @ORM\Entity(repositoryClass=PersonnelRepository::class)
+ * @ORM\Table(name="personnel",
+ * indexes={
+ *         @ORM\Index(name="idx_matricule", columns={"matricule"})
+ *     }
+ * )
  * @ORM\HasLifecycleCallbacks
  */
 class Personnel
@@ -50,13 +55,21 @@ class Personnel
 
 
     /**
-     * @ORM\Column(type="integer", nullable=true)
+     * @ORM\Column(type="integer", nullable=true, unique=true)
      */
     private $matricule;
 
-    public function __construct()
-    {
-    }
+    /**
+     * @ORM\Column(type="string", length=3, nullable=true)
+     */
+    private $societe;
+
+    /**
+     * @ORM\Column(type="string", length=200, nullable=true)
+     */
+    private $numeroCompteBancaire;
+
+    public function __construct() {}
 
     public function getId(): ?int
     {
@@ -130,6 +143,30 @@ class Personnel
     public function setMatricule(?int $matricule): self
     {
         $this->matricule = $matricule;
+
+        return $this;
+    }
+
+    public function getSociete(): ?string
+    {
+        return $this->societe;
+    }
+
+    public function setSociete(?string $societe): self
+    {
+        $this->societe = $societe;
+
+        return $this;
+    }
+
+    public function getNumeroCompteBancaire(): ?string
+    {
+        return $this->numeroCompteBancaire;
+    }
+
+    public function setNumeroCompteBancaire(?string $numeroCompteBancaire): self
+    {
+        $this->numeroCompteBancaire = $numeroCompteBancaire;
 
         return $this;
     }

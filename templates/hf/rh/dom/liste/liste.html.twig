@@ -1,0 +1,113 @@
+{% extends 'base.html.twig' %}
+
+{% import 'macros/_sortable_macros.html.twig' as sortable %}
+
+{% block title %}Liste des Ordres de Mission
+{% endblock %}
+
+{% block content %}
+	<div class="container" id="agence-service-data" data-agences="{{ agencesJson|e('html_attr') }}" data-controller="dom-liste">
+		{% include 'partials/flash_messages.html.twig' %}
+
+		{% include "hf/rh/dom/liste/_formulaireRecherche.html.twig" with{
+			form : form
+		}%}
+
+
+		{% include "partials/_pagination_haut.html.twig" with {
+			buttons: [
+			{
+				href: 'dom_export_excel',
+				class: 'bg-success',
+				icon: 'fas fa-table',
+				text: 'Excel',
+				tooltip: 'Exporter en Excel'
+			},
+			{
+				href: 'dom_first_form',
+				class: 'bg-warning',
+				text: 'Nouvelle demande',
+				tooltip: 'Nouvelle demande'
+			}
+		],
+			currentPage: paginationData['currentPage'],
+			totalPages: paginationData['lastPage'],
+			resultCount: paginationData['totalItems'],
+			routeName: routeName,
+			criteria: queryParams
+		} %}
+	</div>
+
+
+	<div class="container-fluid">
+		<table class="table rounded table-plein-ecran">
+			<thead class="table-dark">
+				<tr>
+					<th>
+						<i class="fas fa-ellipsis-vertical"></i>
+					</th>
+					{{ sortable.header('Statut', 'statut', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
+					{{ sortable.header('Sous type', 'typeDocument', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
+					{{ sortable.header('N° DOM', 'numeroOrdreMission', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
+					{{ sortable.header('Date de demande', 'dateDemande', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
+					<th>Motif de déplacemnt</th>
+					{{ sortable.header('Matricule', 'matricule', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
+					<th>Agence\Service</th>
+					{{ sortable.header('Date de début', 'dateDebut', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
+					{{ sortable.header('Date de fin', 'dateFin', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
+					<th>Client</th>
+					<th>Lieu d'intervention</th>
+					<th>Total général payer</th>
+					<th>Devis</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for item in paginationData['data'] %}
+					<tr>
+						{# Début Action #}
+						<td style="padding: 0px;" class="align-middle">
+							<div class="dropdown">
+								<button class="btn  dropdown-toggle trois-points-vertical" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+									<i class="fas fa-ellipsis-vertical"></i>
+								</button>
+
+								<ul class="dropdown-menu dropdown-menu-end" id="dropdown-menu" aria-labelledby="dropdownMenuButton" style="">
+									<li>
+										<a class="dropdown-item fw-bold" href="#">Trop perçu</a>
+									</li>
+								</ul>
+
+							</div>
+						</td>
+						{# Fin Actions #}
+
+						{# >>>===== DEBUT Statut  ======= La logique CSS est maintenant gérée par les méthodes getStatutCssClass() et getStatutCssStyle() de l'entité Dom #}
+						<td class="{{ item.statutCssClass }}" style="{{ item.statutCssStyle }}">{{ item.idStatutDemande.description }}</td>
+						{# <<<===== FIN Statut ==== #}
+						<td>{{ item.sousTypeDocument.codeSousType }}</td>
+						<td>
+							<a href="#" target="_blank">
+								{{ item.numeroOrdreMission }}
+							</a>
+						</td>
+						<td class="text-center">{{ item.dateDemande | date('d/m/Y')}}</td>
+						<td>{{ item.motifDeplacement}}</td>
+						<td class="text-center">{{ item.matricule }}</td>
+						<td>{{ item.libelleCodeAgenceService}}</td>
+						<td class="text-center">{{ item.dateDebut | date('d/m/Y')}}</td>
+						<td class="text-center">{{ item.dateFin | date('d/m/Y') }}</td>
+						<td>{{ item.client}}</td>
+						<td>{{ item.lieuIntervention}}</td>
+						<td class="text-end">{{ item.totalGeneralPayer}}</td>
+						<td>{{ item.devis}}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+
+		{% include "partials/_pagination_bas.html.twig" with {
+			currentPage: paginationData['currentPage'],
+			totalPages: paginationData['totalItems']
+		} %}
+	</div>
+{% endblock %}

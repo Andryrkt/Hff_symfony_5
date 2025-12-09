@@ -1,0 +1,40 @@
+{#
+    Macros pour créer des en-têtes de colonnes triables
+    
+    Utilisation:
+    {% import 'partials/_sortable_macros.html.twig' as sortable %}
+    
+    {{ sortable.header('Statut', 'statut', routeName, queryParams, currentSort, currentOrder) }}
+#}
+
+{# Style pour les en-têtes triables #}
+		<style>
+			.sortable-header {
+				cursor: pointer;
+				user-select: none;
+			}
+			.sortable-header:hover {
+				text-decoration: underline !important;
+				opacity: 0.8;
+			}
+			.sort-icon {
+				margin-left: 5px;
+				font-size: 0.8em;
+				opacity: 0.6;
+			}
+			.sort-icon-active {
+				opacity: 1;
+			}
+		</style>
+{% macro header(label, sortKey, routeName, queryParams, currentSort, currentOrder, thClass = '') %}
+	<th {{ thClass ? 'class="' ~ thClass ~ '"' : '' }}>
+		<a href="{{ path(routeName, queryParams|merge({ sortBy: sortKey, sortOrder: (currentSort == sortKey and currentOrder == 'ASC') ? 'DESC' : 'ASC', page: 1 })) }}" class="text-white text-decoration-none sortable-header">
+			{{ label }}
+			{% if currentSort == sortKey %}
+				<i class="fas fa-sort-{{ currentOrder == 'ASC' ? 'up' : 'down' }} sort-icon sort-icon-active"></i>
+			{% else %}
+				<i class="fas fa-sort sort-icon"></i>
+			{% endif %}
+		</a>
+	</th>
+{% endmacro %}

@@ -4,6 +4,7 @@ namespace App\Form\Admin\PersonnelUser;
 
 use App\Entity\Admin\PersonnelUser\User;
 use App\Entity\Admin\ApplicationGroupe\Group;
+use App\Entity\Admin\ApplicationGroupe\Permission;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -49,12 +50,28 @@ class UserType extends AbstractType
                 'multiple' => true,
                 'expanded' => true,
             ])
-            ->add('groups', EntityType::class, [
-                'class' => Group::class,
-                'choice_label' => 'name',
-                'label' => 'Groupes',
+            ->add('permissionsDirectes', EntityType::class, [
+                'class' => Permission::class,
+                'choice_label' => 'code',
+                'label' => 'Permissions directes',
                 'multiple' => true,
+                'expanded' => false,
                 'required' => false,
+                'group_by' => function ($choice, $key, $value) {
+                    $vignette = $choice->getVignette();
+                    return $vignette ? $vignette->getNom() : 'Sans vignette';
+                },
+                'attr' => [
+                    'class' => 'form-select',
+                    'data-controller' => 'tom-select',
+                    'data-placeholder' => 'Sélectionnez des permissions...',
+                ],
+                'query_builder' => function ($repository) {
+                    return $repository->createQueryBuilder('p')
+                        ->leftJoin('p.vignette', 'v')
+                        ->orderBy('v.nom', 'ASC')
+                        ->addOrderBy('p.code', 'ASC');
+                },
             ])
         ;
     }
@@ -65,4 +82,4 @@ class UserType extends AbstractType
             'data_class' => User::class,
         ]);
     }
-} 
+}

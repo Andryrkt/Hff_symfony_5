@@ -63,4 +63,37 @@ class UserRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
+
+    /**
+     * @return User[] Returns an array of User objects
+     */
+    public function search(?string $query): array
+    {
+        $qb = $this->createQueryBuilder('u')
+            ->orderBy('u.id', 'DESC');
+
+        if ($query) {
+            $qb->andWhere('u.username LIKE :query OR u.email LIKE :query OR u.matricule LIKE :query')
+                ->setParameter('query', '%' . $query . '%');
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findWithAccesses(int $userId): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.userAccesses', 'ua')
+            ->addSelect('ua')
+            ->leftJoin('ua.agence', 'a')
+            ->addSelect('a')
+            ->leftJoin('ua.service', 's')
+            ->addSelect('s')
+            ->leftJoin('ua.typeDocument', 'td')
+            ->addSelect('td')
+            ->where('u.id = :id')
+            ->setParameter('id', $userId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

@@ -1,0 +1,40 @@
+services:
+  # Services de migration de données
+  App\Service\Migration\Hf\Rh\Dom\DomMigrationMapper:
+    arguments:
+      $logger: '@monolog.logger.migration_dom'
+
+  App\Service\Migration\Admin\PersonnelUser\PersonnelMigrationMapper:
+    arguments:
+      $logger: '@monolog.logger.migration_personnel'
+
+  App\Service\Migration\Admin\PersonnelUser\UserMigrationMapper:
+    arguments:
+      $logger: '@monolog.logger.migration_user'
+
+  App\Command\Migration\MigrateDomDataCommand:
+    arguments:
+      $legacyConnection: '@doctrine.dbal.legacy_connection'
+      $mapper: '@App\Service\Migration\Hf\Rh\Dom\DomMigrationMapper'
+      $migrationDomLogger: '@monolog.logger.migration_dom'
+    tags:
+      - { name: 'console.command' }
+
+  App\Command\Migration\MigratePersonnelDataCommand:
+    arguments:
+      $em: '@doctrine.orm.entity_manager'
+      $legacyHffConnection: '@doctrine.dbal.legacy_hff_connection'
+      $legacyAirwaysConnection: '@doctrine.dbal.legacy_airways_connection'
+      $mapper: '@App\Service\Migration\Admin\PersonnelUser\PersonnelMigrationMapper'
+      $migrationLogger: '@monolog.logger.migration_personnel'
+    tags:
+      - { name: 'console.command' }
+
+  App\Command\Migration\MigrateUserDataCommand:
+    arguments:
+      $em: '@doctrine.orm.entity_manager'
+      $legacyFetcher: '@App\Service\Migration\Utils\LegacyDataFetcher'
+      $mapper: '@App\Service\Migration\Admin\PersonnelUser\UserMigrationMapper'
+      $migrationLogger: '@monolog.logger.migration_user'
+    tags:
+      - { name: 'console.command' }

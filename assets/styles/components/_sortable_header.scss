@@ -1,0 +1,21 @@
+.sortable-header {
+  position: relative; // Contexte pour le positionnement de l'icône
+
+  .sort-icon {
+    opacity: 0; // Cache l'icône par défaut
+    transition: opacity 0.2s ease-in-out;
+    margin-left: 5px;
+
+    // S'assure que l'icône de la colonne active est toujours visible
+    &.sort-icon-active {
+      opacity: 1;
+    }
+  }
+
+  // Affiche l'icône au survol (sauf si elle est déjà active)
+  &:hover {
+    .sort-icon:not(.sort-icon-active) {
+      opacity: 0.7;
+    }
+  }
+}

@@ -2,6 +2,7 @@
 
 namespace App\Entity\Admin\Statut;
 
+use App\Entity\Hf\Rh\Dom\Dom;
 use App\Entity\Traits\TimestampableTrait;
 use App\Repository\Admin\Statut\StatutDemandeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -38,9 +39,15 @@ class StatutDemande
      */
     private $description;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Dom::class, mappedBy="idStatutDemande")
+     */
+    private $doms;
+
 
     public function __construct()
     {
+        $this->doms = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -80,6 +87,36 @@ class StatutDemande
     public function setDescription(string $description): self
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Dom>
+     */
+    public function getDoms(): Collection
+    {
+        return $this->doms;
+    }
+
+    public function addDom(Dom $dom): self
+    {
+        if (!$this->doms->contains($dom)) {
+            $this->doms[] = $dom;
+            $dom->setIdStatutDemande($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDom(Dom $dom): self
+    {
+        if ($this->doms->removeElement($dom)) {
+            // set the owning side to null (unless already changed)
+            if ($dom->getIdStatutDemande() === $this) {
+                $dom->setIdStatutDemande(null);
+            }
+        }
 
         return $this;
     }

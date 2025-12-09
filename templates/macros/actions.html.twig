@@ -1,0 +1,31 @@
+{# templates/macros/actions.html.twig #}
+
+{% macro filter_buttons(reset_path, submit_text = 'Recherche', reset_text = 'Effacer') %}
+	<div class="d-flex justify-content-end mb-2">
+		{# Bouton pour réinitialiser/effacer le filtre #}
+		<a href="{{ reset_path }}" class="btn btn-secondary fw-bold me-2">
+			<i class="fas fa-eraser me-1"></i>
+			{{ reset_text }}
+		</a>
+
+		{# Bouton pour soumettre le formulaire de recherche #}
+		<button class="btn btn-warning fw-bold" type="submit">
+			<i class="fab fa-searchengin me-1"></i>
+			{{ submit_text }}
+		</button>
+	</div>
+{% endmacro %}
+
+{% macro simple_button(path, text, icon, class = 'btn-primary') %}
+    <a href="{{ path }}" class="btn {{ class }} fw-bold">
+        <i class="{{ icon }} me-1"></i>
+        {{ text }}
+    </a>
+{% endmacro %}
+
+{% macro submit_button(text, icon = null, class = 'btn-primary') %}
+    <button type="submit" class="btn {{ class }} fw-bold">
+        {% if icon %}<i class="{{ icon }} me-1"></i> {% endif %}
+        {{ text }}
+    </button>
+{% endmacro %}

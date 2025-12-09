@@ -1,0 +1,39 @@
+// Show main dropdown on hover
+.breadcrumb-item.dropdown:hover>.dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    display: block;
+    margin-top: 0; // Ensure it connects to the parent
+}
+
+// Show nested submenu on hover
+// Show nested submenu on hover
+.dropend {
+    position: relative; // Ensure positioning context for the submenu
+}
+
+.dropend:hover>.dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    display: block;
+    position: absolute; // Force absolute positioning
+    top: 0;
+    left: 100%;
+    margin-top: -5px; // Slight adjustment for alignment
+    margin-left: 0.125rem;
+}
+
+// Base styles for transitions
+.dropdown-menu {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    display: none; // Default to none to prevent layout issues
+}
+
+// Ensure the parent keeps the hover state when moving to submenu
+.dropdown-menu:hover {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+}

@@ -1,6 +1,58 @@
 monolog:
     channels:
         - deprecation # Deprecations are logged in the dedicated "deprecation" channel when it exists
+        - dom_first_form
+        - dom_second_form
+        - migration_dom
+        - migration_personnel_delete
+        - migration_user_delete
+        - migration_dom_delete
+        - migration_personnel
+        - migration_user
+
+    handlers:
+        dom_first:
+            type: stream
+            path: "%kernel.logs_dir%/dom_first_form.log"
+            level: debug
+            channels: [dom_first_form]
+            formatter: monolog.formatter.user_log
+        dom_second:
+            type: stream
+            path: "%kernel.logs_dir%/dom_second_form.log"
+            level: debug
+            channels: [dom_second_form]
+            formatter: monolog.formatter.user_log
+        migration_dom:
+            type: stream
+            path: "%kernel.logs_dir%/migrations/migration_dom.log"
+            level: info
+            channels: [migration_dom]
+        migration_personnel:
+            type: stream
+            path: "%kernel.logs_dir%/migrations/migration_personnel.log"
+            level: info
+            channels: [migration_personnel]
+        migration_user:
+            type: stream
+            path: "%kernel.logs_dir%/migrations/migration_user.log"
+            level: info
+            channels: [migration_user]
+        migration_personnel_delete:
+            type: stream
+            path: "%kernel.logs_dir%/migrations/delete_personnel.log"
+            level: info
+            channels: [migration_personnel_delete]
+        migration_user_delete:
+            type: stream
+            path: "%kernel.logs_dir%/migrations/delete_user.log"
+            level: info
+            channels: [migration_user_delete]
+        migration_dom_delete:
+            type: stream
+            path: "%kernel.logs_dir%/migrations/delete_dom.log"
+            level: info
+            channels: [migration_dom_delete]
 
 when@dev:
     monolog:
@@ -9,7 +61,7 @@ when@dev:
                 type: stream
                 path: "%kernel.logs_dir%/%kernel.environment%.log"
                 level: debug
-                channels: ["!event"]
+                channels: ["!event", "!migration_dom", "!migration_personnel", "!migration_user", "!migration_personnel_delete", "!migration_user_delete", "!migration_dom_delete"]
             # uncomment to get logging in your browser
             # you may have to allow bigger header sizes in your Web server configuration
             #firephp:
@@ -21,7 +73,7 @@ when@dev:
             console:
                 type: console
                 process_psr_3_messages: false
-                channels: ["!event", "!doctrine", "!console"]
+                channels: ["!event", "!doctrine", "!console", "!migration_dom", "!migration_personnel", "!migration_user", "!migration_personnel_delete", "!migration_user_delete", "!migration_dom_delete"]
 
 when@test:
     monolog:
@@ -36,6 +88,14 @@ when@test:
                 type: stream
                 path: "%kernel.logs_dir%/%kernel.environment%.log"
                 level: debug
+            # Ajout du handler symfony_mailer pour l'environnement de test
+            email_errors_test: # Donnez un nom unique au handler
+                type: symfony_mailer
+                from_email: 'noreply@votredomaine.com'
+                to_email: ['%env(ADMIN_EMAIL)%']
+                subject: 'HFF - Erreur Application (TEST) :: %%message%%'
+                level: error
+                content_type: text/html
 
 when@prod:
     monolog:
@@ -60,3 +120,8 @@ when@prod:
                 channels: [deprecation]
                 path: php://stderr
                 formatter: monolog.formatter.json
+            notifier:
+                type: service
+                id: App\Logger\NotifierHandler
+                level: error
+                channels: [ "!event" ]

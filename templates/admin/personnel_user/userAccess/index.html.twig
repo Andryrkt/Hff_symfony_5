@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}UserAccess index
+{% endblock %}
+
+{% block content %}
+	<h1>UserAccess index</h1>
+
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>User</th>
+				<th>Agence</th>
+				<th>Service</th>
+				<th>All Agence</th>
+				<th>All Service</th>
+				<th>Permissions</th>
+				<th>actions</th>
+			</tr>
+		</thead>
+		        <tbody id="user_accesses">
+		        {% for user_access in user_accesses %}
+		            <tr data-bs-toggle="collapse" data-bs-target="#collapse-{{ user_access.id }}" style="cursor: pointer;" class="clickable-row">
+		                <td>{{ user_access.id }}</td>
+		                <td>{{ user_access.users.fullname }}</td>
+		                <td>{{ user_access.agence.nom }}</td>
+		                <td>{{ user_access.service.nom }}</td>
+		                <td>{{ user_access.allAgence ? 'Yes' : 'No' }}</td>
+		                <td>{{ user_access.allService ? 'Yes' : 'No' }}</td>
+		                <td>
+		                    {% for permission in user_access.permissions %}
+		                        {{ permission.code }}
+		                        {% if not loop.last %},
+		                        {% endif %}
+		                    {% endfor %}
+		                </td>
+		                                    <td>
+		                                        <a href="{{ path('admin_user_access_show', {'id': user_access.id}) }}">show</a>
+		                                    </td>
+		                                </tr>
+		                
+		                                {# Ligne du formulaire en collapse #}
+		                                <tr class="collapse" id="collapse-{{ user_access.id }}">
+		                                    <td colspan="8">
+		                                        <div class="p-3 bg-light">
+		                                            <turbo-frame id="form-{{ user_access.id }}" src="{{ path('admin_user_access_edit', {'id': user_access.id}) }}" loading="lazy">
+		                                                {# Le formulaire sera chargé ici via Turbo #}
+		                                                <div class="text-center text-muted">
+		                                                    <small>Chargement du formulaire...</small>
+		                                                </div>
+		                                            </turbo-frame>
+		                                        </div>
+		                                    </td>
+		                                </tr>		        {% else %}				<tr>
+					<td colspan="8">no records found</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+	<a href="{{ path('admin_user_access_new') }}">Create new</a>
+{% endblock %}

@@ -1,12 +1,20 @@
 # This file is the entry point to configure your own services.
 # Files in the packages/ subdirectory configure your dependencies.
 
+imports:
+  - { resource: 'services/*.yaml' }
+  - { resource: 'services/migration.yaml' }
+  - { resource: 'services/delete.yaml' }
+
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+  app.timezone: 'Etc/GMT-3'
   env(LDAP_HOST): "192.168.0.1"
   env(LDAP_SEARCH_DN): "%env(resolve:LDAP_SEARCH_DN)%"
   env(LDAP_SEARCH_PASSWORD): "%env(resolve:LDAP_SEARCH_PASSWORD)%"
+  documents_directory: '%kernel.project_dir%/public/uploads'
+  docuware_directory: 'C:\DOCUWARE'
 
 services:
   # default configuration for services in *this* file
@@ -28,12 +36,11 @@ services:
 
   _instanceof:
     App\Contract\Navigation\BreadcrumbBuilderInterface:
-      tags: ['app.breadcrumb_builder']
+      tags: [ 'app.breadcrumb_builder' ]
 
   App\Service\Navigation\ContextAwareBreadcrumbBuilder:
     arguments:
-      - !tagged_iterator app.breadcrumb_builder
-
+    - !tagged_iterator app.breadcrumb_builder
 
   App\Model\DatabaseInformix:
     arguments:
@@ -71,3 +78,42 @@ services:
     arguments:
       $searchDn: "%env(resolve:LDAP_SEARCH_DN)%"
       $searchPassword: "%env(resolve:LDAP_SEARCH_PASSWORD)%"
+
+  Parsedown:
+    class: Parsedown
+    public: true
+
+  App\Service\Hf\Rh\Dom\DomPdfService:
+    arguments:
+      $projectDir: '%kernel.project_dir%'
+
+  App\Logger\UserProcessor:
+    tags:
+        - { name: monolog.processor, channel: dom_first_form }
+        - { name: monolog.processor, channel: dom_second_form }
+
+  monolog.formatter.user_log:
+    class: Monolog\Formatter\LineFormatter
+    arguments:
+        - "[%%datetime%%] [User: %%extra.user_email%%] %%channel%%.%%level_name%%: %%message%% %%context%% %%extra%%\n----------------------------------------------------------------------------------------------------\n"
+        - 'Y-m-d H:i:s'
+        - true # allowInlineLineBreaks
+        - true # ignoreEmptyContextAndExtra
+
+  App\Logger\NotifierHandler:
+    arguments:
+        $notifier: '@notifier'
+        $adminEmail: '%env(ADMIN_EMAIL)%'
+
+  # Configuration explicite pour AgenceSerializerService
+  App\Service\Admin\AgenceSerializerService:
+    arguments:
+      $agenceRepository: '@App\Repository\Admin\AgenceService\AgenceRepository'
+      $serializer: '@serializer'
+      $cache: '@cache.app'
+      $logger: '@monolog.logger'
+
+  # Listener pour définir automatiquement createdBy lors de la création d'entités
+  App\EventListener\CreatedByListener:
+    tags:
+      - { name: doctrine.event_listener, event: prePersist }

@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Éditer les rôles de
+	{{ user.username }}
+{% endblock %}
+
+{% block content %}
+	<h1>Éditer les rôles de
+		{{ user.username }}</h1>
+
+	{{ form_start(form) }}
+	{{ form_widget(form) }}
+	<button class="btn btn-success">Enregistrer les rôles</button>
+	{{ form_end(form) }}
+
+	<a href="{{ path('admin_user_index') }}">Retour à la liste des utilisateurs</a>
+{% endblock %}

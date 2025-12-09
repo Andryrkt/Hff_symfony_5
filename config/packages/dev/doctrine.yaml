@@ -1,0 +1,12 @@
+when@dev:
+    doctrine:
+        dbal:
+            default_connection: default
+            connections:
+                default:
+                    # Active le logging SQL détaillé en dev
+                    logging: true
+                    profiling: true
+                    profiling_collect_backtrace: true
+        orm:
+            auto_generate_proxy_classes: true

@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit TypeDocument
+{% endblock %}
+
+{% block content %}
+	<div class="container">
+		<h1>Edit TypeDocument</h1>
+
+		{{ include('admin/historisation/type_document/_form.html.twig', {'button_label': 'Update'}) }}
+
+		<a href="{{ path('app_admin_historisation_type_document_index') }}" class="btn btn-secondary my-3">Retour à la liste</a>
+
+		{{ include('admin/historisation/type_document/_delete_form.html.twig') }}
+	</div>
+{% endblock %}

@@ -2,29 +2,25 @@
 
 namespace App\Security\Voter;
 
-use App\Contract\AgencyServiceAwareInterface;
+
+use App\Entity\Admin\ApplicationGroupe\Permission;
 use App\Entity\Admin\PersonnelUser\User;
 use App\Entity\Admin\PersonnelUser\UserAccess;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
-use Symfony\Component\Security\Core\User\UserInterface as CoreUserInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class PermissionVoter extends Voter
 {
-    private $entityManager;
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
-
     protected function supports(string $attribute, $subject): bool
     {
-        return in_array($attribute, ['CREATE', 'READ', 'SUBMIT'])
-            && ($subject === null || $subject instanceof AgencyServiceAwareInterface);
+        // Ce voter s’applique à toute permission sous forme de code (string)
+        return is_string($attribute);
     }
 
+    /**
+     * @param string $attribute  -> ex: "RH_CONGE_CREATE"
+     * @param mixed $subject     -> peut être une entité (ex: une demande de congé) ou null
+     */
     protected function voteOnAttribute(string $attribute, $subject, TokenInterface $token): bool
     {
         $user = $token->getUser();
@@ -33,54 +29,37 @@ class PermissionVoter extends Voter
             return false;
         }
 
-        // Si l'utilisateur a le rôle ROLE_ADMIN, il a toutes les permissions
-        if (in_array('ROLE_ADMIN', $user->getRoles())) {
+        // 1️⃣ Vérifie si l’utilisateur a la permission en direct
+        $permissionCodes = $user->getPermissionsDirectes()->map(fn(Permission $p) => $p->getCode())->toArray();
+        if (in_array($attribute, $permissionCodes, true)) {
             return true;
         }
 
-        // Pour les actions de création (subject est null), nous devons définir une logique spécifique.
-        // Si vous voulez permettre la création sans agence/service spécifique, la logique doit être ici.
-        // Pour l'instant, si le sujet est null, nous refusons l'accès car le voter est basé sur agence/service de l'objet.
-        if ($subject === null) {
-            return false;
+        // 2️⃣ Vérifie via les accès étendus (UserAccess)
+        foreach ($user->getUserAccesses() as $access) {
+            if ($this->hasPermissionInAccess($access, $attribute)) {
+                return true;
+            }
         }
 
-        /** @var AgencyServiceAwareInterface $subject */
-        $emitterAgence = $subject->getEmitterAgence();
-        $emitterService = $subject->getEmitterService();
-        $debtorAgence = $subject->getDebtorAgence();
-        $debtorService = $subject->getDebtorService();
-
-        // Si l'une des agences ou services n'est pas définie, on ne peut pas vérifier la permission
-        if (!$emitterAgence || !$emitterService || !$debtorAgence || !$debtorService) {
-            return false;
+        // 3️⃣ Vérifie éventuellement les rôles globaux (ADMIN, CHEF_SERVICE, etc.)
+        if (in_array('ROLE_ADMIN', $user->getRoles(), true)) {
+            return true;
         }
 
-        // Vérifier la permission pour l'agence/service émetteur
-        $emitterUserAccess = $this->entityManager->getRepository(UserAccess::class)
-            ->findOneBy([
-                'user' => $user,
-                'agence' => $emitterAgence,
-                'service' => $emitterService
-            ]);
+        // Par défaut, refus
+        return false;
+    }
 
-        if (!$emitterUserAccess || !in_array($attribute, $emitterUserAccess->getPermissions())) {
-            return false; // Pas de permission pour l'émetteur
+    private function hasPermissionInAccess(UserAccess $access, string $permission): bool
+    {
+        $permissionCodes = $access->getPermissions()->map(fn(Permission $p) => $p->getCode())->toArray();
+        // Si toutes les agences et tous les services sont autorisés
+        if ($access->getAllAgence() && $access->getAllService()) {
+            return in_array($permission, $permissionCodes, true);
         }
 
-        // Vérifier la permission pour l'agence/service débiteur
-        $debtorUserAccess = $this->entityManager->getRepository(UserAccess::class)
-            ->findOneBy([
-                'user' => $user,
-                'agence' => $debtorAgence,
-                'service' => $debtorService
-            ]);
-
-        if (!$debtorUserAccess || !in_array($attribute, $debtorUserAccess->getPermissions())) {
-            return false; // Pas de permission pour le débiteur
-        }
-
-        // Si les deux vérifications passent, l'utilisateur a la permission
-        return true;
+        // Tu pourrais affiner ici selon agence/service courant (si $subject contient une info)
+        return in_array($permission, $permissionCodes, true);
     }
 }

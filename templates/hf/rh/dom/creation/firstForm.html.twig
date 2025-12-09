@@ -1,0 +1,59 @@
+{% extends "base.html.twig" %}
+
+{% block title %}
+	Création DOM - 1
+{% endblock %}
+
+{% block content %}
+
+	<div class="container mt-6 mb-4">
+		<div class="card p-3">
+			<div class="card-body">
+				<div class="container-fluid">
+					{% include 'partials/flash_messages.html.twig' %}
+				</div>
+
+				{{ form_start(form, {'attr': {'data-controller': 'first-form', 'data-action': 'submit->first-form#validate'}})}}
+				<div class="row">
+					<div class="col-6">
+						{{ form_row(form.agenceUser)}}
+					</div>
+					<div class="col-6">
+						{{ form_row(form.serviceUser)}}
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6">
+						{{form_row(form.typeMission, {'attr': {'data-first-form-target': 'typeMissionSelect', 'data-action': 'change->first-form#toggleCategorieField'}})}}
+					</div>
+
+					<div class="col-6" id="chek">
+						{{ form_row(form.salarier, {'attr': {'data-first-form-target': 'salarieSelect', 'data-action': 'change->first-form#toggleSalarieFields'}})}}
+					</div>
+
+				</div>
+				<div class="row" id="categorie_field_container" data-first-form-target="categorieFieldContainer">
+					<div class="col-12">
+						{{ form_row(form.categorie, {'attr': {'data-first-form-target': 'categorieInput'}})}}
+					</div>
+				</div>
+				<div class="row" id="Interne" data-first-form-target="interneDiv">
+					{{ form_row(form.matriculeNom, {'attr': {'data-first-form-target': 'matriculeNomSelect', 'data-action': 'change->first-form#updateMatricule'}})}}
+					{{ form_row(form.matricule, {'attr': {'data-first-form-target': 'matriculeInput'}})}}
+				</div>
+				<div class="row" id="externe" style="display:none" data-first-form-target="externeDiv">
+					{{ form_row(form.nom)}}
+					{{ form_row(form.prenom)}}
+					{{ form_row(form.cin)}}
+				</div>
+				<div class="row">
+					<div class="d-flex justify-content-end mt-2">
+						{% import "macros/actions.html.twig" as actions %}
+						{{ actions.submit_button('Suivant', 'fas fa-arrow-right', 'btn-info') }}
+					</div>
+				</div>
+				{{ form_end(form)}}
+			</div>
+		</div>
+	</div>
+{% endblock %}

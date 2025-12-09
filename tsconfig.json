@@ -1,22 +1,48 @@
 {
-    "compilerOptions": {
-        "target": "es6",
-        "module": "esnext",
-        "lib": ["dom", "es6"],
-        "strict": true,
-        "esModuleInterop": true,
-        "moduleResolution": "node",
-        "forceConsistentCasingInFileNames": true,
-        "skipLibCheck": true,
-        "allowJs": true,
-        "noEmit": false,
-        "resolveJsonModule": true
-    },
-    "include": [
-        "assets/**/*.ts",
-        "assets/**/*.js"
-    ],
-    "exclude": [
-        "node_modules"
-    ]
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": false,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "allowJs": true,
+    "noImplicitAny": false,
+    "noEmit": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "assets/*"
+      ],
+      "@controllers/*": [
+        "assets/controllers/*"
+      ],
+      "@styles/*": [
+        "assets/styles/*"
+      ],
+      "@js/*": [
+        "assets/js/*"
+      ],
+      "@utils/*": [
+        "assets/js/utils/*"
+      ],
+      "@config/*": [
+        "assets/js/config/*"
+      ]
+    }
+  },
+  "include": [
+    "assets/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "public",
+    "**/__tests__/**",
+    "**/*.test.ts",
+    "**/*.test.js"
+  ]
 }

@@ -1,0 +1,19 @@
+.navbar-nav .dropdown-menu .dropstart .dropdown-menu {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    display: block; /* Ensure it's block for transition */
+}
+
+.navbar-nav .dropdown-menu .dropstart:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Adjust positioning for dropstart on hover */
+.navbar-nav .dropdown-menu .dropstart:hover .dropdown-menu {
+    left: auto; /* Reset default Bootstrap left */
+    right: 100%; /* Open to the left */
+    top: 0; /* Align with parent item */
+    margin-top: 0; /* Remove any default margin */
+}

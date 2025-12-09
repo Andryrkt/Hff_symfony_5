@@ -1,0 +1,117 @@
+{# templates/macros/form_macros.html.twig #}
+
+{% macro checkbox_group(form_field, select_all_label = 'Tout cocher') %}
+	<div data-checkbox-group>
+		{{ form_label(form_field) }}
+		<div
+			class="form-check">
+			{# On utilise l'ID du champ pour garantir un ID unique pour la case "select-all" #}
+			<input type="checkbox" id="{{ form_field.vars.id }}_select_all" class="form-check-input" data-checkbox-group-all>
+			<label for="{{ form_field.vars.id }}_select_all" class="form-check-label fw-bold">{{ select_all_label }}</label>
+		</div>
+		<hr>
+		<div data-checkbox-group-items>
+			{{ form_widget(form_field) }}
+		</div>
+		{{ form_errors(form_field) }}
+	</div>
+{% endmacro %}
+
+
+{# ===================agence et service emetteur ou debiteur =================================#}
+
+{% macro debiteurOuEmetteurFields(form, type = 'debiteur', options = {}) %}
+	{% if type not in ['debiteur', 'emetteur'] %}
+		{% set type = 'debiteur' %}
+	{% endif %}
+
+	{% set defaultOptions = {
+        'agenceClass': 'agence' ~ (type|capitalize),
+        'serviceClass': 'service' ~ (type|capitalize),
+        'spinnerId': 'spinner-service-' ~ type,
+        'spinnerSize': 'small',
+        'spinnerClass': 'spinner-absolute',
+        'serviceContainerId': 'service-container-' ~ type,
+        'layout': 'vertical'
+    } %}
+
+	{% set options = defaultOptions|merge(options) %}
+
+    {# Manually render Selects to avoid EntityType overhead. JS populates them. #}
+    {% set agenceField = attribute(form, type).agence %}
+    {% set serviceField = attribute(form, type).service %}
+
+	{% if options.layout == 'horizontal' %}
+		<div class="row align-items-end">
+			<div class="col-md-6">
+                {{ form_label(agenceField) }}
+				<div class="spinner-container">
+                    {# Manual Select replacing form_widget #}
+                    <select id="{{ agenceField.vars.id }}" 
+                            name="{{ agenceField.vars.full_name }}" 
+                            class="form-select {{ options.agenceClass }}"
+                            {% if agenceField.vars.required %}required="required"{% endif %}>
+                        <option value="">{{ options.agence_placeholder|default('-- Choisir une agence --') }}</option>
+                        {# Options populated by JS via agencesJson #}
+                        {% if agenceField.vars.value %}
+                            <option value="{{ agenceField.vars.value }}" selected="selected">{{ agenceField.vars.value }}</option>
+                        {% endif %}
+                    </select>
+
+					{% include 'components/spinner.html.twig' with {
+                        'id': options.spinnerId,
+                        'size': options.spinnerSize,
+                        'class': options.spinnerClass
+                    } %}
+				</div>
+                {# Render any errors #}
+                {{ form_errors(agenceField) }}
+			</div>
+			<div class="col-md-6">
+				<div id="{{ options.serviceContainerId }}">
+                    {{ form_label(serviceField) }}
+                    <select id="{{ serviceField.vars.id }}" 
+                            name="{{ serviceField.vars.full_name }}" 
+                            class="form-select {{ options.serviceClass }}">
+                        <option value="">{{ options.service_placeholder|default('-- Choisir un service --') }}</option>
+                         {% if serviceField.vars.value %}
+                            <option value="{{ serviceField.vars.value }}" selected="selected">{{ serviceField.vars.value }}</option>
+                        {% endif %}
+                    </select>
+                    {{ form_errors(serviceField) }}
+				</div>
+			</div>
+		</div>
+	{% else %}
+        {{ form_label(agenceField) }}
+		<div class="spinner-container">
+             <select id="{{ agenceField.vars.id }}" 
+                    name="{{ agenceField.vars.full_name }}" 
+                    class="form-select {{ options.agenceClass }}">
+                <option value="">{{ options.agence_placeholder|default('-- Choisir une agence --') }}</option>
+                 {% if agenceField.vars.value %}
+                    <option value="{{ agenceField.vars.value }}" selected="selected">{{ agenceField.vars.value }}</option>
+                {% endif %}
+            </select>
+			{% include 'components/spinner.html.twig' with {
+                'id': options.spinnerId,
+                'size': options.spinnerSize,
+                'class': options.spinnerClass
+            } %}
+		</div>
+        {{ form_errors(agenceField) }}
+
+		<div id="{{ options.serviceContainerId }}" class="mb-3">
+			{{ form_label(serviceField) }}
+             <select id="{{ serviceField.vars.id }}" 
+                    name="{{ serviceField.vars.full_name }}" 
+                    class="form-select {{ options.serviceClass }}">
+                <option value="">{{ options.service_placeholder|default('-- Choisir un service --') }}</option>
+                 {% if serviceField.vars.value %}
+                    <option value="{{ serviceField.vars.value }}" selected="selected">{{ serviceField.vars.value }}</option>
+                {% endif %}
+            </select>
+            {{ form_errors(serviceField) }}
+		</div>
+	{% endif %}
+{% endmacro %}

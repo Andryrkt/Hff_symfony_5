@@ -4,20 +4,28 @@ namespace App\Entity\Admin\PersonnelUser;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Traits\TimestampableTrait;
+use App\Entity\Admin\AgenceService\Agence;
+use App\Entity\Admin\AgenceService\Service;
 use Doctrine\Common\Collections\Collection;
-use App\Entity\Admin\ApplicationGroupe\Group;
 use App\Entity\Admin\PersonnelUser\Personnel;
 use App\Entity\Admin\PersonnelUser\UserAccess;
 use Doctrine\Common\Collections\ArrayCollection;
+use App\Entity\Admin\ApplicationGroupe\Permission;
 use App\Repository\Admin\PersonnelUser\UserRepository;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
- * @ORM\Table(name="`user`")
+ * @ORM\Table(name="`user`",
+ * indexes={
+ *         @ORM\Index(name="idx_username", columns={"username"}),
+ *         @ORM\Index(name="idx_matricule", columns={"matricule"})
+ *     }
+ * )
  * @ORM\HasLifecycleCallbacks
  */
-class User implements UserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use TimestampableTrait;
 
@@ -49,7 +57,7 @@ class User implements UserInterface
     private $email;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true, unique=true)
      */
     private $matricule;
 
@@ -64,7 +72,7 @@ class User implements UserInterface
     private $poste;
 
     /**
-     * @ORM\OneToOne(targetEntity=Personnel::class,  inversedBy="users", cascade={"persist", "remove"})
+     * @ORM\OneToOne(targetEntity=Personnel::class, inversedBy="users", cascade={"persist", "remove"}, fetch="EAGER")
      * @ORM\JoinColumn(name="personnel_id", referencedColumnName="id")
      */
     private $personnel;
@@ -75,18 +83,103 @@ class User implements UserInterface
     private $userAccesses;
 
     /**
-     * @ORM\ManyToMany(targetEntity=Group::class, inversedBy="users")
-     * @ORM\JoinTable(name="users_groups")
+     * @ORM\ManyToMany(targetEntity=Permission::class, inversedBy="users", fetch="EAGER")
      */
-    private $groups;
+    private $permissionsDirectes;
 
 
     public function __construct()
     {
         $this->userAccesses = new ArrayCollection();
-        $this->groups = new ArrayCollection();
+        $this->permissionsDirectes = new ArrayCollection();
     }
 
+    /**=================================================
+     * Fonction personaliser
+     *================================================*/
+
+    /**
+     * Récupération de l'agence de l'utilisateur conecter
+     *
+     * @return string|null
+     */
+    public function getAgenceUser(): ?Agence
+    {
+        $personnel = $this->getPersonnel();
+        if (!$personnel) {
+            throw new \RuntimeException('Personnel not found for this user.');
+        }
+
+        $agenceServiceIrium = $personnel->getAgenceServiceIrium();
+        if (!$agenceServiceIrium) {
+            throw new \RuntimeException('AgenceServiceIrium not found for the personnel.');
+        }
+
+        $agence = $agenceServiceIrium->getAgence();
+        if (!$agence) {
+            throw new \RuntimeException('Agence not found for the AgenceServiceIrium.');
+        }
+
+        return $agence;
+    }
+
+    /**
+     * Recuperation du service de l'utilisateur connecter
+     *
+     * @return string|null
+     */
+    public function getServiceUser(): ?Service
+    {
+        $personnel = $this->getPersonnel();
+        if (!$personnel) {
+            throw new \RuntimeException('Personnel not found for this user.');
+        }
+
+        $agenceServiceIrium = $personnel->getAgenceServiceIrium();
+        if (!$agenceServiceIrium) {
+            throw new \RuntimeException('AgenceServiceIrium not found for the personnel.');
+        }
+
+        $service = $agenceServiceIrium->getService();
+        if (!$service) {
+            throw new \RuntimeException('Service not found for the AgenceServiceIrium.');
+        }
+
+        return $service;
+    }
+
+    /**
+     * Récupération du nom de l'utilisateur connecter
+     *
+     * @return string
+     */
+    public function getNom(): string
+    {
+        $personnel = $this->getPersonnel();
+        if (!$personnel) {
+            throw new \RuntimeException('Personnel not found for this user.');
+        }
+
+        return $personnel->getNom();
+    }
+
+    /**
+     * Récupération du prénoms de l'utilisateur connecter
+     *
+     * @return string
+     */
+    public function getPrenoms(): string
+    {
+        $personnel = $this->getPersonnel();
+        if (!$personnel) {
+            throw new \RuntimeException('Personnel not found for this user.');
+        }
+
+        return $personnel->getPrenoms();
+    }
+    /** ==================================================
+     *  GETTERS & SETTERS
+     *==================================================*/
 
     public function getId(): ?int
     {
@@ -268,118 +361,28 @@ class User implements UserInterface
         return $this;
     }
 
+
     /**
-     * @return Collection<int, Group>
+     * @return Collection<int, Permission>
      */
-    public function getGroups(): Collection
+    public function getPermissionsDirectes(): Collection
     {
-        return $this->groups;
+        return $this->permissionsDirectes;
     }
 
-    public function addGroup(Group $group): self
+    public function addPermissionsDirecte(Permission $permissionsDirecte): self
     {
-        if (!$this->groups->contains($group)) {
-            $this->groups[] = $group;
-            $group->addUser($this);
+        if (!$this->permissionsDirectes->contains($permissionsDirecte)) {
+            $this->permissionsDirectes[] = $permissionsDirecte;
         }
 
         return $this;
     }
 
-    public function removeGroup(Group $group): self
+    public function removePermissionsDirecte(Permission $permissionsDirecte): self
     {
-        if ($this->groups->removeElement($group)) {
-            $group->removeUser($this);
-        }
+        $this->permissionsDirectes->removeElement($permissionsDirecte);
 
         return $this;
-    }
-
-
-
-    public function getAgenceEmetteur(): ?string
-    {
-        $personnel = $this->getPersonnel();
-        if ($personnel === null) {
-            // Fallback: tenter via UserAccess
-            foreach ($this->getUserAccesses() as $userAccess) {
-                $agence = $userAccess->getAgence();
-                if ($agence !== null) {
-                    return sprintf('%s - %s', $agence->getCode(), $agence->getNom());
-                }
-            }
-            return null;
-        }
-
-        $agenceServiceIrium = $personnel->getAgenceServiceIrium();
-        if ($agenceServiceIrium === null) {
-            // Fallback: tenter via UserAccess
-            foreach ($this->getUserAccesses() as $userAccess) {
-                $agence = $userAccess->getAgence();
-                if ($agence !== null) {
-                    return sprintf('%s - %s', $agence->getCode(), $agence->getNom());
-                }
-            }
-            return null;
-        }
-
-        $agence = $agenceServiceIrium->getAgence();
-        if ($agence === null) {
-            // Fallback: tenter via UserAccess
-            foreach ($this->getUserAccesses() as $userAccess) {
-                $fallbackAgence = $userAccess->getAgence();
-                if ($fallbackAgence !== null) {
-                    return sprintf('%s - %s', $fallbackAgence->getCode(), $fallbackAgence->getNom());
-                }
-            }
-            return null;
-        }
-
-        $nomAgence = $agence->getNom();
-        $codeAgence = $agence->getCode();
-        return $codeAgence . ' - ' . $nomAgence;
-    }
-
-    public function getServiceEmetteur(): ?string
-    {
-        $personnel = $this->getPersonnel();
-        if ($personnel === null) {
-            // Fallback: tenter via UserAccess
-            foreach ($this->getUserAccesses() as $userAccess) {
-                $service = $userAccess->getService();
-                if ($service !== null) {
-                    return sprintf('%s - %s', $service->getCode(), $service->getNom());
-                }
-            }
-            return null;
-        }
-
-        $agenceServiceIrium = $personnel->getAgenceServiceIrium();
-        if ($agenceServiceIrium === null) {
-            // Fallback: tenter via UserAccess
-            foreach ($this->getUserAccesses() as $userAccess) {
-                $service = $userAccess->getService();
-                if ($service !== null) {
-                    return sprintf('%s - %s', $service->getCode(), $service->getNom());
-                }
-            }
-            return null;
-        }
-
-        $service = $agenceServiceIrium->getService();
-        if ($service === null) {
-            // Fallback: tenter via UserAccess
-            foreach ($this->getUserAccesses() as $userAccess) {
-                $fallbackService = $userAccess->getService();
-                if ($fallbackService !== null) {
-                    return sprintf('%s - %s', $fallbackService->getCode(), $fallbackService->getNom());
-                }
-            }
-            return null;
-        }
-
-        $nomService = $service->getNom();
-        $codeService = $service->getCode();
-        return $codeService . ' - ' . $nomService;
     }
 }

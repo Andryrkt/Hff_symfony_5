@@ -2,17 +2,26 @@
 
 namespace App\Entity\Admin\PersonnelUser;
 
-use App\Repository\Admin\PersonnelUser\UserAccessRepository;
+use App\Entity\Admin\Historisation\TypeDocument;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Traits\TimestampableTrait;
 use App\Entity\Admin\AgenceService\Agence;
 use App\Entity\Admin\AgenceService\Service;
-use App\Entity\Admin\ApplicationGroupe\Application;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use App\Entity\Admin\ApplicationGroupe\Permission;
+use App\Repository\Admin\PersonnelUser\UserAccessRepository;
+use Symfony\UX\Turbo\Attribute\Broadcast;
 
 /**
  * @ORM\Entity(repositoryClass=UserAccessRepository::class)
+ * @ORM\HasLifecycleCallbacks
  */
+#[Broadcast]
 class UserAccess
 {
+    use TimestampableTrait;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -36,14 +45,32 @@ class UserAccess
     private $service;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Application::class, inversedBy="userAccesses")
+     * @ORM\Column(type="boolean", options={"default": false})
      */
-    private $application;
+    private bool $allAgence = false;
 
     /**
-     * @ORM\Column(type="string", length=30)
+     * @ORM\Column(type="boolean", options={"default": false})
      */
-    private $accessType; // ALL, AGENCE, SERVICE, AGENCE_SERVICE
+    private bool $allService = false;
+
+    /**
+     * @ORM\ManyToMany(targetEntity=Permission::class, inversedBy="userAccesses")
+     */
+    private $permissions;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=TypeDocument::class, inversedBy="userAccesses")
+     * @ORM\JoinColumn(name="typeDocumentId", referencedColumnName="id")
+     */
+    private $typeDocument;
+
+    public function __construct()
+    {
+        $this->permissions = new ArrayCollection();
+    }
+
+
 
     public function getId(): ?int
     {
@@ -86,27 +113,89 @@ class UserAccess
         return $this;
     }
 
-    public function getApplication(): ?Application
+    public function getAllAgence()
     {
-        return $this->application;
+        return $this->allAgence;
     }
 
-    public function setApplication(?Application $application): self
+    public function setAllAgence($allAgence): self
     {
-        $this->application = $application;
+        $this->allAgence = $allAgence;
 
         return $this;
     }
 
-    public function getAccessType(): ?string
+    public function getAllService()
     {
-        return $this->accessType;
+        return $this->allService;
     }
 
-    public function setAccessType(string $accessType): self
+    public function setAllService($allService): self
     {
-        $this->accessType = $accessType;
+        $this->allService = $allService;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Permission>
+     */
+    public function getPermissions(): Collection
+    {
+        return $this->permissions;
+    }
+
+    public function addPermission(Permission $permission): self
+    {
+        if (!$this->permissions->contains($permission)) {
+            $this->permissions[] = $permission;
+        }
+
+        return $this;
+    }
+
+    public function removePermission(Permission $permission): self
+    {
+        $this->permissions->removeElement($permission);
+
+        return $this;
+    }
+
+    public function getTypeDocument(): ?TypeDocument
+    {
+        return $this->typeDocument;
+    }
+
+    public function setTypeDocument(?TypeDocument $typeDocument): self
+    {
+        $this->typeDocument = $typeDocument;
+
+        return $this;
+    }
+
+    public function getName(): string
+    {
+        $parts = [];
+        if ($this->allAgence) {
+            $parts[] = 'Toutes les agences';
+        } elseif ($this->agence) {
+            $parts[] = 'Agence: ' . $this->agence->getNom();
+        }
+
+        if ($this->allService) {
+            $parts[] = 'Tous les services';
+        } elseif ($this->service) {
+            $parts[] = 'Service: ' . $this->service->getNom();
+        }
+
+        if ($this->typeDocument) {
+            $parts[] = 'Doc: ' . $this->typeDocument->getLibelleDocument();
+        }
+
+        if (empty($parts)) {
+            return 'Accès #' . $this->id;
+        }
+
+        return implode(' - ', $parts);
     }
 }
