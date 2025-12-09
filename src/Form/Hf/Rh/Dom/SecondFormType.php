@@ -7,15 +7,12 @@ use App\Entity\Hf\Rh\Dom\Site;
 use App\Entity\Hf\Rh\Dom\SousTypeDocument;
 use App\Form\Common\DateRangeType;
 use App\Form\Common\FileUploadType;
-use App\Form\Common\AgenceServiceType;
+use App\Form\Common\LightAgenceServiceType;
 use App\Repository\Hf\Rh\Dom\SiteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -42,16 +39,13 @@ class SecondFormType extends AbstractType
     ];
 
     private EntityManagerInterface $em;
-    private Security $security;
     private SiteRepository $siteRepository;
 
     public function __construct(
         EntityManagerInterface $em,
-        Security $security,
         SiteRepository $siteRepository
     ) {
         $this->em = $em;
-        $this->security = $security;
         $this->siteRepository = $siteRepository;
     }
 
@@ -74,7 +68,7 @@ class SecondFormType extends AbstractType
         $this->addAttachmentsSection($builder, $data);
     }
 
-    private function isSpecialMissionType(?object $typeMission): bool
+    private function isSpecialMissionType(?SousTypeDocument $typeMission): bool
     {
         if (!$typeMission) {
             return false;
@@ -90,7 +84,7 @@ class SecondFormType extends AbstractType
 
     private function addDebiteurSection(FormBuilderInterface $builder, $data): void
     {
-        $builder->add('debiteur', \App\Form\Common\LightAgenceServiceType::class, [
+        $builder->add('debiteur', LightAgenceServiceType::class, [
             'label' => false,
             'required' => false,
             'mapped' => false,
@@ -111,7 +105,6 @@ class SecondFormType extends AbstractType
                 'required' => false,
                 'attr' => ['disabled' => true],
                 'data' => $data->agenceUser ?? null,
-                'mapped' => false,
             ])
             ->add('serviceUser', TextType::class, [
                 'mapped' => false,
@@ -119,7 +112,6 @@ class SecondFormType extends AbstractType
                 'required' => false,
                 'attr' => ['disabled' => true],
                 'data' => $data->serviceUser ?? null,
-                'mapped' => false,
             ])
             ->add('dateDemande', DateTimeType::class, [
                 'label' => 'Date',
@@ -129,7 +121,6 @@ class SecondFormType extends AbstractType
                 'format' => 'dd/MM/yyyy',
                 'attr' => ['disabled' => true],
                 'data' => $data->dateDemande ?? null,
-                'mapped' => false,
             ]);
     }
 
@@ -235,50 +226,24 @@ class SecondFormType extends AbstractType
     {
         $builder
             ->add('motifDeplacement', TextType::class, [
-                'label' => 'Motif',
+                'label' => 'Motif *',
                 'required' => true,
-                'constraints' => [
-                    new NotBlank(['message' => 'Le motif de déplacement ne peut pas être vide.']),
-                    new Length([
-                        'min' => 3,
-                        'minMessage' => 'Le motif de déplacement doit comporter au moins {{ limit }} caractères',
-                        'max' => 100,
-                        'maxMessage' => 'Le motif de déplacement ne peut pas dépasser {{ limit }} caractères',
-                    ]),
-                ],
             ])
             ->add('pieceJustificatif', CheckboxType::class, [
                 'label' => 'Pièce à justifier',
                 'required' => false,
             ])
             ->add('client', TextType::class, [
-                'label' => 'Nom du client',
+                'label' => 'Nom du client *',
                 'required' => true,
-                'constraints' => [
-                    new Length([
-                        'min' => 3,
-                        'minMessage' => 'Le client doit comporter au moins {{ limit }} caractères',
-                        'max' => 50,
-                        'maxMessage' => 'Le client ne peut pas dépasser {{ limit }} caractères',
-                    ]),
-                ],
             ])
             ->add('fiche', TextType::class, [
                 'label' => 'N° fiche',
                 'required' => false,
             ])
             ->add('lieuIntervention', TextType::class, [
-                'label' => 'Lieu d\'intervention',
+                'label' => 'Lieu d\'intervention *',
                 'required' => true,
-                'constraints' => [
-                    new NotBlank(['message' => 'Le lieu d\'intervention ne peut pas être vide.']),
-                    new Length([
-                        'min' => 3,
-                        'minMessage' => 'Le lieu doit comporter au moins {{ limit }} caractères',
-                        'max' => 100,
-                        'maxMessage' => 'Le lieu ne peut pas dépasser {{ limit }} caractères',
-                    ]),
-                ],
             ]);
     }
 
@@ -293,14 +258,6 @@ class SecondFormType extends AbstractType
             ->add('numVehicule', TextType::class, [
                 'label' => 'N°',
                 'required' => false,
-                'constraints' => [
-                    new Length([
-                        'min' => 3,
-                        'minMessage' => 'Le n° véhicule doit comporter au moins {{ limit }} caractères',
-                        'max' => 10,
-                        'maxMessage' => 'Le n° véhicule ne peut pas dépasser {{ limit }} caractères',
-                    ]),
-                ],
             ]);
     }
 
@@ -355,19 +312,10 @@ class SecondFormType extends AbstractType
                 ->add("motifAutresDepense{$i}", TextType::class, [
                     'label' => "Motif Autre dépense {$i}",
                     'required' => false,
-                    'constraints' => [
-                        new Length([
-                            'min' => 3,
-                            'minMessage' => "Le motif autre dépense {$i} doit comporter au moins {{ limit }} caractères",
-                            'max' => 30,
-                            'maxMessage' => "Le motif autre dépense {$i} ne peut pas dépasser {{ limit }} caractères",
-                        ]),
-                    ],
                 ])
                 ->add("autresDepense{$i}", TextType::class, [
                     'label' => 'Montant',
                     'required' => false,
-
                 ]);
         }
 
@@ -381,11 +329,6 @@ class SecondFormType extends AbstractType
                 'label' => 'Montant Total',
                 'required' => true,
                 'attr' => ['readonly' => true],
-                'constraints' => [
-                    new NotBlank([
-                        'message' => 'Le montant total ne peut pas être vide.',
-                    ]),
-                ],
             ]);
     }
 
@@ -399,14 +342,6 @@ class SecondFormType extends AbstractType
             ->add('mode', TextType::class, [
                 'label' => 'MOBILE MONEY',
                 'required' => true,
-                'constraints' => [
-                    new Length([
-                        'min' => 3,
-                        'minMessage' => 'Le mode doit comporter au moins {{ limit }} caractères',
-                        'max' => 30,
-                        'maxMessage' => 'Le mode ne peut pas dépasser {{ limit }} caractères',
-                    ]),
-                ],
             ]);
     }
 

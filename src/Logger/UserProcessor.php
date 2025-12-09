@@ -23,7 +23,7 @@ class UserProcessor
             if (method_exists($user, 'getUserIdentifier')) {
                 $identifier = $user->getUserIdentifier();
             } else {
-                $identifier = $user->getUsername();
+                $identifier = $user->getUserIdentifier();
             }
             $record['extra']['user_email'] = $identifier;
         } else {
