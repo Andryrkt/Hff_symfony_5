@@ -2,10 +2,8 @@
 
 namespace App\Tests\Functional;
 
-use App\DataFixtures\Test\TestUserFixtures;
 use App\Tests\BaseTestCase;
-use Symfony\Component\BrowserKit\Cookie;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use App\DataFixtures\Admin\PersonnelUser\UserFixtures;
 
 class UserAccessTest extends BaseTestCase
 {
@@ -18,7 +16,7 @@ class UserAccessTest extends BaseTestCase
         // DEBUG: Affichez l'erreur réelle
         try {
             $this->referenceRepository = $this->loadTestFixtures([
-                TestUserFixtures::class
+                UserFixtures::class
             ])->getReferenceRepository();
         } catch (\Exception $e) {
             // Affiche l'erreur complète
@@ -35,7 +33,7 @@ class UserAccessTest extends BaseTestCase
     public function testUserCanAccessHomepage(): void
     {
         $user = $this->referenceRepository->getReference('user_u1');
-        
+
         // Authenticate the user
         $this->client->loginUser($user);
 

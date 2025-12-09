@@ -2,12 +2,14 @@
 
 namespace App\Tests\Functional\Controller\Rh\Dom\Creation;
 
-use App\Entity\Hf\Rh\Dom\Rmq;
 use App\Tests\BaseTestCase;
+use App\Entity\Hf\Rh\Dom\Rmq;
 use App\Dto\Hf\Rh\Dom\FirstFormDto;
 use App\DataFixtures\Hf\Rh\dom\RmqFixtures;
 use App\Repository\Hf\Rh\Dom\DomRepository;
+use App\DataFixtures\Admin\PersonnelUser\UserFixtures;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use App\DataFixtures\Admin\PersonnelUser\PersonnelFixtures;
 
 class DomSecondControllerTest extends BaseTestCase
 {
@@ -16,28 +18,27 @@ class DomSecondControllerTest extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-                    $this->referenceRepository = $this->loadTestFixtures([
-                        PersonnelFixtures::class, // Assure que le personnel '9999' existe
-                        UserFixtures::class,      // Assure que l'utilisateur de test existe et est lié au personnel
-                        RmqFixtures::class,           // Assure que les entités Rmq (STD, 50) existent
-                    ])->getReferenceRepository();
-        
-                    // DEBUG: Check if Rmq 'STD' is found
-                    $em = static::getContainer()->get('doctrine')->getManager();
-                    $rmqStd = $em->getRepository(Rmq::class)->findOneBy(['description' => 'STD']);
-                    if ($rmqStd) {
-                        echo "\nDEBUG: Rmq 'STD' found in test setUp!";
-                    } else {
-                        echo "\nDEBUG: Rmq 'STD' NOT found in test setUp!";
-                    }
-        
+        $this->referenceRepository = $this->loadTestFixtures([
+            PersonnelFixtures::class, // Assure que le personnel '9999' existe
+            UserFixtures::class,      // Assure que l'utilisateur de test existe et est lié au personnel
+            RmqFixtures::class,           // Assure que les entités Rmq (STD, 50) existent
+        ])->getReferenceRepository();
+
+        // DEBUG: Check if Rmq 'STD' is found
+        $em = static::getContainer()->get('doctrine')->getManager();
+        $rmqStd = $em->getRepository(Rmq::class)->findOneBy(['description' => 'STD']);
+        if ($rmqStd) {
+            echo "\nDEBUG: Rmq 'STD' found in test setUp!";
+        } else {
+            echo "\nDEBUG: Rmq 'STD' NOT found in test setUp!";
+        }
     }
 
     public function testSubmitSecondFormSuccessfully(): void
     {
         // 1. Récupérer un utilisateur de test via les fixtures (il a la permission RH_ORDRE_MISSION_CREATE)
         $testUser = $this->referenceRepository->getReference('user_u1');
-        
+
         // 2. Simuler les données de session du premier formulaire
         $firstFormDto = new FirstFormDto();
         // Remplissez le DTO avec des données valides pour le test
