@@ -1,5 +1,11 @@
 # config/packages/test/security.yaml
 security:
+    # Ne pas désactiver complètement la sécurité, mais permettre les tests
     firewalls:
         main:
-            security: false
+            # Garder la sécurité active mais avec une configuration plus permissive pour les tests
+            lazy: true
+            stateless: false
+            # On garde l'authenticator pour que les tests de login fonctionnent
+            custom_authenticator: App\Security\LdapAuthenticator
+            entry_point: App\Security\LdapAuthenticator

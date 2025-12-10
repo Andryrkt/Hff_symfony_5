@@ -2,7 +2,6 @@
 
 namespace App\Tests\Functional\Controller\Rh\Dom\Creation;
 
-use App\Tests\BaseTestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use App\Entity\Admin\PersonnelUser\User;
 use App\Repository\Admin\PersonnelUser\UserRepository;
@@ -86,7 +85,7 @@ class DomFirstControllerTest extends WebTestCase
         self::assertResponseRedirects('/rh/ordre-de-mission/dom-second-form');
 
         // Vérification de la session
-        $session = self::getContainer()->get('session');
+        $session = $this->client->getContainer()->get('session');
         self::assertNotNull($session->get('dom_first_form_data'));
     }
 }
