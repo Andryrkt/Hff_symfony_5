@@ -47,7 +47,8 @@ final class DomBreadcrumbBuilder extends BaseBreadcrumbBuilder implements Breadc
 
         return $this->breadcrumb
             ->clear()
-            ->add('Accueil', 'app_home', [], $this->accueilSubmenu())
+            ->add('Accueil', 'app_home')
+            ->add('HFF', null, [], $this->hfSubmenu())
             ->add('RH', null, [], $this->rhSubmenu())
             ->add('Ordre de mission', null, [], $this->domSubmenu())
         ;

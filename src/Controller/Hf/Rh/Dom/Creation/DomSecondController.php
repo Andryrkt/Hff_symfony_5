@@ -23,20 +23,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class DomSecondController extends AbstractController
 {
-    private SecondFormDtoFactory $secondFormDtoFactory;
     private LoggerInterface $logger;
     private DomCreationHandler $domCreationHandler;
     private HistoriqueOperationService $historiqueOperationService;
     private AgenceSerializerService $agenceSerializerService;
 
     public function __construct(
-        SecondFormDtoFactory $secondFormDtoFactory,
         LoggerInterface $domSecondFormLogger,
         DomCreationHandler $domCreationHandler,
         HistoriqueOperationService $historiqueOperationService,
         AgenceSerializerService $agenceSerializerService
     ) {
-        $this->secondFormDtoFactory = $secondFormDtoFactory;
         $this->logger = $domSecondFormLogger;
         $this->domCreationHandler = $domCreationHandler;
         $this->historiqueOperationService = $historiqueOperationService;
@@ -49,7 +46,8 @@ class DomSecondController extends AbstractController
     public function secondForm(
         Request $request,
         DomPdfService $pdfService,
-        ContextAwareBreadcrumbBuilder $breadcrumbBuilder
+        ContextAwareBreadcrumbBuilder $breadcrumbBuilder,
+        SecondFormDtoFactory $secondFormDtoFactory
     ) {
         // Démarrer le diagnostic de performance
 
@@ -64,7 +62,7 @@ class DomSecondController extends AbstractController
         }
 
         // Mesure: Création du SecondFormDto
-        $secondFormDto =  $this->secondFormDtoFactory->create($firstFormDto);
+        $secondFormDto =  $secondFormDtoFactory->create($firstFormDto);
 
         // Mesure: Création du formulaire Symfony
         $form = $this->createForm(SecondFormType::class, $secondFormDto);

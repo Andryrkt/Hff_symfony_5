@@ -60,10 +60,10 @@ class SecondFormDtoFactory
         $dto->prenom = $firstFormDto->salarier == 'TEMPORAIRE' ? $firstFormDto->prenom : $user->getPrenoms();
         $dto->cin = $firstFormDto->cin;
         $dto->salarier = $firstFormDto->salarier;
-        $dto->indemniteForfaitaire = $this->getMontantIndemniteForfaitaire($firstFormDto, $user, $typeMission, $categorie);
+        $dto->indemniteForfaitaire = $this->getMontantIndemniteForfaitaire($user, $typeMission, $categorie);
 
         $dto->rmq = $this->getRmq($user);
-        $dto->site = $this->getSite($firstFormDto, $user, $typeMission, $categorie);
+        $dto->site = $this->getSite($user, $typeMission, $categorie);
 
         /** @var Agence $agence @var Service $service */
         [$agence, $service] = $this->getAgenceService($firstFormDto, $user);
@@ -78,6 +78,100 @@ class SecondFormDtoFactory
         return $dto;
     }
 
+    public function createFromDom(Dom $dom): SecondFormDto
+    {
+        $dto = new SecondFormDto();
+        /** @var User */
+        $user = $this->security->getUser();
+
+        if (!$user instanceof User) {
+            throw new \RuntimeException('User not authenticated');
+        }
+
+        $typeMission = $dom->getSousTypeDocument() ? $this->em->find(SousTypeDocument::class, $dom->getSousTypeDocument()) : null;
+        $categorie = $dom->getCategoryId() ? $this->em->find(Categorie::class, $dom->getCategoryId()) : null;
+        $site = $dom->getSiteId() ? $this->em->find(Site::class, $dom->getSiteId()) : null;
+        $salarier = strlen($dom->getMatricule()) === 4 && ctype_digit($dom->getMatricule()) ? 'PERMANENT' :  'TEMPORAIRE';
+
+
+        $dto->dateDemande = $dom->getDateDemande();
+
+        $dto->matricule = $dom->getMatricule();
+        $dto->nom = $dom->getNom();
+        $dto->prenom = $dom->getPrenom();
+        $dto->salarier = $salarier;
+        $dto->cin = $salarier == 'PERMANENT' ? null : trim(explode('-', $dom->getMatricule())[2]);
+
+        $dto->typeMission = $typeMission;
+        $dto->categorie = $categorie;
+        $dto->site = $site;
+        $dto->rmq = $this->getRmq($user);
+        // $dto->site = $this->getSite($user, $typeMission, $categorie);
+
+        // dateHeureMission
+        if ($dom->getDateDebut() && $dom->getHeureDebut() && $dom->getDateFin() && $dom->getHeureFin()) {
+            $dateDebut = $dom->getDateDebut()->format('Y-m-d') . ' ' . $dom->getHeureDebut();
+            $dateFin = $dom->getDateFin()->format('Y-m-d') . ' ' . $dom->getHeureFin();
+            $dto->dateHeureMission = [
+                'start' => new DateTime($dateDebut),
+                'end' => new DateTime($dateFin),
+            ];
+        }
+
+        $dto->nombreJour = $dom->getNombreJour();
+        $dto->motifDeplacement = $dom->getMotifDeplacement();
+        $dto->pieceJustificatif = $dom->getPieceJustificatif();
+        $dto->client = $dom->getClient();
+        $dto->fiche = $dom->getFiche();
+        $dto->lieuIntervention = $dom->getLieuIntervention();
+        $dto->vehiculeSociete = $dom->getVehiculeSociete();
+        $dto->numVehicule = $dom->getNumVehicule();
+        $dto->idemnityDepl = $dom->getIdemnityDepl();
+        $dto->totalIndemniteDeplacement = (int)str_replace(' ', '.', $dom->getIdemnityDepl()) * (int)$dom->getNombreJour();
+        $dto->devis = $dom->getDevis();
+        $dto->supplementJournaliere = $dom->getDroitIndemnite();
+        $dto->indemniteForfaitaire = $dom->getIndemniteForfaitaire();
+        $dto->totalIndemniteForfaitaire = $dom->getTotalIndemniteForfaitaire();
+        $dto->motifAutresDepense1 = $dom->getMotifAutreDepense1();
+        $dto->autresDepense1 = $dom->getAutresDepense1();
+        $dto->motifAutresDepense2 = $dom->getMotifAutresDepense2();
+        $dto->autresDepense2 = $dom->getAutresDepense2();
+        $dto->motifAutresDepense3 = $dom->getMotifAutresDepense3();
+        $dto->autresDepense3 = $dom->getAutresDepense3();
+        $dto->totalAutresDepenses = $dom->getTotalAutresDepenses();
+        $dto->totalGeneralPayer = $dom->getTotalGeneralPayer();
+        $dto->modePayement = trim(explode(':', $dom->getModePayement())[0]);
+        $dto->mode = trim(explode(':', $dom->getModePayement())[1]);
+        $dto->pieceJoint01 = $dom->getPieceJoint01();
+        $dto->pieceJoint02 = $dom->getPieceJoint02();
+        $dto->numeroOrdreMission = $dom->getNumeroOrdreMission();
+        // $dto->mailUser n'existe pas dans l'entité Dom
+
+        // Peuplement de agenceUser et serviceUser
+        // Note : L'entité Dom a une propriété libelleCodeAgenceService qui pourrait contenir ces informations
+        // mais pour une désagrégation propre en agence et service, il faudrait une logique plus complexe
+        // ou que ces informations soient stockées séparément dans Dom.
+        // Pour l'instant, on se base sur les agence/service liés à l'utilisateur ou au personnel lors de la création initiale du DTO.
+        // Puisque nous remplissons à partir d'un Dom existant, nous pouvons essayer de déduire les agence/service
+        // à partir du `libelleCodeAgenceService` ou laisser ces champs non remplis si ce n'est pas possible directement.
+        // Pour cet exemple, je vais laisser ces champs non remplis car la logique de dérivation n'est pas claire
+        // et le DTO peut accepter des valeurs nulles.
+
+        // Pour le débiteur, l'entité Dom a une propriété string, tandis que le DTO attend un array.
+        // Il est préférable de ne pas mapper directement cette propriété sans plus d'informations sur la conversion.
+        // $dto->debiteur = $dom->getDebiteur(); // Ne pas mapper directement
+
+        return $dto;
+    }
+
+
+    /**
+     * recupération de l'entity Rmq par rapport au code de l'agence de l'utilisateur
+     * le Rmq est 50 pour l'agence rental et STD pour les autres agences
+     * 
+     * @param User $user
+     * @return Rmq
+     */
     private function getRmq(User $user): Rmq
     {
         $agenceCode = $user->getAgenceUser()->getCode() ?? '';
@@ -86,7 +180,15 @@ class SecondFormDtoFactory
         return $this->em->getRepository(Rmq::class)->findOneBy(['description' => $codeToSearch]);
     }
 
-    private function getSite(FirstFormDto $firstFormDto, User $user, ?SousTypeDocument $typeMission, ?Categorie $categorie): ?Site
+    /**
+     * recupération de l'entity Site par rapport au type de mission, la catégorie, le Rmq et l'indemnites
+     * 
+     * @param User $user
+     * @param SousTypeDocument $typeMission
+     * @param Categorie $categorie
+     * @return Site
+     */
+    private function getSite(User $user, ?SousTypeDocument $typeMission, ?Categorie $categorie): ?Site
     {
         if (!$typeMission || !$categorie) {
             return null;
@@ -138,13 +240,13 @@ class SecondFormDtoFactory
         return [$agence, $service];
     }
 
-    private function getMontantIndemniteForfaitaire(FirstFormDto $firstFormDto, User $user, ?SousTypeDocument $typeMission, ?Categorie $categorie): string
+    private function getMontantIndemniteForfaitaire(User $user, ?SousTypeDocument $typeMission, ?Categorie $categorie): string
     {
         if (!$typeMission || !$categorie) {
             return '0';
         }
 
-        $site = $this->getSite($firstFormDto, $user, $typeMission, $categorie);
+        $site = $this->getSite($user, $typeMission, $categorie);
         if (!$site) {
             return '0';
         }

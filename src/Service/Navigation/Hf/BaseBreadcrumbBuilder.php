@@ -419,7 +419,7 @@ class BaseBreadcrumbBuilder
         ];
     }
 
-    protected function accueilSubmenu(): array
+    protected function hfSubmenu(): array
     {
         return array_filter([
             /** =============== Documentation ===================== */

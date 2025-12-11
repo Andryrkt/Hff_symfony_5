@@ -13,20 +13,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class DomDetailController extends AbstractController
 {
     /**
-     * @Route("/detail/{id}", name="dom_detail")
+     * @Route("/detail/{numeroOrdreMission}", name="dom_detail")
      */
-    public function detailDom($id, DomRepository $domRepository)
+    public function detailDom(string $numeroOrdreMission, DomRepository $domRepository)
     {
 
-        $dom = $domRepository->findOneBy(['id' => $id]);
+        $dom = $domRepository->findOneBy(['numeroOrdreMission' => $numeroOrdreMission]);
         $dom->setIdemnityDepl((int)str_replace('.', '', $dom->getIdemnityDepl()));
-        $matricule = $dom->getMatricule();
-        if (strlen($matricule) === 4 && ctype_digit($matricule)) {
-            $salarier = 'PERMANENT';
-        } else {
-            $salarier = 'TEMPORAIRE';
-        }
-        // dd($dom);
+        $salarier  = strlen($dom->getMatricule()) === 4 && ctype_digit($dom->getMatricule()) ? 'PERMANENT' :  'TEMPORAIRE';
+
+
         return $this->render(
             'hf/rh/dom/liste/detail.html.twig',
             [
