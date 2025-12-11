@@ -73,11 +73,13 @@ class FirstFormType extends AbstractType
                     'label' => 'Type de Mission',
                     'class' => SousTypeDocument::class,
                     'choice_label' => 'codeSousType',
+                    'mapped' => false,
                     'query_builder' => function (SousTypeDocumentRepository $repo) {
                         return $repo->createQueryBuilder('s')
                             ->where('s.codeSousType NOT IN (:excludedIds)')
                             ->setParameter('excludedIds', ['MUTATION', 'TROP PERCU']); // id de mutation et trop perçu
-                    }
+                    },
+                    'data' => $options['data'] && $options['data']->typeMissionId ? $this->em->getReference(SousTypeDocument::class, $options['data']->typeMissionId) : null,
                 ]
             )
             ->add(
@@ -133,7 +135,7 @@ class FirstFormType extends AbstractType
                     'placeholder' => false,
                     'required' => false,
                     'empty_data' => null,
-                    'mapped' => true,
+                    'mapped' => false,
                     'invalid_message' => 'Veuillez sélectionner une catégorie valide.',
                     'query_builder' => function (CategorieRepository $repository) use ($options) {
                         $descriptionRmq = explode('-', $options['data']->agenceUser)[0] == '50' ? '50' : 'STD';
@@ -143,6 +145,7 @@ class FirstFormType extends AbstractType
                             ->setParameter('description', $descriptionRmq)
                             ->orderBy('c.description', 'ASC');
                     },
+                    'data' => $options['data'] && $options['data']->categorieId ? $this->em->getReference(Categorie::class, $options['data']->categorieId) : null,
                 ]
             )
             ->add(

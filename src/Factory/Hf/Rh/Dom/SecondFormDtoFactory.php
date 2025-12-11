@@ -14,6 +14,7 @@ use App\Service\Utils\FormattingService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Admin\AgenceService\Agence;
 use App\Entity\Hf\Rh\Dom\SousTypeDocument;
+use App\Entity\Hf\Rh\Dom\Categorie;
 use App\Entity\Admin\PersonnelUser\Personnel;
 use App\Service\Utils\NumeroGeneratorService;
 use Symfony\Component\Security\Core\Security;
@@ -48,33 +49,21 @@ class SecondFormDtoFactory
             throw new \RuntimeException('User not authenticated');
         }
 
-        if ($firstFormDto->typeMission) {
-            // Réattacher l'entité au contexte Doctrine si elle est détachée (vient de la session)
-            $firstFormDto->typeMission = $this->em->find(
-                SousTypeDocument::class,
-                $firstFormDto->typeMission->getId()
-            );
-        }
-        if ($firstFormDto->categorie) {
-            // Réattacher l'entité au contexte Doctrine si elle est détachée (vient de la session)
-            $firstFormDto->categorie = $this->em->find(
-                get_class($firstFormDto->categorie),
-                $firstFormDto->categorie->getId()
-            );
-        }
+        $typeMission = $firstFormDto->typeMissionId ? $this->em->find(SousTypeDocument::class, $firstFormDto->typeMissionId) : null;
+        $categorie = $firstFormDto->categorieId ? $this->em->find(Categorie::class, $firstFormDto->categorieId) : null;
 
         $dto->dateDemande = new DateTime('now');
-        $dto->typeMission = $firstFormDto->typeMission;
-        $dto->categorie = $firstFormDto->categorie;
+        $dto->typeMission = $typeMission;
+        $dto->categorie = $categorie;
         $dto->matricule = $firstFormDto->matricule;
         $dto->nom = $firstFormDto->salarier == 'TEMPORAIRE' ? $firstFormDto->nom : $user->getNom();
         $dto->prenom = $firstFormDto->salarier == 'TEMPORAIRE' ? $firstFormDto->prenom : $user->getPrenoms();
         $dto->cin = $firstFormDto->cin;
         $dto->salarier = $firstFormDto->salarier;
-        $dto->indemniteForfaitaire = $this->getMontantIndemniteForfaitaire($firstFormDto, $user);
+        $dto->indemniteForfaitaire = $this->getMontantIndemniteForfaitaire($firstFormDto, $user, $typeMission, $categorie);
 
         $dto->rmq = $this->getRmq($user);
-        $dto->site = $this->getSite($firstFormDto, $user);
+        $dto->site = $this->getSite($firstFormDto, $user, $typeMission, $categorie);
 
         /** @var Agence $agence @var Service $service */
         [$agence, $service] = $this->getAgenceService($firstFormDto, $user);
@@ -97,12 +86,16 @@ class SecondFormDtoFactory
         return $this->em->getRepository(Rmq::class)->findOneBy(['description' => $codeToSearch]);
     }
 
-    private function getSite(FirstFormDto $firstFormDto, User $user): Site
+    private function getSite(FirstFormDto $firstFormDto, User $user, ?SousTypeDocument $typeMission, ?Categorie $categorie): ?Site
     {
+        if (!$typeMission || !$categorie) {
+            return null;
+        }
+
         $criteria = [
-            'sousTypeDocument' => $firstFormDto->typeMission,
+            'sousTypeDocument' => $typeMission,
             'rmq' => $this->getRmq($user),
-            'categorie' => $firstFormDto->categorie
+            'categorie' => $categorie
         ];
 
         $indemites = $this->em->getRepository(Indemnite::class)->findBy($criteria);
@@ -145,31 +138,38 @@ class SecondFormDtoFactory
         return [$agence, $service];
     }
 
-    private function getMontantIndemniteForfaitaire(FirstFormDto $firstFormDto, User $user): string
+    private function getMontantIndemniteForfaitaire(FirstFormDto $firstFormDto, User $user, ?SousTypeDocument $typeMission, ?Categorie $categorie): string
     {
+        if (!$typeMission || !$categorie) {
+            return '0';
+        }
+
+        $site = $this->getSite($firstFormDto, $user, $typeMission, $categorie);
+        if (!$site) {
+            return '0';
+        }
+
         $criteria = [
-            'sousTypeDocument' => $firstFormDto->typeMission,
+            'sousTypeDocument' => $typeMission,
             'rmq' => $this->getRmq($user),
-            'categorie' => $firstFormDto->categorie,
-            'site' => $this->getSite($firstFormDto, $user)
+            'categorie' => $categorie,
+            'site' => $site
         ];
 
         $indemites = $this->em->getRepository(Indemnite::class)->findOneBy($criteria);
         if ($indemites) {
             $montant = $indemites->getMontant();
-
             $montant = $this->formattingService->formatNumber($montant, 0);
         } else {
             $montant = 0;
         }
 
-
-        if ($firstFormDto->typeMission->getCodeSousType() === SousTypeDocument::CODE_TROP_PERCU) {
+        if ($typeMission->getCodeSousType() === SousTypeDocument::CODE_TROP_PERCU) {
             $montant = 0;
-        } else if ($firstFormDto->typeMission->getCodeSousType() === SousTypeDocument::CODE_COMPLEMENT || $firstFormDto->typeMission->getCodeSousType() === SousTypeDocument::CODE_MUTATION) {
+        } else if ($typeMission->getCodeSousType() === SousTypeDocument::CODE_COMPLEMENT || $typeMission->getCodeSousType() === SousTypeDocument::CODE_MUTATION) {
             $montant  = '';
         }
 
-        return $montant;
+        return (string) $montant;
     }
 }

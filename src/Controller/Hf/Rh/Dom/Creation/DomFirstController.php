@@ -61,14 +61,22 @@ class DomFirstController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->logger->info('Premier formulaire soumis et valide.');
-            // 1. recupération des données du formulaire
-            $data = $form->getData();
+            
+            // 1. Récupération des données du formulaire
+            $dto = $form->getData();
+            
+            // Manually set IDs from unmapped fields
+            $typeMission = $form->get('typeMission')->getData();
+            $categorie = $form->get('categorie')->getData();
+            
+            $dto->typeMissionId = $typeMission ? $typeMission->getId() : null;
+            $dto->categorieId = $categorie ? $categorie->getId() : null;
 
-            $this->logger->debug('Données du formulaire', ['data' => $data]);
+            $this->logger->debug('Données du formulaire', ['data' => $dto]);
 
-            // 2. stocage des donner dans le session
+            // 2. Stockage des données dans la session
             $session = $request->getSession();
-            $session->set('dom_first_form_data', $data);
+            $session->set('dom_first_form_data', $dto);
 
             // 3. Redirection vers le second formulaire
             return $this->redirectToRoute('dom_second_form');
