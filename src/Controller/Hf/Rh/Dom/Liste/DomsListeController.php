@@ -17,7 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Controller\Traits\PaginationAndSortingTrait;
 
 /**
- * @Route("/rh/ordre-de-mission")
+ * @Route("/hf/rh/ordre-de-mission")
  */
 class DomsListeController extends AbstractController
 {

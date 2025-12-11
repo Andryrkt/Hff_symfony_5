@@ -86,7 +86,7 @@
 						{# <<<===== FIN Statut ==== #}
 						<td>{{ item.sousTypeDocument.codeSousType }}</td>
 						<td>
-							<a href="#" target="_blank">
+							<a href="{{ path('dom_detail', {'id': item.id}) }}" target="_blank">
 								{{ item.numeroOrdreMission }}
 							</a>
 						</td>
