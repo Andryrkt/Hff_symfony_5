@@ -41,7 +41,7 @@ class ProductBreadcrumbBuilder implements BreadcrumbBuilderInterface
 
     private function buildProductDetail(array $parameters): array
     {
-                if (!isset($parameters['product_id'])) {
+        if (!isset($parameters['product_id'])) {
             throw new \InvalidArgumentException('product_id is required');
         }
         $productId = $parameters['product_id'];
@@ -49,7 +49,7 @@ class ProductBreadcrumbBuilder implements BreadcrumbBuilderInterface
 
         return $this->breadcrumb
             ->clear()
-            ->add('Accueil', 'app_home')
+            ->add('Accueil', 'home_index')
             ->add('Produits', 'product_list')
             ->add($productName, 'product_show', ['id' => $productId])
             ->get();
@@ -59,21 +59,21 @@ class ProductBreadcrumbBuilder implements BreadcrumbBuilderInterface
     {
         return $this->breadcrumb
             ->clear()
-            ->add('Accueil', 'app_home')
+            ->add('Accueil', 'home_index')
             ->add('Produits', 'product_list')
             ->get();
     }
 
     private function buildProductCategory(array $parameters): array
     {
-                if (!isset($parameters['category'])) {
+        if (!isset($parameters['category'])) {
             throw new \InvalidArgumentException('category is required');
         }
         $category = $parameters['category'];
 
         return $this->breadcrumb
             ->clear()
-            ->add('Accueil', 'app_home')
+            ->add('Accueil', 'home_index')
             ->add('Produits', 'product_list')
             ->add(ucfirst($category), 'product_category', ['category' => $category])
             ->get();

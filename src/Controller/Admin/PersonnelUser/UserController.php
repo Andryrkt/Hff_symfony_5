@@ -34,7 +34,7 @@ class UserController extends AbstractController
             'users' => $users,
             'query' => $query,
             'breadcrumbs' => [
-                ['label' => 'Accueil', 'url' => $this->generateUrl('app_home')],
+                ['label' => 'Accueil', 'url' => $this->generateUrl('home_index')],
                 ['label' => 'Utilisateurs'],
             ],
         ]);
@@ -175,7 +175,7 @@ class UserController extends AbstractController
             'accesses' => $userAccessRepository->findBy(['users' => $user]),
             'form' => $form->createView(),
             'breadcrumbs' => [
-                ['label' => 'Accueil', 'url' => $this->generateUrl('app_home')],
+                ['label' => 'Accueil', 'url' => $this->generateUrl('home_index')],
                 ['label' => 'Utilisateurs', 'url' => $this->generateUrl('admin_user_index')],
                 ['label' => 'Gérer les accès - ' . $user->getFullname()],
             ],

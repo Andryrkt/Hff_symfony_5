@@ -28,16 +28,19 @@
 				{% if app.debug %}
 					<div class="error-message">
 						<strong>Détails techniques :</strong>
-						<div>{{ status_text }} ({{ status_code }})</div>
+						<div>{{ status_text }}
+							({{ status_code }})</div>
 						<div class="mt-3">{{ exception.message }}</div>
 
-						<div class="row mt-3">
+						<div
+							class="row mt-3">
 							<!-- Colonne de gauche - Informations de base -->
 							<div class="col-lg-6 col-md-12">
 								<div class="p-2 bg-light rounded mt-2">
 									<strong>Fichier :</strong><br>
 									<small class="text-muted">{{ exception.file }}</small><br>
-									<strong>Ligne :</strong> {{ exception.line }}
+									<strong>Ligne :</strong>
+									{{ exception.line }}
 								</div>
 							</div>
 
@@ -67,7 +70,7 @@
 				{% endif %}
 			</p>
 
-			<a href="{{ path("app_home") }}">
+			<a href="{{ path("home_index") }}">
 				<i class="fas fa-arrow-left-long pe-2"></i>
 				Accueil
 			</a>

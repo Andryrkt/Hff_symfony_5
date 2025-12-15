@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class HomeController extends AbstractController
 {
     /**
-     * @Route("/", name="app_home")
+     * @Route("/", name="home_index")
      */
     public function index(ContextAwareBreadcrumbBuilder $breadcrumbBuilder, HomeCardService $homeCardService): Response
     {
