@@ -8,6 +8,8 @@ class BreadcrumbBuilder
 {
     private array $items = [];
     private UrlGeneratorInterface $urlGenerator;
+    private ?string $backRoute = null;
+    private array $backRouteParams = [];
 
     public function __construct(UrlGeneratorInterface $urlGenerator)
     {
@@ -46,7 +48,7 @@ class BreadcrumbBuilder
             } elseif ($route) {
                 $url = $this->urlGenerator->generate($route, $params);
             }
-            
+
             $processed[] = [
                 'label' => $item['label'],
                 'url' => $url,
@@ -54,6 +56,22 @@ class BreadcrumbBuilder
             ];
         }
         return $processed;
+    }
+
+    public function setBackRoute(string $route, array $params = []): self
+    {
+        $this->backRoute = $route;
+        $this->backRouteParams = $params;
+
+        return $this;
+    }
+
+    public function getBackConfig(): array
+    {
+        return [
+            'back_route' => $this->backRoute,
+            'back_route_params' => $this->backRouteParams,
+        ];
     }
 
     public function get(): array
@@ -64,6 +82,8 @@ class BreadcrumbBuilder
     public function clear(): self
     {
         $this->items = [];
+        $this->backRoute = null;
+        $this->backRouteParams = [];
 
         return $this;
     }

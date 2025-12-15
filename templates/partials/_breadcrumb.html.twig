@@ -20,10 +20,25 @@
 {% endmacro %}
 
 
-<nav aria-label="breadcrumb" class="mb-3 position-relative">
-	<ol class="breadcrumb bg-light p-2 rounded shadow-sm mb-0">
+<nav aria-label="breadcrumb" class="mb-3 position-relative d-flex align-items-center gap-2">
+	{% set items = breadcrumb.items is defined ? breadcrumb.items : breadcrumb %}
+	{% set back_route = breadcrumb.back_route is defined ? breadcrumb.back_route : (back_route|default(null)) %}
+	{% set back_route_params = breadcrumb.back_route_params is defined ? breadcrumb.back_route_params : (back_route_params|default({})) %}
+
+	{% if back_route %}
+		<a href="{{ path(back_route, back_route_params) }}" class="btn btn-outline-secondary btn-sm d-flex align-items-center" title="Retour à la page précédente">
+			<i class="fa-solid fa-arrow-left"></i>
+			<span class="d-none d-md-inline">Retour</span>
+		</a>
+	{% else %}
+		<button type="button" class="btn btn-outline-secondary btn-sm d-flex align-items-center" onclick="window.history.back()" title="Retour à la page précédente">
+			<i class="fa-solid fa-arrow-left"></i>
+			<span class="d-none d-md-inline">Retour</span>
+		</button>
+	{% endif %}
+	<ol class="breadcrumb bg-light p-2 rounded shadow-sm mb-0 flex-grow-1">
 		{% from _self import render_submenu %}
-		{% for item in breadcrumb %}
+		{% for item in items %}
 			{% set has_submenu = item.submenu is defined and item.submenu|length > 0 %}
 			{% set item_id = 'breadcrumb-' ~ loop.index %}
 			<li class="breadcrumb-item{% if loop.last and not has_submenu %} active{% endif %}{% if has_submenu %} dropdown{% endif %}" {% if loop.last and not has_submenu %} aria-current="page" {% endif %}>
