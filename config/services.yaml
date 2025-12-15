@@ -115,3 +115,7 @@ services:
   App\EventListener\CreatedByListener:
     tags:
       - { name: doctrine.event_listener, event: prePersist }
+
+  App\Controller\DocumentationController:
+    arguments:
+      $projectDir: '%kernel.project_dir%'

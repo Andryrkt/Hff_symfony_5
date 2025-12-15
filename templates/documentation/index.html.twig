@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Documentation -
+	{{ current_page|capitalize }}
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" href="{{ asset('build/documentation.css') }}">
+{% endblock %}
+
+{% block content %}
+	{# Navbar included in base #}
+
+	<div class="container-fluid doc-container">
+		<div
+			class="row">
+			<!-- Sidebar -->
+			<nav id="doc-sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+				<div class="position-sticky pt-3">
+					<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+						<span>Navigation</span>
+					</h6>
+					<ul class="nav flex-column">
+						{% for item in menu %}
+							<li class="nav-item">
+								<a class="nav-link {% if item.slug == current_page %}active{% endif %}" href="{{ path('app_documentation_index', {page: item.slug}) }}" data-doc-link>
+									<span data-feather="file-text"></span>
+									{{ item.title }}
+								</a>
+							</li>
+						{% endfor %}
+					</ul>
+				</div>
+			</nav>
+
+			<!-- Main Content -->
+			<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+				<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+					<h1 class="h2" id="doc-title">{{ current_page|replace({'-': ' ', '_': ' '})|capitalize }}</h1>
+				</div>
+
+				<div class="markdown-body" id="doc-content">
+					{{ content|raw }}
+				</div>
+			</main>
+		</div>
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="{{ asset('build/documentation.js') }}"></script>
+{% endblock %}
