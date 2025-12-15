@@ -23,7 +23,12 @@ final class DomBreadcrumbBuilder extends BaseBreadcrumbBuilder implements Breadc
 
     public function supports(string $context): bool
     {
-        return in_array($context, ['dom_first_form', 'dom_second_form', 'liste_dom_index']);
+        return in_array($context, [
+            'dom_first_form',
+            'dom_second_form',
+            'liste_dom_index',
+            'dom_duplication'
+        ]);
     }
 
     public function build(array $parameters = []): array
@@ -37,6 +42,8 @@ final class DomBreadcrumbBuilder extends BaseBreadcrumbBuilder implements Breadc
                 return $this->buildSecondFormBreadcrumb();
             case 'liste_dom_index':
                 return $this->buildListeBreadcrumb();
+            case 'dom_duplication':
+                return $this->buildDuplicationBreadcrumb($parameters['numeroOrdreMission']);
             default:
                 throw new \InvalidArgumentException("Unsupported product context: {$context}");
         }
@@ -72,6 +79,13 @@ final class DomBreadcrumbBuilder extends BaseBreadcrumbBuilder implements Breadc
     {
         return $this->buildBaseBreadcrumb()
             ->add("Liste de consultation de demande d'ordre de mission")
+            ->get();
+    }
+
+    private function buildDuplicationBreadcrumb($numeroOrdreMission): array
+    {
+        return $this->buildBaseBreadcrumb()
+            ->add("Duplication d'ordre de mission n° {$numeroOrdreMission}")
             ->get();
     }
 }

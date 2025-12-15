@@ -9,8 +9,6 @@
 
 {% endblock %}
 
-{% import "macros/form_macros.html.twig" as formMacros %}
-
 {% block content %}
 	<div class="container-fluid">
 		{% include 'partials/flash_messages.html.twig' %}
@@ -20,9 +18,6 @@
 		<div class="card p-2">
 			<div class="card-body">
 				<div class="row">
-					<div class="col-12 col-md-11">
-						<h3 class="perso-titre">Nouvelle demande d'ordre de mission</h3>
-					</div>
 					<div class="col-12 col-md-1">
 						<div class="tablinks p-2 btn btn-outline-warning ">
 							<a href="{{ path("dom_first_form")}}" style="text-decoration: none;color:black; font-weight: bold;">Retour</a>

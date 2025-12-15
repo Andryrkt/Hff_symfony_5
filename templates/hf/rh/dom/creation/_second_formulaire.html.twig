@@ -1,3 +1,5 @@
+{% import "macros/form_macros.html.twig" as formMacros %}
+
 {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}})}}
 
 <input type="hidden" id="typeMission" value="{{secondFormDto.typeMission.id}}">
@@ -16,15 +18,10 @@
 		<label for="" class="col-4  fw-bold">Agence service débiteur</label>
 		<div class="row">
 			{{ formMacros.debiteurOuEmetteurFields(form, 'debiteur', {
-
-                                layout: 'horizontal',
-
-                                agenceColumnClass: 'col-md-6',
-
-                                serviceColumnClass: 'col-md-6'
-
-                            }) }}
-
+                 layout: 'horizontal',
+                agenceColumnClass: 'col-md-6',
+                 serviceColumnClass: 'col-md-6'
+             }) }}
 		</div>
 
 	</div>

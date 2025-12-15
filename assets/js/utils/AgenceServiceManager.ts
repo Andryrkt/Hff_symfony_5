@@ -172,10 +172,27 @@ export function initAgenceServiceHandlers(): void {
         if (config && config.agenceInput) {
             populateAgenceOptions(config.agenceInput);
 
+            // Sauvegarder la valeur pré-sélectionnée du service avant de réinitialiser
+            const preselectedServiceValue = config.serviceInput?.value || '';
+
             optionParDefaut(config.serviceInput, "-- Choisir un Service --");
             config.agenceInput.addEventListener("change", () =>
                 handleAgenceChange(key)
             );
+
+            // Si une agence est pré-sélectionnée, charger ses services et restaurer la sélection du service
+            if (config.agenceInput.value) {
+                handleAgenceChange(key);
+                
+                // Restaurer la sélection du service après un court délai pour s'assurer que les options sont chargées
+                if (preselectedServiceValue && config.serviceInput) {
+                    setTimeout(() => {
+                        if (config.serviceInput) {
+                            config.serviceInput.value = preselectedServiceValue;
+                        }
+                    }, 10);
+                }
+            }
         }
     }
 }

@@ -4,8 +4,10 @@ namespace App\Controller\Hf\Rh\Dom\Creation;
 
 use App\Form\Hf\Rh\Dom\SecondFormType;
 use App\Repository\Hf\Rh\Dom\DomRepository;
+use App\Service\Admin\AgenceSerializerService;
 use App\Factory\Hf\Rh\Dom\SecondFormDtoFactory;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
@@ -19,7 +21,9 @@ class DomDuplicationController extends AbstractController
     public function index(
         string $numeroOrdreMission,
         DomRepository $domRepository,
-        SecondFormDtoFactory $secondFormDtoFactory
+        SecondFormDtoFactory $secondFormDtoFactory,
+        AgenceSerializerService $agenceSerializerService,
+        ContextAwareBreadcrumbBuilder $breadcrumbBuilder
     ) {
 
         // recuperation des données du numéro d'Ordre de mission
@@ -33,6 +37,11 @@ class DomDuplicationController extends AbstractController
 
         return $this->render('hf/rh/dom/creation/dom_duplication.html.twig', [
             'form' => $form->createView(),
+            'secondFormDto' => $secondFormDto,
+            'agencesJson' => $agenceSerializerService->serializeAgencesForDropdown(),
+            'breadcrumbs'   => $breadcrumbBuilder->build('dom_duplication', [
+                'numeroOrdreMission' => $numeroOrdreMission
+            ]),
         ]);
     }
 }

@@ -7,6 +7,7 @@ use App\Entity\Hf\Rh\Dom\Dom;
 use App\Entity\Hf\Rh\Dom\Rmq;
 use App\Entity\Hf\Rh\Dom\Site;
 use App\Dto\Hf\Rh\Dom\FirstFormDto;
+use App\Entity\Hf\Rh\Dom\Categorie;
 use App\Entity\Hf\Rh\Dom\Indemnite;
 use App\Dto\Hf\Rh\Dom\SecondFormDto;
 use App\Entity\Admin\PersonnelUser\User;
@@ -14,7 +15,7 @@ use App\Service\Utils\FormattingService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Admin\AgenceService\Agence;
 use App\Entity\Hf\Rh\Dom\SousTypeDocument;
-use App\Entity\Hf\Rh\Dom\Categorie;
+use App\Entity\Admin\AgenceService\Service;
 use App\Entity\Admin\PersonnelUser\Personnel;
 use App\Service\Utils\NumeroGeneratorService;
 use Symfony\Component\Security\Core\Security;
@@ -88,9 +89,13 @@ class SecondFormDtoFactory
             throw new \RuntimeException('User not authenticated');
         }
 
-        $typeMission = $dom->getSousTypeDocument() ? $this->em->find(SousTypeDocument::class, $dom->getSousTypeDocument()) : null;
-        $categorie = $dom->getCategoryId() ? $this->em->find(Categorie::class, $dom->getCategoryId()) : null;
-        $site = $dom->getSiteId() ? $this->em->find(Site::class, $dom->getSiteId()) : null;
+        $typeMission = $dom->getSousTypeDocument();
+        $categorie = $dom->getCategoryId();
+        $site = $dom->getSiteId();
+        $agenceEmetteur = $dom->getAgenceEmetteurId();
+        $serviceEmetteur = $dom->getServiceEmetteurId();
+        $agenceDebiteur = $dom->getAgenceDebiteurId();
+        $serviceDebiteur = $dom->getServiceDebiteur();
         $salarier = strlen($dom->getMatricule()) === 4 && ctype_digit($dom->getMatricule()) ? 'PERMANENT' :  'TEMPORAIRE';
 
 
@@ -106,15 +111,29 @@ class SecondFormDtoFactory
         $dto->categorie = $categorie;
         $dto->site = $site;
         $dto->rmq = $this->getRmq($user);
-        // $dto->site = $this->getSite($user, $typeMission, $categorie);
 
-        // dateHeureMission
-        if ($dom->getDateDebut() && $dom->getHeureDebut() && $dom->getDateFin() && $dom->getHeureFin()) {
-            $dateDebut = $dom->getDateDebut()->format('Y-m-d') . ' ' . $dom->getHeureDebut();
-            $dateFin = $dom->getDateFin()->format('Y-m-d') . ' ' . $dom->getHeureFin();
+        // dateHeureMission - créer même si certaines valeurs sont manquantes
+        if ($dom->getDateDebut() || $dom->getDateFin()) {
+            $dateDebut = null;
+            $dateFin = null;
+            $heureDebut = null;
+            $heureFin = null;
+
+            if ($dom->getDateDebut()) {
+                $dateDebut = $dom->getDateDebut();
+                $heureDebut = $dom->getHeureDebut() ? new \DateTime($dom->getDateDebut()->format('Y-m-d') . ' ' . $dom->getHeureDebut()) : null;
+            }
+
+            if ($dom->getDateFin()) {
+                $dateFin = $dom->getDateFin();
+                $heureFin = $dom->getHeureFin() ? new \DateTime($dom->getDateFin()->format('Y-m-d') . ' ' . $dom->getHeureFin()) : null;
+            }
+
             $dto->dateHeureMission = [
-                'start' => new DateTime($dateDebut),
-                'end' => new DateTime($dateFin),
+                'debut' => $dateDebut,
+                'fin' => $dateFin,
+                'heureDebut' => $heureDebut,
+                'heureFin' => $heureFin
             ];
         }
 
@@ -145,21 +164,13 @@ class SecondFormDtoFactory
         $dto->pieceJoint01 = $dom->getPieceJoint01();
         $dto->pieceJoint02 = $dom->getPieceJoint02();
         $dto->numeroOrdreMission = $dom->getNumeroOrdreMission();
-        // $dto->mailUser n'existe pas dans l'entité Dom
+        // $dto->mailUser = $user->getEmail();
 
-        // Peuplement de agenceUser et serviceUser
-        // Note : L'entité Dom a une propriété libelleCodeAgenceService qui pourrait contenir ces informations
-        // mais pour une désagrégation propre en agence et service, il faudrait une logique plus complexe
-        // ou que ces informations soient stockées séparément dans Dom.
-        // Pour l'instant, on se base sur les agence/service liés à l'utilisateur ou au personnel lors de la création initiale du DTO.
-        // Puisque nous remplissons à partir d'un Dom existant, nous pouvons essayer de déduire les agence/service
-        // à partir du `libelleCodeAgenceService` ou laisser ces champs non remplis si ce n'est pas possible directement.
-        // Pour cet exemple, je vais laisser ces champs non remplis car la logique de dérivation n'est pas claire
-        // et le DTO peut accepter des valeurs nulles.
+        $dto->agenceUser = $agenceEmetteur ? ($agenceEmetteur->getCode() . ' ' . $agenceEmetteur->getNom()) : '';
+        $dto->serviceUser = $serviceEmetteur ? ($serviceEmetteur->getCode() . ' ' . $serviceEmetteur->getNom()) : '';
 
-        // Pour le débiteur, l'entité Dom a une propriété string, tandis que le DTO attend un array.
-        // Il est préférable de ne pas mapper directement cette propriété sans plus d'informations sur la conversion.
-        // $dto->debiteur = $dom->getDebiteur(); // Ne pas mapper directement
+        // Passer les objets Entity pour le champ debiteur (le LightAgenceServiceType utilise EntityToIdTransformer)
+        $dto->debiteur = ['agence' => $agenceDebiteur, 'service' => $serviceDebiteur];
 
         return $dto;
     }
