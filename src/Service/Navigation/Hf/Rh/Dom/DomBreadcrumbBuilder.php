@@ -26,14 +26,14 @@ final class DomBreadcrumbBuilder extends BaseBreadcrumbBuilder implements Breadc
         return in_array($context, [
             'dom_first_form',
             'dom_second_form',
-            'liste_dom_index',
+            'dom_liste_index',
             'dom_duplication'
         ]);
     }
 
     public function build(array $parameters = []): array
     {
-        $context = $parameters['context'] ?? 'liste_dom_index';
+        $context = $parameters['context'] ?? 'dom_liste_index';
 
         $items = [];
         $backConfig = [];
@@ -45,7 +45,7 @@ final class DomBreadcrumbBuilder extends BaseBreadcrumbBuilder implements Breadc
             case 'dom_second_form':
                 $items = $this->buildSecondFormBreadcrumb();
                 break;
-            case 'liste_dom_index':
+            case 'dom_liste_index':
                 $items = $this->buildListeBreadcrumb();
                 break;
             case 'dom_duplication':
@@ -102,7 +102,7 @@ final class DomBreadcrumbBuilder extends BaseBreadcrumbBuilder implements Breadc
     {
         return $this->buildBaseBreadcrumb()
             ->add("Duplication d'ordre de mission n° {$numeroOrdreMission}")
-            ->setBackRoute('liste_dom_index')
+            ->setBackRoute('dom_liste_index')
             ->get();
     }
 }

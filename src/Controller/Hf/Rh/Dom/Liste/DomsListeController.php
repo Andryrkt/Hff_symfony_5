@@ -25,7 +25,7 @@ class DomsListeController extends AbstractController
 
     /**
      * affichage de l'architecture de la liste du DOM
-     * @Route("/liste-dom", name="liste_dom_index")
+     * @Route("/liste-dom", name="dom_liste_index")
      */
     public function index(
         Request $request,
@@ -62,11 +62,11 @@ class DomsListeController extends AbstractController
                 'paginationData' => $paginationData,
                 'form' => $form->createView(),
                 'agencesJson' => $agenceSerializerService->serializeAgencesForDropdown(),
-                'routeName' => 'liste_dom_index',
+                'routeName' => 'dom_liste_index',
                 'queryParams' => $request->query->all(),
                 'currentSort' => $domSearchDto->sortBy,
                 'currentOrder' => $domSearchDto->sortOrder,
-                'breadcrumbs' => $breadcrumbBuilder->build('liste_dom_index'),
+                'breadcrumbs' => $breadcrumbBuilder->build('dom_liste_index'),
             ]
         );
     }
