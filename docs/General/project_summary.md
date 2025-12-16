@@ -19,7 +19,7 @@ Le code est organisé autour des modèles de données (Entités) suivants :
 #### Gestion Agences/Services:
 *   `Agence`: Représente une agence.
 *   `Service`: Représente un service.
-*   `AgenceServiceIrium`: Fait le lien entre agences et services.
+*   `AgenceServiceIrium`: Fait le lien entre agences, services, le personnel reponsable, le code sage et la societe corespondante .
 
 ### Liste Complète des Agences
 
@@ -85,17 +85,16 @@ Le code est organisé autour des modèles de données (Entités) suivants :
 | SLR | SOLAIRE |
 | LGR | LOCATION GROUPES |
 | LSC | LOCATION SAMCRETTE |
-| C1 | TRAVEL AIRWAYS |
+| C1  | TRAVEL AIRWAYS |
 
 #### Gestion Utilisateurs/Personnel:
 *   `User`: L'utilisateur qui se connecte.
 *   `Personnel`: Représente un membre du personnel.
 *   `UserAccess`: Gère les droits d'accès d'un utilisateur à une agence/service.
 
-#### Gestion des Accès et Groupes:
-*   `Group`: Un groupe d'utilisateurs.
-*   `Application`: Représente une application ou un module.
-*   `GroupAccess`: Gère les droits d'un groupe sur une application.
+#### Historique des actions:
+*   `TypeDocument`: Représente chaque module crée dans cette application (ex: DOM, BADM, DIT, ...)
+*   `TypeOperation`: Représente un les opérations à faire par l'utilisateur
 
 #### Statuts:
 *   `StatutDemande`: Pour gérer différents statuts de demandes.

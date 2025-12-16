@@ -130,32 +130,55 @@ body {
     padding: 0.2em 0.4em;
     border-radius: 6px;
     background-color: #f1f5f9;
+    /* Light background for inline code to contrast with text */
     color: #0f172a;
+    /* Dark text for inline code */
+    border: 1px solid #e2e8f0;
 }
 
 .markdown-body pre {
     background-color: #1e293b !important;
+    /* Dark slate background */
+    color: #e2e8f0;
     border-radius: 8px;
-    padding: 1.5rem;
+    padding: 1.25rem;
     margin: 1.5rem 0;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    overflow-x: auto;
+    border: 1px solid #334155;
+    position: relative;
+}
+
+/* Optional: "Mac-like" dots decoration or simple header */
+.markdown-body pre::before {
+    content: "";
+    display: block;
+    height: 12px;
+    width: 12px;
+    background: #ff5f56;
+    border-radius: 50%;
+    box-shadow: 20px 0 0 #ffbd2e, 40px 0 0 #27c93f;
+    margin-bottom: 10px;
+    opacity: 0.8;
 }
 
 .markdown-body pre code {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
     background-color: transparent !important;
-    color: #e2e8f0 !important;
+    color: inherit !important;
     padding: 0;
     font-size: 0.9em;
+    line-height: 1.6;
+    display: block;
 }
 
 /* Blockquotes */
 .markdown-body blockquote {
     border-left: 4px solid #3b82f6;
-    background-color: #f8fafc;
+    background-color: #1e293b;
     padding: 1rem 1.5rem;
     border-radius: 0 8px 8px 0;
-    color: #475569;
+    color: #e2e8f0;
     font-style: italic;
     margin: 2rem 0;
 }
@@ -199,4 +222,100 @@ body {
     border-radius: 8px;
     border: 1px solid var(--doc-border-color);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* PrismJS Theme (Tomorrow Night) */
+code[class*="language-"],
+pre[class*="language-"] {
+    color: #ccc;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 1em;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.5;
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+}
+
+.token.comment,
+.token.block-comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+    color: #999;
+}
+
+.token.punctuation {
+    color: #ccc;
+}
+
+.token.tag,
+.token.attr-name,
+.token.namespace,
+.token.deleted {
+    color: #e2777a;
+}
+
+.token.function-name {
+    color: #6196cc;
+}
+
+.token.boolean,
+.token.number,
+.token.function {
+    color: #f08d49;
+}
+
+.token.property,
+.token.class-name,
+.token.constant,
+.token.symbol {
+    color: #f8c555;
+}
+
+.token.selector,
+.token.important,
+.token.atrule,
+.token.keyword,
+.token.builtin {
+    color: #cc99cd;
+}
+
+.token.string,
+.token.char,
+.token.attr-value,
+.token.regex,
+.token.variable {
+    color: #7ec699;
+}
+
+.token.operator,
+.token.entity,
+.token.url {
+    color: #67cdcc;
+}
+
+.token.important,
+.token.bold {
+    font-weight: bold;
+}
+
+.token.italic {
+    font-style: italic;
+}
+
+.token.entity {
+    cursor: help;
+}
+
+.token.inserted {
+    color: green;
 }

@@ -50,7 +50,33 @@ class DocumentationController extends AbstractController
         }
 
         if (!file_exists($filePath)) {
-            throw new NotFoundHttpException('Documentation page not found: ' . $page);
+            // Attempt to find the file recursively by basename
+            $baseName = basename($page);
+            if (substr($baseName, -3) !== '.md') {
+                $baseName .= '.md';
+            }
+
+            $foundPath = null;
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($this->docsDir, \RecursiveDirectoryIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::SELF_FIRST
+            );
+
+            foreach ($iterator as $file) {
+                if ($file->isFile() && $file->getBasename() === $baseName) {
+                    $foundPath = $file->getPathname();
+                    // Update page variable for correct relative link resolution later
+                    $relativePath = substr($foundPath, strlen($this->docsDir) + 1);
+                    $page = str_replace(['.md', '\\'], ['', '/'], $relativePath);
+                    break;
+                }
+            }
+
+            if ($foundPath) {
+                $filePath = $foundPath;
+            } else {
+                throw new NotFoundHttpException('Documentation page not found: ' . $page);
+            }
         }
 
         $content = file_get_contents($filePath);
@@ -58,8 +84,35 @@ class DocumentationController extends AbstractController
         $htmlContent = $parsedown->text($content);
 
         // Rewrite links: generate absolute URLs using Symfony router
-        $htmlContent = preg_replace_callback('/href="((?!http|#)[^"]+)\.md"/', function ($matches) {
-            return 'href="' . $this->generateUrl('app_documentation_index', ['page' => $matches[1]]) . '"';
+        $htmlContent = preg_replace_callback('/href="((?!http|#|mailto|ftp)[^"]+)\.md"/', function ($matches) use ($page) {
+            $link = $matches[1];
+
+            // Handle absolute paths (from docs root) starting with /
+            if (strpos($link, '/') === 0) {
+                return 'href="' . $this->generateUrl('app_documentation_index', ['page' => ltrim($link, '/')]) . '"';
+            }
+
+            // Handle relative paths
+            $currentDir = dirname($page);
+            if ($currentDir === '.') {
+                $targetPath = $link;
+            } else {
+                $targetPath = $currentDir . '/' . $link;
+            }
+
+            // Canonicalize path (resolve .. and .)
+            $parts = explode('/', str_replace('\\', '/', $targetPath));
+            $canonicalParts = [];
+            foreach ($parts as $part) {
+                if ($part === '..') {
+                    array_pop($canonicalParts);
+                } elseif ($part !== '.' && $part !== '') {
+                    $canonicalParts[] = $part;
+                }
+            }
+            $finalPage = implode('/', $canonicalParts);
+
+            return 'href="' . $this->generateUrl('app_documentation_index', ['page' => $finalPage]) . '"';
         }, $htmlContent);
 
         // Get list of available docs for sidebar

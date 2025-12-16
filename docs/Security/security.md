@@ -33,7 +33,7 @@ Exemple de logique pour voir une demande :
 
 ### Permissions `UserAccess`
 
-L'entité `UserAccess` (voir [Base de Données](database.md)) est liée à des `Permission`.
+L'entité `UserAccess` (voir [Base de Données](../Architecture/database.md)) est liée à des `Permission`.
 Exemples de permissions :
 -   `RH_ORDRE_MISSION_CREATE`(pour les workflows de validation)
 -   `RH_ORDRE_MISSION_VIEWS`
