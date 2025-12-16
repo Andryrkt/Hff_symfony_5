@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Form\Hf\Rh\Dom;
+namespace App\Form\Hf\Rh\Dom\creation;
 
 use App\Dto\Hf\Rh\Dom\FirstFormDto;
 use App\Entity\Hf\Rh\Dom\Categorie;
@@ -24,6 +24,7 @@ class FirstFormType extends AbstractType
 {
     private $security;
     private $personnelRepository;
+    private $em;
 
     const SALARIE = [
         'PERMANENT' => 'PERMANENT',
@@ -32,6 +33,7 @@ class FirstFormType extends AbstractType
 
     public function __construct(EntityManagerInterface $em, Security $security, PersonnelRepository $personnelRepository)
     {
+        $this->em = $em;
         $this->security = $security;
         $this->personnelRepository = $personnelRepository;
     }
