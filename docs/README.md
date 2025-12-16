@@ -7,11 +7,14 @@ Bienvenue dans la documentation technique du projet HFF Intranet. Cette document
 -   **[Architecture du Projet](architecture.md)**
     -   Structure des dossiers
     -   Système de "Vignettes"
-    -   Choix technologiques
+    -   Nomenclature & Conventions
 -   **[Base de Données & Modèle de Données](database.md)**
     -   DiagrammeEntité-Association (MCD simplifié)
     -   Logique `UserAccess` (Gestion fine des droits)
     -   Listes statiques (Agences, Services)
+-   **[Parcours Utilisateur](user_journeys.md)**
+    -   Navigation Globale
+    -   Workflow Ordre de Mission
 -   **[Sécurité & Authentification](security.md)**
     -   LDAP
     -   Voters & Permissions

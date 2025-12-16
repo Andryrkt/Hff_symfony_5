@@ -6,6 +6,10 @@
 
 {% block stylesheets %}
 	{{ parent() }}
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet"/>
 	<link rel="stylesheet" href="{{ asset('build/documentation.css') }}">
 {% endblock %}
 
@@ -16,27 +20,52 @@
 		<div
 			class="row">
 			<!-- Sidebar -->
-			<nav id="doc-sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+			<nav id="doc-sidebar" class="col-md-3 col-lg-2 d-md-block sidebar collapse">
 				<div class="position-sticky pt-3">
-					<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-						<span>Navigation</span>
-					</h6>
+					<div class="px-3 mb-4">
+						<h5 class="text-uppercase text-muted fw-bold" style="font-size: 0.75rem; letter-spacing: 1px;">Documentation</h5>
+					</div>
 					<ul class="nav flex-column">
 						{% for item in menu %}
-							<li class="nav-item">
-								<a class="nav-link {% if item.slug == current_page %}active{% endif %}" href="{{ path('app_documentation_index', {page: item.slug}) }}" data-doc-link>
-									<span data-feather="file-text"></span>
-									{{ item.title }}
-								</a>
-							</li>
+							{% if item.type is defined and item.type == 'category' %}
+								<li class="nav-item mb-1">
+									<button class="btn btn-toggle d-inline-flex align-items-center rounded border-0 collapsed fw-bold text-muted text-uppercase" style="font-size: 0.8rem; letter-spacing: 0.5px; padding: 0.5rem 1rem; width: 100%; text-align: left;" data-bs-toggle="collapse" data-bs-target="#collapse-{{ item.id }}" aria-expanded="false">
+										<i class="fas fa-folder me-2"></i>
+										{{ item.title }}
+									</button>
+									<div class="collapse show" id="collapse-{{ item.id }}">
+										<ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small ms-3">
+											{% for subitem in item.items %}
+												<li>
+													<a href="{{ path('app_documentation_index', {page: subitem.slug}) }}" class="nav-link {% if subitem.slug == current_page %}active{% endif %} d-inline-flex text-decoration-none rounded" data-doc-link>
+														<i class="fas fa-file-alt me-2 text-muted"></i>
+														{{ subitem.title }}
+													</a>
+												</li>
+											{% endfor %}
+										</ul>
+									</div>
+								</li>
+							{% else %}
+								<li class="nav-item">
+									<a class="nav-link {% if item.slug == current_page %}active{% endif %}" href="{{ path('app_documentation_index', {page: item.slug}) }}" data-doc-link>
+										{% if item.slug == 'README' %}
+											<i class="fas fa-home me-2"></i>
+										{% else %}
+											<i class="fas fa-book me-2"></i>
+										{% endif %}
+										{{ item.title }}
+									</a>
+								</li>
+							{% endif %}
 						{% endfor %}
 					</ul>
 				</div>
 			</nav>
 
 			<!-- Main Content -->
-			<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-				<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 doc-main">
+				<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom doc-header">
 					<h1 class="h2" id="doc-title">{{ current_page|replace({'-': ' ', '_': ' '})|capitalize }}</h1>
 				</div>
 
@@ -50,5 +79,9 @@
 
 {% block javascripts %}
 	{{ parent() }}
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-php.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-bash.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-yaml.min.js"></script>
 	<script src="{{ asset('build/documentation.js') }}"></script>
 {% endblock %}

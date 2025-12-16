@@ -86,22 +86,93 @@ class DocumentationController extends AbstractController
 
     private function getDocMenu(): array
     {
-        $files = glob($this->docsDir . '/*.md');
         $menu = [];
-        $slugger = new AsciiSlugger();
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($this->docsDir, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::SELF_FIRST
+        );
 
         foreach ($files as $file) {
-            $basename = basename($file, '.md');
-            $title = ucfirst(str_replace(['_', '-'], ' ', $basename));
+            if ($file->isFile() && $file->getExtension() === 'md') {
+                $relativePath = substr($file->getPathname(), strlen($this->docsDir) + 1);
+                $slug = str_replace(['.md', '\\'], ['', '/'], $relativePath);
+                $basename = $file->getBasename('.md');
 
-            // Prioritize README
-            if ($basename === 'README') {
-                array_unshift($menu, ['slug' => 'README', 'title' => 'Accueil']);
-            } else {
-                $menu[] = ['slug' => $basename, 'title' => $title];
+                // Determine Category (Folder)
+                $parts = explode('/', $slug);
+                // If it's a file in a subdirectory
+                if (count($parts) > 1) {
+                    $categorySlug = $parts[0];
+                    $categoryTitle = ucfirst(str_replace(['_', '-'], ' ', $categorySlug));
+                    $title = ucfirst(str_replace(['_', '-'], ' ', $basename));
+
+                    if (!isset($menu[$categoryTitle])) {
+                        $slugger = new AsciiSlugger();
+                        $menu[$categoryTitle] = [
+                            'type' => 'category',
+                            'title' => $categoryTitle,
+                            'id' => strtolower($slugger->slug($categoryTitle))
+                        ];
+                        $menu[$categoryTitle]['items'] = [];
+                    }
+                    $menu[$categoryTitle]['items'][] = ['slug' => $slug, 'title' => $title];
+                } else {
+                    // Root file
+                    $title = ucfirst(str_replace(['_', '-'], ' ', $basename));
+                    if ($basename === 'README') {
+                        // Ensure README is always at the very top level special item
+                        $menu['__ROOT__README__'] = ['type' => 'link', 'slug' => 'README', 'title' => 'Accueil'];
+                    } else {
+                        // Other root files
+                        if (!isset($menu['Général'])) {
+                            $slugger = new AsciiSlugger();
+                            $menu['Général'] = [
+                                'type' => 'category',
+                                'title' => 'Général',
+                                'id' => 'general',
+                                'items' => []
+                            ];
+                        }
+                        $menu['Général']['items'][] = ['slug' => $slug, 'title' => $title];
+                    }
+                }
             }
         }
 
-        return $menu;
+        // Sort Categories
+        ksort($menu);
+
+        // Sort items within categories
+        foreach ($menu as &$entry) {
+            if (isset($entry['items'])) {
+                usort($entry['items'], function ($a, $b) {
+                    return strcasecmp($a['title'], $b['title']);
+                });
+            }
+        }
+
+        // Move README to top if exists and flatten/arrange for simpler Twig usage? 
+        // Or keep structure: ['CategoryName' => ['items' => [...]], 'LinkKey' => ['type' => 'link', ...]]
+        // Let's ensure 'Accueil' is first.
+        $finalMenu = [];
+        if (isset($menu['__ROOT__README__'])) {
+            $finalMenu[] = $menu['__ROOT__README__'];
+            unset($menu['__ROOT__README__']);
+        }
+
+        // Add other categories
+        foreach ($menu as $key => $value) {
+            if (isset($value['type']) && $value['type'] === 'category') {
+                $finalMenu[] = [
+                    'type' => 'category',
+                    'title' => $key,
+                    'items' => $value['items']
+                ];
+            } else {
+                $finalMenu[] = $value;
+            }
+        }
+
+        return $finalMenu;
     }
 }
