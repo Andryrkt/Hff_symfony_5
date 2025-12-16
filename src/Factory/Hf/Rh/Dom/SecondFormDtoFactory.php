@@ -164,7 +164,7 @@ class SecondFormDtoFactory
         $dto->pieceJoint01 = $dom->getPieceJoint01();
         $dto->pieceJoint02 = $dom->getPieceJoint02();
         $dto->numeroOrdreMission = $dom->getNumeroOrdreMission();
-        // $dto->mailUser = $user->getEmail();
+        $dto->mailUser = $user->getEmail();
 
         $dto->agenceUser = $agenceEmetteur ? ($agenceEmetteur->getCode() . ' ' . $agenceEmetteur->getNom()) : '';
         $dto->serviceUser = $serviceEmetteur ? ($serviceEmetteur->getCode() . ' ' . $serviceEmetteur->getNom()) : '';

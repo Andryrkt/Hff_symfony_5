@@ -15,7 +15,6 @@ use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use App\Service\Historique_operation\HistoriqueOperationService;
 use App\Service\Admin\AgenceSerializerService;
-use App\Service\Debug\PerformanceDiagnosticService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
@@ -26,18 +25,15 @@ class DomSecondController extends AbstractController
     private LoggerInterface $logger;
     private DomCreationHandler $domCreationHandler;
     private HistoriqueOperationService $historiqueOperationService;
-    private AgenceSerializerService $agenceSerializerService;
 
     public function __construct(
         LoggerInterface $domSecondFormLogger,
         DomCreationHandler $domCreationHandler,
-        HistoriqueOperationService $historiqueOperationService,
-        AgenceSerializerService $agenceSerializerService
+        HistoriqueOperationService $historiqueOperationService
     ) {
         $this->logger = $domSecondFormLogger;
         $this->domCreationHandler = $domCreationHandler;
         $this->historiqueOperationService = $historiqueOperationService;
-        $this->agenceSerializerService = $agenceSerializerService;
     }
 
     /**
@@ -47,10 +43,10 @@ class DomSecondController extends AbstractController
         Request $request,
         DomPdfService $pdfService,
         ContextAwareBreadcrumbBuilder $breadcrumbBuilder,
-        SecondFormDtoFactory $secondFormDtoFactory
+        SecondFormDtoFactory $secondFormDtoFactory,
+        AgenceSerializerService $agenceSerializerService
     ) {
         // Démarrer le diagnostic de performance
-
         $this->denyAccessUnlessGranted('RH_ORDRE_MISSION_CREATE');
 
         // Mesure: Récupération des données de session
@@ -86,7 +82,7 @@ class DomSecondController extends AbstractController
         return $this->render('hf/rh/dom/creation/secondForm.html.twig', [
             'form'          => $formView,
             'secondFormDto' => $form->getData(),
-            'agencesJson'   => $this->agenceSerializerService->serializeAgencesForDropdown(),
+            'agencesJson'   => $agenceSerializerService->serializeAgencesForDropdown(),
             'breadcrumbs'   => $breadcrumbBuilder->build('dom_second_form'),
         ]);
     }

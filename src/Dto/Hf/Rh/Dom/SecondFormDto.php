@@ -142,5 +142,5 @@ class SecondFormDto
 
     // autre
     public string $numeroOrdreMission;
-    public string $mailUser;
+    public string $mailUser = '';
 }
