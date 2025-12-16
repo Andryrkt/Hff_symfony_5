@@ -21,6 +21,72 @@ Le code est organisé autour des modèles de données (Entités) suivants :
 *   `Service`: Représente un service.
 *   `AgenceServiceIrium`: Fait le lien entre agences et services.
 
+### Liste Complète des Agences
+
+| Code | Nom |
+| :--- | :--- |
+| 01 | ANTANANARIVO |
+| 02 | CESSNA IVATO |
+| 20 | FORT-DAUPHIN |
+| 30 | AMBATOVY |
+| 40 | TAMATAVE |
+| 50 | RENTAL |
+| 60 | PNEU - OUTIL - LUB |
+| 80 | ADMINISTRATION |
+| 90 | COMM ENERGIE |
+| 91 | ENERGIE DURABLE |
+| 92 | ENERGIE JIRAMA |
+| C1 | TRAVEL AIRWAYS |
+
+### Liste Complète des Services
+
+| Code | Nom |
+| :--- | :--- |
+| NEG | MAGASIN |
+| COM | COMMERCIAL |
+| ATE | ATELIER |
+| CSP | CUSTOMER SUPPORT |
+| GAR | GARANTIE |
+| FOR | FORMATION |
+| ASS | ASSURANCE |
+| MAN | ENERGIE MAN |
+| LCD | LOCATION |
+| DIR | DIRECTION GENERALE |
+| FIN | FINANCE |
+| PER | PERSONNEL ET SECURITE |
+| INF | INFORMATIQUE |
+| IMM | IMMOBILIER |
+| TRA | TRANSIT |
+| APP | APPRO |
+| UMP | UNITE METHODE ET PROCEDURES |
+| ENG | ENGINEERIE ET REALISATIONS |
+| VAN | VANILLE |
+| GIR | GIROFLE |
+| THO | THOMSON |
+| TSI | TSIAZOMPANIRY |
+| LTV | LOCATION TAMATAVE |
+| LFD | LOCATION FORT DAUPHINE |
+| LBV | LOCATION MORAMANGA |
+| MAH | MAHAJANGA |
+| NOS | NOSY BE |
+| TUL | TOLIARA |
+| AMB | AMBOHIMANAMBOLA |
+| FLE | FLEXIBLE |
+| TSD | TSIROANOMANDIDY |
+| VAT | VATOMANDRY |
+| BLK | BELOBABA |
+| MAS | MOBILE ASSETS |
+| MAP | MARCHE PUBLIC |
+| ADM | ADMINISTRATION |
+| LEV | LEVAGE DM |
+| LR6 | LOCATION RN6 |
+| LST | LOCATION STAR |
+| LCJ | LOCATION CENTRALE JIRAMA |
+| SLR | SOLAIRE |
+| LGR | LOCATION GROUPES |
+| LSC | LOCATION SAMCRETTE |
+| C1 | TRAVEL AIRWAYS |
+
 #### Gestion Utilisateurs/Personnel:
 *   `User`: L'utilisateur qui se connecte.
 *   `Personnel`: Représente un membre du personnel.

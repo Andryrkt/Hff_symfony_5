@@ -36,6 +36,46 @@ Les propriétés suivantes déterminent la portée de l'accès :
 -   `Service` : Entité fonctionnelle (IT, RH, Compta...).
 -   `Dom` (Demande d'Ordre de Mission) : Entité principale du module RH/Mission.
 
+```mermaid
+classDiagram
+    class User {
+        +string username
+        +array roles
+    }
+    class Personnel {
+        +string matricule
+        +string nom
+        +string prenom
+    }
+    class UserAccess {
+        +bool allAgence
+        +bool allService
+        +string typeDocument
+        +array permissions
+    }
+    class Agence {
+        +string code
+        +string nom
+    }
+    class Service {
+        +string code
+        +string nom
+    }
+    class Dom {
+        +int id
+        +string motif
+        +date dateDepart
+    }
+
+    User "1" -- "1" Personnel : linked to
+    User "1" -- "*" UserAccess : has
+    UserAccess "*" -- "0..1" Agence : scopes to
+    UserAccess "*" -- "0..1" Service : scopes to
+    Dom "*" -- "1" Personnel : requester
+    Dom "*" -- "1" Agence : origin
+    Dom "*" -- "1" Service : origin
+```
+
 ## 📋 Listes de Référence
 
 ### Agences

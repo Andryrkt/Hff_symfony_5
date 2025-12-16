@@ -20,6 +20,9 @@ Bienvenue dans la documentation technique du projet HFF Intranet. Cette document
     -   Configuration serveur
     -   Optimisation
     -   Commandes utiles
+-   **[Guide de Dépannage (Troubleshooting)](troubleshooting.md)**
+    -   Erreurs courantes (404, Cache, Assets)
+
 
 ## 🚀 Démarrage Rapide
 
