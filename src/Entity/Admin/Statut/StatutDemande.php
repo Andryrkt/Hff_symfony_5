@@ -2,6 +2,7 @@
 
 namespace App\Entity\Admin\Statut;
 
+use App\Entity\Hf\Materiel\Casier\Casier;
 use App\Entity\Hf\Rh\Dom\Dom;
 use App\Entity\Traits\TimestampableTrait;
 use App\Repository\Admin\Statut\StatutDemandeRepository;
@@ -44,10 +45,16 @@ class StatutDemande
      */
     private $doms;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Casier::class, mappedBy="statutDemande")
+     */
+    private $casiers;
+
 
     public function __construct()
     {
         $this->doms = new ArrayCollection();
+        $this->casiers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -115,6 +122,36 @@ class StatutDemande
             // set the owning side to null (unless already changed)
             if ($dom->getIdStatutDemande() === $this) {
                 $dom->setIdStatutDemande(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Casier>
+     */
+    public function getCasiers(): Collection
+    {
+        return $this->casiers;
+    }
+
+    public function addCasier(Casier $casier): self
+    {
+        if (!$this->casiers->contains($casier)) {
+            $this->casiers[] = $casier;
+            $casier->setStatutDemande($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCasier(Casier $casier): self
+    {
+        if ($this->casiers->removeElement($casier)) {
+            // set the owning side to null (unless already changed)
+            if ($casier->getStatutDemande() === $this) {
+                $casier->setStatutDemande(null);
             }
         }
 

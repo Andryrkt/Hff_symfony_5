@@ -2,6 +2,7 @@
 
 namespace App\Entity\Admin\AgenceService;
 
+use App\Entity\Hf\Materiel\Casier\Casier;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\Admin\AgenceService\AgenceRepository;
 use App\Entity\Traits\TimestampableTrait;
@@ -67,11 +68,17 @@ class Agence
      */
     private $services;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Casier::class, mappedBy="agence_rattacher")
+     */
+    private $casier;
+
     public function __construct()
     {
         $this->agenceServiceIriums = new ArrayCollection();
         $this->userAccesses = new ArrayCollection();
         $this->services = new ArrayCollection();
+        $this->casier = new ArrayCollection();
     }
 
     public function getCodeNom(string $separateur = ""): string
@@ -190,6 +197,36 @@ class Agence
         if ($this->services->removeElement($service)) {
             $service->removeAgence($this);
         }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CasierPhp>
+     */
+    public function getCasierPhps(): Collection
+    {
+        return $this->casier;
+    }
+
+    public function addCasierPhp(Casier $casier): self
+    {
+        if (!$this->casier->contains($casier)) {
+            $this->casier[] = $casier;
+            $casier->setAgenceRattacher($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCasierPhp(Casier $casier): self
+    {
+        if ($this->casier->removeElement($casier)) {
+            // set the owning side to null (unless already changed)
+            if ($casier->getAgenceRattacher() === $this) {
+                $casier->setAgenceRattacher(null);
+            }
+        }
+
         return $this;
     }
 }
