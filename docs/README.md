@@ -4,23 +4,27 @@ Bienvenue dans la documentation technique du projet HFF Intranet. Cette document
 
 ## 🧭 Table des Matières
 
--   **[Architecture du Projet](architecture.md)**
+-   **[Résumé du Projet](General/project_summary.md)**
+-   **[Architecture du Projet](Architecture/architecture.md)**
     -   Structure des dossiers
     -   Système de "Vignettes"
-    -   Choix technologiques
--   **[Base de Données & Modèle de Données](database.md)**
+    -   Nomenclature & Conventions
+-   **[Base de Données & Modèle de Données](Architecture/database.md)**
     -   DiagrammeEntité-Association (MCD simplifié)
     -   Logique `UserAccess` (Gestion fine des droits)
     -   Listes statiques (Agences, Services)
--   **[Sécurité & Authentification](security.md)**
+-   **[Parcours Utilisateur](Guides/user_journeys.md)**
+    -   Navigation Globale
+    -   Workflow Ordre de Mission
+-   **[Sécurité & Authentification](Security/security.md)**
     -   LDAP
     -   Voters & Permissions
     -   Rôles utilisateurs
--   **[Déploiement & Environnement](deployment.md)**
+-   **[Déploiement & Environnement](Architecture/deployment.md)**
     -   Configuration serveur
     -   Optimisation
     -   Commandes utiles
--   **[Guide de Dépannage (Troubleshooting)](troubleshooting.md)**
+-   **[Guide de Dépannage (Troubleshooting)](Guides/troubleshooting.md)**
     -   Erreurs courantes (404, Cache, Assets)
 
 

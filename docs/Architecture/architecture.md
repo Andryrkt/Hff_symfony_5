@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-Le projet est construit sur **Symfony 5.4** et utilise une architecture MVC classique.
+Le projet est construit sur **Symfony 5.4 (php7.4)**  et utilise une architecture MVC classique.
 Le frontend est géré via **Webpack Encore**, utilisant **Bootstrap 5** et **jQuery** pour l'interactivité.
 
 ## 📂 Structure des Dossiers
@@ -19,6 +19,12 @@ Voici les dossiers clés pour comprendre l'organisation du code :
 -   **`Repository/`** : Classes pour les requêtes SQL personnalisées (EntityRepository).
 -   **`Security/`** : Gestionnaire d'authentification (LDAP, UserProvider, Voter).
 -   **`Service/`** : Logique métier réutilisable (ex: Export Excel, Mailer).
+-   **`Constants/`** : Constantes globales et chaque entité possède ses propres constantes.
+-   **`Contract/`** : Interface contractuelle pour les services.
+-   **`Dto/`** : Data Transfer Object pour les données complexes.
+-   **`Factory/`** : pour l'initialisaion des objets complexes et hidration de l'entité.
+-   **`Form/`** : creation de formulaires pour les données.
+
 
 ### `templates/` (Frontend)
 
@@ -30,8 +36,31 @@ Voici les dossiers clés pour comprendre l'organisation du code :
 ### `assets/` (Frontend Sources)
 
 -   `app.js` / `app.css` : Points d'entrée principaux.
--   `controllers/` : Contrôleurs Stimulus (si utilisés).
+-   `controllers/` : Contrôleurs Stimulus qui permet de gerer les evenements.
 -   `js/` : Scripts personnalisés.
+
+## 📏 Nomenclature & Conventions
+
+Pour maintenir la cohérence du code, merci de respecter ces conventions :
+
+### Base de Données (Spécifique)
+Contrairement aux conventions Symfony standard (snake_case avec `_id`), ce projet utilise souvent le **camelCase** pour les colonnes de clés étrangères.
+-   **Standard** : `user_id`, `type_document_id`
+-   **Projet HFF** : `userId`, `typeDocumentId`, `sousTypeDocumentId`
+
+*Il est donc souvent nécessaire de spécifier manuellement le nom de la colonne dans les annotations Doctrine :*
+```php
+@ORM\JoinColumn(name="sousTypeDocumentId", referencedColumnName="id")
+```
+
+### Rutage & Contrôleurs
+-   **Routes** : snake_case, préfixées par le module. Ex: `/rh/mission/liste`.
+-   **Noms de route** : snake_case. Ex: `app_rh_mission_list`.
+-   **Contrôleurs** : PascalCase, suffixé par `Controller`. Ex: `MissionController`.
+
+### Variables & Code
+-   **PHP** : Respect des standards PSR-12 (camelCase pour variables/méthodes, PascalCase pour classes).
+-   **Twig** : snake_case pour les noms de fichiers (ex: `liste_mission.html.twig`).
 
 ## 🧩 Le Système de "Vignettes"
 
@@ -79,26 +108,5 @@ Pour ajouter un nouveau module (ex: "Transport") :
 4.  **Gérer les Droits**
     Si nécessaire, créer un `Voter` spécifique ou ajouter des règles dans `UserAccess` pour contrôler qui peut voir cette vignette.
 
-## 📏 Nomenclature & Conventions
 
-Pour maintenir la cohérence du code, merci de respecter ces conventions :
-
-### Base de Données (Spécifique)
-Contrairement aux conventions Symfony standard (snake_case avec `_id`), ce projet utilise souvent le **camelCase** pour les colonnes de clés étrangères.
--   **Standard** : `user_id`, `type_document_id`
--   **Projet HFF** : `userId`, `typeDocumentId`, `sousTypeDocumentId`
-
-*Il est donc souvent nécessaire de spécifier manuellement le nom de la colonne dans les annotations Doctrine :*
-```php
-@ORM\JoinColumn(name="sousTypeDocumentId", referencedColumnName="id")
-```
-
-### Rutage & Contrôleurs
--   **Routes** : snake_case, préfixées par le module. Ex: `/rh/mission/liste`.
--   **Noms de route** : snake_case. Ex: `app_rh_mission_list`.
--   **Contrôleurs** : PascalCase, suffixé par `Controller`. Ex: `MissionController`.
-
-### Variables & Code
--   **PHP** : Respect des standards PSR-12 (camelCase pour variables/méthodes, PascalCase pour classes).
--   **Twig** : snake_case pour les noms de fichiers (ex: `liste_mission.html.twig`).
 

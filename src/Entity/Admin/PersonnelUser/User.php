@@ -126,7 +126,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * Recuperation du service de l'utilisateur connecter
      *
-     * @return string|null
+     * @return ?Service
      */
     public function getServiceUser(): ?Service
     {

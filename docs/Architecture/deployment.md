@@ -2,10 +2,10 @@
 
 ## Prérequis Serveur
 
--   **OS** : Windows Server (IIS) ou Linux (Apache/Nginx).
+-   **OS** : Windows Server (IIS).
 -   **PHP** : 7.4 minimum.
--   **Base de données** : SQL Server 2019 ou Informix.
--   **Extensions PHP** : `intl`, `mbstring`, `pdo`, `pdo_sqlsrv` (ou driver approprié), `ldap`, `zip`.
+-   **Base de données** : SQL Server 2019 et Informix.
+-   **Extensions PHP** : `intl`, `mbstring`, `pdo`,`sqlsrv`,`pdo_sqlsrv`,`odbc`,`pdo_odbc`, `ldap`, `zip`.
 -   **Outils** : Composer, NodeJS, Git.
 
 ## Installation en Production
