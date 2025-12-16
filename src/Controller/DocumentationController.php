@@ -32,16 +32,21 @@ class DocumentationController extends AbstractController
             throw new NotFoundHttpException('Invalid page.');
         }
 
-        // Adjust for index/readme
-        if ($page === 'index') {
-            $page = 'README';
-        }
+        // Special case for root README
+        if ($page === 'project_readme') {
+            $filePath = dirname($this->docsDir) . '/README.md';
+        } else {
+            // Adjust for index/readme
+            if ($page === 'index') {
+                $page = 'README';
+            }
 
-        $filePath = $this->docsDir . '/' . $page . '.md';
+            $filePath = $this->docsDir . '/' . $page . '.md';
 
-        // Try without extension if failed
-        if (!file_exists($filePath)) {
-            $filePath = $this->docsDir . '/' . $page;
+            // Try without extension if failed
+            if (!file_exists($filePath)) {
+                $filePath = $this->docsDir . '/' . $page;
+            }
         }
 
         if (!file_exists($filePath)) {

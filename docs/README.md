@@ -23,4 +23,4 @@ Bienvenue dans la documentation technique du projet HFF Intranet. Cette document
 
 ## 🚀 Démarrage Rapide
 
-Pour installer le projet localement, voir le [README à la racine du projet](../README.md#%EF%B8%8F-installation).
+Pour installer le projet localement, voir le README à la racine du projet ([fichier README.md](project_readme.md)).
