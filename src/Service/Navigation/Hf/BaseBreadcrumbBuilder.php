@@ -51,7 +51,7 @@ class BaseBreadcrumbBuilder
     {
         return [
             ['label' => 'Nouvelle demande', 'route' => 'dom_first_form'],
-            ['label' => 'Consultation', 'route' => 'liste_dom_index']
+            ['label' => 'Consultation', 'route' => 'dom_liste_index']
         ];
     }
 
@@ -419,7 +419,7 @@ class BaseBreadcrumbBuilder
         ];
     }
 
-    protected function accueilSubmenu(): array
+    protected function hfSubmenu(): array
     {
         return array_filter([
             /** =============== Documentation ===================== */

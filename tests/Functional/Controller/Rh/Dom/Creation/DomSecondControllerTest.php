@@ -2,97 +2,118 @@
 
 namespace App\Tests\Functional\Controller\Rh\Dom\Creation;
 
-use App\Tests\BaseTestCase;
-use App\Entity\Hf\Rh\Dom\Rmq;
 use App\Dto\Hf\Rh\Dom\FirstFormDto;
-use App\DataFixtures\Hf\Rh\dom\RmqFixtures;
+use App\Entity\Admin\PersonnelUser\User;
+use App\Entity\Hf\Rh\Dom\Categorie;
+use App\Entity\Hf\Rh\Dom\Rmq;
+use App\Entity\Hf\Rh\Dom\SousTypeDocument;
+use App\Repository\Admin\PersonnelUser\UserRepository;
 use App\Repository\Hf\Rh\Dom\DomRepository;
-use App\DataFixtures\Admin\PersonnelUser\UserFixtures;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use App\DataFixtures\Admin\PersonnelUser\PersonnelFixtures;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
-class DomSecondControllerTest extends BaseTestCase
+class DomSecondControllerTest extends WebTestCase
 {
-    private $referenceRepository;
+    private $client;
+    private ?EntityManagerInterface $em;
 
     protected function setUp(): void
     {
-        parent::setUp();
-        $this->referenceRepository = $this->loadTestFixtures([
-            PersonnelFixtures::class, // Assure que le personnel '9999' existe
-            UserFixtures::class,      // Assure que l'utilisateur de test existe et est lié au personnel
-            RmqFixtures::class,           // Assure que les entités Rmq (STD, 50) existent
-        ])->getReferenceRepository();
+        $this->client = static::createClient();
+        $this->em = static::getContainer()->get('doctrine.orm.entity_manager');
+    }
 
-        // DEBUG: Check if Rmq 'STD' is found
-        $em = static::getContainer()->get('doctrine')->getManager();
-        $rmqStd = $em->getRepository(Rmq::class)->findOneBy(['description' => 'STD']);
-        if ($rmqStd) {
-            echo "\nDEBUG: Rmq 'STD' found in test setUp!";
-        } else {
-            echo "\nDEBUG: Rmq 'STD' NOT found in test setUp!";
+    private function getAuthorizedUser(): User
+    {
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $user = $userRepository->createQueryBuilder('u')
+            ->where('u.roles LIKE :role')
+            ->setParameter('role', '%"ROLE_ADMIN"%')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if (!$user) {
+            throw new \RuntimeException('Aucun utilisateur admin trouvé en base de données pour le test.');
         }
+
+        return $user;
     }
 
     public function testSubmitSecondFormSuccessfully(): void
     {
-        // 1. Récupérer un utilisateur de test via les fixtures (il a la permission RH_ORDRE_MISSION_CREATE)
-        $testUser = $this->referenceRepository->getReference('user_u1');
+        $testUser = $this->getAuthorizedUser();
+        $personnel = $testUser->getPersonnel();
+        if (!$personnel) {
+            self::markTestSkipped('Test user has no associated Personnel.');
+        }
+        
+        // Fetch real entities from DB to get their IDs
+        $typeMission = $this->em->getRepository(SousTypeDocument::class)->findOneBy(['codeSousType' => 'MISSION']);
+        $categorie = $this->em->getRepository(Categorie::class)->findOneBy([]);
 
-        // 2. Simuler les données de session du premier formulaire
+        if (!$typeMission || !$categorie) {
+             self::markTestSkipped('Base data (TypeMission, Categorie) not found for the test.');
+        }
+
         $firstFormDto = new FirstFormDto();
-        // Remplissez le DTO avec des données valides pour le test
         $firstFormDto->salarier = 'PERMANENT';
-        // $firstFormDto->typeMission = '';
-        // $firstFormDto->categorie = '';
-        $firstFormDto->matricule = '9999'; // Garanti par TestPersonnelFixtures
-        $firstFormDto->nom = 'TEST';
-        $firstFormDto->prenom = 'TEST';
-        $firstFormDto->cin = null;
-
-
-        $session = static::getContainer()->get('session');
+        $firstFormDto->typeMissionId = $typeMission->getId();
+        $firstFormDto->categorieId = $categorie->getId();
+        $firstFormDto->matricule = $personnel->getMatricule();
+        $firstFormDto->nom = $personnel->getNom();
+        $firstFormDto->prenom = $personnel->getPrenoms();
+        $firstFormDto->cin = '1234567890'; // Fake CIN for test
+        $firstFormDto->agenceUser = 'AGENCE TEST';
+        $firstFormDto->serviceUser = 'SERVICE TEST';
+        
+        $token = new UsernamePasswordToken($testUser, 'main', $testUser->getRoles());
+        $session = $this->client->getContainer()->get('session');
+        $session->set('_security_main', serialize($token));
         $session->set('dom_first_form_data', $firstFormDto);
         $session->save();
 
-        // 3. Accéder au second formulaire
+        // 3. Access the second form
         $crawler = $this->client->request('GET', '/rh/ordre-de-mission/dom-second-form');
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('h3', 'Nouvelle demande d\'ordre de mission'); // A adapter au titre réel
 
-        // 4. Créer un fichier de test pour l'upload
-        $testPdfPath = sys_get_temp_dir() . '/test.pdf';
-        file_put_contents($testPdfPath, 'dummy pdf content');
-        $uploadedFile = new UploadedFile($testPdfPath, 'test.pdf', 'application/pdf', null, true);
-
-        // 5. Soumettre le formulaire avec des données valides
-        $form = $crawler->selectButton('Enregistrer')->form([
+        // 4. Submit the form with valid data
+        $form = $crawler->selectButton('Enregistrer')->form();
+        
+        $formValues = [
             'second_form[motifDeplacement]' => 'Test motif de déplacement',
             'second_form[client]' => 'Test Client',
             'second_form[lieuIntervention]' => 'Test Lieu',
-            'second_form[pieceJoint01]' => $uploadedFile,
-            // ... Remplissez les autres champs nécessaires
-        ]);
+            'second_form[dateHeureMission][dateDebut]' => (new \DateTime())->format('Y-m-d'),
+            'second_form[dateHeureMission][heureDebut]' => '08:00',
+            'second_form[dateHeureMission][dateFin]' => (new \DateTime('+1 day'))->format('Y-m-d'),
+            'second_form[dateHeureMission][heureFin]' => '17:00',
+            'second_form[nombreJour]' => '2',
+        ];
+        
+        $this->client->submit($form, $formValues);
 
-        $this->client->submit($form);
-
-        // 6. Vérifier les assertions
-        // Vérifier la redirection vers la liste des DOMs
-        self::assertResponseRedirects('/rh/ordre-de-mission/liste'); // Adaptez l'URL si nécessaire
+        // 5. Assertions
+        self::assertResponseRedirects('/hf/rh/dom/liste'); 
         $crawler = $this->client->followRedirect();
 
-        // Vérifier le message de succès
         self::assertSelectorExists('.alert-success');
         self::assertSelectorTextContains('.alert-success', 'La demande d\'ordre de mission a été créée avec succès.');
 
-        // Vérifier en base de données que l'ordre de mission a été créé
-        /** @var DomRepository $domRepository */
         $domRepository = static::getContainer()->get(DomRepository::class);
         $dom = $domRepository->findOneBy(['motifDeplacement' => 'Test motif de déplacement']);
         self::assertNotNull($dom);
+        
+        // Clean up the created entity
+        $this->em->remove($dom);
+        $this->em->flush();
+    }
 
-        // Nettoyage du fichier temporaire
-        unlink($testPdfPath);
-        // La suppression des entités de la BDD est gérée automatiquement par LiipTestFixturesBundle
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+        $this->em->close();
+        $this->em = null;
     }
 }

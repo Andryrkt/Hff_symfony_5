@@ -1,6 +1,10 @@
 <?php
 
+<<<<<<< HEAD:tests/Security/LdapAuthenticatorTest.php
 namespace App\Tests\Security;
+=======
+namespace App\Tests\Unit\Security;
+>>>>>>> bfa66a2cbcd9094b19b5e06fd86634b1745eb2b1:tests/Unit/Security/LdapAuthenticatorTest.php
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Ldap\Entry;

@@ -23,23 +23,43 @@ final class DomBreadcrumbBuilder extends BaseBreadcrumbBuilder implements Breadc
 
     public function supports(string $context): bool
     {
-        return in_array($context, ['dom_first_form', 'dom_second_form', 'liste_dom_index']);
+        return in_array($context, [
+            'dom_first_form',
+            'dom_second_form',
+            'dom_liste_index',
+            'dom_duplication'
+        ]);
     }
 
     public function build(array $parameters = []): array
     {
-        $context = $parameters['context'] ?? 'liste_dom_index';
+        $context = $parameters['context'] ?? 'dom_liste_index';
+
+        $items = [];
+        $backConfig = [];
 
         switch ($context) {
             case 'dom_first_form':
-                return $this->buildFirstFormBreadcrumb();
+                $items = $this->buildFirstFormBreadcrumb();
+                break;
             case 'dom_second_form':
-                return $this->buildSecondFormBreadcrumb();
-            case 'liste_dom_index':
-                return $this->buildListeBreadcrumb();
+                $items = $this->buildSecondFormBreadcrumb();
+                break;
+            case 'dom_liste_index':
+                $items = $this->buildListeBreadcrumb();
+                break;
+            case 'dom_duplication':
+                $items = $this->buildDuplicationBreadcrumb($parameters['numeroOrdreMission'] ?? null);
+                break;
             default:
                 throw new \InvalidArgumentException("Unsupported product context: {$context}");
         }
+
+        // Récupérer la config du bouton retour
+        $backConfig = $this->breadcrumb->getBackConfig();
+
+        // Fusionner items et config pour le retour
+        return array_merge(['items' => $items], $backConfig);
     }
 
     private function buildBaseBreadcrumb(): BreadcrumbBuilder
@@ -47,7 +67,8 @@ final class DomBreadcrumbBuilder extends BaseBreadcrumbBuilder implements Breadc
 
         return $this->breadcrumb
             ->clear()
-            ->add('Accueil', 'app_home', [], $this->accueilSubmenu())
+            ->add('Accueil', 'home_index')
+            ->add('HFF', null, [], $this->hfSubmenu())
             ->add('RH', null, [], $this->rhSubmenu())
             ->add('Ordre de mission', null, [], $this->domSubmenu())
         ;
@@ -57,6 +78,7 @@ final class DomBreadcrumbBuilder extends BaseBreadcrumbBuilder implements Breadc
     {
         return $this->buildBaseBreadcrumb()
             ->add("Création d'ordre de mission - Étape 1")
+            ->setBackRoute('home_index')
             ->get();
     }
 
@@ -64,6 +86,7 @@ final class DomBreadcrumbBuilder extends BaseBreadcrumbBuilder implements Breadc
     {
         return $this->buildBaseBreadcrumb()
             ->add("Création d'ordre de mission -Étape 2")
+            ->setBackRoute('dom_first_form')
             ->get();
     }
 
@@ -71,6 +94,15 @@ final class DomBreadcrumbBuilder extends BaseBreadcrumbBuilder implements Breadc
     {
         return $this->buildBaseBreadcrumb()
             ->add("Liste de consultation de demande d'ordre de mission")
+            ->setBackRoute('home_index')
+            ->get();
+    }
+
+    private function buildDuplicationBreadcrumb($numeroOrdreMission): array
+    {
+        return $this->buildBaseBreadcrumb()
+            ->add("Duplication d'ordre de mission n° {$numeroOrdreMission}")
+            ->setBackRoute('dom_liste_index')
             ->get();
     }
 }

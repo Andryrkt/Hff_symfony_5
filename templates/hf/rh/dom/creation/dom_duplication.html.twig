@@ -1,0 +1,38 @@
+{% extends "base.html.twig" %}
+
+{% block title %}
+	Création DOM - 2
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+
+{% endblock %}
+
+
+{% block content %}
+	<div class="container-fluid">
+		{% include 'partials/flash_messages.html.twig' %}
+	</div>
+
+	<div class="container mt-6 mb-4" id="agence-service-data" data-agences="{{ agencesJson|e('html_attr') }}" data-controller="second-form">
+		<div class="card p-2">
+			<div class="card-body">
+				<div class="row">
+					<div class="col-12 col-md-1">
+						<div class="tablinks p-2 btn btn-outline-warning ">
+							<a href="{{ path("dom_first_form")}}" style="text-decoration: none;color:black; font-weight: bold;">Retour</a>
+						</div>
+					</div>
+				</div>
+				{% include "hf/rh/dom/creation/_second_formulaire.html.twig" with {'form' : form} %}
+			</div>
+		</div>
+	</div>
+
+{% endblock %}
+
+
+{% block javascripts %}
+	{{ parent() }}
+{% endblock %}

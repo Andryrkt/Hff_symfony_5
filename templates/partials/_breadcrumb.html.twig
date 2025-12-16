@@ -1,49 +1,70 @@
 {% macro render_submenu(items, parent_id) %}
-    {% from _self import render_submenu %}
-    {% for item in items %}
-        {% set has_submenu = item.submenu is defined and item.submenu|length > 0 %}
-        {% set item_id = parent_id ~ '-' ~ loop.index %}
-        <li class="{% if has_submenu %}dropend{% endif %}">
-            <a class="dropdown-item {% if has_submenu %}dropdown-toggle{% endif %}" href="{{ item.url|default('#') }}"
-               id="dropdown-{{ item_id }}"
-               {% if has_submenu %}data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"{% endif %}>
-                {% if item.icon is defined %}<i class="{{ item.icon }} me-1"></i>{% endif %}{{ item.label }}
-            </a>
-            {% if has_submenu %}
-                <ul class="dropdown-menu" aria-labelledby="dropdown-{{ item_id }}">
-                    {{ render_submenu(item.submenu, item_id) }}
-                </ul>
-            {% endif %}
-        </li>
-    {% endfor %}
+	{% from _self import render_submenu %}
+	{% for item in items %}
+		{% set has_submenu = item.submenu is defined and item.submenu|length > 0 %}
+		{% set item_id = parent_id ~ '-' ~ loop.index %}
+		<li class="{% if has_submenu %}dropend{% endif %}">
+			<a class="dropdown-item {% if has_submenu %}dropdown-toggle{% endif %}" href="{{ item.url|default('#') }}" id="dropdown-{{ item_id }}" {% if has_submenu %} data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {% endif %}>
+				{% if item.icon is defined %}
+					<i class="{{ item.icon }} me-1"></i>
+				{% endif %}
+				{{ item.label }}
+			</a>
+			{% if has_submenu %}
+				<ul class="dropdown-menu" aria-labelledby="dropdown-{{ item_id }}">
+					{{ render_submenu(item.submenu, item_id) }}
+				</ul>
+			{% endif %}
+		</li>
+	{% endfor %}
 {% endmacro %}
 
-<nav aria-label="breadcrumb" class="mb-3 position-relative">
-    <ol class="breadcrumb bg-light p-2 rounded shadow-sm mb-0">
-        {% from _self import render_submenu %}
-        {% for item in breadcrumb %}
-            {% set has_submenu = item.submenu is defined and item.submenu|length > 0 %}
-            {% set item_id = 'breadcrumb-' ~ loop.index %}
-            <li class="breadcrumb-item{% if loop.last and not has_submenu %} active{% endif %}{% if has_submenu %} dropdown{% endif %}" {% if loop.last and not has_submenu %}aria-current="page"{% endif %}>
 
-                {% if item.url and (not loop.last or has_submenu) %}
-                     <a class="text-decoration-none text-primary {% if has_submenu %}dropdown-toggle{% endif %}" href="{{ item.url }}"
-                       id="dropdown-{{ item_id }}"
-                       {% if has_submenu %}role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"{% endif %}>
-                        {% if item.icon is defined %}<i class="{{ item.icon }} me-1"></i>{% endif %}{{ item.label }}
-                    </a>
-                {% else %}
-                    <span class="{{ loop.last ? 'text-dark fw-semibold' : 'text-secondary' }}">
-                        {% if item.icon is defined %}<i class="{{ item.icon }} me-1"></i>{% endif %}{{ item.label }}
-                    </span>
-                {% endif %}
+<nav aria-label="breadcrumb" class="mb-3 position-relative d-flex align-items-center gap-2">
+	{% set items = breadcrumb.items is defined ? breadcrumb.items : breadcrumb %}
+	{% set back_route = breadcrumb.back_route is defined ? breadcrumb.back_route : (back_route|default(null)) %}
+	{% set back_route_params = breadcrumb.back_route_params is defined ? breadcrumb.back_route_params : (back_route_params|default({})) %}
 
-                {% if has_submenu %}
-                    <ul class="dropdown-menu" aria-labelledby="dropdown-{{ item_id }}">
-                        {{ render_submenu(item.submenu, item_id) }}
-                    </ul>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ol>
+	{% if back_route %}
+		<a href="{{ path(back_route, back_route_params) }}" class="btn btn-outline-secondary btn-sm d-flex align-items-center" title="Retour à la page précédente">
+			<i class="fa-solid fa-arrow-left"></i>
+			<span class="d-none d-md-inline">Retour</span>
+		</a>
+	{% else %}
+		<button type="button" class="btn btn-outline-secondary btn-sm d-flex align-items-center" onclick="window.history.back()" title="Retour à la page précédente">
+			<i class="fa-solid fa-arrow-left"></i>
+			<span class="d-none d-md-inline">Retour</span>
+		</button>
+	{% endif %}
+	<ol class="breadcrumb bg-light p-2 rounded shadow-sm mb-0 flex-grow-1">
+		{% from _self import render_submenu %}
+		{% for item in items %}
+			{% set has_submenu = item.submenu is defined and item.submenu|length > 0 %}
+			{% set item_id = 'breadcrumb-' ~ loop.index %}
+			<li class="breadcrumb-item{% if loop.last and not has_submenu %} active{% endif %}{% if has_submenu %} dropdown{% endif %}" {% if loop.last and not has_submenu %} aria-current="page" {% endif %}>
+
+				{% if item.url and (not loop.last or has_submenu) %}
+					<a class="text-decoration-none text-primary {% if has_submenu %}dropdown-toggle{% endif %}" href="{{ item.url }}" id="dropdown-{{ item_id }}" {% if has_submenu %} role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" {% endif %}>
+						{% if item.icon is defined %}
+							<i class="{{ item.icon }} me-1"></i>
+						{% endif %}
+						{{ item.label }}
+					</a>
+				{% else %}
+					<span class="{{ loop.last ? 'text-dark fw-semibold' : 'text-secondary' }}">
+						{% if item.icon is defined %}
+							<i class="{{ item.icon }} me-1"></i>
+						{% endif %}
+						{{ item.label }}
+					</span>
+				{% endif %}
+
+				{% if has_submenu %}
+					<ul class="dropdown-menu" aria-labelledby="dropdown-{{ item_id }}">
+						{{ render_submenu(item.submenu, item_id) }}
+					</ul>
+				{% endif %}
+			</li>
+		{% endfor %}
+	</ol>
 </nav>

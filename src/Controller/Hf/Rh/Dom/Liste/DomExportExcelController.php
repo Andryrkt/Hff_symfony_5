@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 /**
  * Contrôleur d'export Excel pour les DOM (Demandes d'Ordre de Mission)
  * 
- * @Route("/rh/ordre-de-mission")
+ * @Route("/hf/rh/ordre-de-mission")
  */
 final class DomExportExcelController extends AbstractExcelExportController
 {

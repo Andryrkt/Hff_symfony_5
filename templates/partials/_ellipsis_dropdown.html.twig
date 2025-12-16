@@ -1,0 +1,30 @@
+<div class="custom-dropdown">
+	<button class="btn custom-dropdown-toggle {{ button_class|default('trois-points-vertical') }}" type="button" id="dropdownMenuButton-{{ id|default('default') }}" aria-expanded="false">
+		{% if icon is defined %}
+			<i class="{{ icon }}"></i>
+		{% else %}
+			{{ button_text|default('') }}
+		{% endif %}
+	</button>
+	<ul class="custom-dropdown-menu custom-dropdown-menu-end" aria-labelledby="dropdownMenuButton-{{ id|default('default') }}">
+		{% for item in items %}
+			<li>
+				{% if item.route is defined %}
+					<a class="custom-dropdown-item {{ item.class|default('fw-bold') }}" href="{{ path(item.route, item.route_params|default({})) }}">
+						{{ item.label }}
+					</a>
+				{% elseif item.url is defined %}
+					<a class="custom-dropdown-item {{ item.class|default('fw-bold') }}" href="{{ item.url }}">
+						{{ item.label }}
+					</a>
+				{% elseif item.type == 'divider' %}
+					<hr class="dropdown-divider">
+				{% elseif item.type == 'button' %}
+					<button class="custom-dropdown-item {{ item.class|default('fw-bold') }}" data-action="{{ item.action|default('') }}" {{ item.attributes|default('')|raw }}>
+						{{ item.label }}
+					</button>
+				{% endif %}
+			</li>
+		{% endfor %}
+	</ul>
+</div>

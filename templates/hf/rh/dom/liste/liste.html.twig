@@ -66,18 +66,21 @@
 					<tr>
 						{# Début Action #}
 						<td style="padding: 0px;" class="align-middle">
-							<div class="dropdown">
-								<button class="btn  dropdown-toggle trois-points-vertical" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-									<i class="fas fa-ellipsis-vertical"></i>
-								</button>
-
-								<ul class="dropdown-menu dropdown-menu-end" id="dropdown-menu" aria-labelledby="dropdownMenuButton" style="">
-									<li>
-										<a class="dropdown-item fw-bold" href="#">Trop perçu</a>
-									</li>
-								</ul>
-
-							</div>
+							{{ include('partials/_ellipsis_dropdown.html.twig', {
+									id: 'mission-actions',
+									icon: 'fas fa-ellipsis-vertical',
+									items: [
+										{
+											label: 'Duplication',
+											route: 'dom_duplication',
+											route_params: {'numeroOrdreMission': item.numeroOrdreMission}
+										},
+										{
+											label: 'Trop perçu',
+											url: '#'
+										}
+									]
+								}) }}
 						</td>
 						{# Fin Actions #}
 
@@ -86,7 +89,7 @@
 						{# <<<===== FIN Statut ==== #}
 						<td>{{ item.sousTypeDocument.codeSousType }}</td>
 						<td>
-							<a href="#" target="_blank">
+							<a href="{{ path('dom_detail', {'numeroOrdreMission': item.numeroOrdreMission}) }}" target="_blank">
 								{{ item.numeroOrdreMission }}
 							</a>
 						</td>

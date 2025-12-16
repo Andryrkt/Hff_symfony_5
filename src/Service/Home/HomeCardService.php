@@ -103,7 +103,7 @@ class HomeCardService
                     'icon' => 'fas fa-tags',
                     'children' => [
                         ['label' => 'Nouvelle demande', 'route' => 'dom_first_form', 'icon' => 'fas fa-search'],
-                        ['label' => 'Consultation', 'route' => 'liste_dom_index', 'icon' => 'fas fa-plus'],
+                        ['label' => 'Consultation', 'route' => 'dom_liste_index', 'icon' => 'fas fa-plus'],
                     ]
                 ],
                 [
