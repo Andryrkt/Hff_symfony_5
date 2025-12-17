@@ -65,6 +65,7 @@ class DatabaseInformix implements DatabaseConnectionInterface
 
     /**
      * Méthode pour récupérer les résultats d'une requête
+     * sous forme d'un tableau associatif
      *  */
     public function fetchResults($result)
     {
@@ -75,6 +76,22 @@ class DatabaseInformix implements DatabaseConnectionInterface
             }
         }
         return $rows;
+    }
+
+    /**
+     * Méthode pour récupérer les résultats d'une requête
+     * sous forme d'une seul tableau associatif
+     */
+    public function fetchScalarResults($result)
+    {
+        if ($result) {
+            // Récupérer la première ligne
+            $row = odbc_fetch_array($result);
+            if ($row !== false) {
+                return $row; // Retourne directement le tableau associatif
+            }
+        }
+        return []; // Tableau vide si pas de résultat
     }
 
     /**

@@ -99,7 +99,7 @@ final class CasierModel
             ";
 
             $result = $this->databaseInformix->executeQuery($statement);
-            $rows = $this->databaseInformix->fetchResults($result);
+            $rows = $this->databaseInformix->fetchScalarResults($result);
 
             return $rows;
         } finally {

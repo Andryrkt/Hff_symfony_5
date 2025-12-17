@@ -32,17 +32,46 @@ class SecondFormDto
     public string $dateAchat;
 
 
-    public string $nom;
+    public ?\DateTime $dateDemande = null;
 
-    public string $numero;
+    public string $nom; //casier du materiel
 
-    public Agence $agence_rattacher;
+    public string $numeroCasier; // numero de casier de creation
+
+    public Agence $agenceRattacher;
 
     public StatutDemande $statutDemande;
 
+    /**
+     * @Assert\NotBlank(message="Le chantier ne peut pas être vide.")
+     * @Assert\Length(
+     *      min=3,
+     *      max=8,
+     *      minMessage="Le chantier doit comporter au moins {{ limit }} caractères",
+     *      maxMessage="Le chantier ne peut pas dépasser {{ limit }} caractères"
+     * )
+     */
     public string $chantier;
 
+    /**
+     * @Assert\NotBlank(message="Le client ne peut pas être vide.")
+     * @Assert\Length(
+     *      min=3,
+     *      max=8,
+     *      minMessage="Le client doit comporter au moins {{ limit }} caractères",
+     *      maxMessage="Le client ne peut pas dépasser {{ limit }} caractères"
+     * )
+     */
     public string $client;
 
+    /**
+     * @Assert\NotBlank(message="Le motif ne peut pas être vide.")
+     * @Assert\Length(
+     *      min=3,
+     *      max=100,
+     *      minMessage="Le motif doit comporter au moins {{ limit }} caractères",
+     *      maxMessage="Le motif ne peut pas dépasser {{ limit }} caractères"
+     * )
+     */
     public string $motif;
 }

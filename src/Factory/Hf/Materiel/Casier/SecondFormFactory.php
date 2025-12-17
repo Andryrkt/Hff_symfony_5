@@ -36,13 +36,12 @@ class SecondFormFactory
             throw new \RuntimeException('User not authenticated');
         }
 
-        $dto->agenceUser = $user->getAgenceUser()->getCode() . '-' . $user->getAgenceUser()->getNom();
-        $dto->serviceUser = $user->getServiceUser()->getCode() . '-' . $user->getServiceUser()->getNom();
+        $dto->dateDemande = new \DateTime();
         $dto->designation = $caracteristiqueMateriel['designation'];
         $dto->idMateriel = $caracteristiqueMateriel['num_matricule'];
         $dto->numParc = $caracteristiqueMateriel['num_parc'];
         $dto->numSerie = $caracteristiqueMateriel['num_serie'];
-        $dto->groupe = $caracteristiqueMateriel['groupe'];
+        $dto->groupe = $caracteristiqueMateriel['famille'];
         $dto->constructeur = $caracteristiqueMateriel['constructeur'];
         $dto->modele = $caracteristiqueMateriel['modele'];
         $dto->anneeDuModele = $caracteristiqueMateriel['annee_du_modele'];

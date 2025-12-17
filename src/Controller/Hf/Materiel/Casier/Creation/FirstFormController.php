@@ -6,7 +6,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormInterface;
 use App\Model\Hf\Materiel\Casier\CasierModel;
 use Symfony\Component\HttpFoundation\Request;
-use App\Form\Hf\Materiel\Casier\FirstFormType;
+use App\Form\Hf\Materiel\Casier\Creation\FirstFormType;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Factory\Hf\Materiel\Casier\FirstFormFactory;
 use Symfony\Component\HttpFoundation\RedirectResponse;
