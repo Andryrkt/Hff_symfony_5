@@ -9,9 +9,9 @@ class FirstFormDto
 
     public string $serviceUser;
 
-    public int $idMateriel;
+    public ?int $idMateriel = null;
 
-    public int $numParc;
+    public ?string $numParc = null;
 
-    public string $numSerie;
+    public ?string $numSerie = null;
 }

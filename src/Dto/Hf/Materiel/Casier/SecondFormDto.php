@@ -7,17 +7,11 @@ use App\Entity\Admin\Statut\StatutDemande;
 
 class SecondFormDto
 {
-    public string $nom;
-
-    public string $numero;
-
-    public Agence $agence_rattacher;
-
-    public StatutDemande $statutDemande;
-
     public string $agenceUser;
 
     public string $serviceUser;
+
+    public string $designation = "";
 
     public int $idMateriel;
 
@@ -25,19 +19,26 @@ class SecondFormDto
 
     public string $numSerie;
 
+    public string $groupe;
+
     public string $constructeur = "";
 
-    public string $designation = "";
-
     public string $modele = "";
-
-    public string $groupe;
 
     public string $anneeDuModele;
 
     public string $affectation;
 
     public string $dateAchat;
+
+
+    public string $nom;
+
+    public string $numero;
+
+    public Agence $agence_rattacher;
+
+    public StatutDemande $statutDemande;
 
     public string $chantier;
 
