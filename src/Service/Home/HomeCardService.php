@@ -144,7 +144,7 @@ class HomeCardService
                     'label' => 'Casier',
                     'icon' => 'fas fa-tags',
                     'children' => [
-                        ['label' => 'Nouvelle demande', 'route' => '#', 'icon' => 'fas fa-search'],
+                        ['label' => 'Nouvelle demande', 'route' => 'hf_materiel_casier_first_form_index', 'icon' => 'fas fa-search'],
                         ['label' => 'Consultation', 'route' => '#', 'icon' => 'fas fa-plus'],
                     ]
                 ],
