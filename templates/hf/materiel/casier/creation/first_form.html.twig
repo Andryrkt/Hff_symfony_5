@@ -20,10 +20,10 @@
 						{{ form_row(form.serviceUser)}}
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-12 col-md-4">{{ form_row(form.idMateriel)}}</div>
-					<div class="col-12 col-md-4">{{ form_row(form.numParc)}}</div>
-					<div class="col-12 col-md-4">{{ form_row(form.numSerie)}}</div>
+				<div class="row" data-controller="casier-first-form">
+					<div class="col-12 col-md-4" data-controller="number-only character-limiter" data-character-limiter-max-length-value="5">{{ form_row(form.idMateriel, { 'attr': { 'data-number-only-target': 'input', 'data-character-limiter-target': 'input', 'data-casier-first-form-target': 'idMateriel', 'data-action': 'input->number-only#filter input->character-limiter#limiterCaracteres input->casier-first-form#validateFields'}})}}</div>
+					<div class="col-12 col-md-4">{{ form_row(form.numParc, { 'attr': { 'data-casier-first-form-target': 'numParc', 'data-action': 'input->casier-first-form#validateFields'}})}}</div>
+					<div class="col-12 col-md-4">{{ form_row(form.numSerie, { 'attr': { 'data-casier-first-form-target': 'numSerie', 'data-action': 'input->casier-first-form#validateFields'}})}}</div>
 				</div>
 				<div class="row">
 					<div class="d-flex justify-content-end mt-2">
