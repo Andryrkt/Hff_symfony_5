@@ -23,6 +23,7 @@ export class StimulusAutoloader {
             { name: 'tom-select', import: () => import('@controllers/components/tom_select_controller') },
             { name: 'character-limiter', import: () => import('@controllers/components/character_limiter_controller') },
             { name: 'number-only', import: () => import('@controllers/components/number_only_controller') },
+            { name: 'form-confirmation', import: () => import('@controllers/components/form_confirmation_controller') },
         ];
 
         // Contrôleurs de page - chargés à la demande (lazy loading)

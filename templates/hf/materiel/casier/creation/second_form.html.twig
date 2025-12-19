@@ -21,7 +21,7 @@
 		<div class="row"></div>
 
 
-		{{ form_start(form)}}
+		{{ form_start(form, {'attr': {'id': 'casier-second-form'}})}}
 
 
 		<div class="row">
@@ -78,7 +78,7 @@
 		<div class="row">
 			<div class="d-flex justify-content-end mt-2">
 				{% import "macros/actions.html.twig" as actions %}
-				{{ actions.submit_button('Enregistrer', 'fa fa-print', 'btn-warning', true) }}
+				{{ actions.submit_button('Enregistrer', 'fa fa-print', 'btn-warning', true, 'Confirmez-vous la création de ce casier matériel ?', 'Veuillez ne pas quitter la page pendant la création du casier.', 'Création du casier matériel') }}
 			</div>
 		</div>
 		{{ form_end(form) }}
