@@ -183,14 +183,17 @@ class SecondFormType extends AbstractType
             )
             ->add(
                 'dateAchat',
-                TextType::class,
+                DateTimeType::class,
                 [
-                    'label' => 'Date d’achat ',
+                    'label' => 'Date d’achat',
                     'mapped' => false,
+                    'widget' => 'single_text', // Utilisez le widget single_text pour une meilleure compatibilité
+                    'html5' => false, // Désactivez l'HTML5 si vous souhaitez un format spécifique
+                    'format' => 'dd/MM/yyyy',
                     'attr' => [
                         'disabled' => true
                     ],
-                    'data' => $options["data"]->dateAchat
+                    'data' => \DateTime::createFromFormat('Y-m-d', $options["data"]->dateAchat)
                 ]
             )
         ;

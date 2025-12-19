@@ -21,6 +21,8 @@ export class StimulusAutoloader {
             { name: 'navigation', import: () => import('@controllers/components/navigation_controller') },
             { name: 'clickable', import: () => import('@controllers/components/inline_edit_controller') },
             { name: 'tom-select', import: () => import('@controllers/components/tom_select_controller') },
+            { name: 'character-limiter', import: () => import('@controllers/components/character_limiter_controller') },
+            { name: 'number-only', import: () => import('@controllers/components/number_only_controller') },
         ];
 
         // Contrôleurs de page - chargés à la demande (lazy loading)
@@ -32,6 +34,10 @@ export class StimulusAutoloader {
             { name: 'first-form', import: () => import('@controllers/pages/hf/rh/dom/first_form_controller') },
             { name: 'second-form', import: () => import('@controllers/pages/hf/rh/dom/second_form_controller') },
             { name: 'dom-liste', import: () => import('@controllers/pages/hf/rh/dom/dom_liste_controller') },
+
+            // Casier
+            { name: 'casier-first-form', import: () => import('@controllers/pages/hf/materiel/casier/casier_first_form_controller') },
+
 
             // Admin
             { name: 'user-roles', import: () => import('@controllers/pages/admin/user_roles_controller') },

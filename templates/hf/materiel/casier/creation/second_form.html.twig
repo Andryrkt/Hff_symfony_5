@@ -56,12 +56,22 @@
 			<div class="col-12 col-md-6 col-lg-4">{{form_row(form.agenceRattacher)}}</div>
 		</div>
 		<div class="row">
-			<div class="col-12">{{ form_row(form.motif)}}</div>
-
+			<div class="col-12" data-controller="character-limiter" data-character-limiter-max-length-value="100">
+				{{ form_row(form.motif, {
+                    'attr': {
+                        'data-character-limiter-target': 'input', 
+                        'data-action': 'input->character-limiter#limiterCaracteres'
+                    }
+                })}}
+			</div>
 		</div>
 		<div class="row">
-			<div class="col-12 col-md-6">{{ form_row(form.client, { 'attr': { 'class': 'limiteCarater'}})}}</div>
-			<div class="col-12 col-md-6">{{ form_row(form.chantier, { 'attr': { 'class': 'limiteCarater'}})}}</div>
+			<div class="col-12 col-md-6" data-controller="character-limiter" data-character-limiter-max-length-value="8">
+				{{ form_row(form.client, { 'attr': { 'data-character-limiter-target': 'input', 'data-action': 'input->character-limiter#limiterCaracteres'}})}}
+			</div>
+			<div class="col-12 col-md-6" data-controller="character-limiter" data-character-limiter-max-length-value="8">
+				{{ form_row(form.chantier, { 'attr': { 'data-character-limiter-target': 'input', 'data-action': 'input->character-limiter#limiterCaracteres'}})}}
+			</div>
 		</div>
 
 
