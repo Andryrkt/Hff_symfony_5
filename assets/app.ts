@@ -17,6 +17,8 @@ import "./styles/app.scss";
 import "select2";
 import "select2/dist/css/select2.css";
 import "select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css";
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 
 // Import des utilitaires
 import { ChronometerManager } from "./js/utils/chronometer";
@@ -36,6 +38,10 @@ class App {
 
     constructor() {
         this.application = Application.start();
+
+        // Rendre SweetAlert2 disponible globalement
+        window.Swal = Swal;
+
         this.init();
     }
 
@@ -137,6 +143,7 @@ declare global {
         appInstance: any;
         $: any;
         Turbo: any;
+        Swal: typeof import('sweetalert2').default;
     }
 }
 

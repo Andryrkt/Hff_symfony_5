@@ -34,13 +34,14 @@ class SecondFormController extends AbstractController
 
         // 5. creation du formulaire
         $form = $this->createForm(SecondFormType::class, $secondFormDto);
-        // $form->handleRequest($request);
+        $form->handleRequest($request);
 
-        // if ($form->isSubmitted() && $form->isValid()) {
-        //     $casierModel->create($form->getData());
-        //     $this->addFlash('success', 'Casier créé avec succès.');
-        //     return $this->redirectToRoute('hf_materiel_casier_index');
-        // }
+        if ($form->isSubmitted() && $form->isValid()) {
+            dd($form->getData());
+            // $casierModel->create($form->getData());
+            // $this->addFlash('success', 'Casier créé avec succès.');
+            // return $this->redirectToRoute('hf_materiel_casier_index');
+        }
         return $this->render('hf/materiel/casier/creation/second_form.html.twig', [
             'form' => $form->createView(),
         ]);

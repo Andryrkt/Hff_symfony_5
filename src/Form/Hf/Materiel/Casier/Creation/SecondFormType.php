@@ -36,7 +36,7 @@ class SecondFormType extends AbstractType
                 'agenceRattacher',
                 EntityType::class,
                 [
-                    'label' => 'Agence rattacher',
+                    'label' => 'Agence rattacher *',
                     'placeholder' => '-- Choisir une agence  --',
                     'class' => Agence::class,
                     'choice_label' => function (Agence $agence): string {
@@ -53,7 +53,7 @@ class SecondFormType extends AbstractType
                 'motif',
                 TextType::class,
                 [
-                    'label' => 'Motif de création',
+                    'label' => 'Motif de création *',
                     'required' => true
                 ]
             )
@@ -61,7 +61,7 @@ class SecondFormType extends AbstractType
                 'client',
                 TextType::class,
                 [
-                    'label' => 'Client',
+                    'label' => 'Client *',
                     'required' => true,
                 ]
             )
@@ -69,7 +69,7 @@ class SecondFormType extends AbstractType
                 'chantier',
                 TextType::class,
                 [
-                    'label' => 'Chantier',
+                    'label' => 'Chantier *',
                     'required' => true,
                 ]
             )
@@ -77,7 +77,7 @@ class SecondFormType extends AbstractType
                 'designation',
                 TextType::class,
                 [
-                    'label' => 'Désignation ',
+                    'label' => 'Désignation',
                     'mapped' => false,
                     'attr' => [
                         'disabled' => true
@@ -101,7 +101,7 @@ class SecondFormType extends AbstractType
                 'numSerie',
                 TextType::class,
                 [
-                    'label' => 'N° Série ',
+                    'label' => 'N° Série',
                     'mapped' => false,
                     'attr' => [
                         'disabled' => true
