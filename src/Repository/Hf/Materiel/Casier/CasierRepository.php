@@ -4,6 +4,7 @@ namespace App\Repository\Hf\Materiel\Casier;
 
 use App\Entity\Hf\Materiel\Casier\Casier;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -39,12 +40,26 @@ class CasierRepository extends ServiceEntityRepository
         }
     }
 
-    public function getPaginatedAndFiltered()
+    public function getCasiersTemporaire(array $criteria)
     {
         $queryBuilder = $this->createQueryBuilder('c')
             ->orderBy('c.numero', 'DESC');
 
+        $this->filtred($criteria, $queryBuilder);
+
         return $queryBuilder->getQuery()->getResult();
+    }
+
+    private function filtred(array $criteria, QueryBuilder $queryBuilder)
+    {
+        if ($criteria['agence'] !== null) {
+            $queryBuilder->andWhere('c.agenceRattacher = :agence')
+                ->setParameter('agence', $criteria['agence']->getId());
+        }
+        if ($criteria['casier'] !== null) {
+            $queryBuilder->andWhere('c.nom LIKE :casier')
+                ->setParameter('casier', '%' . $criteria['casier'] . '%');
+        }
     }
 
     //    /**
