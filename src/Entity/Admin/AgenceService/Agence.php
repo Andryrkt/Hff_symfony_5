@@ -69,7 +69,7 @@ class Agence
     private $services;
 
     /**
-     * @ORM\OneToMany(targetEntity=Casier::class, mappedBy="agence_rattacher")
+     * @ORM\OneToMany(targetEntity=Casier::class, mappedBy="agenceRattacher")
      */
     private $casier;
 

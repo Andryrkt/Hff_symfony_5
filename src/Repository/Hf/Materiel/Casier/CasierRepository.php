@@ -39,6 +39,14 @@ class CasierRepository extends ServiceEntityRepository
         }
     }
 
+    public function getPaginatedAndFiltered()
+    {
+        $queryBuilder = $this->createQueryBuilder('c')
+            ->orderBy('c.numero', 'DESC');
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
     //    /**
     //     * @return CasierPhp[] Returns an array of CasierPhp objects
     //     */

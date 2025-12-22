@@ -39,7 +39,7 @@ class Casier implements CreatedByInterface
     /**
      * @ORM\ManyToOne(targetEntity=Agence::class, inversedBy="casierPhps")
      */
-    private $agence_rattacher;
+    private $agenceRattacher;
 
     /**
      * @ORM\ManyToOne(targetEntity=StatutDemande::class, inversedBy="casiers")
@@ -77,12 +77,12 @@ class Casier implements CreatedByInterface
 
     public function getAgenceRattacher(): ?Agence
     {
-        return $this->agence_rattacher;
+        return $this->agenceRattacher;
     }
 
-    public function setAgenceRattacher(?Agence $agence_rattacher): self
+    public function setAgenceRattacher(?Agence $agenceRattacher): self
     {
-        $this->agence_rattacher = $agence_rattacher;
+        $this->agenceRattacher = $agenceRattacher;
 
         return $this;
     }

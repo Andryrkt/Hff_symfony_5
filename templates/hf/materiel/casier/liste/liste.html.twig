@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des Casiers - temporaire
+{% endblock %}
+
+{% block content %}
+	<div class="container">
+		{% include 'partials/flash_messages.html.twig' %}
+
+		{% include "hf/materiel/casier/liste/_formulaireRecherche.html.twig" with{
+			form : form
+		}%}
+	</div>
+
+
+	<div class="container">
+		<table class="table   table-shadow shadow  rounded " style="text-align: center;">
+			<thead class="table-dark">
+				<tr>
+					<th>Statut</th>
+					<th>Agence rattaché</th>
+					<th>Casier</th>
+					<th>Date de création</th>
+					<th>Numero Casier</th>
+
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody id="table-container">
+				{% for item in casiers %}
+					<tr>
+						<td>{{ item.statutDemande.description}}</td>
+						<td>{{item.agenceRattacher.code}}</td>
+						<td style="text-align:left">{{item.nom}}</td>
+						<td>{{item.dateCreation|date("d/m/Y")}}</td>
+						<td>{{item.numero}}</td>
+
+						<td>
+							<a href="#" class="btn  fw-bold mb-3" style="background-color: #0c5c0cff; color: white">Validé</a>
+						</td>
+
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+{% endblock %}
