@@ -15,7 +15,7 @@
 	</div>
 
 
-	<div class="container">
+	<div class="container" data-controller="pages--hf--materiel--casier--liste">
 		<table class="table   table-shadow shadow  rounded " style="text-align: center;">
 			<thead class="table-dark">
 				<tr>
@@ -38,7 +38,18 @@
 						<td>{{item.numero}}</td>
 
 						<td>
-							<a href="#" class="btn  fw-bold mb-3" style="background-color: #0c5c0cff; color: white">Validé</a>
+							{% if item.isValid %}
+								<button class="btn btn-sm btn-success fw-bold mb-3" disabled>Déjà Validé</button>
+							{% else %}
+								<a href="#"
+								   class="btn btn-sm fw-bold mb-3"
+								   data-action="click->pages--hf--materiel--casier--liste#validate"
+								   data-casier-nom="{{ item.nom }}"
+                                   data-validate-url="{{ path('api_casier_validate', {id: item.id}) }}"
+								   style="background-color: #0c5c0cff; color: white">
+									Validé
+								</a>
+							{% endif %}
 						</td>
 
 					</tr>

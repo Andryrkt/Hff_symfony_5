@@ -38,6 +38,7 @@ export class StimulusAutoloader {
 
             // Casier
             { name: 'casier-first-form', import: () => import('@controllers/pages/hf/materiel/casier/casier_first_form_controller') },
+            { name: 'pages--hf--materiel--casier--liste', import: () => import('@controllers/pages/hf/materiel/casier/liste_controller') },
 
 
             // Admin
