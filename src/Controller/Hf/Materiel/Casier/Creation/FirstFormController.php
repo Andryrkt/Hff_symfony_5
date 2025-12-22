@@ -6,10 +6,11 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormInterface;
 use App\Model\Hf\Materiel\Casier\CasierModel;
 use Symfony\Component\HttpFoundation\Request;
-use App\Form\Hf\Materiel\Casier\Creation\FirstFormType;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Factory\Hf\Materiel\Casier\FirstFormFactory;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use App\Form\Hf\Materiel\Casier\Creation\FirstFormType;
+use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use App\Service\Historique_operation\HistoriqueOperationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -30,8 +31,12 @@ class FirstFormController extends AbstractController
     /**
      * @Route("/", name="hf_materiel_casier_first_form_index")
      */
-    public function index(FirstFormFactory $casierFirstFormFactory, Request $request, CasierModel $casierModel)
-    {
+    public function index(
+        FirstFormFactory $casierFirstFormFactory,
+        Request $request,
+        CasierModel $casierModel,
+        ContextAwareBreadcrumbBuilder $breadcrumbBuilder
+    ) {
         // 1. gerer l'accés 
         $this->denyAccessUnlessGranted('MATERIEL_CASIER_CREATE');
 
@@ -51,6 +56,7 @@ class FirstFormController extends AbstractController
         // 5. rendu de la vue
         return $this->render('hf/materiel/casier/creation/first_form.html.twig', [
             'form' => $form->createView(),
+            'breadcrumbs' => $breadcrumbBuilder->build('hf_materiel_casier_first_form_index'),
         ]);
     }
 

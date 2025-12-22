@@ -47,6 +47,8 @@ class BaseBreadcrumbBuilder
         // Si l'utilisateur a accès, retourner le sous-menu complet
         return $submenu;
     }
+
+    /**>>>--------------  RH  -------------------*/
     protected function domSubmenu(): array
     {
         return [
@@ -108,6 +110,8 @@ class BaseBreadcrumbBuilder
             ]
         ];
     }
+    /**<<<--------------  RH  -------------------*/
+
 
     protected function comptaSubmenu(): array
     {
@@ -184,6 +188,15 @@ class BaseBreadcrumbBuilder
         ];
     }
 
+    /** >>>---------- MATERIEL ------------*/
+    protected function casierSubmenu(): array
+    {
+        return [
+            ['label' => 'Nouvelle demande', 'route' => 'hf_materiel_casier_first_form_index'],
+            ['label' => 'Consultation', 'route' => 'hf_materiel_casier_liste_index']
+        ];
+    }
+
     protected function materielSubmenu(): array
     {
         return [
@@ -201,8 +214,8 @@ class BaseBreadcrumbBuilder
                 'label' => 'Casier',
                 'route' => null,
                 'submenu' => [
-                    ['label' => 'Nouvelle demande', 'route' => '#'],
-                    ['label' => 'Consultation', 'route' => '#']
+                    ['label' => 'Nouvelle demande', 'route' => 'hf_materiel_casier_first_form_index'],
+                    ['label' => 'Consultation', 'route' => 'hf_materiel_casier_liste_index']
                 ]
             ],
             // ======== Commandes matériel ========== 
@@ -218,6 +231,7 @@ class BaseBreadcrumbBuilder
         ];
     }
 
+    /** <<<---------- MATERIEL ------------*/
     protected function atelierSubmenu(): array
     {
         return [

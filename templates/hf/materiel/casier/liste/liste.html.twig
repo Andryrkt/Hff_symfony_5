@@ -28,7 +28,9 @@
 					<th>Date de création</th>
 					<th>Numero Casier</th>
 
-					<th>Action</th>
+					{% if is_granted('ROLE_ADMIN') or is_granted('MATERIEL_CASIER_VALIDATION') %}
+						<th>Action</th>
+					{% endif %}
 				</tr>
 			</thead>
 			<tbody id="table-container">
@@ -40,15 +42,17 @@
 						<td>{{item.dateCreation|date("d/m/Y")}}</td>
 						<td>{{item.numero}}</td>
 
-						<td>
-							{% if item.isValid %}
-								<button class="btn btn-sm btn-success fw-bold mb-3" disabled>Déjà Validé</button>
-							{% else %}
-								<a href="#" class="btn btn-sm fw-bold mb-3" data-action="click->pages--hf--materiel--casier--liste#validate" data-casier-nom="{{ item.nom }}" data-validate-url="{{ path('api_casier_validate', {id: item.id}) }}" style="background-color: #0c5c0cff; color: white">
-									Validé
-								</a>
-							{% endif %}
-						</td>
+						{% if is_granted('ROLE_ADMIN') or is_granted('MATERIEL_CASIER_VALIDATION') %}
+							<td>
+								{% if item.isValid %}
+									<button class="btn btn-sm btn-success fw-bold mb-3" disabled>Déjà Validé</button>
+								{% else %}
+									<a href="#" class="btn btn-sm fw-bold mb-3" data-action="click->pages--hf--materiel--casier--liste#validate" data-casier-nom="{{ item.nom }}" data-validate-url="{{ path('api_casier_validate', {id: item.id}) }}" style="background-color: #0c5c0cff; color: white">
+										Validé
+									</a>
+								{% endif %}
+							</td>
+						{% endif %}
 
 					</tr>
 				{% endfor %}

@@ -11,6 +11,7 @@ use App\Factory\Hf\Materiel\Casier\SecondFormFactory;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Form\Hf\Materiel\Casier\Creation\SecondFormType;
 use App\Service\Hf\Materiel\Casier\CasierCreationHandler;
+use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use App\Constants\Admin\Historisation\TypeDocumentConstants;
 use App\Constants\Admin\Historisation\TypeOperationConstants;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -39,8 +40,12 @@ class SecondFormController extends AbstractController
     /**
      * @Route("/second-form", name="hf_materiel_casier_second_form_index")
      */
-    public function index(Request $request, CasierModel $casierModel, SecondFormFactory $secondFormFactory)
-    {
+    public function index(
+        Request $request,
+        CasierModel $casierModel,
+        SecondFormFactory $secondFormFactory,
+        ContextAwareBreadcrumbBuilder $breadcrumbBuilder
+    ) {
         // 1. gerer l'accés 
         $this->denyAccessUnlessGranted('MATERIEL_CASIER_CREATE');
 
@@ -61,6 +66,7 @@ class SecondFormController extends AbstractController
 
         return $this->render('hf/materiel/casier/creation/second_form.html.twig', [
             'form' => $form->createView(),
+            'breadcrumbs' => $breadcrumbBuilder->build('hf_materiel_casier_second_form_index'),
         ]);
     }
 

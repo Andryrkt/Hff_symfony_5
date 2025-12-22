@@ -7,6 +7,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Form\Hf\Materiel\Casier\Liste\SearchType;
 use App\Constants\Hf\Materiel\Casier\ButtonsConstants;
 use App\Repository\Hf\Materiel\Casier\CasierRepository;
+use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
@@ -17,8 +18,11 @@ class ListeController extends AbstractController
     /**
      * @Route("/liste", name="hf_materiel_casier_liste_index")
      */
-    public function index(CasierRepository $casierRepository, Request $request)
-    {
+    public function index(
+        CasierRepository $casierRepository,
+        Request $request,
+        ContextAwareBreadcrumbBuilder $breadcrumbBuilder
+    ) {
         // 1. gerer l'accés
         $this->denyAccessUnlessGranted('MATERIEL_CASIER_VIEW');
 
@@ -39,6 +43,7 @@ class ListeController extends AbstractController
             'casiers' => $casiers,
             'form' => $form->createView(),
             'buttons' => ButtonsConstants::BUTTONS_ACTIONS,
+            'breadcrumbs' => $breadcrumbBuilder->build('hf_materiel_casier_liste_index'),
         ]);
     }
 }
