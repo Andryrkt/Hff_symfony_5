@@ -4,6 +4,7 @@ namespace App\Controller\Hf\Materiel\Casier\Liste;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Factory\Hf\Materiel\Casier\SearchFactory;
 use App\Form\Hf\Materiel\Casier\Liste\SearchType;
 use App\Constants\Hf\Materiel\Casier\ButtonsConstants;
 use App\Repository\Hf\Materiel\Casier\CasierRepository;
@@ -21,22 +22,23 @@ class ListeController extends AbstractController
     public function index(
         CasierRepository $casierRepository,
         Request $request,
-        ContextAwareBreadcrumbBuilder $breadcrumbBuilder
+        ContextAwareBreadcrumbBuilder $breadcrumbBuilder,
+        SearchFactory $searchFactory
     ) {
         // 1. gerer l'accés
         $this->denyAccessUnlessGranted('MATERIEL_CASIER_VIEW');
 
         // creation du formulaire de recherhce
-        $form = $this->createForm(SearchType::class);
+        $searchDto = $searchFactory->create();
+        $form = $this->createForm(SearchType::class, $searchDto);
 
         //traitement du formulaire
         $form->handleRequest($request);
-        $criteria = [];
         if ($form->isSubmitted() && $form->isValid()) {
-            $criteria = $form->getData();
+            $searchDto = $form->getData();
         }
         // recuperation des données
-        $casiers = $casierRepository->getCasiersTemporaire($criteria);
+        $casiers = $casierRepository->getCasiersTemporaire($searchDto);
 
 
         return $this->render('hf/materiel/casier/liste/liste.html.twig', [

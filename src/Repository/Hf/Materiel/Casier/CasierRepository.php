@@ -2,6 +2,7 @@
 
 namespace App\Repository\Hf\Materiel\Casier;
 
+use App\Dto\Hf\Materiel\Casier\SearchDto;
 use App\Entity\Hf\Materiel\Casier\Casier;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -40,25 +41,30 @@ class CasierRepository extends ServiceEntityRepository
         }
     }
 
-    public function getCasiersTemporaire(array $criteria)
+    public function getCasiersTemporaire(SearchDto $searchDto)
     {
         $queryBuilder = $this->createQueryBuilder('c')
             ->orderBy('c.numero', 'DESC');
 
-        $this->filtred($criteria, $queryBuilder);
+        $this->filtred($searchDto, $queryBuilder);
 
         return $queryBuilder->getQuery()->getResult();
     }
 
-    private function filtred(array $criteria, QueryBuilder $queryBuilder)
+    private function filtred(SearchDto $searchDto, QueryBuilder $queryBuilder)
     {
-        if (!empty($criteria['agence'])) {
+        if (!empty($searchDto->agence)) {
             $queryBuilder->andWhere('c.agenceRattacher = :agence')
-                ->setParameter('agence', $criteria['agence']->getId());
+                ->setParameter('agence', $searchDto->agence->getId());
         }
-        if (!empty($criteria['casier'])) {
+        if (!empty($searchDto->casier)) {
             $queryBuilder->andWhere('c.nom LIKE :casier')
-                ->setParameter('casier', '%' . $criteria['casier'] . '%');
+                ->setParameter('casier', '%' . $searchDto->casier . '%');
+        }
+
+        if (!empty($searchDto->statut)) {
+            $queryBuilder->andWhere('c.statutDemande = :statut')
+                ->setParameter('statut', $searchDto->statut->getId());
         }
     }
 
