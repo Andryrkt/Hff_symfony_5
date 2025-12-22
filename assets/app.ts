@@ -26,6 +26,7 @@ import { SessionManager } from "./js/utils/session";
 import { SubmenuManager } from "./js/utils/submenuManager";
 import { ToastManager } from "./js/utils/toast";
 import { CustomDropdown } from "./js/utils/customDropdown";
+import { initPagination } from "./js/utils/pagination";
 
 // Import des styles supplémentaires
 import './styles/home.css';
@@ -82,6 +83,7 @@ class App {
         new SessionManager().init();
         new ToastManager().init();
         new SubmenuManager().init();
+        initPagination();
     }
 
     /**

@@ -52,11 +52,11 @@ class CasierRepository extends ServiceEntityRepository
 
     private function filtred(array $criteria, QueryBuilder $queryBuilder)
     {
-        if ($criteria['agence'] !== null) {
+        if (!empty($criteria['agence'])) {
             $queryBuilder->andWhere('c.agenceRattacher = :agence')
                 ->setParameter('agence', $criteria['agence']->getId());
         }
-        if ($criteria['casier'] !== null) {
+        if (!empty($criteria['casier'])) {
             $queryBuilder->andWhere('c.nom LIKE :casier')
                 ->setParameter('casier', '%' . $criteria['casier'] . '%');
         }

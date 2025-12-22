@@ -46,6 +46,11 @@ class Casier implements CreatedByInterface
      */
     private $statutDemande;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isValide = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -95,6 +100,18 @@ class Casier implements CreatedByInterface
     public function setStatutDemande(?StatutDemande $statutDemande): self
     {
         $this->statutDemande = $statutDemande;
+
+        return $this;
+    }
+
+    public function isValid(): ?bool
+    {
+        return $this->isValide;
+    }
+
+    public function setIsValide(bool $isValide): self
+    {
+        $this->isValide = $isValide;
 
         return $this;
     }
