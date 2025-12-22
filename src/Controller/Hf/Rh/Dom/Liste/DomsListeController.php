@@ -8,13 +8,14 @@ use App\Dto\Hf\Rh\Dom\DomSearchDto;
 use App\Form\Hf\Rh\Dom\Liste\DomSearchType;
 use App\Repository\Hf\Rh\Dom\DomRepository;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use App\Service\Admin\AgenceSerializerService;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Constants\Hf\Rh\Dom\ButtonsDomConstants;
+use App\Controller\Traits\PaginationAndSortingTrait;
+
 use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
-use App\Controller\Traits\PaginationAndSortingTrait;
 
 /**
  * @Route("/hf/rh/ordre-de-mission")
@@ -67,6 +68,7 @@ class DomsListeController extends AbstractController
                 'currentSort' => $domSearchDto->sortBy,
                 'currentOrder' => $domSearchDto->sortOrder,
                 'breadcrumbs' => $breadcrumbBuilder->build('dom_liste_index'),
+                'buttons' => ButtonsDomConstants::BUTTONS_ACTIONS,
             ]
         );
     }

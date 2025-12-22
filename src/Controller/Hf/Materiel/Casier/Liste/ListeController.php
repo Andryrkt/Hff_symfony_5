@@ -5,6 +5,7 @@ namespace App\Controller\Hf\Materiel\Casier\Liste;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Form\Hf\Materiel\Casier\Liste\SearchType;
+use App\Constants\Hf\Materiel\Casier\ButtonsConstants;
 use App\Repository\Hf\Materiel\Casier\CasierRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -33,9 +34,11 @@ class ListeController extends AbstractController
         // recuperation des données
         $casiers = $casierRepository->getCasiersTemporaire($criteria);
 
+
         return $this->render('hf/materiel/casier/liste/liste.html.twig', [
             'casiers' => $casiers,
             'form' => $form->createView(),
+            'buttons' => ButtonsConstants::BUTTONS_ACTIONS,
         ]);
     }
 }

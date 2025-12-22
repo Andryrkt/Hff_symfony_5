@@ -9,9 +9,12 @@
 	<div class="container">
 		{% include 'partials/flash_messages.html.twig' %}
 
+		{# Formulaire de recherche #}
 		{% include "hf/materiel/casier/liste/_formulaireRecherche.html.twig" with{
 			form : form
 		}%}
+		{# Boutons d'actions #}
+		{{ actions.action_buttons(buttons) }}
 	</div>
 
 
@@ -41,12 +44,7 @@
 							{% if item.isValid %}
 								<button class="btn btn-sm btn-success fw-bold mb-3" disabled>Déjà Validé</button>
 							{% else %}
-								<a href="#"
-								   class="btn btn-sm fw-bold mb-3"
-								   data-action="click->pages--hf--materiel--casier--liste#validate"
-								   data-casier-nom="{{ item.nom }}"
-                                   data-validate-url="{{ path('api_casier_validate', {id: item.id}) }}"
-								   style="background-color: #0c5c0cff; color: white">
+								<a href="#" class="btn btn-sm fw-bold mb-3" data-action="click->pages--hf--materiel--casier--liste#validate" data-casier-nom="{{ item.nom }}" data-validate-url="{{ path('api_casier_validate', {id: item.id}) }}" style="background-color: #0c5c0cff; color: white">
 									Validé
 								</a>
 							{% endif %}
