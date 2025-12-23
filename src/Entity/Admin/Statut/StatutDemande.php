@@ -2,6 +2,7 @@
 
 namespace App\Entity\Admin\Statut;
 
+use App\Entity\Hf\Atelier\Dit\Dit;
 use App\Entity\Hf\Materiel\Casier\Casier;
 use App\Entity\Hf\Rh\Dom\Dom;
 use App\Entity\Traits\TimestampableTrait;
@@ -50,11 +51,17 @@ class StatutDemande
      */
     private $casiers;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Dit::class, mappedBy="statutDemande")
+     */
+    private $dits;
+
 
     public function __construct()
     {
         $this->doms = new ArrayCollection();
         $this->casiers = new ArrayCollection();
+        $this->dits = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -152,6 +159,36 @@ class StatutDemande
             // set the owning side to null (unless already changed)
             if ($casier->getStatutDemande() === $this) {
                 $casier->setStatutDemande(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Dit>
+     */
+    public function getDits(): Collection
+    {
+        return $this->dits;
+    }
+
+    public function addDit(Dit $dit): self
+    {
+        if (!$this->dits->contains($dit)) {
+            $this->dits[] = $dit;
+            $dit->setStatutDemande($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDit(Dit $dit): self
+    {
+        if ($this->dits->removeElement($dit)) {
+            // set the owning side to null (unless already changed)
+            if ($dit->getStatutDemande() === $this) {
+                $dit->setStatutDemande(null);
             }
         }
 
