@@ -57,7 +57,7 @@ class CasierMigrationMapper
     private function mapRelations(Casier $casier, array $oldData): void
     {
         // Relation StatutDemande
-        $statut = $this->relationMapper->mapStatutDemande($oldData);
+        $statut = $this->relationMapper->mapStatutDemande($oldData, 'CAS');
         if ($statut) {
             $casier->setStatutDemande($statut);
         }

@@ -166,7 +166,7 @@ class DomMigrationMapper
     private function mapRelations(Dom $dom, array $oldData): void
     {
         // Relation StatutDemande
-        $statut = $this->relationMapper->mapStatutDemande($oldData);
+        $statut = $this->relationMapper->mapStatutDemande($oldData, 'DOM');
         if ($statut) {
             $dom->setIdStatutDemande($statut);
         }

@@ -37,7 +37,7 @@ class EntityRelationMapper
      * Mappe la relation StatutDemande
      * Stratégie : ID → Code (via legacy DB)
      */
-    public function mapStatutDemande(array $oldData): ?StatutDemande
+    public function mapStatutDemande(array $oldData, string $codeApplication): ?StatutDemande
     {
         if (empty($oldData['ID_Statut_Demande'])) {
             return null;
@@ -47,7 +47,7 @@ class EntityRelationMapper
         if ($codeStatut) {
             $statut = $this->em->getRepository(StatutDemande::class)
                 ->findOneBy([
-                    'codeApplication' => 'DOM',
+                    'codeApplication' => $codeApplication,
                     'codeStatut' => $codeStatut
                 ]);
         }
