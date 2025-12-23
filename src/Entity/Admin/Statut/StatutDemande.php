@@ -2,6 +2,7 @@
 
 namespace App\Entity\Admin\Statut;
 
+use App\Entity\Hf\Materiel\Badm\Badm;
 use App\Entity\Hf\Materiel\Casier\Casier;
 use App\Entity\Hf\Rh\Dom\Dom;
 use App\Entity\Traits\TimestampableTrait;
@@ -50,11 +51,17 @@ class StatutDemande
      */
     private $casiers;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Badm::class, mappedBy="statutDemande")
+     */
+    private $badms;
+
 
     public function __construct()
     {
         $this->doms = new ArrayCollection();
         $this->casiers = new ArrayCollection();
+        $this->badms = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -152,6 +159,36 @@ class StatutDemande
             // set the owning side to null (unless already changed)
             if ($casier->getStatutDemande() === $this) {
                 $casier->setStatutDemande(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Badm>
+     */
+    public function getBadms(): Collection
+    {
+        return $this->badms;
+    }
+
+    public function addBadm(Badm $badm): self
+    {
+        if (!$this->badms->contains($badm)) {
+            $this->badms[] = $badm;
+            $badm->setStatutDemande($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBadm(Badm $badm): self
+    {
+        if ($this->badms->removeElement($badm)) {
+            // set the owning side to null (unless already changed)
+            if ($badm->getStatutDemande() === $this) {
+                $badm->setStatutDemande(null);
             }
         }
 
