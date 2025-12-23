@@ -37,10 +37,10 @@ class PersonnelFixtures extends Fixture implements DependentFixtureInterface, Fi
         // $manager->flush();
     }
 
-    public function getDependencies()
+    public function getDependencies(): array
     {
-        // return [
-        //     AgenceServiceIriumFixtures::class
-        // ];
+        return [
+            AgenceServiceIriumFixtures::class
+        ];
     }
 }
