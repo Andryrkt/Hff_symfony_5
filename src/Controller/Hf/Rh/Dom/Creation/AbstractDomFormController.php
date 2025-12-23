@@ -8,6 +8,8 @@ use Symfony\Component\Form\FormInterface;
 use App\Service\Hf\Rh\Dom\DomCreationHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use App\Constants\Admin\Historisation\TypeDocumentConstants;
+use App\Constants\Admin\Historisation\TypeOperationConstants;
 use App\Service\Historique_operation\HistoriqueOperationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -63,8 +65,8 @@ abstract class AbstractDomFormController extends AbstractController
 
         $this->historiqueOperationService->enregistrer(
             $numeroDom,
-            'CREATION',
-            'DOM',
+            TypeOperationConstants::TYPE_OPERATION_CREATION_NAME,
+            TypeDocumentConstants::TYPE_DOCUMENT_DOM_CODE,
             $success,
             $message
         );

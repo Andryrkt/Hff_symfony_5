@@ -17,15 +17,39 @@
 {% endmacro %}
 
 {% macro simple_button(path, text, icon, class = 'btn-primary') %}
-    <a href="{{ path }}" class="btn {{ class }} fw-bold">
-        <i class="{{ icon }} me-1"></i>
-        {{ text }}
-    </a>
+	<a href="{{ path }}" class="btn {{ class }} fw-bold">
+		<i class="{{ icon }} me-1"></i>
+		{{ text }}
+	</a>
 {% endmacro %}
 
-{% macro submit_button(text, icon = null, class = 'btn-primary') %}
-    <button type="submit" class="btn {{ class }} fw-bold">
-        {% if icon %}<i class="{{ icon }} me-1"></i> {% endif %}
-        {{ text }}
-    </button>
+{% macro submit_button(text, icon = null, class = 'btn-primary', with_confirmation = true, confirmation_message = null, warning_message = null, confirmation_text = null) %}
+	<button 
+		type="submit" 
+		class="btn {{ class }} fw-bold"
+		{% if with_confirmation %}
+		data-controller="form-confirmation"
+		data-form-confirmation-target="submitButton"
+		data-action="click->form-confirmation#confirm"
+		data-form-confirmation-confirmation-message-value="{{ confirmation_message ?: 'Êtes-vous sûr de vouloir soumettre ce formulaire ?' }}"
+		data-form-confirmation-warning-message-value="{{ warning_message ?: 'Veuillez ne pas fermer l\'onglet durant le traitement.' }}"
+		data-form-confirmation-confirmation-text-value="{{ confirmation_text ?: 'Cette action va enregistrer les données.' }}"
+		{% endif %}
+	>
+		{% if icon %}<i class="{{ icon }} me-1"></i> {% endif %}
+		{{ text }}
+	</button>
+{% endmacro %}
+
+{% macro action_buttons(buttons) %}
+	<div>
+		{% for button in buttons %}
+			<a href="{{ button.href == '#' ? '#' : path(button.href) }}" class="btn btn-sm {{ button.class }} text-white my-3 fw-bold" {% if button.tooltip %} data-bs-toggle="tooltip" title="{{ button.tooltip }}" {% endif %}>
+				{% if button.icon %}
+					<i class="{{ button.icon }}"></i>
+				{% endif %}
+				{{ button.text }}
+			</a>
+		{% endfor %}
+	</div>
 {% endmacro %}

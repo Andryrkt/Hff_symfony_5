@@ -17,6 +17,8 @@ import "./styles/app.scss";
 import "select2";
 import "select2/dist/css/select2.css";
 import "select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css";
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 
 // Import des utilitaires
 import { ChronometerManager } from "./js/utils/chronometer";
@@ -24,6 +26,7 @@ import { SessionManager } from "./js/utils/session";
 import { SubmenuManager } from "./js/utils/submenuManager";
 import { ToastManager } from "./js/utils/toast";
 import { CustomDropdown } from "./js/utils/customDropdown";
+import { initPagination } from "./js/utils/pagination";
 
 // Import des styles supplémentaires
 import './styles/home.css';
@@ -36,6 +39,10 @@ class App {
 
     constructor() {
         this.application = Application.start();
+
+        // Rendre SweetAlert2 disponible globalement
+        window.Swal = Swal;
+
         this.init();
     }
 
@@ -76,6 +83,7 @@ class App {
         new SessionManager().init();
         new ToastManager().init();
         new SubmenuManager().init();
+        initPagination();
     }
 
     /**
@@ -137,6 +145,7 @@ declare global {
         appInstance: any;
         $: any;
         Turbo: any;
+        Swal: typeof import('sweetalert2').default;
     }
 }
 

@@ -129,6 +129,27 @@ class LegacyDataFetcher
     }
 
     /**
+     * Récupère le nom d'utilisateur de l'ancienne base - users
+     * ex: lanto
+     */
+    public function getUserName(int $id): ?string
+    {
+        try {
+            $result = $this->legacyConnection->fetchAssociative(
+                'SELECT nom_utilisateur FROM users WHERE id = :id',
+                ['id' => $id]
+            );
+            return $result['nom_utilisateur'] ?? null;
+        } catch (\Exception $e) {
+            $this->logger->error('Erreur récupération du nom d\'utilisateur', [
+                'id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+            return null;
+        }
+    }
+
+    /**
      * Compte le nombre d'utilisateurs dans l'ancienne base
      */
     public function countLegacyUsers(): int

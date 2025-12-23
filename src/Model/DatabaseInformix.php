@@ -21,7 +21,9 @@ class DatabaseInformix implements DatabaseConnectionInterface
         $this->logger = $logger;
     }
 
-    // Méthode pour établir la connexion à la base de données
+    /** 
+     * Méthode pour établir la connexion à la base de données
+     * */
     public function connect()
     {
         try {
@@ -40,7 +42,9 @@ class DatabaseInformix implements DatabaseConnectionInterface
         }
     }
 
-    // Méthode pour exécuter une requête SQL
+    /** 
+     *Méthode pour exécuter une requête SQL
+     * */
     public function executeQuery(string $query)
     {
         try {
@@ -59,7 +63,10 @@ class DatabaseInformix implements DatabaseConnectionInterface
         }
     }
 
-    // Méthode pour récupérer les résultats d'une requête
+    /**
+     * Méthode pour récupérer les résultats d'une requête
+     * sous forme d'un tableau associatif
+     *  */
     public function fetchResults($result)
     {
         $rows = [];
@@ -71,7 +78,25 @@ class DatabaseInformix implements DatabaseConnectionInterface
         return $rows;
     }
 
-    // Méthode pour fermer la connexion à la base de données
+    /**
+     * Méthode pour récupérer les résultats d'une requête
+     * sous forme d'une seul tableau associatif
+     */
+    public function fetchScalarResults($result)
+    {
+        if ($result) {
+            // Récupérer la première ligne
+            $row = odbc_fetch_array($result);
+            if ($row !== false) {
+                return $row; // Retourne directement le tableau associatif
+            }
+        }
+        return []; // Tableau vide si pas de résultat
+    }
+
+    /**
+     * Méthode pour fermer la connexion à la base de données
+     *  */
     public function close()
     {
         if ($this->conn) {
