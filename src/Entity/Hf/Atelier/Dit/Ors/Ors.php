@@ -2,14 +2,21 @@
 
 namespace App\Entity\Hf\Atelier\Dit\Ors;
 
-use App\Repository\Hf\Atelier\Dit\Ors\OrsRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Traits\CreatedByTrait;
+use App\Entity\Traits\TimestampableTrait;
+use App\Contract\Entity\CreatedByInterface;
+use App\Repository\Hf\Atelier\Dit\Ors\OrsRepository;
 
 /**
  * @ORM\Entity(repositoryClass=OrsRepository::class)
+ * @ORM\HasLifecycleCallbacks
  */
-class Ors
+class Ors implements CreatedByInterface
 {
+    use TimestampableTrait;
+    use CreatedByTrait;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
