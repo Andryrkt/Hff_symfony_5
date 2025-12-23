@@ -184,6 +184,22 @@ class EntityRelationMapper
     }
 
     /**
+     * Mappe un User par id
+     */
+    public function mapUserWithId(int $id): ?User
+    {
+        $username = $this->legacyDataFetcher->getUserName($id);
+        $user = $this->em->getRepository(User::class)
+            ->findOneBy(['username' => $username]);
+
+        if (!$user) {
+            $this->logger->warning('User non trouvé', ['id' => $id]);
+        }
+
+        return $user;
+    }
+
+    /**
      * Mappe un User par username
      */
     public function mapUser(string $username): ?User
