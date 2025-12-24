@@ -8,7 +8,9 @@ use App\Entity\Traits\AgenceServiceTrait;
 use App\Entity\Traits\TimestampableTrait;
 use App\Entity\Admin\Statut\StatutDemande;
 use App\Contract\Entity\CreatedByInterface;
+use App\Entity\Hf\Atelier\Dit\WorTypeDocument;
 use App\Contract\Entity\AgenceServiceInterface;
+use App\Entity\Hf\Atelier\Dit\WorNiveauUrgence;
 use App\Repository\Hf\Atelier\Dit\DitRepository;
 
 /**

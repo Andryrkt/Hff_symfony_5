@@ -161,7 +161,7 @@ class HomeCardService
                     ]
                 ],
                 ['label' => 'Glossaire OR', 'route' => '#'],
-                ['label' => 'planning', 'route' => '#'],
+                ['label' => 'planning', 'route' => 'hf_atelier_planning'],
                 ['label' => 'Planning détaillé', 'route' => '#'],
                 ['label' => 'planning interne Atelier', 'route' => '#'],
                 ['label' => 'Satisfaction client (Atelier excellence survey)', 'route' => '#'],
