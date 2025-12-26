@@ -13,6 +13,10 @@ parameters:
   env(LDAP_HOST): "192.168.0.1"
   documents_directory: '%kernel.project_dir%/public/uploads'
   docuware_directory: 'C:\DOCUWARE'
+  app.constructeurs.pieces_magasin: ""
+  app.constructeurs.achat_locaux: ""
+  app.constructeurs.lub: ""
+  app.constructeurs.pneumatique: ""
 
 services:
   # default configuration for services in *this* file

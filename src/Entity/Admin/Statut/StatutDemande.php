@@ -3,6 +3,7 @@
 namespace App\Entity\Admin\Statut;
 
 use App\Entity\Hf\Materiel\Badm\Badm;
+use App\Entity\Hf\Atelier\Dit\Dit;
 use App\Entity\Hf\Materiel\Casier\Casier;
 use App\Entity\Hf\Rh\Dom\Dom;
 use App\Entity\Traits\TimestampableTrait;
@@ -52,6 +53,11 @@ class StatutDemande
     private $casiers;
 
     /**
+     * @ORM\OneToMany(targetEntity=Dit::class, mappedBy="statutDemande")
+     */
+    private $dits;
+
+    /**
      * @ORM\OneToMany(targetEntity=Badm::class, mappedBy="statutDemande")
      */
     private $badms;
@@ -61,6 +67,7 @@ class StatutDemande
     {
         $this->doms = new ArrayCollection();
         $this->casiers = new ArrayCollection();
+        $this->dits = new ArrayCollection();
         $this->badms = new ArrayCollection();
     }
 
@@ -166,6 +173,36 @@ class StatutDemande
     }
 
     /**
+     * @return Collection<int, Dit>
+     */
+    public function getDits(): Collection
+    {
+        return $this->dits;
+    }
+
+    public function addDit(Dit $dit): self
+    {
+        if (!$this->dits->contains($dit)) {
+            $this->dits[] = $dit;
+            $dit->setStatutDemande($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDit(Dit $dit): self
+    {
+        if ($this->dits->removeElement($dit)) {
+            // set the owning side to null (unless already changed)
+            if ($dit->getStatutDemande() === $this) {
+                $dit->setStatutDemande(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * @return Collection<int, Badm>
      */
     public function getBadms(): Collection
@@ -194,5 +231,4 @@ class StatutDemande
 
         return $this;
     }
-
 }
