@@ -3,8 +3,9 @@
 namespace App\Repository\Hf\Atelier\Dit\Ors;
 
 use App\Entity\Hf\Atelier\Dit\Ors\Ors;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Service\Traits\ArrayHelperTrait;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Ors>
@@ -16,6 +17,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class OrsRepository extends ServiceEntityRepository
 {
+    use ArrayHelperTrait;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Ors::class);
@@ -58,20 +61,24 @@ class OrsRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function findAllOrs()
+    public function findAllOrsString(): string
     {
         $qb = $this->createQueryBuilder('o');
         $qb->select("DISTINCT o.numeroOr");
 
-        return $qb->getQuery()->getResult();
+        $result = $qb->getQuery()->getResult();
+
+        return $this->TableauEnString($result);
     }
 
-    public function findAllOrsWithItv()
+    public function findAllOrsWithItvString(): string
     {
         $qb = $this->createQueryBuilder('o');
         $qb->select("DISTINCT CONCAT(o.numeroOr, '-', o.numeroItv) as numero_or_itv");
 
-        return $qb->getQuery()->getResult();
+        $result = $qb->getQuery()->getResult();
+
+        return $this->TableauEnString($result);
     }
 
     //    /**

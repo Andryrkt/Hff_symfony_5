@@ -7,11 +7,11 @@ use App\Entity\Hf\Atelier\Dit\WorNiveauUrgence;
 final class PlanningSearchDto
 {
     public string $agence;
-    public $annee;
+    public $annee = 2025;
     public string $interneExterne = 'TOUS';
     public string $facture = 'ENCOURS';
     public string $plan = 'PLANIFIE';
-    public string $dateDebut;
+    public $dateDebut;
     public $dateFin;
     public $numOr;
     public $numSerie;
@@ -19,11 +19,11 @@ final class PlanningSearchDto
     public $numParc;
     public $agenceDebite;
     public $serviceDebite;
-    public $typeligne = 'TOUETS';
+    public string $typeligne = 'TOUETS';
     public $casier;
     public ?WorNiveauUrgence $niveauUrgence = null;
     public $section;
-    public $months = 3;
+    public int $months = 3;
     public ?bool $orBackOrder = false;
     public $typeDocument;
     public $reparationRealise;

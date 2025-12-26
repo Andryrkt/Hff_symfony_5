@@ -222,7 +222,7 @@ final class PlanningModel
         return $vtypeligne;
     }
 
-    private function planAnnee($criteria)
+    private function planAnnee(PlanningSearchDto $planningSearchDto)
     {
         $yearsDatePlanifier = " CASE WHEN 
                     YEAR ( (SELECT DATE(Min(ska_d_start) ) FROM ska, skw WHERE ofh_id = seor_numor AND ofs_id=sitv_interv AND skw.skw_id = ska.skw_id ) ) is Null 
@@ -235,7 +235,7 @@ final class PlanningModel
 
         $yearsDateNonPlanifier = " YEAR ( DATE(sitv_datdeb) ) ";
 
-        switch ($criteria->getPlan()) {
+        switch ($planningSearchDto->plan) {
             case "PLANIFIE":
                 $vYearsStatutPlan = $yearsDatePlanifier;
                 break;
@@ -245,7 +245,7 @@ final class PlanningModel
         return  $vYearsStatutPlan;
     }
 
-    private function nonplannfierSansDatePla($criteria)
+    private function nonplannfierSansDatePla(PlanningSearchDto $planningSearchDto)
     {
         $conditionSansDatePla = " AND CASE WHEN 
                     YEAR ( (SELECT DATE(Min(ska_d_start) ) FROM ska, skw WHERE ofh_id = seor_numor AND ofs_id=sitv_interv AND skw.skw_id = ska.skw_id ) ) is Null 
@@ -254,7 +254,7 @@ final class PlanningModel
                 ELSE
                     YEAR ( (SELECT DATE(Min(ska_d_start) ) FROM ska, skw WHERE ofh_id = seor_numor AND ofs_id=sitv_interv AND skw.skw_id = ska.skw_id ) )
                 END is null";
-        switch ($criteria->getPlan()) {
+        switch ($planningSearchDto->plan) {
             case "PLANIFIE":
                 $vNoplanniferStatutPlan = "";
                 break;
@@ -264,7 +264,7 @@ final class PlanningModel
         return  $vNoplanniferStatutPlan;
     }
 
-    private function planMonth($criteria)
+    private function planMonth(PlanningSearchDto $planningSearchDto)
     {
         $monthDatePlanifier = " CASE WHEN 
                                     MONTH ( (SELECT DATE(Min(ska_d_start) ) FROM ska, skw WHERE ofh_id = seor_numor AND ofs_id=sitv_interv AND skw.skw_id = ska.skw_id ) ) is Null 
@@ -274,7 +274,7 @@ final class PlanningModel
                                     MONTH ( (SELECT DATE(Min(ska_d_start) ) FROM ska, skw WHERE ofh_id = seor_numor AND ofs_id=sitv_interv AND skw.skw_id = ska.skw_id ) )
                                 END  ";
         $monthDateNonPlanifier =  " MONTH ( DATE(sitv_datdeb) ) ";
-        switch ($criteria->getPlan()) {
+        switch ($planningSearchDto->plan) {
             case "PLANIFIE":
                 $vMonthStatutPlan = $monthDatePlanifier;
                 break;
@@ -284,10 +284,10 @@ final class PlanningModel
         return  $vMonthStatutPlan;
     }
 
-    private function dateDebutMonthPlan($criteria)
+    private function dateDebutMonthPlan(PlanningSearchDto $planningSearchDto)
     {
 
-        if (!empty($criteria->getDateDebut())) {
+        if (!empty($planningSearchDto->dateDebut)) {
             $monthDatePlanifier = " CASE WHEN 
                                      (SELECT DATE(Min(ska_d_start) ) FROM ska, skw WHERE ofh_id = seor_numor AND ofs_id=sitv_interv AND skw.skw_id = ska.skw_id )  is Null 
                                 THEN
@@ -296,12 +296,12 @@ final class PlanningModel
                                      (SELECT DATE(Min(ska_d_start) ) FROM ska, skw WHERE ofh_id = seor_numor AND ofs_id=sitv_interv AND skw.skw_id = ska.skw_id ) 
                                 END  ";
             $monthDateNonPlanifier =  "  DATE(sitv_datdeb)  ";
-            switch ($criteria->getPlan()) {
+            switch ($planningSearchDto->plan) {
                 case "PLANIFIE":
-                    $vDateDMonthStatutPlan = " AND " . $monthDatePlanifier . " >= '" . $criteria->getDateDebut()->format("m/d/Y") . "'";
+                    $vDateDMonthStatutPlan = " AND " . $monthDatePlanifier . " >= '" . $planningSearchDto->dateDebut->format("m/d/Y") . "'";
                     break;
                 case "NON_PLANIFIE":
-                    $vDateDMonthStatutPlan = " AND " . $monthDateNonPlanifier . " >= '" . $criteria->getDateDebut()->format("m/d/Y") . "'";
+                    $vDateDMonthStatutPlan = " AND " . $monthDateNonPlanifier . " >= '" . $planningSearchDto->dateDebut->format("m/d/Y") . "'";
             }
         } else {
             $vDateDMonthStatutPlan = null;
@@ -309,10 +309,10 @@ final class PlanningModel
         return $vDateDMonthStatutPlan;
     }
 
-    private function dateFinMonthPlan($criteria)
+    private function dateFinMonthPlan(PlanningSearchDto $planningSearchDto)
     {
 
-        if (!empty($criteria->getDateFin())) {
+        if (!empty($planningSearchDto->dateFin)) {
             $monthDatePlanifier = " CASE WHEN 
                                     (SELECT DATE(Min(ska_d_start) ) FROM ska, skw WHERE ofh_id = seor_numor AND ofs_id=sitv_interv AND skw.skw_id = ska.skw_id )  is Null 
                                 THEN
@@ -321,12 +321,12 @@ final class PlanningModel
                                      (SELECT DATE(Min(ska_d_start) ) FROM ska, skw WHERE ofh_id = seor_numor AND ofs_id=sitv_interv AND skw.skw_id = ska.skw_id ) 
                                 END  ";
             $monthDateNonPlanifier =  " DATE(sitv_datdeb)  ";
-            switch ($criteria->getPlan()) {
+            switch ($planningSearchDto->plan) {
                 case "PLANIFIE":
-                    $vDateFMonthStatutPlan = " AND " . $monthDatePlanifier . " <= '" . $criteria->getDateFin()->format("m/d/Y") . "'";
+                    $vDateFMonthStatutPlan = " AND " . $monthDatePlanifier . " <= '" . $planningSearchDto->dateFin->format("m/d/Y") . "'";
                     break;
                 case "NON_PLANIFIE":
-                    $vDateFMonthStatutPlan = " AND " . $monthDateNonPlanifier . " <= '" . $criteria->getDateFin()->format("m/d/Y") . "'";
+                    $vDateFMonthStatutPlan = " AND " . $monthDateNonPlanifier . " <= '" . $planningSearchDto->dateFin->format("m/d/Y") . "'";
             }
         } else {
             $vDateFMonthStatutPlan = null;
@@ -335,9 +335,9 @@ final class PlanningModel
         return $vDateFMonthStatutPlan;
     }
 
-    private function facture($criteria)
+    private function facture(PlanningSearchDto $planningSearchDto)
     {
-        switch ($criteria->getFacture()) {
+        switch ($planningSearchDto->facture) {
             case "TOUS":
                 $vStatutFacture = " AND  sitv_pos  IN ('FC','FE','CP','ST','EC')";
                 break;
@@ -352,9 +352,9 @@ final class PlanningModel
         return $vStatutFacture;
     }
 
-    private function interneExterne($criteria)
+    private function interneExterne(PlanningSearchDto $planningSearchDto)
     {
-        switch ($criteria->getInterneExterne()) {
+        switch ($planningSearchDto->interneExterne) {
             case "TOUS":
                 $vStatutInterneExterne = "";
                 break;
@@ -368,90 +368,90 @@ final class PlanningModel
         return $vStatutInterneExterne;
     }
 
-    private function agence($criteria)
+    private function agence(PlanningSearchDto $planningSearchDto)
     {
-        if (!empty($criteria->getAgence())) {
-            $agence = " AND SEOR_SUCC in ('" . $criteria->getAgence() . "')";
+        if (!empty($planningSearchDto->agence)) {
+            $agence = " AND SEOR_SUCC in ('" . $planningSearchDto->agence . "')";
         } else {
             $agence = "";
         }
         return $agence;
     }
 
-    private function agenceDebite($criteria)
+    private function agenceDebite(PlanningSearchDto $planningSearchDto)
     {
-        if (!empty($criteria->getAgenceDebite())) {
-            $agenceDebite = " AND sitv_succdeb = '" . $criteria->getAgenceDebite() . "' ";
+        if (!empty($planningSearchDto->agenceDebite)) {
+            $agenceDebite = " AND sitv_succdeb = '" . $planningSearchDto->agenceDebite . "' ";
         } else {
             $agenceDebite = ""; // AND sitv_succdeb in ('01','02','90','92','40','60','50','40','30','20')
         }
         return $agenceDebite;
     }
 
-    private function serviceDebite($criteria)
+    private function serviceDebite(PlanningSearchDto $planningSearchDto)
     {
-        if (!empty($criteria->getServiceDebite())) {
-            $serviceDebite = " AND sitv_servdeb in ('" . implode("','", $criteria->getServiceDebite()) . "')";
+        if (!empty($planningSearchDto->serviceDebite)) {
+            $serviceDebite = " AND sitv_servdeb in ('" . implode("','", $planningSearchDto->serviceDebite) . "')";
         } else {
             $serviceDebite = "";
         }
         return  $serviceDebite;
     }
 
-    private function idMat($criteria)
+    private function idMat(PlanningSearchDto $planningSearchDto)
     {
-        if (!empty($criteria->getIdMat())) {
-            $vconditionIdMat = " AND mmat_nummat = '" . $criteria->getIdMat() . "'";
+        if (!empty($planningSearchDto->idMat)) {
+            $vconditionIdMat = " AND mmat_nummat = '" . $planningSearchDto->idMat . "'";
         } else {
             $vconditionIdMat = "";
         }
         return $vconditionIdMat;
     }
 
-    private function numOr($criteria)
+    private function numOr(PlanningSearchDto $planningSearchDto)
     {
-        if (!empty($criteria->getNumOr())) {
-            $vconditionNumOr = " AND slor_numor ='" . $criteria->getNumOr() . "'";
+        if (!empty($planningSearchDto->numOr)) {
+            $vconditionNumOr = " AND slor_numor ='" . $planningSearchDto->numOr . "'";
         } else {
             $vconditionNumOr = "";
         }
         return $vconditionNumOr;
     }
 
-    private function numSerie($criteria)
+    private function numSerie(PlanningSearchDto $planningSearchDto)
     {
-        if (!empty($criteria->getNumSerie())) {
-            $vconditionNumSerie = " AND TRIM(mmat_numserie) = '" . $criteria->getNumSerie() . "' ";
+        if (!empty($planningSearchDto->numSerie)) {
+            $vconditionNumSerie = " AND TRIM(mmat_numserie) = '" . $planningSearchDto->numSerie . "' ";
         } else {
             $vconditionNumSerie = "";
         }
         return $vconditionNumSerie;
     }
 
-    private function numParc($criteria)
+    private function numParc(PlanningSearchDto $planningSearchDto)
     {
-        if (!empty($criteria->getNumParc())) {
-            $vconditionNumParc = " AND mmat_recalph = '" . $criteria->getNumParc() . "'";
+        if (!empty($planningSearchDto->numParc)) {
+            $vconditionNumParc = " AND mmat_recalph = '" . $planningSearchDto->numParc . "'";
         } else {
             $vconditionNumParc = "";
         }
         return $vconditionNumParc;
     }
 
-    private function casier($criteria)
+    private function casier(PlanningSearchDto $planningSearchDto)
     {
-        if (!empty($criteria->getCasier())) {
-            $vconditionCasier = " AND mmat_numparc like  '%" . $criteria->getCasier() . "%'  ";
+        if (!empty($planningSearchDto->casier)) {
+            $vconditionCasier = " AND mmat_numparc like  '%" . $planningSearchDto->casier . "%'  ";
         } else {
             $vconditionCasier = "";
         }
         return $vconditionCasier;
     }
 
-    private function section($criteria)
+    private function section(PlanningSearchDto $planningSearchDto)
     {
-        if (!empty($criteria->getSection())) {
-            $section = " AND sitv_typitv = '" . $criteria->getSection() . "' ";
+        if (!empty($planningSearchDto->section)) {
+            $section = " AND sitv_typitv = '" . $planningSearchDto->section . "' ";
         } else {
             $section = null;
         }
