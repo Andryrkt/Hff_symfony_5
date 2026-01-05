@@ -3,10 +3,35 @@
 namespace App\Service\Home;
 
 use App\Repository\Admin\ApplicationGroupe\VignetteRepository;
+use App\Service\Traits\MaterielSubmenuTrait;
+use App\Service\Traits\ItSubmenuTrait;
+use App\Service\Traits\RhSubmenuTrait;
+use App\Service\Traits\HseSubmenuTrait;
+use App\Service\Traits\PolSubmenuTrait;
+use App\Service\Traits\ApproSubmenuTrait;
+use App\Service\Traits\ComptaSubmenuTrait;
+use App\Service\Traits\AtelierSubmenuTrait;
+use App\Service\Traits\EnergieSubmenuTrait;
+use App\Service\Traits\MagasinSubmenuTrait;
+use App\Service\Traits\ReportingSubmenuTrait;
+use App\Service\Traits\DocumentationSubmenuTrait;
 use Symfony\Component\Security\Core\Security;
 
 class HomeCardService
 {
+    use MaterielSubmenuTrait;
+    use ItSubmenuTrait;
+    use RhSubmenuTrait;
+    use HseSubmenuTrait;
+    use PolSubmenuTrait;
+    use ApproSubmenuTrait;
+    use ComptaSubmenuTrait;
+    use AtelierSubmenuTrait;
+    use EnergieSubmenuTrait;
+    use MagasinSubmenuTrait;
+    use ReportingSubmenuTrait;
+    use DocumentationSubmenuTrait;
+
     private $vignetteRepository;
     private $security;
 
@@ -40,203 +65,81 @@ class HomeCardService
     private function getCardData(string $vignetteName): array
     {
         $cardData = [
-            'Documentation' => ['icon' => 'fas fa-box', 'color' => 'success'],
-            'Reporting' => ['icon' => 'fas fa-users', 'color' => 'info'],
-            'Compta' => ['icon' => 'fas fa-chart-bar', 'color' => 'danger'],
-            'RH' => ['icon' => 'fas fa-shopping-cart', 'color' => 'warning'],
-            'Matériel' => ['icon' => 'fas fa-cogs', 'color' => 'secondary'],
-            'Atelier' => ['icon' => 'fas fa-cogs', 'color' => 'secondary'],
-            'Magasin' => ['icon' => 'fas fa-cogs', 'color' => 'secondary'],
-            'Appro' => ['icon' => 'fas fa-cogs', 'color' => 'secondary'],
-            'IT' => ['icon' => 'fas fa-cogs', 'color' => 'secondary'],
-            'POL' => ['icon' => 'fas fa-cogs', 'color' => 'secondary'],
-            'Energie' => ['icon' => 'fas fa-cogs', 'color' => 'secondary'],
-            'HSE' => ['icon' => 'fas fa-cogs', 'color' => 'secondary'],
+            'Documentation' => ['icon' => 'fas fa-book', 'color' => 'success'],
+            'Reporting' => ['icon' => 'fas fa-chart-line', 'color' => 'info'],
+            'Compta' => ['icon' => 'fas fa-file-invoice-dollar', 'color' => 'danger'],
+            'RH' => ['icon' => 'fas fa-users', 'color' => 'warning'],
+            'Matériel' => ['icon' => 'fas fa-truck-pickup', 'color' => 'secondary'],
+            'Atelier' => ['icon' => 'fas fa-tools', 'color' => 'secondary'],
+            'Magasin' => ['icon' => 'fas fa-warehouse', 'color' => 'secondary'],
+            'Appro' => ['icon' => 'fas fa-shopping-basket', 'color' => 'secondary'],
+            'IT' => ['icon' => 'fas fa-laptop', 'color' => 'secondary'],
+            'POL' => ['icon' => 'fas fa-gas-pump', 'color' => 'secondary'],
+            'Energie' => ['icon' => 'fas fa-bolt', 'color' => 'secondary'],
+            'HSE' => ['icon' => 'fas fa-hard-hat', 'color' => 'secondary'],
         ];
 
         return $cardData[$vignetteName] ?? ['icon' => 'fas fa-question-circle', 'color' => 'secondary'];
     }
 
+    private function transformSubmenu(array $submenu): array
+    {
+        return array_map(function ($item) {
+            if (isset($item['submenu'])) {
+                $item['children'] = $this->transformSubmenu($item['submenu']);
+                unset($item['submenu']);
+            }
+            return $item;
+        }, $submenu);
+    }
+
     private function getLinksForVignette(string $vignetteName): array
     {
-        // This is where the hardcoded links are mapped to the vignette name
-        $allLinks = [
-            'Documentation' => [
-                ['label' => 'Annuaire', 'route' => '#', 'icon' => 'fas fa-list-ul'],
-                ['label' => 'plan analytique Hff', 'route' => '#', 'icon' => 'fas fa-plus-circle'],
-                ['label' => 'Documentaion interne', 'route' => '#', 'icon' => 'fas fa-clipboard-check'],
-                [
-                    'label' => 'Contrat', // Lien parent pour le sous-menu
-                    'icon' => 'fas fa-tags',
-                    'children' => [
-                        ['label' => 'Nouveau contrat', 'route' => '#', 'icon' => 'fas fa-search'],
-                        ['label' => 'Consultation', 'route' => '#', 'icon' => 'fas fa-plus'],
-                    ]
-                ],
-            ],
-            'Reporting' => [
-                ['label' => 'Reporting Power BI', 'route' => '#'],
-                ['label' => 'Reporting Excel', 'route' => '#']
-            ],
-            'Compta' => [
-                ['label' => 'Cours de change', 'route' => '#'],
-                [
-                    'label' => 'Demande de paiement', // Lien parent pour le sous-menu
-                    'icon' => 'fas fa-tags',
-                    'children' => [
-                        ['label' => 'Nouvelle demande', 'route' => '#', 'icon' => 'fas fa-search'],
-                        ['label' => 'Consultation', 'route' => '#', 'icon' => 'fas fa-plus'],
-                    ]
-                ],
-                [
-                    'label' => 'Bon de caisse', // Lien parent pour le sous-menu
-                    'icon' => 'fas fa-tags',
-                    'children' => [
-                        ['label' => 'Nouvelle demande', 'route' => '#', 'icon' => 'fas fa-search'],
-                        ['label' => 'Consultation', 'route' => '#', 'icon' => 'fas fa-plus'],
-                    ]
-                ],
-            ],
-            'RH' => [
-                [
-                    'label' => 'Ordre de mission',
-                    'icon' => 'fas fa-tags',
-                    'children' => [
-                        ['label' => 'Nouvelle demande', 'route' => 'dom_first_form', 'icon' => 'fas fa-search'],
-                        ['label' => 'Consultation', 'route' => 'dom_liste_index', 'icon' => 'fas fa-plus'],
-                    ]
-                ],
-                [
-                    'label' => 'Mutations',
-                    'icon' => 'fas fa-tags',
-                    'children' => [
-                        ['label' => 'Nouvelle demande', 'route' => '#', 'icon' => 'fas fa-search'],
-                        ['label' => 'Consultation', 'route' => '#', 'icon' => 'fas fa-plus'],
-                    ]
-                ],
-                [
-                    'label' => 'Congé',
-                    'icon' => 'fas fa-tags',
-                    'children' => [
-                        ['label' => 'Nouvelle demande', 'route' => '#', 'icon' => 'fas fa-search'],
-                        ['label' => 'Consultation', 'route' => '#', 'icon' => 'fas fa-plus'],
-                    ]
-                ],
-                [
-                    'label' => 'Temporaire',
-                    'icon' => 'fas fa-tags',
-                    'children' => [
-                        ['label' => 'Nouvelle demande', 'route' => '#', 'icon' => 'fas fa-search'],
-                        ['label' => 'Consultation', 'route' => '#', 'icon' => 'fas fa-plus'],
-                    ]
-                ],
-            ],
-            'Matériel' => [
-                [
-                    'label' => 'Mouvemnet matériel',
-                    'icon' => 'fas fa-tags',
-                    'children' => [
-                        ['label' => 'Nouvelle demande', 'route' => 'hf_materiel_badm_first_form_index', 'icon' => 'fas fa-plus'],
-                        ['label' => 'Consultation', 'route' => 'hf_materiel_badm_liste_index', 'icon' => 'fas fa-search'],
-                    ]
-                ],
-                [
-                    'label' => 'Casier',
-                    'icon' => 'fas fa-tags',
-                    'children' => [
-                        ['label' => 'Nouvelle demande', 'route' => 'hf_materiel_casier_first_form_index', 'icon' => 'fas fa-search'],
-                        ['label' => 'Consultation', 'route' => 'hf_materiel_casier_liste_index', 'icon' => 'fas fa-plus'],
-                    ]
-                ],
-                ['label' => 'Commandes matériel', 'route' => '#'],
-                ['label' => 'Suivi administratif des matériels', 'route' => '#'],
-            ],
-            'Atelier' => [
-                [
-                    'label' => 'Demande d\'intervention',
-                    'icon' => 'fas fa-tags',
-                    'children' => [
-                        ['label' => 'Nouvelle demande', 'route' => '#', 'icon' => 'fas fa-search'],
-                        ['label' => 'Consultation', 'route' => '#', 'icon' => 'fas fa-plus'],
-                    ]
-                ],
-                ['label' => 'Glossaire OR', 'route' => '#'],
-                ['label' => 'planning', 'route' => 'hf_atelier_planning'],
-                ['label' => 'Planning détaillé', 'route' => '#'],
-                ['label' => 'planning interne Atelier', 'route' => '#'],
-                ['label' => 'Satisfaction client (Atelier excellence survey)', 'route' => '#'],
-            ],
-            'Magasin' => [
-                [
-                    'label' => 'OR',
-                    'icon' => 'fas fa-tags',
-                    'children' => [
-                        ['label' => 'Liste à traiter', 'route' => '#', 'icon' => 'fas fa-search'],
-                        ['label' => 'Liste à livrer', 'route' => '#', 'icon' => 'fas fa-plus'],
-                    ]
-                ],
-                [
-                    'label' => 'CIS',
-                    'icon' => 'fas fa-tags',
-                    'children' => [
-                        ['label' => 'Liste à traiter', 'route' => '#', 'icon' => 'fas fa-search'],
-                        ['label' => 'Liste à livrer', 'route' => '#', 'icon' => 'fas fa-plus'],
-                    ]
-                ],
-                [
-                    'label' => 'INVENTAIRE',
-                    'icon' => 'fas fa-tags',
-                    'children' => [
-                        ['label' => 'Liste inventaire', 'route' => '#', 'icon' => 'fas fa-search'],
-                        ['label' => 'Inventaire détaillé', 'route' => '#', 'icon' => 'fas fa-plus'],
-                    ]
-                ],
-                [
-                    'label' => 'SORTIE DE PIECES',
-                    'icon' => 'fas fa-tags',
-                    'children' => [
-                        ['label' => 'Nouvelle demande', 'route' => '#', 'icon' => 'fas fa-search'],
-                    ]
-                ],
-                [
-                    'label' => 'DEMATERIALISATION',
-                    'icon' => 'fas fa-tags',
-                    'children' => [
-                        ['label' => 'Devis', 'route' => '#', 'icon' => 'fas fa-search'],
-                        ['label' => 'Commandes clients', 'route' => '#', 'icon' => 'fas fa-plus'],
-                        ['label' => 'Planning magasin', 'route' => '#', 'icon' => 'fas fa-plus'],
-                    ]
-                ],
+        $links = [];
 
-                ['label' => 'Soumission commandes fournisseur', 'route' => '#'],
-                ['label' => 'Liste des non placées', 'route' => '#'],
-            ],
-            'Appro' => [
-                ['label' => 'Nouvelle DA', 'route' => '#'],
-                ['label' => 'Consultation des DA', 'route' => '#'],
-                ['label' => 'Liste des commandes fournisseurs', 'route' => '#'],
-            ],
-            'IT' => [
-                ['label' => 'Nouvelle Demande', 'route' => '#'],
-                ['label' => 'Consultation', 'route' => '#'],
-                ['label' => 'Planning', 'route' => '#'],
-            ],
-            'POL' => [
-                ['label' => 'Nouvelle DLUB', 'route' => '#'],
-                ['label' => 'Consultation des DLUB', 'route' => '#'],
-                ['label' => 'Liste des commandes fournisseur', 'route' => '#'],
-                ['label' => 'Pneumatiques', 'route' => '#'],
-            ],
-            'Energie' => [
-                ['label' => 'Rapport de production centrale', 'route' => '#'],
-            ],
-            'HSE' => [
-                ['label' => 'Rapport d\'incident', 'route' => '#'],
-                ['label' => 'Documentation', 'route' => '#']
-            ],
-        ];
+        switch ($vignetteName) {
+            case 'Documentation':
+                $links = $this->documentationSubmenu();
+                break;
+            case 'Reporting':
+                $links = $this->reportingSubmenu();
+                break;
+            case 'Compta':
+                $links = $this->comptaSubmenu();
+                break;
+            case 'RH':
+                $links = $this->rhSubmenu();
+                break;
+            case 'Matériel':
+                $links = $this->materielSubmenu();
+                break;
+            case 'Atelier':
+                $links = $this->atelierSubmenu();
+                break;
+            case 'Magasin':
+                $links = $this->magasinSubmenu();
+                break;
+            case 'Appro':
+                $links = $this->approSubmenu();
+                break;
+            case 'IT':
+                $links = $this->itSubmenu();
+                break;
+            case 'POL':
+                $links = $this->polSubmenu();
+                break;
+            case 'Energie':
+                $links = $this->energieSubmenu();
+                break;
+            case 'HSE':
+                $links = $this->hseSubmenu();
+                break;
+            default:
+                $links = [];
+                break;
+        }
 
-        return $allLinks[$vignetteName] ?? [];
+        return $this->transformSubmenu($links);
     }
 
     public function getCardByIndex(int $index): ?HomeCard

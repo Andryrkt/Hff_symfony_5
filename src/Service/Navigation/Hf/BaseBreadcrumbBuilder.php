@@ -80,72 +80,84 @@ class BaseBreadcrumbBuilder
             /** =============== Documentation ===================== */
             [
                 'label' => 'documentation',
+                'icon' => 'fas fa-book',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('Documentation', $this->documentationSubmenu())
             ],
             /** ======== Reporting ========== */
             [
                 'label' => 'Reporting',
+                'icon' => 'fas fa-chart-line',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('Reporting', $this->reportingSubmenu())
             ],
             /** ======== Compta ========== */
             [
                 'label' => 'Compta',
+                'icon' => 'fas fa-file-invoice-dollar',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('Compta', $this->comptaSubmenu())
             ],
             /** ======== RH ========== */
             [
                 'label' => 'rh',
+                'icon' => 'fas fa-users',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('RH', $this->rhSubmenu())
             ],
             /** ======== Matériel ========== */
             [
                 'label' => 'Matériel',
+                'icon' => 'fas fa-truck-pickup',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('Matériel', $this->materielSubmenu())
             ],
             /** ======== Atelier ========== */
             [
                 'label' => 'Atelier',
+                'icon' => 'fas fa-tools',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('Atelier', $this->atelierSubmenu())
             ],
             /** ======== Magasin ========== */
             [
                 'label' => 'Magasin',
+                'icon' => 'fas fa-warehouse',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('Magasin', $this->magasinSubmenu())
             ],
             /** ======== Appro ========== */
             [
                 'label' => 'Appro',
+                'icon' => 'fas fa-shopping-basket',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('Appro', $this->approSubmenu())
             ],
             /** ======== IT ========== */
             [
                 'label' => 'IT',
+                'icon' => 'fas fa-laptop',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('IT', $this->itSubmenu())
             ],
             /** ======== POL ========== */
             [
                 'label' => 'POL',
+                'icon' => 'fas fa-gas-pump',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('POL', $this->polSubmenu())
             ],
             /** ======== Energie ========== */
             [
                 'label' => 'Energie',
+                'icon' => 'fas fa-bolt',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('Energie', $this->energieSubmenu())
             ],
             /** ======== HSE ========== */
             [
                 'label' => 'HSE',
+                'icon' => 'fas fa-hard-hat',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('HSE', $this->hseSubmenu())
             ],

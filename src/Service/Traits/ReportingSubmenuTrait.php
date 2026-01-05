@@ -10,11 +10,13 @@ trait ReportingSubmenuTrait
             // ======== Reporting Power BI ========== 
             [
                 'label' => 'Reporting Power BI',
+                'icon' => 'fas fa-chart-pie',
                 'route' => '#'
             ],
             // ======== Reporting Excel ========== 
             [
                 'label' => 'Reporting Excel',
+                'icon' => 'fas fa-file-excel',
                 'route' => '#'
             ]
         ];

@@ -10,6 +10,7 @@ trait EnergieSubmenuTrait
             // ======== Rapport de production centrale ========== 
             [
                 'label' => 'Rapport de production centrale',
+                'icon' => 'fas fa-bolt',
                 'route' => '#',
             ]
         ];

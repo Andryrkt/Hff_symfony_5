@@ -10,11 +10,13 @@ trait HseSubmenuTrait
             // ======== Rapport d'incident ========== 
             [
                 'label' => 'Rapport d\'incident',
+                'icon' => 'fas fa-exclamation-triangle',
                 'route' => '#',
             ],
             // ======== Documentation ========== 
             [
                 'label' => 'Documentation',
+                'icon' => 'fas fa-book',
                 'route' => '#',
             ]
         ];

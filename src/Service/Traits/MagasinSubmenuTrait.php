@@ -10,56 +10,63 @@ trait MagasinSubmenuTrait
             // ======== OR ========== 
             [
                 'label' => 'OR',
+                'icon' => 'fas fa-tools',
                 'route' => null,
                 'submenu' => [
-                    ['label' => 'Liste à traiter', 'route' => '#'],
-                    ['label' => 'Liste à livrer', 'route' => '#']
+                    ['label' => 'Liste à traiter', 'icon' => 'fas fa-search', 'route' => '#'],
+                    ['label' => 'Liste à livrer', 'icon' => 'fas fa-truck-loading', 'route' => '#']
                 ]
             ],
             // ======== CIS ========== 
             [
                 'label' => 'CIS',
+                'icon' => 'fas fa-warehouse',
                 'route' => null,
                 'submenu' => [
-                    ['label' => 'Liste à traiter', 'route' => '#'],
-                    ['label' => 'Liste à livrer', 'route' => '#']
+                    ['label' => 'Liste à traiter', 'icon' => 'fas fa-search', 'route' => '#'],
+                    ['label' => 'Liste à livrer', 'icon' => 'fas fa-truck-loading', 'route' => '#']
                 ]
             ],
             // ======== INVENTAIRE ========== 
             [
                 'label' => 'INVENTAIRE',
+                'icon' => 'fas fa-clipboard-list',
                 'route' => null,
                 'submenu' => [
-                    ['label' => 'Liste inventaire', 'route' => '#'],
-                    ['label' => 'Inventaire détaillé', 'route' => '#']
+                    ['label' => 'Liste inventaire', 'icon' => 'fas fa-search', 'route' => '#'],
+                    ['label' => 'Inventaire détaillé', 'icon' => 'fas fa-list-alt', 'route' => '#']
                 ]
             ],
             // ======== SORTIE DE PIECES ========== 
             [
                 'label' => 'SORTIE DE PIECES',
+                'icon' => 'fas fa-dolly',
                 'route' => null,
                 'submenu' => [
-                    ['label' => 'Nouvelle demande', 'route' => '#']
+                    ['label' => 'Nouvelle demande', 'icon' => 'fas fa-plus', 'route' => '#']
                 ]
             ],
             // ======== DEMATERIALISATION ========== 
             [
-                'label' => 'OR',
+                'label' => 'DEMATERIALISATION',
+                'icon' => 'fas fa-laptop-code',
                 'route' => null,
                 'submenu' => [
-                    ['label' => 'Devis', 'route' => '#'],
-                    ['label' => 'Commandes clients', 'route' => '#'],
-                    ['label' => 'Planning magasin', 'route' => '#']
+                    ['label' => 'Devis', 'icon' => 'fas fa-file-invoice', 'route' => '#'],
+                    ['label' => 'Commandes clients', 'icon' => 'fas fa-users', 'route' => '#'],
+                    ['label' => 'Planning magasin', 'icon' => 'fas fa-calendar-alt', 'route' => '#']
                 ]
             ],
             // ======== Soumission commandes fournisseurs ========== 
             [
                 'label' => 'Soumission commandes fournisseurs',
+                'icon' => 'fas fa-paper-plane',
                 'route' => '#',
             ],
             // ======== Liste des non placées ========== 
             [
                 'label' => 'Liste des non placées',
+                'icon' => 'fas fa-times-circle',
                 'route' => '#',
             ]
         ];

@@ -63,10 +63,10 @@ class BadmBreadcrumbBuilder extends BaseBreadcrumbBuilder implements BreadcrumbB
 
         return $this->breadcrumb
             ->clear()
-            ->add('Accueil', 'home_index')
-            ->add('HFF', null, [], $this->hfSubmenu())
-            ->add('MATERIEL', null, [], $this->materielSubmenu())
-            ->add('Badm', null, [], $this->badmSubmenu())
+            ->add('Accueil', 'home_index', [], [], 'fas fa-home')
+            ->add('HFF', null, [], $this->hfSubmenu(), 'fas fa-building')
+            ->add('MATERIEL', null, [], $this->materielSubmenu(), 'fas fa-cogs')
+            ->add('Badm', null, [], $this->badmSubmenu(), 'fas fa-folder')
         ;
     }
 
