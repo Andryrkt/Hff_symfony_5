@@ -78,8 +78,8 @@ class PlanningMaterielMapper
         ]);
 
         return [
-            'numeroDit' => $dit?->getNumeroDit(),
-            'migration' => $dit?->getNumeroMigration()
+            'numeroDit' => $dit ? $dit->getNumeroDit() : '',
+            'migration' => $dit ? $dit->getNumeroMigration() : ''
         ];
     }
 }

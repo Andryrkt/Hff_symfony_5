@@ -136,8 +136,8 @@ class HomeCardService
                     'label' => 'Mouvemnet matériel',
                     'icon' => 'fas fa-tags',
                     'children' => [
-                        ['label' => 'Nouvelle demande', 'route' => '#', 'icon' => 'fas fa-search'],
-                        ['label' => 'Consultation', 'route' => '#', 'icon' => 'fas fa-plus'],
+                        ['label' => 'Nouvelle demande', 'route' => 'hf_materiel_badm_first_form_index', 'icon' => 'fas fa-plus'],
+                        ['label' => 'Consultation', 'route' => 'hf_materiel_badm_liste_index', 'icon' => 'fas fa-search'],
                     ]
                 ],
                 [

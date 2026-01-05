@@ -1,18 +1,19 @@
 <?php
 
-namespace App\Factory\Hf\Rh\Dom;
+namespace App\Factory\Hf\Materiel\Badm;
 
-use App\Constants\Hf\Rh\Dom\SousTypeDomConstants;
-use App\Dto\Hf\Rh\Dom\FirstFormDto;
 use App\Entity\Admin\PersonnelUser\User;
-use App\Entity\Hf\Rh\Dom\SousTypeDocument;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Dto\Hf\Materiel\Badm\FirstFormDto;
 use Symfony\Component\Security\Core\Security;
+use App\Entity\Hf\Materiel\Badm\TypeMouvement;
+use App\Constants\Hf\Materiel\Badm\TypeMouvementConstants;
 
-class FirstFormDtoFactory
+class FirstFormFactory
 {
-    private $security;
-    private $em;
+    private Security $security;
+    private EntityManagerInterface $em;
+
     public function __construct(
         Security $security,
         EntityManagerInterface $em
@@ -23,7 +24,8 @@ class FirstFormDtoFactory
 
     public function create(): FirstFormDto
     {
-        $dto = new FirstFormDto();
+        $dto =  new FirstFormDto();
+
         /** @var User */
         $user = $this->security->getUser();
 
@@ -33,8 +35,8 @@ class FirstFormDtoFactory
 
         $dto->agenceUser = $user->getAgenceUser()->getCode() . '-' . $user->getAgenceUser()->getNom();
         $dto->serviceUser = $user->getServiceUser()->getCode() . '-' . $user->getServiceUser()->getNom();
-        $dto->typeMission = $this->em->getRepository(SousTypeDocument::class)
-            ->findOneBy(['codeSousType' => SousTypeDomConstants::SOUS_TYPE_MISSION]);
+        $dto->typeMouvement = $this->em->getRepository(TypeMouvement::class)->findOneBy(['codeMouvement' => TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC]);
+
 
         return $dto;
     }
