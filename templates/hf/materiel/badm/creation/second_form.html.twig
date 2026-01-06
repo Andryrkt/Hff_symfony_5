@@ -1,0 +1,117 @@
+{% extends "base.html.twig" %}
+
+{% block title %}
+	Création BADM - Etape 2
+{% endblock %}
+
+{% import "macros/form_macros.html.twig" as formMacro %}
+
+{% block content %}
+	<div class="container mt-6 mb-4">
+		{{ form_start(form)}}
+		{{ form_errors(form)}}
+		<div class="row">
+			<div class="col-12 col-md-3">
+				{{ form_row(form.dateDemande)}}
+			</div>
+			<div class="d-flex justify-content-end  ">
+				<h3 id="codeMouvement" class="px-3 py-2 fw-bold rounded {{secondFormDto.typeMouvementCssClass}}">{{secondFormDto.typeMouvement.description}}</h3>
+			</div>
+		</div>
+
+		{# DEBUT Caractéristiques du matériel#}
+		<div class="row">{{ formMacro.sousTitre('Caractéristiques du matériel', {class: 'sousTitre'})}}</div>
+		<div class="row">
+			<div class="row">
+				<div class="col-12 col-md-6 col-lg-3">{{ form_row(form.designation)}}</div>
+				<div class="col-12 col-md-6 col-lg-3">{{ form_row(form.idMateriel)}}</div>
+				<div class="col-12 col-md-6 col-lg-3">{{ form_row(form.numSerie)}}</div>
+				<div class="col-12 col-md-6 col-lg-3">{{ form_row(form.numParc)}}</div>
+			</div>
+			<div class="row">
+				<div class="col-12 col-md-6 col-lg-3">{{ form_row(form.groupe)}}</div>
+				<div class="col-12 col-md-6 col-lg-3">{{ form_row(form.constructeur)}}</div>
+				<div class="col-12 col-md-6 col-lg-3">{{ form_row(form.modele)}}</div>
+				<div class="col-12 col-md-6 col-lg-3">{{ form_row(form.anneeDuModele)}}</div>
+			</div>
+			<div class="row d-flex">
+				<div class="col-12 col-md-6 col-lg-3">{{ form_row(form.affectation)}}</div>
+				<div class="col-12 col-md-6 col-lg-3">{{ form_row(form.dateAchat)}}</div>
+			</div>
+		</div>
+		{# FIN Caractéristiques du matériel#}
+
+		{# DEBUT Etat machine#}
+		<div class="row">{{ formMacro.sousTitre('Etat machine', {class: 'sousTitre'})}}</div>
+		<div class="row">
+			<div class="col-12 col-md-6">{{ form_row(form.heureMachine)}}</div>
+			<div class="col-12 col-md-6">{{ form_row(form.kmMachine)}}</div>
+		</div>
+		{# FIN Etat machine#}
+
+		{# DEBUT Agence, Service et casier Emetteur#}
+		<div class="row">{{ formMacro.sousTitre('Agence, Service et casier émetteur', {class: 'sousTitre'})}}</div>
+		<div class="row">
+			<div class="col-12 col-md-4">{{ form_row(form.emetteur.agence)}}</div>
+			<div class="col-12 col-md-4">{{ form_row(form.emetteur.service)}}</div>
+			<div class="col-12 col-md-4">{{ form_row(form.emetteur.casier)}}</div>
+		</div>
+		{# FIN Agence, Service et casier Emetteur#}
+
+		{# DEBUT Agence, Service et casier Destiantaire#}
+		<div class="row">{{ formMacro.sousTitre('Agence, Service et casier destinataire', {class: 'sousTitre'})}}</div>
+		<div class="row">
+			<div class="col-12 col-md-4">{{ form_row(form.destinataire.agence)}}</div>
+			<div class="col-12 col-md-4">{{ form_row(form.destinataire.service)}}</div>
+			<div class="col-12 col-md-4">{{ form_row(form.destinataire.casier)}}</div>
+		</div>
+		<div class="row">{{ form_row(form.motifMateriel)}}</div>
+		{# FIN Agence, Service et casier Destiantaire#}
+
+		{# DEBUT ENTREE EN PARC#}
+		<div class="row">{{ formMacro.sousTitre('Entrée en parc', {class: 'sousTitre'})}}</div>
+		<div class="row">
+			<div class="col-12 col-md-6">{{ form_row(form.etatAchat)}}</div>
+			<div class="col-12 col-md-6">{{ form_row(form.dateMiseLocation)}}</div>
+		</div>
+		{# FIN Entrée en parc#}
+
+		{# DEBUT Bilan Financière ou valeur (MGA)#}
+		<div class="row">{{ formMacro.sousTitre('Valeur (MGA)', {class: 'sousTitre'})}}</div>
+		<div class="row">
+			<div class="col-12 col-md-6 col-lg-4">{{ form_row(form.coutAcquisition)}}</div>
+			<div class="col-12 col-md-6 col-lg-4">{{ form_row(form.amortissement)}}</div>
+			<div class="col-12 col-md-6 col-lg-4">{{ form_row(form.valeurNetComptable)}}</div>
+		</div>
+		{# FIN Bilan Financière#}
+
+		{# DEBUT Cession d’actif#}
+		<div class="row">{{ formMacro.sousTitre('Cession d’actif', {class: 'sousTitre'})}}</div>
+		<div class="row">
+			<div class="col-12 col-md-6 col-lg-4">{{ form_row(form.nomClient)}}</div>
+			<div class="col-12 col-md-6 col-lg-4">{{ form_row(form.modalitePaiement)}}</div>
+			<div class="col-12 col-md-6 col-lg-4">{{ form_row(form.prixVenteHt)}}</div>
+		</div>
+		{# FIN Cession d’actif#}
+
+		{# DEBUT Mise au rebut#}
+		<div class="row">{{ formMacro.sousTitre('Mise au rebut', {class: 'sousTitre'})}}</div>
+		<div class="row">{{ form_row(form.motifMiseRebut)}}</div>
+
+		<div class="row">
+			<div class="col-12 col-md-6">{{ form_row(form.nomImage)}}</div>
+			<div class="col-12 col-md-6">{{ form_row(form.nomFichier)}}</div>
+		</div>
+		{# FIN Mise au rebut#}
+
+
+		<div class="row">
+			<div class="d-flex justify-content-end mt-2">
+				{% import "macros/actions.html.twig" as actions %}
+				{{ actions.submit_button('Enregistrer', 'fa fa-print', 'btn-warning', true, 'Confirmez-vous la création de ce BADM ?', 'Veuillez ne pas quitter la page pendant la création du BADM.', 'Création du BADM') }}
+			</div>
+		</div>
+
+	</div>
+	{{ form_end(form)}}
+{% endblock %}

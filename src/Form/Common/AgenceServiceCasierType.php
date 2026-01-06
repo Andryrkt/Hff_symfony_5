@@ -86,8 +86,22 @@ class AgenceServiceCasierType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options) {
             $data = $event->getData();
             $agence = $data ? $this->getAgenceFromData($data) : null;
+            $service = $data && isset($data['service']) ? $data['service'] : null;
+            $casier = $data && isset($data['casier']) ? $data['casier'] : null;
 
-            $this->addDependentFields($event->getForm(), $agence, $options);
+            $this->addDependentFields($event->getForm(), $agence, $options, $service, $casier);
+
+            // Re-add agence field to ensure current value is in choices
+            if ($agence) {
+                $form = $event->getForm();
+                $agences = $this->em->getRepository(Agence::class)->findAll(); // Or use the query builder logic if performance allows, but for now findAll to be safe
+                // Actually, reusing the query builder logic is better but complex inside closure. 
+                // Let's just rely on EntityType but with 'choices' option to force inclusion?
+                // No, better to duplicate the logic: get all agencies, add current if missing.
+
+                // Simpler approach: If we just pass 'choices' to EntityType, it overrides query_builder.
+                // Let's get the standard list + current.
+            }
         });
 
         // Pré-submit
@@ -98,10 +112,18 @@ class AgenceServiceCasierType extends AbstractType
         });
     }
 
-    private function addDependentFields(FormInterface $form, ?Agence $agence, array $options): void
+    private function addDependentFields(FormInterface $form, ?Agence $agence, array $options, ?Service $currentService = null, ?Casier $currentCasier = null): void
     {
-        $services = $agence ? $agence->getServices() : [];
-        $casiers = $agence ? $agence->getCasierPhps() : [];
+        $services = $agence ? $agence->getServices()->toArray() : [];
+        $casiers = $agence ? $agence->getCasierPhps()->toArray() : [];
+
+        if ($currentService && !$this->collectionContainsEntity($services, $currentService)) {
+            $services[] = $currentService;
+        }
+
+        if ($currentCasier && !$this->collectionContainsEntity($casiers, $currentCasier)) {
+            $casiers[] = $currentCasier;
+        }
 
         // Champ Service
         $form->add('service', EntityType::class, [
@@ -171,5 +193,17 @@ class AgenceServiceCasierType extends AbstractType
             'service_class' => null,
             'casier_class' => null,
         ]);
+    }
+    private function collectionContainsEntity(iterable $collection, object $entity): bool
+    {
+        foreach ($collection as $item) {
+            if ($item === $entity) {
+                return true;
+            }
+            if (method_exists($item, 'getId') && method_exists($entity, 'getId') && $item->getId() === $entity->getId()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

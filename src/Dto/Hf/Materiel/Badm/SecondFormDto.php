@@ -5,6 +5,7 @@ namespace App\Dto\Hf\Materiel\Badm;
 use App\Entity\Admin\Statut\StatutDemande;
 use App\Entity\Hf\Materiel\Badm\TypeMouvement;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Constants\Hf\Materiel\Badm\TypeMouvementConstants;
 
 class SecondFormDto
 {
@@ -24,13 +25,21 @@ class SecondFormDto
     public int $kmMachine;
     // ---------------- Agence, service et casier emetteur ----------------
     public ?array $emetteur = null;
-    public string $casierEmetteur;
     // ---------------- Agence, service et casier destinataire ----------------
     public ?array $destinataire = null;
-    public string $casierDestinataire;
+    /**
+     * @Assert\NotBlank(message="Le motif ne peut pas être vide.")
+     * @Assert\Length(
+     *      min=3,
+     *      max=100,
+     *      minMessage="Le motif doit comporter au moins {{ limit }} caractères",
+     *      maxMessage="Le motif ne peut pas dépasser {{ limit }} caractères"
+     * )
+     */
+    public string $motifMateriel;
     // ---------------- Entrée en parc ----------------
     public string $etatAchat;
-    public string $dateMiseLocation;
+    public ?\DateTime $dateMiseLocation = null;
     // ---------------- Valeur ----------------
     public float $coutAcquisition;
     public float $amortissement;
@@ -58,4 +67,10 @@ class SecondFormDto
     public string $numeroBadm;
     public StatutDemande $statutDemande;
     public \DateTime $dateDemande;
+
+
+    public function getTypeMouvementCssClass(): string
+    {
+        return TypeMouvementConstants::getCssClass($this->typeMouvement->getDescription());
+    }
 }

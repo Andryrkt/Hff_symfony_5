@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Factory\Hf\Materiel\Badm\SecondFormFactory;
 use App\Form\Hf\Materiel\Badm\Creation\SecondFormType;
+use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use App\Service\Hf\Materiel\Badm\BadmBlockingConditionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -22,7 +23,8 @@ class SecondFormController extends AbstractController
         Request $request,
         BadmModel $badmModel,
         BadmBlockingConditionService $badmBlockingConditionService,
-        SecondFormFactory $secondFormFactory
+        SecondFormFactory $secondFormFactory,
+        ContextAwareBreadcrumbBuilder $breadcrumbBuilder
     ) {
         // 1. gerer l'accés 
         $this->denyAccessUnlessGranted('MATERIEL_BADM_CREATE');
@@ -34,7 +36,7 @@ class SecondFormController extends AbstractController
         $infoMaterielDansIps = $badmModel->getInfoMateriel($firstFormDto);
 
         // 4. CONDITION DE BLOCAGE 
-        $blockingMessage = $badmBlockingConditionService->checkBlockingConditions($firstFormDto, $infoMaterielDansIps);
+        $blockingMessage = !$this->isGranted('ROLE_ADMIN') ? $badmBlockingConditionService->checkBlockingConditions($firstFormDto, $infoMaterielDansIps) : null;
         if ($blockingMessage) {
             $this->addFlash('warning', $blockingMessage);
             return $this->redirectToRoute('hf_materiel_badm_first_form_index');
@@ -49,7 +51,11 @@ class SecondFormController extends AbstractController
         // TODO: 7. traitement du formulaire
         // $this->traitementFormulaire($request, $form);
 
-        return $this->render('hf/materiel/badm/creation/second_form.html.twig');
+        return $this->render('hf/materiel/badm/creation/second_form.html.twig', [
+            'form' => $form->createView(),
+            'secondFormDto' => $secondFormDto,
+            'breadcrumbs' => $breadcrumbBuilder->build('hf_materiel_badm_second_form_index'),
+        ]);
     }
 
     /**

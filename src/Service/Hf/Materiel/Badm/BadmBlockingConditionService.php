@@ -35,6 +35,7 @@ class BadmBlockingConditionService
      */
     public function checkBlockingConditions($dto, array $infoMaterielDansIps): ?string
     {
+
         // bloqué si:
         // 2.1 le matériel n'existe pas
         if (empty($infoMaterielDansIps)) {

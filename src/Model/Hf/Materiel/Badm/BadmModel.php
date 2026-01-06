@@ -48,20 +48,20 @@ class BadmModel
                             mmat_nummat as num_matricule,
                             trim(mmat_numserie) as num_serie,
                             trim(mmat_recalph) as num_parc ,
-                            (select mhir_compteur from Informix.mat_hir a where a.mhir_nummat = mmat_nummat and a.mhir_daterel = (select max(b.mhir_daterel) from Informix.mat_hir b where b.mhir_nummat = a.mhir_nummat)) as HEURE,
-                            (select mhir_cumcomp from Informix.mat_hir a where a.mhir_nummat = mmat_nummat and a.mhir_daterel = (select max(b.mhir_daterel) from Informix.mat_hir b where b.mhir_nummat = a.mhir_nummat)) as KM,
+                            (select mhir_compteur from Informix.mat_hir a where a.mhir_nummat = mmat_nummat and a.mhir_daterel = (select max(b.mhir_daterel) from Informix.mat_hir b where b.mhir_nummat = a.mhir_nummat)) as heure_machine,
+                            (select mhir_cumcomp from Informix.mat_hir a where a.mhir_nummat = mmat_nummat and a.mhir_daterel = (select max(b.mhir_daterel) from Informix.mat_hir b where b.mhir_nummat = a.mhir_nummat)) as km_machine,
                             (select mhir_daterel from Informix.mat_hir a where a.mhir_nummat = mmat_nummat and a.mhir_daterel = (select max(b.mhir_daterel) from Informix.mat_hir b where b.mhir_nummat = a.mhir_nummat)) as Date_compteur,
                             trim(mmat_numparc) as casier_emetteur,
-                            year(mmat_datemser) as annee,
+                            year(mmat_datemser) as annee_du_modele,
                             date(mmat_datentr) as date_achat,
                             (select nvl(sum(mofi_mt),0) from Informix.mat_ofi where mofi_classe = 30 and mofi_ssclasse in (10,11,12,13,14,16,17,18,19) and mofi_numbil = mbil_numbil and mofi_typmt = 'R' and mofi_lib like 'Prix d''achat') as Prix_achat,
-                            (select nvl(sum(mofi_mt),0) from Informix.mat_ofi where mofi_classe = 30 and mofi_ssclasse = 15 and mofi_numbil = mbil_numbil and mofi_typmt = 'R') as Amortissement,
-                            (select nvl(sum(mofi_mt),0) from Informix.mat_ofi where mofi_classe = 40 and mofi_ssclasse in (21,22,23) and mofi_numbil = mbil_numbil and mofi_typmt = 'R') as Charge_Entretien,
-                            (select nvl(sum(mofi_mt),0) from Informix.mat_ofi where mofi_classe = 30 and mofi_ssclasse in (10,11,12,13,14,16,17,18,19) and mofi_numbil = mbil_numbil and mofi_typmt = 'R') as Droits_Taxe,
-                            mmat_nouo as etat_materiel,
+                            (select nvl(sum(mofi_mt),0) from Informix.mat_ofi where mofi_classe = 30 and mofi_ssclasse = 15 and mofi_numbil = mbil_numbil and mofi_typmt = 'R') as amortissement,
+                            (select nvl(sum(mofi_mt),0) from Informix.mat_ofi where mofi_classe = 40 and mofi_ssclasse in (21,22,23) and mofi_numbil = mbil_numbil and mofi_typmt = 'R') as charge_entretien,
+                            (select nvl(sum(mofi_mt),0) from Informix.mat_ofi where mofi_classe = 30 and mofi_ssclasse in (10,11,12,13,14,16,17,18,19) and mofi_numbil = mbil_numbil and mofi_typmt = 'R') as cout_acquisition, -- droits taxe
+                            mmat_nouo as etat_achat,
                             trim((select atab_lib from Informix.agr_tab where atab_code = mmat_natmat and atab_nom = 'NAT')) as famille,
                             trim(mmat_affect) as code_affect,
-                            (select  mimm_dateserv from Informix.mmo_imm where mimm_nummat = mmat_nummat) as date_location
+                            (select  mimm_dateserv from Informix.mmo_imm where mimm_nummat = mmat_nummat) as date_mise_en_location
                         FROM Informix.mat_mat, Informix.agr_succ, outer mat_bil
                         WHERE (MMAT_SUCC in ('01', '02', '20', '30', '40', '50', '60', '80', '90','91','92') or MMAT_SUCC IN (SELECT ASUC_PARC FROM informix.AGR_SUCC WHERE ASUC_NUM IN ('01','02', '20', '30', '40', '50', '60', '80', '90','91','92') ))
                         and trim(MMAT_ETSTOCK) in ('ST','AT')

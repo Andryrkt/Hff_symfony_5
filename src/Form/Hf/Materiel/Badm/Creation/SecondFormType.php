@@ -24,6 +24,8 @@ class SecondFormType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $typeMouvement = $options["data"]->typeMouvement->getDescription();
+
         $builder
             // =============== CARACTERISTIQUES DU MATERIEL ===============
             ->add(
@@ -68,10 +70,10 @@ class SecondFormType extends AbstractType
                 [
                     'label' => 'N° Parc',
                     'attr' => [
-                        'disabled' => $options["data"]->typeMouvement->getDescription() !== TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC
+                        'disabled' => $typeMouvement !== TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC
                     ],
                     'data' => $options["data"]->numParc,
-                    'required' => $options["data"]->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC
+                    'required' => $typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC
                 ]
             )
             ->add(
@@ -172,32 +174,38 @@ class SecondFormType extends AbstractType
                 ]
             )
 
-            // =============== Agence, service et casier emetteur ============
+            //TODO: =============== Agence, service et casier emetteur ============
             ->add('emetteur', AgenceServiceCasierType::class, [
                 'render_type' => 'select',
-                'with_casier' => true,
+                'disabled' => true,
                 'label' => false,
                 'required' => false,
-                'mapped' => false,
                 'agence_label' => 'Agence Emetteur',
                 'service_label' => 'Service Emetteur',
                 'agence_placeholder' => '-- Agence Emetteur --',
                 'service_placeholder' => '-- Service Emetteur --',
-                'data' => $data->emetteur ?? []
             ])
-            // =============== Agence, service et casier destinataire ============
+            //TODO: =============== Agence, service et casier destinataire ============
             ->add('destinataire', AgenceServiceCasierType::class, [
                 'render_type' => 'select',
-                'with_casier' => true,
                 'label' => false,
                 'required' => false,
-                'mapped' => false,
                 'agence_label' => 'Agence Destinataire',
                 'service_label' => 'Service Destinataire',
                 'agence_placeholder' => '-- Agence Destinataire --',
                 'service_placeholder' => '-- Service Destinataire --',
-                'data' => $data->destinataire ?? []
             ])
+            ->add(
+                'motifMateriel',
+                TextType::class,
+                [
+                    'label' => 'Motif',
+                    'attr' => [
+                        'disabled' => $typeMouvement !== TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC && $typeMouvement !== TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_AGENCE_SERVICE && $typeMouvement !== TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_DE_CASIER,
+                    ],
+                    'required' => $typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC || $typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_AGENCE_SERVICE || $typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_DE_CASIER,
+                ]
+            )
             // =============== Entrée en parc ===============
             ->add(
                 'etatAchat',
@@ -318,6 +326,9 @@ class SecondFormType extends AbstractType
                 [
                     'label' => 'Image (Merci de mettre un fichier image)',
                     'required' => $options["data"]->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT,
+                    'attr' => [
+                        'disabled' =>  $options["data"]->typeMouvement->getDescription() !== TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT
+                    ],
                     'allowed_mime_types' => ['image/jpeg', 'image/jpg', 'image/png'],
                     'accept' => '.jpeg, .jpg, .png',
                     'max_size' => '5M'
@@ -329,6 +340,9 @@ class SecondFormType extends AbstractType
                 [
                     'label' => 'Fichier (Merci de mettre un fichier PDF)',
                     'required' => false,
+                    'attr' => [
+                        'disabled' =>  $options["data"]->typeMouvement->getDescription() !== TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT
+                    ],
                     'allowed_mime_types' => [
                         'application/pdf',
                         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
