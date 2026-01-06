@@ -4,13 +4,13 @@ namespace App\Controller\Hf\Materiel\Badm\Creation;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormInterface;
-use App\Model\Hf\Materiel\Badm\BadmModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Factory\Hf\Materiel\Badm\FirstFormFactory;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Form\Hf\Materiel\Badm\Creation\FirstFormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
+use App\Service\Hf\Materiel\Badm\BadmBlockingConditionService;
 use App\Service\Historique_operation\HistoriqueOperationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -35,8 +35,8 @@ class FirstFormController extends AbstractController
     public function index(
         FirstFormFactory $badmFirstFormFactory,
         Request $request,
-        BadmModel $badmModel,
-        ContextAwareBreadcrumbBuilder $breadcrumbBuilder
+        ContextAwareBreadcrumbBuilder $breadcrumbBuilder,
+        BadmBlockingConditionService $badmBlockingConditionService
     ) {
         // 1. gerer l'accés 
         $this->denyAccessUnlessGranted('MATERIEL_BADM_CREATE');
@@ -49,7 +49,7 @@ class FirstFormController extends AbstractController
 
 
         // 4. traitement du formualire
-        $response = $this->traitemementForm($form, $request, $badmModel);
+        $response = $this->traitemementForm($form, $request, $badmBlockingConditionService);
         if ($response instanceof RedirectResponse) {
             return $response;
         }
@@ -61,7 +61,7 @@ class FirstFormController extends AbstractController
         ]);
     }
 
-    private function traitemementForm(FormInterface $form, Request $request, BadmModel $badmModel)
+    private function traitemementForm(FormInterface $form, Request $request, BadmBlockingConditionService $badmBlockingConditionService)
     {
         $form->handleRequest($request);
 
@@ -71,22 +71,9 @@ class FirstFormController extends AbstractController
             // 1. Récupération des données du formulaire
             $dto = $form->getData();
 
-            // 2. Vérification de l'existence du matériel
-            $infoMaterielExistant = $badmModel->estMaterielExiste($dto);
-            if (!$infoMaterielExistant) {
-                $this->logger->warning('Le matériel n\'existe pas.');
-                $message = 'Le matériel peut être déjà vendu ou vous avez mal saisi le numéro de série ou le numéro de parc ou ID matériel.';
-                $this->historiqueOperationService->enregistrer(
-                    '',
-                    'CREATION',
-                    'BADM',
-                    false,
-                    $message
-                );
 
-                $this->addFlash('warning', $message);
-                return $this->redirectToRoute('hf_materiel_badm_first_form_index');
-            }
+
+
 
             $this->logger->debug('Données du formulaire', ['data' => $dto]);
 

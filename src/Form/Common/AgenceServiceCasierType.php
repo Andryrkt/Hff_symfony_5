@@ -2,7 +2,6 @@
 
 namespace App\Form\Common;
 
-
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -11,13 +10,14 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormInterface;
 use App\Entity\Admin\AgenceService\Agence;
 use App\Entity\Admin\AgenceService\Service;
+use App\Entity\Hf\Materiel\Casier\Casier;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Form\DataTransformer\EntityToIdTransformer;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
-class AgenceServiceType extends AbstractType
+class AgenceServiceCasierType extends AbstractType
 {
     private $em;
 
@@ -39,6 +39,7 @@ class AgenceServiceType extends AbstractType
     {
         $agenceTransformer = new EntityToIdTransformer($this->em, Agence::class);
         $serviceTransformer = new EntityToIdTransformer($this->em, Service::class);
+        $casierTransformer = new EntityToIdTransformer($this->em, Casier::class);
 
         $builder
             ->add(
@@ -52,6 +53,12 @@ class AgenceServiceType extends AbstractType
                     'required' => $options['service_required'],
                     'attr' => ['class' => $options['service_class'] ?? 'light-service-input'],
                 ])->addModelTransformer($serviceTransformer)
+            )
+            ->add(
+                $builder->create('casier', HiddenType::class, [
+                    'required' => $options['casier_required'],
+                    'attr' => ['class' => $options['casier_class'] ?? 'light-casier-input'],
+                ])->addModelTransformer($casierTransformer)
             );
     }
 
@@ -80,21 +87,23 @@ class AgenceServiceType extends AbstractType
             $data = $event->getData();
             $agence = $data ? $this->getAgenceFromData($data) : null;
 
-            $this->addServiceField($event->getForm(), $agence, $options);
+            $this->addDependentFields($event->getForm(), $agence, $options);
         });
 
         // Pré-submit
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($options) {
             $data = $event->getData();
-            $agence = $this->getAgenceFromFormData($data, $event->getForm());
-            $this->addServiceField($event->getForm(), $agence, $options);
+            $agence = $this->getAgenceFromFormData($data);
+            $this->addDependentFields($event->getForm(), $agence, $options);
         });
     }
 
-    private function addServiceField(FormInterface $form, ?Agence $agence, array $options): void
+    private function addDependentFields(FormInterface $form, ?Agence $agence, array $options): void
     {
         $services = $agence ? $agence->getServices() : [];
+        $casiers = $agence ? $agence->getCasierPhps() : [];
 
+        // Champ Service
         $form->add('service', EntityType::class, [
             'label' => $options['service_label'],
             'class' => Service::class,
@@ -104,6 +113,18 @@ class AgenceServiceType extends AbstractType
             'placeholder' => $options['service_placeholder'],
             'choices' => $services,
             'required' => $options['service_required']
+        ]);
+
+        // Champ Casier
+        $form->add('casier', EntityType::class, [
+            'label' => $options['casier_label'],
+            'class' => Casier::class,
+            'choice_label' => function (Casier $casier): string {
+                return $casier->getNom();
+            },
+            'placeholder' => $options['casier_placeholder'],
+            'choices' => $casiers,
+            'required' => $options['casier_required']
         ]);
     }
 
@@ -119,10 +140,9 @@ class AgenceServiceType extends AbstractType
         return null;
     }
 
-    private function getAgenceFromFormData(array $data, FormInterface $form): ?Agence
+    private function getAgenceFromFormData(array $data): ?Agence
     {
         if (isset($data['agence']) && $data['agence']) {
-            // Use the injected EntityManager
             return $this->em->getRepository(Agence::class)->find($data['agence']);
         }
 
@@ -133,16 +153,23 @@ class AgenceServiceType extends AbstractType
     {
         $resolver->setDefaults([
             'render_type' => 'select', // 'select' or 'hidden'
+            // Agence options
             'agence_label' => "Agence",
             'agence_placeholder' => '-- Choisir une agence--',
             'agence_required' => false,
+            'agence_codes' => [],
+            // Service options
             'service_label' => "Service",
             'service_placeholder' => '-- Choisir un service--',
             'service_required' => false,
-            'agence_codes' => [],
-            // Options for hidden mode
+            // Casier options
+            'casier_label' => "Casier",
+            'casier_placeholder' => '-- Choisir un casier--',
+            'casier_required' => false,
+            // Classes for JS hooks in hidden mode
             'agence_class' => null,
             'service_class' => null,
+            'casier_class' => null,
         ]);
     }
 }

@@ -35,7 +35,7 @@ class FirstFormFactory
 
         $dto->agenceUser = $user->getAgenceUser()->getCode() . '-' . $user->getAgenceUser()->getNom();
         $dto->serviceUser = $user->getServiceUser()->getCode() . '-' . $user->getServiceUser()->getNom();
-        $dto->typeMouvement = $this->em->getRepository(TypeMouvement::class)->findOneBy(['codeMouvement' => TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC]);
+        $dto->typeMouvement = $this->em->getRepository(TypeMouvement::class)->findOneBy(['description' => TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC]);
 
 
         return $dto;

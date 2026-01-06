@@ -9,24 +9,9 @@ use Symfony\Component\Security\Core\Security;
 
 class SecondFormFactory
 {
-    private Security $security;
-
-    public function __construct(
-        Security $security
-    ) {
-        $this->security = $security;
-    }
-
     public function create(array $caracteristiqueMateriel): SecondFormDto
     {
         $dto =  new SecondFormDto();
-
-        /** @var User */
-        $user = $this->security->getUser();
-
-        if (!$user instanceof User) {
-            throw new \RuntimeException('User not authenticated');
-        }
 
         $dto->dateDemande = new \DateTime();
         $dto->designation = $caracteristiqueMateriel['designation'];

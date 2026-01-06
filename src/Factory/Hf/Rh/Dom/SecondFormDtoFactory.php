@@ -169,7 +169,7 @@ class SecondFormDtoFactory
         $dto->agenceUser = $agenceEmetteur ? ($agenceEmetteur->getCode() . ' ' . $agenceEmetteur->getNom()) : '';
         $dto->serviceUser = $serviceEmetteur ? ($serviceEmetteur->getCode() . ' ' . $serviceEmetteur->getNom()) : '';
 
-        // Passer les objets Entity pour le champ debiteur (le LightAgenceServiceType utilise EntityToIdTransformer)
+        // Passer les objets Entity pour le champ debiteur (le AgenceServiceType en mode hidden utilise EntityToIdTransformer)
         $dto->debiteur = ['agence' => $agenceDebiteur, 'service' => $serviceDebiteur];
 
         return $dto;

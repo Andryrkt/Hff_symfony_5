@@ -57,7 +57,7 @@ class FirstFormType extends AbstractType
                 'class' => TypeMouvement::class,
                 'choice_label' => 'description',
                 'label' => 'Type Mouvement',
-                'placeholder' => '-- Choisir une type de mouvement--',
+                'placeholder' => false,
                 'required' => true,
                 'data' => $options["data"]->typeMouvement ?? null
             ])

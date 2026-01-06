@@ -7,7 +7,7 @@ use App\Entity\Hf\Rh\Dom\Site;
 use App\Entity\Hf\Rh\Dom\SousTypeDocument;
 use App\Form\Common\DateRangeType;
 use App\Form\Common\FileUploadType;
-use App\Form\Common\LightAgenceServiceType;
+use App\Form\Common\AgenceServiceType;
 use App\Repository\Hf\Rh\Dom\SiteRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
@@ -84,7 +84,8 @@ class SecondFormType extends AbstractType
 
     private function addDebiteurSection(FormBuilderInterface $builder, $data): void
     {
-        $builder->add('debiteur', LightAgenceServiceType::class, [
+        $builder->add('debiteur', AgenceServiceType::class, [
+            'render_type' => 'hidden',
             'label' => false,
             'required' => false,
             'mapped' => false,

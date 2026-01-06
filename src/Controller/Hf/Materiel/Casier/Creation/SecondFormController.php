@@ -103,7 +103,7 @@ class SecondFormController extends AbstractController
     private function processValidForm(FormInterface $form): ?RedirectResponse
     {
         $numeroCasier = 'non-défini';
-        $message = 'Création de l\'ordre de mission.';
+        $message = 'Création du casier.';
         $success = false;
 
         try {
