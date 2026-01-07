@@ -26,6 +26,8 @@ interface AgenceServiceCasierConfig {
     serviceInput: HTMLSelectElement | null;
     casierInput: HTMLSelectElement | null;
     agencesData: Agence[];
+    serviceInitialDisabled?: boolean;
+    casierInitialDisabled?: boolean;
 }
 
 // Configuration des éléments DOM
@@ -74,39 +76,52 @@ function handleAgenceChange(configKey: string): void {
     
     // Charger les services depuis les données pré-chargées
     const services = selectedAgence ? selectedAgence.services : [];
-    updateServiceOptions(services, serviceInput);
+    updateServiceOptions(services, serviceInput, configKey);
 
     // Charger les casiers depuis les données pré-chargées
     if (casierInput) {
         const casiers = selectedAgence ? selectedAgence.casiers : [];
-        updateCasierOptions(casiers, casierInput);
+        updateCasierOptions(casiers, casierInput, configKey);
     }
 }
 
 // --- DOM & Select Utilities ---
 
-function updateServiceOptions(services: Service[], selectElement: HTMLSelectElement | null): void {
+function updateServiceOptions(services: Service[], selectElement: HTMLSelectElement | null, configKey: string): void {
+    const config = configAgenceServiceCasier[configKey];
     supprimLesOptions(selectElement);
     optionParDefaut(selectElement, "-- Choisir un Service --");
 
     if (Array.isArray(services) && selectElement) {
-        selectElement.disabled = false;
-        services.forEach((service) => {
-            const option = document.createElement("option");
-            option.value = String(service.id);
-            option.text = service.code + " " + service.nom;
-            selectElement.add(option);
-        });
+        if (services.length > 0) {
+            if (!config.serviceInitialDisabled) {
+                selectElement.disabled = false;
+            }
+            services.forEach((service) => {
+                const option = document.createElement("option");
+                option.value = String(service.id);
+                option.text = service.code + " " + service.nom;
+                selectElement.add(option);
+            });
+        } else {
+            optionParDefaut(selectElement, "-- Aucun service disponible --");
+            selectElement.disabled = true;
+        }
+    } else if (selectElement) {
+        selectElement.disabled = true;
     }
 }
 
-function updateCasierOptions(casiers: Casier[] | undefined, selectElement: HTMLSelectElement | null): void {
+function updateCasierOptions(casiers: Casier[] | undefined, selectElement: HTMLSelectElement | null, configKey: string): void {
+    const config = configAgenceServiceCasier[configKey];
     supprimLesOptions(selectElement);
     optionParDefaut(selectElement, "-- Choisir un Casier --");
 
     if (Array.isArray(casiers) && selectElement) {
         if (casiers.length > 0) {
-            selectElement.disabled = false;
+            if (!config.casierInitialDisabled) {
+                selectElement.disabled = false;
+            }
             casiers.forEach((casier) => {
                 const option = document.createElement("option");
                 option.value = String(casier.id);
@@ -218,11 +233,17 @@ export function initAgenceServiceCasierHandlers(): void {
                 const preselectedServiceValue = config.serviceInput?.value || '';
                 const preselectedCasierValue = config.casierInput?.value || '';
 
+                // Stocker l'état initial des champs désactivés
+                config.serviceInitialDisabled = config.serviceInput?.disabled;
+                config.casierInitialDisabled = config.casierInput?.disabled;
+
                 // Initialiser les selects dépendants
                 optionParDefaut(config.serviceInput, "-- Choisir un Service --");
                 if (config.casierInput) {
                     optionParDefaut(config.casierInput, "-- Choisir un Casier --");
-                    config.casierInput.disabled = true;
+                    if (!config.casierInitialDisabled) { // Only disable if not already disabled by server
+                        config.casierInput.disabled = true;
+                    }
                 }
 
                 // Attacher l'événement de changement
