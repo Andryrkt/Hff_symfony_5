@@ -3,6 +3,7 @@
 namespace App\Form\Hf\Materiel\Badm\Creation;
 
 use App\Form\Common\FileUploadType;
+use App\Service\Utils\FormattingService;
 use Symfony\Component\Form\AbstractType;
 use App\Dto\Hf\Materiel\Badm\SecondFormDto;
 use App\Form\Common\AgenceServiceCasierType;
@@ -21,6 +22,14 @@ class SecondFormType extends AbstractType
         "CHEQUE" => "CHEQUE",
         "VIREMENT" => "VIREMENT"
     ];
+
+    private FormattingService $formattingService;
+
+    public function __construct(
+        FormattingService $formattingService
+    ) {
+        $this->formattingService = $formattingService;
+    }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -245,7 +254,7 @@ class SecondFormType extends AbstractType
                         'disabled' => true
                     ],
                     'required' => false,
-                    'data' => $options["data"]->coutAcquisition
+                    'data' => $this->formattingService->formatNumber($options["data"]->coutAcquisition)
                 ]
             )
             ->add(
@@ -257,7 +266,7 @@ class SecondFormType extends AbstractType
                         'disabled' => true
                     ],
                     'required' => false,
-                    'data' => $options["data"]->amortissement
+                    'data' => $this->formattingService->formatNumber($options["data"]->amortissement)
                 ]
             )
             ->add(
@@ -269,7 +278,7 @@ class SecondFormType extends AbstractType
                         'disabled' => true
                     ],
                     'required' => false,
-                    'data' => $options["data"]->valeurNetComptable
+                    'data' => $this->formattingService->formatNumber($options["data"]->valeurNetComptable)
                 ]
             )
             //================ CESSION ACTIF =================

@@ -14,22 +14,18 @@ use Symfony\Component\Security\Core\Security;
 use App\Entity\Hf\Materiel\Badm\TypeMouvement;
 use App\Constants\Admin\AgenceService\ServiceConstants;
 use App\Constants\Hf\Materiel\Badm\TypeMouvementConstants;
-use App\Service\Utils\FormattingService;
 
 class SecondFormFactory
 {
     private Security $security;
     private EntityManagerInterface $entityManager;
-    private FormattingService $formattingService;
 
     public function __construct(
         Security $security,
-        EntityManagerInterface $entityManager,
-        FormattingService $formattingService
+        EntityManagerInterface $entityManager
     ) {
         $this->security = $security;
         $this->entityManager = $entityManager;
-        $this->formattingService = $formattingService;
     }
 
     public function create(FirstFormDto $firstFormDto, array $infoMaterielDansIps): SecondFormDto
@@ -80,9 +76,11 @@ class SecondFormFactory
         $dto->dateMiseLocation = $agenceServiceCasierDateMiseEnLocation['dateMiseLocation'];
 
         //valeur
-        $dto->coutAcquisition = $this->formattingService->formatNumber($infoMaterielDansIps['cout_acquisition']);
-        $dto->amortissement = $this->formattingService->formatNumber($infoMaterielDansIps['amortissement']);
-        $dto->valeurNetComptable = $this->formattingService->formatNumber($infoMaterielDansIps['cout_acquisition'] - $infoMaterielDansIps['amortissement']);
+        $coutAcquisition = (float)$infoMaterielDansIps['cout_acquisition'];
+        $amortissement = (float)$infoMaterielDansIps['amortissement'];
+        $dto->coutAcquisition = $coutAcquisition;
+        $dto->amortissement = $amortissement;
+        $dto->valeurNetComptable = $coutAcquisition - $amortissement;
 
         // Mouvement materiel
         $dto->dateDemande = new \DateTime();
