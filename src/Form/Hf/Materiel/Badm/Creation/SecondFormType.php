@@ -2,8 +2,10 @@
 
 namespace App\Form\Hf\Materiel\Badm\Creation;
 
+use App\Entity\Admin\AgenceService\Agence;
 use App\Form\Common\FileUploadType;
 use App\Service\Utils\FormattingService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use App\Dto\Hf\Materiel\Badm\SecondFormDto;
 use App\Form\Common\AgenceServiceCasierType;
@@ -24,16 +26,46 @@ class SecondFormType extends AbstractType
     ];
 
     private FormattingService $formattingService;
+    private EntityManagerInterface $em;
 
     public function __construct(
-        FormattingService $formattingService
+        FormattingService $formattingService,
+        EntityManagerInterface $em
     ) {
         $this->formattingService = $formattingService;
+        $this->em = $em;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $typeMouvement = $options["data"]->typeMouvement->getDescription();
+
+        $agences = $this->em->getRepository(Agence::class)->findAll();
+        $agencesData = [];
+        foreach ($agences as $agence) {
+            $servicesData = [];
+            foreach ($agence->getServices() as $service) {
+                $servicesData[] = [
+                    'id' => $service->getId(),
+                    'code' => $service->getCode(),
+                    'nom' => $service->getNom(),
+                ];
+            }
+            $casiersData = [];
+            foreach ($agence->getCasierPhps() as $casier) {
+                $casiersData[] = [
+                    'id' => $casier->getId(),
+                    'nom' => $casier->getNom(),
+                ];
+            }
+            $agencesData[] = [
+                'id' => $agence->getId(),
+                'code' => $agence->getCode(),
+                'nom' => $agence->getNom(),
+                'services' => $servicesData,
+                'casiers' => $casiersData,
+            ];
+        }
 
         $builder
             // =============== CARACTERISTIQUES DU MATERIEL ===============
@@ -154,7 +186,7 @@ class SecondFormType extends AbstractType
                     'attr' => [
                         'disabled' => true
                     ],
-                    'data' => $options["data"]->dateAchat
+                    'data' => $this->formattingService->formatDate($options["data"]->dateAchat)
                 ]
             )
 
@@ -183,7 +215,7 @@ class SecondFormType extends AbstractType
                 ]
             )
 
-            //TODO: =============== Agence, service et casier emetteur ============
+            // =============== Agence, service et casier emetteur ============
             ->add('emetteur', AgenceServiceCasierType::class, [
                 'render_type' => 'select',
                 'disabled' => true,
@@ -201,8 +233,17 @@ class SecondFormType extends AbstractType
                 'required' => false,
                 'agence_label' => 'Agence Destinataire',
                 'service_label' => 'Service Destinataire',
+                'casier_label' => 'Casier Destinataire',
                 'agence_placeholder' => '-- Agence Destinataire --',
                 'service_placeholder' => '-- Service Destinataire --',
+                'casier_placeholder' => '-- Casier Destinataire --',
+                'agence_class' => 'agenceDestinataire',
+                'service_class' => 'serviceDestinataire',
+                'casier_class' => 'casierDestinataire',
+                'row_attr' => [
+                    'id' => 'agence-service-destinataire',
+                    'data-agences' => json_encode($agencesData),
+                ],
             ])
             ->add(
                 'motifMateriel',

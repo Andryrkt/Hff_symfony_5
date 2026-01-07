@@ -2,6 +2,7 @@
 
 namespace App\Controller\Api\Hf\Materiel\Casier;
 
+use App\Entity\Admin\AgenceService\Agence;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Hf\Materiel\Casier\Casier;
 use Symfony\Component\Routing\Annotation\Route;
@@ -41,5 +42,23 @@ class ApiController extends AbstractController
                 'message' => 'Une erreur est survenue lors de la validation du casier.'
             ], 500); // Internal Server Error
         }
+    }
+
+    /**
+     * @Route("/api/casier-fetch/{id}", name="api_casier_fetch", methods={"GET"})
+     */
+    public function fetchCasiers(Agence $agence): JsonResponse
+    {
+        $casiers = $agence->getCasierPhps();
+        
+        $data = [];
+        foreach ($casiers as $casier) {
+            $data[] = [
+                'value' => $casier->getId(),
+                'text' => $casier->getNom(),
+            ];
+        }
+
+        return new JsonResponse($data);
     }
 }

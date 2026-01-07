@@ -79,7 +79,8 @@ class AgenceServiceCasierType extends AbstractType
                     return $agence->getCode() . ' ' . $agence->getNom();
                 },
                 'placeholder' => $options['agence_placeholder'],
-                'required' => $options['agence_required']
+                'required' => $options['agence_required'],
+                'attr' => ['class' => $options['agence_class']],
             ]);
 
         // Pré-set data
@@ -134,7 +135,8 @@ class AgenceServiceCasierType extends AbstractType
             },
             'placeholder' => $options['service_placeholder'],
             'choices' => $services,
-            'required' => $options['service_required']
+            'required' => $options['service_required'],
+            'attr' => ['class' => $options['service_class']],
         ]);
 
         // Champ Casier
@@ -146,7 +148,8 @@ class AgenceServiceCasierType extends AbstractType
             },
             'placeholder' => $options['casier_placeholder'],
             'choices' => $casiers,
-            'required' => $options['casier_required']
+            'required' => $options['casier_required'],
+            'attr' => ['class' => $options['casier_class']],
         ]);
     }
 

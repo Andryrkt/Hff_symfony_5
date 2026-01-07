@@ -44,6 +44,9 @@ export class StimulusAutoloader {
             // Admin
             { name: 'user-roles', import: () => import('@controllers/pages/admin/user_roles_controller') },
             { name: 'user-access', import: () => import('@controllers/pages/admin/user_access_controller') },
+
+            // Handlers
+            { name: 'badm-second-form', import: () => import('@/controllers/pages/hf/materiel/badm/badm_second_form_controller') },
         ];
 
         let coreLoaded = 0;

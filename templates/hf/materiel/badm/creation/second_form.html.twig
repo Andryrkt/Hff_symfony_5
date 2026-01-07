@@ -7,6 +7,7 @@
 {% import "macros/form_macros.html.twig" as formMacro %}
 
 {% block content %}
+	<div data-controller="badm-second-form"></div>
 	<div class="container mt-6 mb-4">
 		{{ form_start(form)}}
 		{{ form_errors(form)}}
@@ -60,10 +61,12 @@
 
 		{# DEBUT Agence, Service et casier Destiantaire#}
 		<div class="row">{{ formMacro.sousTitre('Agence, Service et casier destinataire', {class: 'sousTitre'})}}</div>
-		<div class="row">
-			<div class="col-12 col-md-4">{{ form_row(form.destinataire.agence)}}</div>
-			<div class="col-12 col-md-4">{{ form_row(form.destinataire.service)}}</div>
-			<div class="col-12 col-md-4">{{ form_row(form.destinataire.casier)}}</div>
+		<div id="{{ form.destinataire.vars.row_attr.id }}" data-agences="{{ form.destinataire.vars.row_attr['data-agences'] }}">
+			<div class="row">
+				<div class="col-12 col-md-4">{{ form_row(form.destinataire.agence)}}</div>
+				<div class="col-12 col-md-4">{{ form_row(form.destinataire.service)}}</div>
+				<div class="col-12 col-md-4">{{ form_row(form.destinataire.casier)}}</div>
+			</div>
 		</div>
 		<div class="row">{{ form_row(form.motifMateriel)}}</div>
 		{# FIN Agence, Service et casier Destiantaire#}

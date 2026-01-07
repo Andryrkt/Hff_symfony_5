@@ -27,6 +27,7 @@ import { SubmenuManager } from "./js/utils/submenuManager";
 import { ToastManager } from "./js/utils/toast";
 import { CustomDropdown } from "./js/utils/customDropdown";
 import { initPagination } from "./js/utils/pagination";
+import { initAgenceServiceHandlers } from "./js/utils/AgenceServiceManager";
 
 // Import des styles supplémentaires
 import './styles/home.css';
@@ -84,6 +85,7 @@ class App {
         new ToastManager().init();
         new SubmenuManager().init();
         initPagination();
+        initAgenceServiceHandlers();
     }
 
     /**

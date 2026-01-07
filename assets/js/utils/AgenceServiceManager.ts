@@ -143,9 +143,6 @@ function populateAgenceOptions(selectElement: HTMLSelectElement): void {
 export function initAgenceServiceHandlers(): void {
     const dataContainer = document.getElementById("agence-service-data");
     if (!dataContainer) {
-        console.error(
-            "AgenceServiceManager: Data container #agence-service-data not found."
-        );
         return;
     }
 
