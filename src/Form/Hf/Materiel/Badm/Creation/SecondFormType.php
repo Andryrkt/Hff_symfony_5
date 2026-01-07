@@ -226,11 +226,11 @@ class SecondFormType extends AbstractType
                 'agence_placeholder' => '-- Agence Emetteur --',
                 'service_placeholder' => '-- Service Emetteur --',
             ])
-            //TODO: =============== Agence, service et casier destinataire ============
+            // =============== Agence, service et casier destinataire ============
             ->add('destinataire', AgenceServiceCasierType::class, [
                 'render_type' => 'select',
                 'label' => false,
-                'required' => false,
+                'required' => $typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC && $typeMouvement !== TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_AGENCE_SERVICE,
                 'agence_label' => 'Agence Destinataire',
                 'service_label' => 'Service Destinataire',
                 'casier_label' => 'Casier Destinataire',
@@ -244,6 +244,9 @@ class SecondFormType extends AbstractType
                     'id' => 'agence-service-destinataire',
                     'data-agences' => json_encode($agencesData),
                 ],
+                'agence_disabled' => $typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_DE_CASIER || $typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_CESSION_DACTIF || $typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT,
+                'service_disabled' => $typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_DE_CASIER || $typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_CESSION_DACTIF || $typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT,
+                'casier_disabled' => $typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_CESSION_DACTIF || $typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT,
             ])
             ->add(
                 'motifMateriel',

@@ -81,6 +81,7 @@ class AgenceServiceCasierType extends AbstractType
                 'placeholder' => $options['agence_placeholder'],
                 'required' => $options['agence_required'],
                 'attr' => ['class' => $options['agence_class']],
+                'disabled' => $options['agence_disabled'],
             ]);
 
         // Pré-set data
@@ -137,6 +138,7 @@ class AgenceServiceCasierType extends AbstractType
             'choices' => $services,
             'required' => $options['service_required'],
             'attr' => ['class' => $options['service_class']],
+            'disabled' => $options['service_disabled'],
         ]);
 
         // Champ Casier
@@ -150,6 +152,7 @@ class AgenceServiceCasierType extends AbstractType
             'choices' => $casiers,
             'required' => $options['casier_required'],
             'attr' => ['class' => $options['casier_class']],
+            'disabled' => $options['casier_disabled'],
         ]);
     }
 
@@ -183,14 +186,17 @@ class AgenceServiceCasierType extends AbstractType
             'agence_placeholder' => '-- Choisir une agence--',
             'agence_required' => false,
             'agence_codes' => [],
+            'agence_disabled' => false,
             // Service options
             'service_label' => "Service",
             'service_placeholder' => '-- Choisir un service--',
             'service_required' => false,
+            'service_disabled' => false,
             // Casier options
             'casier_label' => "Casier",
             'casier_placeholder' => '-- Choisir un casier--',
             'casier_required' => false,
+            'casier_disabled' => false,
             // Classes for JS hooks in hidden mode
             'agence_class' => null,
             'service_class' => null,
