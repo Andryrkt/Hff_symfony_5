@@ -80,7 +80,11 @@ class AgenceServiceCasierType extends AbstractType
                 },
                 'placeholder' => $options['agence_placeholder'],
                 'required' => $options['agence_required'],
-                'attr' => ['class' => $options['agence_class']],
+                'attr' => [
+                    'class' => $options['agence_class'],
+                    'data-controller' => 'tom-select',
+                    'data-placeholder' => $options['agence_placeholder'],
+                ],
                 'disabled' => $options['agence_disabled'],
             ]);
 
@@ -137,7 +141,11 @@ class AgenceServiceCasierType extends AbstractType
             'placeholder' => $options['service_placeholder'],
             'choices' => $services,
             'required' => $options['service_required'],
-            'attr' => ['class' => $options['service_class']],
+            'attr' => [
+                'class' => $options['service_class'],
+                'data-controller' => 'tom-select',
+                'data-placeholder' => $options['service_placeholder'],
+            ],
             'disabled' => $options['service_disabled'],
         ]);
 
@@ -151,7 +159,11 @@ class AgenceServiceCasierType extends AbstractType
             'placeholder' => $options['casier_placeholder'],
             'choices' => $casiers,
             'required' => $options['casier_required'],
-            'attr' => ['class' => $options['casier_class']],
+            'attr' => [
+                'class' => $options['casier_class'],
+                'data-controller' => 'tom-select',
+                'data-placeholder' => $options['casier_placeholder'],
+            ],
             'disabled' => $options['casier_disabled'],
         ]);
     }

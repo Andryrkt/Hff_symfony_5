@@ -73,7 +73,7 @@ function handleAgenceChange(configKey: string): void {
     }
 
     const selectedAgence = agencesData.find((agence) => agence.id == agenceId);
-    
+
     // Charger les services depuis les données pré-chargées
     const services = selectedAgence ? selectedAgence.services : [];
     updateServiceOptions(services, serviceInput, configKey);
@@ -107,33 +107,42 @@ function updateServiceOptions(services: Service[], selectElement: HTMLSelectElem
             optionParDefaut(selectElement, "-- Aucun service disponible --");
             selectElement.disabled = true;
         }
+
+        // Distribuer l'événement pour TomSelect
+        if (selectElement.dataset.controller === 'components--tom-select') {
+            selectElement.dispatchEvent(new Event('options-updated', { bubbles: true }));
+        }
     } else if (selectElement) {
         selectElement.disabled = true;
     }
 }
 
 function updateCasierOptions(casiers: Casier[] | undefined, selectElement: HTMLSelectElement | null, configKey: string): void {
+    if (!selectElement) return;
     const config = configAgenceServiceCasier[configKey];
+
+    // 1. Mettre à jour le select natif
     supprimLesOptions(selectElement);
     optionParDefaut(selectElement, "-- Choisir un Casier --");
 
-    if (Array.isArray(casiers) && selectElement) {
-        if (casiers.length > 0) {
-            if (!config.casierInitialDisabled) {
-                selectElement.disabled = false;
-            }
-            casiers.forEach((casier) => {
-                const option = document.createElement("option");
-                option.value = String(casier.id);
-                option.text = casier.nom;
-                selectElement.add(option);
-            });
-        } else {
-            optionParDefaut(selectElement, "-- Aucun casier disponible --");
-            selectElement.disabled = true;
+    if (Array.isArray(casiers) && casiers.length > 0) {
+        if (!config.casierInitialDisabled) {
+            selectElement.disabled = false;
         }
-    } else if (selectElement) {
+        casiers.forEach((casier) => {
+            const option = document.createElement("option");
+            option.value = String(casier.id);
+            option.text = casier.nom;
+            selectElement.add(option);
+        });
+    } else {
+        optionParDefaut(selectElement, "-- Aucun casier disponible --");
         selectElement.disabled = true;
+    }
+
+    // 2. Distribuer l'événement pour TomSelect
+    if (selectElement.dataset.controller === 'tom-select') {
+        selectElement.dispatchEvent(new Event('options-updated', { bubbles: true }));
     }
 }
 
@@ -200,6 +209,11 @@ function populateAgenceOptions(selectElement: HTMLSelectElement, agencesData: Ag
     if (currentValue) {
         selectElement.value = currentValue;
     }
+
+    // Distribuer l'événement pour TomSelect
+    if (selectElement.dataset.controller === 'tom-select') {
+        selectElement.dispatchEvent(new Event('options-updated', { bubbles: true }));
+    }
 }
 
 // --- Initialization ---
@@ -210,13 +224,13 @@ export function initAgenceServiceCasierHandlers(): void {
     possibleKeys.forEach((key) => {
         const agenceSelector = `.agence${capitalize(key)}`;
         const containerId = `agence-service-${key}`;
-        
+
         const agenceInput = document.querySelector(agenceSelector) as HTMLSelectElement;
         const dataContainer = document.getElementById(containerId);
 
         if (agenceInput && dataContainer) {
             configAgenceServiceCasier[key] = createConfig(key);
-            
+
             try {
                 const rawData = (dataContainer as HTMLElement).dataset.agences;
                 configAgenceServiceCasier[key].agencesData = rawData ? JSON.parse(rawData) : [];
@@ -263,6 +277,13 @@ export function initAgenceServiceCasierHandlers(): void {
                         if (preselectedCasierValue && config.casierInput) {
                             config.casierInput.value = preselectedCasierValue;
                         }
+
+                        // Forcer la synchronisation avec TomSelect si présent
+                        [config.agenceInput, config.serviceInput, config.casierInput].forEach(input => {
+                            if (input && input.dataset.controller === 'tom-select') {
+                                input.dispatchEvent(new Event('change', { bubbles: true }));
+                            }
+                        });
                     }, 100);
                 }
             }
