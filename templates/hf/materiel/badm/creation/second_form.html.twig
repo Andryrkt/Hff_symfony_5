@@ -68,7 +68,14 @@
 				<div class="col-12 col-md-4">{{ form_row(form.destinataire.casier)}}</div>
 			</div>
 		</div>
-		<div class="row">{{ form_row(form.motifMateriel)}}</div>
+		<div class="row" data-controller="character-limiter" data-character-limiter-max-length-value="100">
+			{{ form_row(form.motifMateriel, {
+                    'attr': {
+                        'data-character-limiter-target': 'input', 
+                        'data-action': 'input->character-limiter#limiterCaracteres'
+                    }
+                })}}
+		</div>
 		{# FIN Agence, Service et casier Destiantaire#}
 
 		{# DEBUT ENTREE EN PARC#}
@@ -99,7 +106,14 @@
 
 		{# DEBUT Mise au rebut#}
 		<div class="row">{{ formMacro.sousTitre('Mise au rebut', {class: 'sousTitre'})}}</div>
-		<div class="row">{{ form_row(form.motifMiseRebut)}}</div>
+		<div class="row" data-controller="character-limiter" data-character-limiter-max-length-value="100">
+			{{ form_row(form.motifMiseRebut, {
+                    'attr': {
+                        'data-character-limiter-target': 'input', 
+                        'data-action': 'input->character-limiter#limiterCaracteres'
+                    }
+                })}}
+		</div>
 
 		<div class="row">
 			<div class="col-12 col-md-6">{{ form_row(form.nomImage)}}</div>
