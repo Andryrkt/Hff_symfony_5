@@ -3,6 +3,7 @@
 namespace App\Controller\Hf\Materiel\Badm\Creation;
 
 use App\Model\Hf\Materiel\Badm\BadmModel;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Factory\Hf\Materiel\Badm\SecondFormFactory;
@@ -48,8 +49,8 @@ class SecondFormController extends AbstractController
         // 6. creation du formulaire
         $form = $this->createForm(SecondFormType::class, $secondFormDto);
 
-        // TODO: 7. traitement du formulaire
-        // $this->traitementFormulaire($request, $form);
+        // 7. traitement du formulaire
+        $this->traitementFormulaire($request, $form);
 
         return $this->render('hf/materiel/badm/creation/second_form.html.twig', [
             'form' => $form->createView(),
@@ -72,5 +73,14 @@ class SecondFormController extends AbstractController
         }
 
         return $firstFormDto;
+    }
+
+    private function traitementFormulaire(Request $request, FormInterface $form)
+    {
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            dd($form->getData());
+        }
     }
 }

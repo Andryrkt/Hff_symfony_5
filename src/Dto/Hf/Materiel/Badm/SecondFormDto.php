@@ -12,7 +12,7 @@ class SecondFormDto
     // --------------- Caracteristique du matériel ---------------
     public string $designation = "";
     public int $idMateriel;
-    public int $numParc;
+    public ?int $numParc;
     public string $numSerie;
     public string $groupe;
     public string $constructeur = "";
@@ -21,8 +21,8 @@ class SecondFormDto
     public string $affectation;
     public string $dateAchat;
     // --------------- Etat machine -----------------
-    public int $heureMachine;
-    public int $kmMachine;
+    public ?int $heureMachine;
+    public ?int $kmMachine;
     // ---------------- Agence, service et casier emetteur ----------------
     public ?array $emetteur = null;
     // ---------------- Agence, service et casier destinataire ----------------
@@ -38,12 +38,12 @@ class SecondFormDto
      */
     public string $motifMateriel;
     // ---------------- Entrée en parc ----------------
-    public string $etatAchat;
+    public ?string $etatAchat;
     public ?\DateTime $dateMiseLocation = null;
     // ---------------- Valeur ----------------
-    public float $coutAcquisition;
-    public float $amortissement;
-    public float $valeurNetComptable;
+    public ?float $coutAcquisition;
+    public ?float $amortissement;
+    public ?float $valeurNetComptable;
 
     // ---------------- cession d'actif ----------------
     public string $nomClient;
