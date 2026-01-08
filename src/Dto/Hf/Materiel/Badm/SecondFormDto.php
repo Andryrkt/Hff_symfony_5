@@ -10,58 +10,60 @@ use App\Constants\Hf\Materiel\Badm\TypeMouvementConstants;
 class SecondFormDto
 {
     // --------------- Caracteristique du matériel ---------------
-    public string $designation = "";
-    public int $idMateriel;
-    public ?int $numParc;
-    public string $numSerie;
-    public string $groupe;
-    public string $constructeur = "";
-    public string $modele = "";
-    public string $anneeDuModele;
-    public string $affectation;
-    public string $dateAchat;
+    public ?string $designation = null;
+    public ?int $idMateriel = null;
+    public ?string $numParc = null;
+    public ?string $numSerie = null;
+    public ?string $groupe = null;
+    public ?string $constructeur = null;
+    public ?string $modele = null;
+    public ?string $anneeDuModele = null;
+    public ?string $affectation = null;
+    public ?string $dateAchat = null;
     // --------------- Etat machine -----------------
-    public ?int $heureMachine;
-    public ?int $kmMachine;
+    public ?int $heureMachine = 0;
+    public ?int $kmMachine = 0;
     // ---------------- Agence, service et casier emetteur ----------------
     public ?array $emetteur = null;
     // ---------------- Agence, service et casier destinataire ----------------
     public ?array $destinataire = null;
     /**
-     * @Assert\NotBlank(message="Le motif ne peut pas être vide.")
+     * @Assert\NotBlank(message="Le motif ne peut pas être vide.", groups={"motif_materiel"})
      * @Assert\Length(
      *      min=3,
      *      max=100,
      *      minMessage="Le motif doit comporter au moins {{ limit }} caractères",
-     *      maxMessage="Le motif ne peut pas dépasser {{ limit }} caractères"
+     *      maxMessage="Le motif ne peut pas dépasser {{ limit }} caractères",
+     *      groups={"motif_materiel"}
      * )
      */
-    public string $motifMateriel;
+    public ?string $motifMateriel = null;
     // ---------------- Entrée en parc ----------------
-    public ?string $etatAchat;
+    public ?string $etatAchat = null;
     public ?\DateTime $dateMiseLocation = null;
     // ---------------- Valeur ----------------
-    public ?float $coutAcquisition;
-    public ?float $amortissement;
-    public ?float $valeurNetComptable;
+    public ?float $coutAcquisition = 0;
+    public ?float $amortissement = 0;
+    public ?float $valeurNetComptable = 0;
 
     // ---------------- cession d'actif ----------------
-    public string $nomClient;
-    public string $modalitePaiement;
-    public float $prixVenteHt;
+    public ?string $nomClient = null;
+    public ?string $modalitePaiement = null;
+    public ?float $prixVenteHt = null;
     // ---------------- Mise au rebut -----------------
     /**
-     * @Assert\NotBlank(message="Le motif ne peut pas être vide.")
+     * @Assert\NotBlank(message="Le motif ne peut pas être vide.", groups={"mise_au_rebut"})
      * @Assert\Length(
      *      min=3,
      *      max=100,
      *      minMessage="Le motif doit comporter au moins {{ limit }} caractères",
-     *      maxMessage="Le motif ne peut pas dépasser {{ limit }} caractères"
+     *      maxMessage="Le motif ne peut pas dépasser {{ limit }} caractères",
+     *      groups={"mise_au_rebut"}
      * )
      */
-    public string $motifMiseRebut;
-    public string $nomImage;
-    public string $nomFichier;
+    public ?string $motifMiseRebut = null;
+    public ?string $nomImage = null;
+    public ?string $nomFichier = null;
     // --------------- mouvement materiel ---------------
     public TypeMouvement $typeMouvement;
     public string $numeroBadm;

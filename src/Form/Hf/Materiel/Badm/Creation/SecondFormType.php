@@ -14,6 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use App\Constants\Hf\Materiel\Badm\TypeMouvementConstants;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
@@ -110,9 +111,7 @@ class SecondFormType extends AbstractType
                 TextType::class,
                 [
                     'label' => 'N° Parc',
-                    'attr' => [
-                        'disabled' => $typeMouvement !== TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC
-                    ],
+                    'disabled' => $typeMouvement !== TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC,
                     'data' => $options["data"]->numParc,
                     'required' => $typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC
                 ]
@@ -197,9 +196,8 @@ class SecondFormType extends AbstractType
                 TextType::class,
                 [
                     'label' => 'Heures machine',
-                    'attr' => [
-                        'disabled' => true
-                    ],
+                    'mapped' => false,
+                    'disabled' => true,
                     'data' => $options["data"]->heureMachine
                 ]
             )
@@ -208,9 +206,8 @@ class SecondFormType extends AbstractType
                 TextType::class,
                 [
                     'label' => 'Kilométrage',
-                    'attr' => [
-                        'disabled' => true
-                    ],
+                    'mapped' => false,
+                    'disabled' => true,
                     'data' => $options["data"]->kmMachine
                 ]
             )
@@ -265,9 +262,8 @@ class SecondFormType extends AbstractType
                 TextType::class,
                 [
                     'label' => 'Etat à l\'achat',
-                    'attr' => [
-                        'disabled' => true
-                    ],
+                    'mapped' => false,
+                    'disabled' => true,
                     'data' => $options["data"]->etatAchat,
                     'required' => false
                 ]
@@ -279,10 +275,7 @@ class SecondFormType extends AbstractType
                     'label' => 'Date de mise en location',
                     'widget' => 'single_text',
                     'html5' => true,
-                    //'format' => 'dd/MM/yyyy', 
-                    'attr' => [
-                        'disabled' => $options["data"]->typeMouvement->getDescription() !== TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC
-                    ],
+                    'disabled' => $options["data"]->typeMouvement->getDescription() !== TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC,
                     'required' => $options["data"]->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC,
                     'data' => $options["data"]->dateMiseLocation,
                 ]
@@ -294,9 +287,8 @@ class SecondFormType extends AbstractType
                 TextType::class,
                 [
                     'label' => 'Coût d\'acquisition',
-                    'attr' => [
-                        'disabled' => true
-                    ],
+                    'mapped' => false,
+                    'disabled' => true,
                     'required' => false,
                     'data' => $this->formattingService->formatNumber($options["data"]->coutAcquisition)
                 ]
@@ -306,9 +298,8 @@ class SecondFormType extends AbstractType
                 TextType::class,
                 [
                     'label' => 'Amortissement',
-                    'attr' => [
-                        'disabled' => true
-                    ],
+                    'mapped' => false,
+                    'disabled' => true,
                     'required' => false,
                     'data' => $this->formattingService->formatNumber($options["data"]->amortissement)
                 ]
@@ -318,9 +309,8 @@ class SecondFormType extends AbstractType
                 TextType::class,
                 [
                     'label' => 'VNC',
-                    'attr' => [
-                        'disabled' => true
-                    ],
+                    'mapped' => false,
+                    'disabled' => true,
                     'required' => false,
                     'data' => $this->formattingService->formatNumber($options["data"]->valeurNetComptable)
                 ]
@@ -331,9 +321,7 @@ class SecondFormType extends AbstractType
                 TextType::class,
                 [
                     'label' => 'Nom client',
-                    'attr' => [
-                        'disabled' => $options["data"]->typeMouvement->getDescription() !== TypeMouvementConstants::TYPE_MOUVEMENT_CESSION_DACTIF
-                    ],
+                    'disabled' => $options["data"]->typeMouvement->getDescription() !== TypeMouvementConstants::TYPE_MOUVEMENT_CESSION_DACTIF,
                     'required' => $options["data"]->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_CESSION_DACTIF,
                 ]
             )
@@ -344,9 +332,7 @@ class SecondFormType extends AbstractType
                     'label' => 'Modalité de paiement',
                     'choices' => self::MODE_PAYEMENT,
                     'placeholder' => ' -- Choisir mode paiement --',
-                    'attr' => [
-                        'disabled' => $options["data"]->typeMouvement->getDescription() !== TypeMouvementConstants::TYPE_MOUVEMENT_CESSION_DACTIF
-                    ],
+                    'disabled' => $options["data"]->typeMouvement->getDescription() !== TypeMouvementConstants::TYPE_MOUVEMENT_CESSION_DACTIF,
                     'required' => $options["data"]->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_CESSION_DACTIF,
                 ]
             )
@@ -355,9 +341,7 @@ class SecondFormType extends AbstractType
                 TextType::class,
                 [
                     'label' => 'Prix HT',
-                    'attr' => [
-                        'disabled' => $options["data"]->typeMouvement->getDescription() !== TypeMouvementConstants::TYPE_MOUVEMENT_CESSION_DACTIF
-                    ],
+                    'disabled' => $options["data"]->typeMouvement->getDescription() !== TypeMouvementConstants::TYPE_MOUVEMENT_CESSION_DACTIF,
                     'required' => $options["data"]->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_CESSION_DACTIF,
                 ]
             )
@@ -367,9 +351,7 @@ class SecondFormType extends AbstractType
                 TextType::class,
                 [
                     'label' => 'Motif de mise au rebut',
-                    'attr' => [
-                        'disabled' =>  $options["data"]->typeMouvement->getDescription() !== TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT
-                    ],
+                    'disabled' =>  $options["data"]->typeMouvement->getDescription() !== TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT,
                     'required' => $options["data"]->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT,
                 ]
             )
@@ -379,9 +361,7 @@ class SecondFormType extends AbstractType
                 [
                     'label' => 'Image (Merci de mettre un fichier image)',
                     'required' => $options["data"]->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT,
-                    'attr' => [
-                        'disabled' =>  $options["data"]->typeMouvement->getDescription() !== TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT
-                    ],
+                    'disabled' =>  $options["data"]->typeMouvement->getDescription() !== TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT,
                     'allowed_mime_types' => ['image/jpeg', 'image/jpg', 'image/png'],
                     'accept' => '.jpeg, .jpg, .png',
                     'max_size' => '5M'
@@ -393,9 +373,7 @@ class SecondFormType extends AbstractType
                 [
                     'label' => 'Fichier (Merci de mettre un fichier PDF)',
                     'required' => false,
-                    'attr' => [
-                        'disabled' =>  $options["data"]->typeMouvement->getDescription() !== TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT
-                    ],
+                    'disabled' =>  $options["data"]->typeMouvement->getDescription() !== TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT,
                     'allowed_mime_types' => [
                         'application/pdf',
                         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -428,6 +406,29 @@ class SecondFormType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => SecondFormDto::class,
+            'validation_groups' => function (FormInterface $form) {
+                /** @var SecondFormDto $data */
+                $data = $form->getData();
+                $groups = ['Default'];
+
+                if ($data && $data->typeMouvement) {
+                    $description = $data->typeMouvement->getDescription();
+
+                    if (in_array($description, [
+                        TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC,
+                        TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_AGENCE_SERVICE,
+                        TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_DE_CASIER,
+                    ])) {
+                        $groups[] = 'motif_materiel';
+                    }
+
+                    if ($description === TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT) {
+                        $groups[] = 'mise_au_rebut';
+                    }
+                }
+
+                return $groups;
+            },
         ]);
     }
 }

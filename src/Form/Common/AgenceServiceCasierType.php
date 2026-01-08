@@ -113,8 +113,21 @@ class AgenceServiceCasierType extends AbstractType
         // Pré-submit
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($options) {
             $data = $event->getData();
+            $form = $event->getForm();
+
             $agence = $this->getAgenceFromFormData($data);
-            $this->addDependentFields($event->getForm(), $agence, $options);
+
+            // Si l'agence n'est pas dans les données soumises (ex: champ disabled),
+            // on essaie de la récupérer depuis les données existantes du formulaire
+            if (!$agence) {
+                $initialData = $form->getData();
+                $agence = $this->getAgenceFromData($initialData);
+            }
+
+            $service = $this->getServiceFromFormData($data);
+            $casier = $this->getCasierFromFormData($data);
+
+            $this->addDependentFields($form, $agence, $options, $service, $casier);
         });
     }
 
@@ -208,6 +221,24 @@ class AgenceServiceCasierType extends AbstractType
     {
         if (isset($data['agence']) && $data['agence']) {
             return $this->em->getRepository(Agence::class)->find($data['agence']);
+        }
+
+        return null;
+    }
+
+    private function getServiceFromFormData(array $data): ?Service
+    {
+        if (isset($data['service']) && $data['service']) {
+            return $this->em->getRepository(Service::class)->find($data['service']);
+        }
+
+        return null;
+    }
+
+    private function getCasierFromFormData(array $data): ?Casier
+    {
+        if (isset($data['casier']) && $data['casier']) {
+            return $this->em->getRepository(Casier::class)->find($data['casier']);
         }
 
         return null;
