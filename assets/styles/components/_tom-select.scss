@@ -9,8 +9,8 @@
     margin-top: 5px;
     transition: all 0.2s ease;
     position: relative;
-    font-size: 0.875em;
-    /* Smaller font size */
+    font-size: 0.5rem;
+    /* Reduced font size */
     user-select: none;
 }
 
@@ -60,8 +60,8 @@
 .ts-dropdown .ts-option {
     padding: 6px 12px 6px 20px;
     border-left: 3px solid transparent;
-    font-size: 0.875em;
-    /* Smaller font size */
+    font-size: 0.8rem;
+    /* Reduced font size */
 }
 
 .ts-dropdown .ts-option.selected {
@@ -74,8 +74,8 @@
     min-height: 38px;
     /* Reduced min-height */
     border: 1px solid #ced4da;
-    font-size: 0.875em;
-    /* Smaller font size for selected items/input */
+    font-size: 0.8rem;
+    /* Reduced font size for selected items/input */
 }
 
 .ts-control .item {
@@ -83,7 +83,7 @@
     color: white;
     border: none;
     border-radius: 3px;
-    font-size: 0.875em;
+    font-size: 0.8rem;
     /* Ensure selected items also have smaller font */
 }
 
@@ -97,8 +97,8 @@
     width: calc(100% - 16px);
     box-shadow: none;
     transition: border-color 0.2s ease;
-    font-size: 0.875em;
-    /* Smaller font size */
+    font-size: 0.8rem;
+    /* Reduced font size */
 }
 
 .ts-dropdown .ts-input:focus {

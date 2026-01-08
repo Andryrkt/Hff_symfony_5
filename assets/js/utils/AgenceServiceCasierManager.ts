@@ -88,11 +88,16 @@ function handleAgenceChange(configKey: string): void {
 // --- DOM & Select Utilities ---
 
 function updateServiceOptions(services: Service[], selectElement: HTMLSelectElement | null, configKey: string): void {
+    if (!selectElement) return;
     const config = configAgenceServiceCasier[configKey];
+
+    // Sauvegarder la valeur actuelle pour tenter de la restaurer
+    const currentValue = selectElement.value;
+
     supprimLesOptions(selectElement);
     optionParDefaut(selectElement, "-- Choisir un Service --");
 
-    if (Array.isArray(services) && selectElement) {
+    if (Array.isArray(services)) {
         if (services.length > 0) {
             if (!config.serviceInitialDisabled) {
                 selectElement.disabled = false;
@@ -108,11 +113,16 @@ function updateServiceOptions(services: Service[], selectElement: HTMLSelectElem
             selectElement.disabled = true;
         }
 
+        // Tenter de restaurer la valeur
+        if (currentValue) {
+            selectElement.value = currentValue;
+        }
+
         // Distribuer l'événement pour TomSelect
-        if (selectElement.dataset.controller === 'components--tom-select') {
+        if (selectElement.dataset.controller === 'tom-select') {
             selectElement.dispatchEvent(new Event('options-updated', { bubbles: true }));
         }
-    } else if (selectElement) {
+    } else {
         selectElement.disabled = true;
     }
 }
@@ -120,6 +130,9 @@ function updateServiceOptions(services: Service[], selectElement: HTMLSelectElem
 function updateCasierOptions(casiers: Casier[] | undefined, selectElement: HTMLSelectElement | null, configKey: string): void {
     if (!selectElement) return;
     const config = configAgenceServiceCasier[configKey];
+
+    // Sauvegarder la valeur actuelle
+    const currentValue = selectElement.value;
 
     // 1. Mettre à jour le select natif
     supprimLesOptions(selectElement);
@@ -138,6 +151,11 @@ function updateCasierOptions(casiers: Casier[] | undefined, selectElement: HTMLS
     } else {
         optionParDefaut(selectElement, "-- Aucun casier disponible --");
         selectElement.disabled = true;
+    }
+
+    // Tenter de restaurer la valeur
+    if (currentValue) {
+        selectElement.value = currentValue;
     }
 
     // 2. Distribuer l'événement pour TomSelect
@@ -267,24 +285,32 @@ export function initAgenceServiceCasierHandlers(): void {
 
                 // Si une agence est pré-sélectionnée, charger ses services et casiers
                 if (config.agenceInput.value) {
+                    // Restaurer les valeurs pré-sélectionnées après initialisation par agence
                     handleAgenceChange(key);
 
-                    // Restaurer les sélections après un court délai
-                    setTimeout(() => {
-                        if (preselectedServiceValue && config.serviceInput) {
-                            config.serviceInput.value = preselectedServiceValue;
-                        }
-                        if (preselectedCasierValue && config.casierInput) {
-                            config.casierInput.value = preselectedCasierValue;
-                        }
+                    if (preselectedServiceValue && config.serviceInput) {
+                        config.serviceInput.value = preselectedServiceValue;
+                    }
+                    if (preselectedCasierValue && config.casierInput) {
+                        config.casierInput.value = preselectedCasierValue;
+                    }
 
-                        // Forcer la synchronisation avec TomSelect si présent
-                        [config.agenceInput, config.serviceInput, config.casierInput].forEach(input => {
+                    // Forcer la synchronisation avec TomSelect si présent
+                    [config.agenceInput, config.serviceInput, config.casierInput].forEach(input => {
+                        if (input && input.dataset.controller === 'tom-select') {
+                            input.dispatchEvent(new Event('change', { bubbles: true }));
+                            input.dispatchEvent(new Event('options-updated', { bubbles: true }));
+                        }
+                    });
+
+                    // Un court délai supplémentaire pour assurer l'affichage final
+                    setTimeout(() => {
+                        [config.serviceInput, config.casierInput].forEach(input => {
                             if (input && input.dataset.controller === 'tom-select') {
                                 input.dispatchEvent(new Event('change', { bubbles: true }));
                             }
                         });
-                    }, 100);
+                    }, 50);
                 }
             }
         }

@@ -92,8 +92,8 @@ class AgenceServiceCasierType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options) {
             $data = $event->getData();
             $agence = $data ? $this->getAgenceFromData($data) : null;
-            $service = $data && isset($data['service']) ? $data['service'] : null;
-            $casier = $data && isset($data['casier']) ? $data['casier'] : null;
+            $service = $data ? $this->getServiceFromData($data) : null;
+            $casier = $data ? $this->getCasierFromData($data) : null;
 
             $this->addDependentFields($event->getForm(), $agence, $options, $service, $casier);
 
@@ -175,6 +175,30 @@ class AgenceServiceCasierType extends AbstractType
         }
         if (is_array($data) && isset($data['agence'])) {
             return $data['agence'];
+        }
+
+        return null;
+    }
+
+    private function getServiceFromData($data): ?Service
+    {
+        if (is_object($data) && method_exists($data, 'getService')) {
+            return $data->getService();
+        }
+        if (is_array($data) && isset($data['service'])) {
+            return $data['service'];
+        }
+
+        return null;
+    }
+
+    private function getCasierFromData($data): ?Casier
+    {
+        if (is_object($data) && method_exists($data, 'getCasier')) {
+            return $data->getCasier();
+        }
+        if (is_array($data) && isset($data['casier'])) {
+            return $data['casier'];
         }
 
         return null;
