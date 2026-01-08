@@ -1,0 +1,8 @@
+services:
+  App\Service\Hf\Rh\Dom\DomPdfService:
+    arguments:
+      $projectDir: '%kernel.project_dir%'
+
+  App\Service\Hf\Materiel\Badm\BadmPdfService:
+    arguments:
+      $projectDir: '%kernel.project_dir%'

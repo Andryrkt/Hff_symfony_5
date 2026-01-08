@@ -85,9 +85,7 @@ services:
     class: Parsedown
     public: true
 
-  App\Service\Hf\Rh\Dom\DomPdfService:
-    arguments:
-      $projectDir: '%kernel.project_dir%'
+
 
   App\Logger\UserProcessor:
     tags:
