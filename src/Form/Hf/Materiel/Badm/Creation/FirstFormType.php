@@ -47,7 +47,10 @@ class FirstFormType extends AbstractType
             ])
             ->add('numParc', TextType::class, [
                 'label' => "N° Parc",
-                'required' => false
+                'required' => false,
+                'attr' => [
+                    'readonly' => true
+                ]
             ])
             ->add('numSerie', TextType::class, [
                 'label' => "N° Serie",
