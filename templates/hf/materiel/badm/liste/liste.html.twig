@@ -9,6 +9,9 @@
 	<div class="container" id="agence-service-data" data-agences="{{ agencesJson|e('html_attr') }}" data-controller="dom-liste">
 		{% include 'partials/flash_messages.html.twig' %}
 
+		{% include "hf/materiel/badm/liste/_formulaireRecherche.html.twig" with{
+			form : form
+		}%}
 
 		{% include "partials/_pagination_haut.html.twig" with {
 			buttons: buttons,
@@ -71,7 +74,7 @@
 								<td>{{ item.numSerie}}</td>
 								<td>{{ item.numParc}}</td>
 								<td>{{ item.emetteur.casier.nom}}</td>
-								<td>{{ item.destinataire.casier ? item.destiantaire.casier.nom : ''}}</td>
+								<td>{{ item.destinataire.casier ? item.destinataire.casier.nom : ''}}</td>
 								{% set startDate = item.dateDemande | date('Y-m-d') %}
 								{% set currentDate = "now"|date("Y-m-d") %}
 								{% set diff = date(currentDate).diff(date(startDate)) %}

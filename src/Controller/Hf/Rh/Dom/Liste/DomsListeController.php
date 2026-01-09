@@ -44,6 +44,7 @@ class DomsListeController extends AbstractController
             'method' => 'GET'
         ]);
 
+        // 3. traitement du formulaire
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -53,7 +54,7 @@ class DomsListeController extends AbstractController
             $session->set('dom_search_dto', $domSearchDto);
         }
 
-        // 3. recupération des données à afficher avec filtrage par agence
+        // 4. recupération des données à afficher avec filtrage par agence
         $page = $this->handlePaginationAndSorting($request, $domSearchDto);
         $paginationData = $domRepository->findPaginatedAndFiltered($page, $domSearchDto->limit, $domSearchDto);
 

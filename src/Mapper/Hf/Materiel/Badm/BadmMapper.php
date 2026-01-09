@@ -77,7 +77,7 @@ class BadmMapper
     public function reverseMap(Badm $badm): SecondFormDto
     {
         $secondFormDto = new SecondFormDto();
-        $numSerieDesignation = $this->badmModel->getNumSerieDesignationMateriel($badm->getIdMateriel());
+        $numSerieDesignation = $this->badmModel->getNumSerieDesignationMateriel($badm);
 
         // --------------- Caracteristique du matériel ---------------
         // Ces champs ne sont pas directement stockés dans l'entité Badm

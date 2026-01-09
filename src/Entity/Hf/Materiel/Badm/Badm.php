@@ -391,36 +391,4 @@ class Badm implements CreatedByInterface, AgenceServiceInterface
 
         return $this;
     }
-
-    /**
-     * Retourne la classe CSS appropriée pour le statut de la demande
-     * Utilise StatutDomConstants pour centraliser la logique
-     * 
-     * @return string
-     */
-    public function getStatutCssClass(): string
-    {
-        if (!$this->statutDemande) {
-            return '';
-        }
-
-        $description = trim($this->statutDemande->getDescription());
-        return StatutBadmConstants::getCssClass($description);
-    }
-
-    /**
-     * Retourne le style CSS inline pour le statut de la demande
-     * Utilise StatutDomConstants pour centraliser la logique
-     * 
-     * @return string
-     */
-    public function getStatutCssStyle(): string
-    {
-        if (!$this->statutDemande) {
-            return '';
-        }
-
-        $description = trim($this->statutDemande->getDescription());
-        return StatutBadmConstants::getCssStyle($description);
-    }
 }

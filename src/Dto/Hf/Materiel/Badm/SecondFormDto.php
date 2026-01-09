@@ -5,6 +5,7 @@ namespace App\Dto\Hf\Materiel\Badm;
 use App\Entity\Admin\Statut\StatutDemande;
 use App\Entity\Hf\Materiel\Badm\TypeMouvement;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Constants\Hf\Materiel\Badm\StatutBadmConstants;
 use App\Constants\Hf\Materiel\Badm\TypeMouvementConstants;
 
 class SecondFormDto
@@ -91,8 +92,43 @@ class SecondFormDto
     public array $ors = [];
 
 
+    /**
+     * Retourne la classe CSS appropriée pour le type de mouvement
+     */
     public function getTypeMouvementCssClass(): string
     {
         return TypeMouvementConstants::getCssClass($this->typeMouvement->getDescription());
+    }
+
+    /**
+     * Retourne la classe CSS appropriée pour le statut de la demande
+     * Utilise StatutDomConstants pour centraliser la logique
+     * 
+     * @return string
+     */
+    public function getStatutCssClass(): string
+    {
+        if (!$this->statutDemande) {
+            return '';
+        }
+
+        $description = trim($this->statutDemande->getDescription());
+        return StatutBadmConstants::getCssClass($description);
+    }
+
+    /**
+     * Retourne le style CSS inline pour le statut de la demande
+     * Utilise StatutDomConstants pour centraliser la logique
+     * 
+     * @return string
+     */
+    public function getStatutCssStyle(): string
+    {
+        if (!$this->statutDemande) {
+            return '';
+        }
+
+        $description = trim($this->statutDemande->getDescription());
+        return StatutBadmConstants::getCssStyle($description);
     }
 }

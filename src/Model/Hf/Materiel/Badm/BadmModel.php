@@ -145,11 +145,19 @@ class BadmModel
         }
     }
 
-    public function getNumSerieDesignationMateriel(int $idMateriel)
+    public function getNumSerieDesignationMateriel(Object $objet)
     {
         $this->databaseInformix->connect();
 
         try {
+            $conditions = $this->buildMaterielSearchConditions($objet);
+
+            if (empty($conditions)) {
+                return [];
+            }
+
+            $whereClause = ' AND (' . implode(' AND ', $conditions) . ')';
+
             $statement = " SELECT
                             trim(mmat_desi) as designation,
                             mmat_nummat as num_matricule,
@@ -166,7 +174,7 @@ class BadmModel
                         and mbil_dateclot = MDY(12, 31, 1899)
                         and mmat_datedisp < MDY(12, 31, 2999)
                         and (MMAT_ETACHAT = 'FA' and MMAT_ETVENTE = '--')
-                        and mmat_nummat = $idMateriel
+                        $whereClause
             ";
 
             $result = $this->databaseInformix->executeQuery($statement);
