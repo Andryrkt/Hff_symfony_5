@@ -137,7 +137,7 @@ class BadmModel
             ";
 
             $result = $this->databaseInformix->executeQuery($statement);
-            $rows = $this->databaseInformix->fetchScalarResults($result);
+            $rows = $this->databaseInformix->fetchResults($result);
 
             return $rows;
         } finally {

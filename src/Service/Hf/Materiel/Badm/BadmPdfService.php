@@ -2,6 +2,7 @@
 
 namespace App\Service\Hf\Materiel\Badm;
 
+use App\Constants\Hf\Materiel\Badm\TypeMouvementConstants;
 use TCPDF;
 use App\Service\Utils\FormattingService;
 use App\Dto\Hf\Materiel\Badm\SecondFormDto;
@@ -60,22 +61,22 @@ class BadmPdfService extends AbstractGeneratePdf
 
         $pdf->setFont('helvetica', 'B', 12);
         $pdf->setAbsX(55);
-        if ($dto->typeMouvement === 'CHANGEMENT DE CASIER') {
+        if ($dto->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_DE_CASIER) {
             $pdf->SetFillColor(155, 155, 155);
-            $pdf->cell(110, 6, $dto->typeMouvement, 0, 0, 'C', true, '', 0, false, 'T', 'M');
-        } elseif ($dto->typeMouvement === 'MISE AU REBUT') {
+            $pdf->cell(110, 6, $dto->typeMouvement->getDescription(), 0, 0, 'C', true, '', 0, false, 'T', 'M');
+        } elseif ($dto->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT) {
             $pdf->SetFillColor(255, 69, 0);
-            $pdf->cell(110, 6, $dto->typeMouvement, 0, 0, 'C', true, '', 0, false, 'T', 'M');
-        } elseif ($dto->typeMouvement === 'CESSION D\'ACTIF') {
+            $pdf->cell(110, 6, $dto->typeMouvement->getDescription(), 0, 0, 'C', true, '', 0, false, 'T', 'M');
+        } elseif ($dto->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_CESSION_DACTIF) {
             $pdf->SetFillColor(240, 0, 32);
-            $pdf->cell(110, 6, $dto->typeMouvement, 0, 0, 'C', true, '', 0, false, 'T', 'M');
-        } elseif ($dto->typeMouvement === 'CHANGEMENT AGENCE/SERVICE') {
+            $pdf->cell(110, 6, $dto->typeMouvement->getDescription(), 0, 0, 'C', true, '', 0, false, 'T', 'M');
+        } elseif ($dto->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_AGENCE_SERVICE) {
             $pdf->SetFillColor(0, 128, 255);
-            $pdf->cell(110, 6, $dto->typeMouvement, 0, 0, 'C', true, '', 0, false, 'T', 'M');
-        } elseif ($dto->typeMouvement === 'ENTREE EN PARC') {
+            $pdf->cell(110, 6, $dto->typeMouvement->getDescription(), 0, 0, 'C', true, '', 0, false, 'T', 'M');
+        } elseif ($dto->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC) {
             $pdf->SetFillColor(0, 86, 27);
             $pdf->SetTextColor(255, 255, 255);
-            $pdf->cell(110, 6, $dto->typeMouvement, 0, 0, 'C', true, '', 0, false, 'T', 'M');
+            $pdf->cell(110, 6, $dto->typeMouvement->getDescription(), 0, 0, 'C', true, '', 0, false, 'T', 'M');
         }
         $pdf->SetTextColor(0, 0, 0);
         $pdf->setFont('helvetica', 'B', 10);
