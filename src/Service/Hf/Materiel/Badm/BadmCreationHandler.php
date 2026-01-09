@@ -77,10 +77,27 @@ class BadmCreationHandler
 
     private function processFiles(FormInterface $form, Badm $badm, BadmPdfService $pdfService, SecondFormDto $secondFormDto): void
     {
+        // uplode des fichiers
         [$uploadedFilesPaths, $uploadedFileNames, $finalPdfPath, $finalPdfName] = $this->saveUploadedFiles($form, $badm);
 
+        // generation de pdf (page de garde)
         $pdfService->genererPDF($secondFormDto, $finalPdfPath);
 
+        //!pas de fusion pour le BADM fusion des fichiers
+        //$this->fusion($uploadedFilesPaths, $finalPdfPath, $badm);
+
+        // enregistrement de nom de fichier uploder s'il existe
+        if (!empty($uploadedFileNames)) {
+            $badm->setNomImage($uploadedFileNames[0] ?? null);
+            $badm->setNomFichier($uploadedFileNames[1] ?? null);
+        }
+
+        // copie de fichier vers docuware
+        $this->copyToDocuware($badm, $pdfService, $finalPdfPath, $finalPdfName);
+    }
+
+    private function fusion($uploadedFilesPaths, $finalPdfPath, $badm): void
+    {
         $success = false;
         $message = 'Fusion des fichiers.';
         try {
@@ -104,16 +121,7 @@ class BadmCreationHandler
                 $message
             );
         }
-
-
-        if (!empty($uploadedFileNames)) {
-            $badm->setNomImage($uploadedFileNames[0] ?? null);
-            $badm->setNomFichier($uploadedFileNames[1] ?? null);
-        }
-
-        $this->copyToDocuware($badm, $pdfService, $finalPdfPath, $finalPdfName);
     }
-
     private function copyToDocuware(Badm $badm, BadmPdfService $pdfService, string  $finalPdfPath, string  $finalPdfName): void
     {
         $docuwarePath = $this->params->get('docuware_directory') . '/BADM/' . $finalPdfName;

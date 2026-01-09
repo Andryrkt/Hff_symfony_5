@@ -62,7 +62,23 @@ class SecondFormDto
      * )
      */
     public ?string $motifMiseRebut = null;
+    /**
+     * @Assert\File(
+     *     maxSize = "5M",
+     *     mimeTypes = {"image/jpeg", "image/png", "image/jpg"},
+     *     mimeTypesMessage = "Merci de télécharger une image valide (JPG, JPEG, PNG).",
+     *     groups={"mise_au_rebut"}
+     * )
+     */
     public $pieceJoint01 = null; // nomImage
+    /**
+     * @Assert\File(
+     *     maxSize = "5M",
+     *     mimeTypes = {"application/pdf"},
+     *     mimeTypesMessage = "Merci de télécharger un fichier PDF valide.",
+     *     groups={"mise_au_rebut"}
+     * )
+     */
     public $pieceJoint02 = null; // nomFichier
     // --------------- mouvement materiel ---------------
     public TypeMouvement $typeMouvement;

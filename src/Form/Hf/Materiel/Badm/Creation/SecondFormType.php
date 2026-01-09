@@ -366,12 +366,8 @@ class SecondFormType extends AbstractType
                     'label' => 'Fichier (Merci de mettre un fichier PDF)',
                     'required' => false,
                     'disabled' =>  $options["data"]->typeMouvement->getDescription() !== TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT,
-                    'allowed_mime_types' => [
-                        'application/pdf',
-                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                    ],
-                    'accept' => '.pdf, .docx, .xlsx',
+                    'allowed_mime_types' => ['application/pdf'],
+                    'accept' => '.pdf',
                     'max_size' => '5M'
                 ]
             )

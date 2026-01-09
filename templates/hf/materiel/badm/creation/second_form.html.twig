@@ -128,8 +128,26 @@
 		</div>
 
 		<div class="row">
-			<div class="col-12 col-md-6">{{ form_row(form.pieceJoint01)}}</div>
-			<div class="col-12 col-md-6">{{ form_row(form.pieceJoint02)}}</div>
+			<div class="col-12 col-md-6" 
+				 data-controller="file-validation"
+				 data-file-validation-allowed-types-value='["image/jpeg", "image/png", "image/jpg"]'
+				 data-file-validation-max-size-value="5">
+				{{ form_row(form.pieceJoint01, {
+					'attr': {
+						'data-action': 'change->file-validation#validate'
+					}
+				})}}
+			</div>
+			<div class="col-12 col-md-6"
+				 data-controller="file-validation"
+				 data-file-validation-allowed-types-value='["application/pdf"]'
+				 data-file-validation-max-size-value="5">
+				{{ form_row(form.pieceJoint02, {
+					'attr': {
+						'data-action': 'change->file-validation#validate'
+					}
+				})}}
+			</div>
 		</div>
 		{# FIN Mise au rebut#}
 

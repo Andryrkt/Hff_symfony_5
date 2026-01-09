@@ -26,6 +26,7 @@ export class StimulusAutoloader {
             { name: 'number-formatter', import: () => import('@controllers/components/number_formatter_controller') },
             { name: 'form-confirmation', import: () => import('@controllers/components/form_confirmation_controller') },
             { name: 'components--uppercase', import: () => import('@controllers/components/uppercase_controller') },
+            { name: 'file-validation', import: () => import('@controllers/components/file_validation_controller') },
         ];
 
         // Contrôleurs de page - chargés à la demande (lazy loading)
