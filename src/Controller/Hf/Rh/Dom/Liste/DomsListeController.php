@@ -39,7 +39,7 @@ class DomsListeController extends AbstractController
         $this->denyAccessUnlessGranted('RH_ORDRE_MISSION_VIEW');
 
         $domSearchDto = new DomSearchDto();
-        // 3. creation du formulaire de recherhce
+        // 2. creation du formulaire de recherhce
         $form = $this->createForm(DomSearchType::class, $domSearchDto, [
             'method' => 'GET'
         ]);
@@ -53,7 +53,7 @@ class DomsListeController extends AbstractController
             $session->set('dom_search_dto', $domSearchDto);
         }
 
-        // 4. recupération des données à afficher avec filtrage par agence
+        // 3. recupération des données à afficher avec filtrage par agence
         $page = $this->handlePaginationAndSorting($request, $domSearchDto);
         $paginationData = $domRepository->findPaginatedAndFiltered($page, $domSearchDto->limit, $domSearchDto);
 
@@ -61,12 +61,12 @@ class DomsListeController extends AbstractController
             'hf/rh/dom/liste/liste.html.twig',
             [
                 'paginationData' => $paginationData,
-                'form' => $form->createView(),
-                'agencesJson' => $agenceSerializerService->serializeAgencesForDropdown(),
                 'routeName' => 'dom_liste_index',
                 'queryParams' => $request->query->all(),
                 'currentSort' => $domSearchDto->sortBy,
                 'currentOrder' => $domSearchDto->sortOrder,
+                'form' => $form->createView(),
+                'agencesJson' => $agenceSerializerService->serializeAgencesForDropdown(),
                 'breadcrumbs' => $breadcrumbBuilder->build('dom_liste_index'),
                 'buttons' => ButtonsDomConstants::BUTTONS_ACTIONS,
             ]

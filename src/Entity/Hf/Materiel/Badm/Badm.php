@@ -2,15 +2,16 @@
 
 namespace App\Entity\Hf\Materiel\Badm;
 
-use App\Entity\Admin\Statut\StatutDemande;
-use App\Entity\Hf\Materiel\Casier\Casier;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Traits\CreatedByTrait;
+use App\Entity\Hf\Materiel\Casier\Casier;
 use App\Entity\Traits\AgenceServiceTrait;
 use App\Entity\Traits\TimestampableTrait;
+use App\Entity\Admin\Statut\StatutDemande;
 use App\Contract\Entity\CreatedByInterface;
 use App\Contract\Entity\AgenceServiceInterface;
 use App\Repository\Hf\Materiel\Badm\BadmRepository;
+use App\Constants\Hf\Materiel\Badm\StatutBadmConstants;
 
 /**
  * @ORM\Entity(repositoryClass=BadmRepository::class)
@@ -389,5 +390,37 @@ class Badm implements CreatedByInterface, AgenceServiceInterface
         $this->statutDemande = $statutDemande;
 
         return $this;
+    }
+
+    /**
+     * Retourne la classe CSS appropriée pour le statut de la demande
+     * Utilise StatutDomConstants pour centraliser la logique
+     * 
+     * @return string
+     */
+    public function getStatutCssClass(): string
+    {
+        if (!$this->statutDemande) {
+            return '';
+        }
+
+        $description = trim($this->statutDemande->getDescription());
+        return StatutBadmConstants::getCssClass($description);
+    }
+
+    /**
+     * Retourne le style CSS inline pour le statut de la demande
+     * Utilise StatutDomConstants pour centraliser la logique
+     * 
+     * @return string
+     */
+    public function getStatutCssStyle(): string
+    {
+        if (!$this->statutDemande) {
+            return '';
+        }
+
+        $description = trim($this->statutDemande->getDescription());
+        return StatutBadmConstants::getCssStyle($description);
     }
 }

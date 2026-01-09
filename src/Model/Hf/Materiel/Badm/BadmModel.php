@@ -144,4 +144,37 @@ class BadmModel
             $this->databaseInformix->close();
         }
     }
+
+    public function getNumSerieDesignationMateriel(int $idMateriel)
+    {
+        $this->databaseInformix->connect();
+
+        try {
+            $statement = " SELECT
+                            trim(mmat_desi) as designation,
+                            mmat_nummat as num_matricule,
+                            trim(mmat_numserie) as num_serie,
+                            trim(mmat_recalph) as num_parc 
+                           
+                        FROM Informix.mat_mat, Informix.agr_succ, outer mat_bil
+                        WHERE (MMAT_SUCC in ('01', '02', '20', '30', '40', '50', '60', '80', '90','91','92') or MMAT_SUCC IN (SELECT ASUC_PARC FROM informix.AGR_SUCC WHERE ASUC_NUM IN ('01','02', '20', '30', '40', '50', '60', '80', '90','91','92') ))
+                        and trim(MMAT_ETSTOCK) in ('ST','AT')
+                        and trim(MMAT_AFFECT) in ('IMM','VTE','LCD','SDO')
+                        and mmat_soc = 'HF'
+                        and (mmat_succ = asuc_num or mmat_succ = asuc_parc)
+                        and mmat_nummat = mbil_nummat
+                        and mbil_dateclot = MDY(12, 31, 1899)
+                        and mmat_datedisp < MDY(12, 31, 2999)
+                        and (MMAT_ETACHAT = 'FA' and MMAT_ETVENTE = '--')
+                        and mmat_nummat = $idMateriel
+            ";
+
+            $result = $this->databaseInformix->executeQuery($statement);
+            $rows = $this->databaseInformix->fetchScalarResults($result);
+
+            return $rows;
+        } finally {
+            $this->databaseInformix->close();
+        }
+    }
 }

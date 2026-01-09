@@ -6,6 +6,86 @@
 {% endblock %}
 
 {% block content %}
-	<h1>
-		OKEy</h1>
+	<div class="container" id="agence-service-data" data-agences="{{ agencesJson|e('html_attr') }}" data-controller="dom-liste">
+		{% include 'partials/flash_messages.html.twig' %}
+
+
+		{% include "partials/_pagination_haut.html.twig" with {
+			buttons: buttons,
+			currentPage: paginationData['currentPage'],
+			totalPages: paginationData['lastPage'],
+			resultCount: paginationData['totalItems'],
+			routeName: routeName,
+			criteria: queryParams
+		} %}
+	</div>
+
+	<div class="container-fluid">
+		<table class="table rounded table-plein-ecran">
+			<thead class="table-dark">
+				<tr>
+					<th>
+						<i class="fas fa-ellipsis-vertical"></i>
+					</th>
+					<th>Statut</th>
+					<th>N° BADM</th>
+					<th>Date demande</th>
+					<th>Mouvement</th>
+					<th>Id Materiel</th>
+					<th>Ag\Serv Emetteur</th>
+					<th>Ag\Serv Destinataire</th>
+					<th>Désignation</th>
+					<th>N° Série</th>
+					<th>N° Parc</th>
+					<th>Casier emetteur</th>
+					<th>Casier destinataire</th>
+					<th>Durée Traitement</th>
+				</tr>
+			</thead>
+					<tbody>
+						{% for item in paginationData.data %}
+							<tr>
+								{# Début Action #}
+								<td style="padding: 0px;" class="align-middle">
+									{{ include('partials/_ellipsis_dropdown.html.twig', {
+											id: 'mission-actions',
+											icon: 'fas fa-ellipsis-vertical',
+											items: []
+										}) }}
+								</td>
+								{# Fin Actions #}
+
+								{# >>>===== DEBUT Statut  ======= La logique CSS est maintenant gérée par les méthodes getStatutCssClass() et getStatutCssStyle() de l'entité Dom #}
+								<td class="{{ item.statutCssClass }}" style="{{ item.statutCssStyle }}">{{ item.statutDemande.description }}</td>
+								{# <<<===== FIN Statut ==== #}
+
+								<td>
+									<a href="{{ path('hf_materiel_badm_detail_index', {numeroBadm: item.numeroBadm}) }}" target="_blank">{{ item.numeroBadm }}</a>
+								</td>
+								<td>{{ item.demande | date('d/m/Y')}}</td>
+								<td>{{ item.typeMouvement.description}}</td>
+								<td>{{ item.idMateriel}}</td>
+								<td>{{ item.emetteur.agence.code ~ '' ~ item.emetteur.service.code}}</td>
+								<td>{{ item.destinataire.agnece.code ~ '' ~ item.destinataire.service.code}}</td>
+								<td>{{ item.designation}}</td>
+								<td>{{ item.numSerie}}</td>
+								<td>{{ item.numParc}}</td>
+								<td>{{ item.emetteur.casier.nom}}</td>
+								<td>{{ item.destinataire.casier ? item.destiantaire.casier.nom : ''}}</td>
+								{% set startDate = item.dateDemande | date('Y-m-d') %}
+								{% set currentDate = "now"|date("Y-m-d") %}
+								{% set diff = date(currentDate).diff(date(startDate)) %}
+								<td>
+									{{ diff.days }}
+									jours</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+			</table>
+
+			{% include "partials/_pagination_bas.html.twig" with {
+				currentPage: paginationData['currentPage'],
+				totalPages: paginationData['totalItems']
+			} %}
+	</div>
 {% endblock %}

@@ -31,4 +31,43 @@ final class StatutBadmConstants
             self::STATUT_A_TRAITER_COMPTA
         ];
     }
+
+    //Classes Css par statut
+    public const CSS_CLASS_MAP = [
+        self::STATUT_OUVERT => 'bg-warning bg-gradient text-cente',
+        self::STATUT_CLOTURE => 'bg-success bg-gradient',
+        self::STATUT_CLOTURE_COMPTA => 'bg-success bg-gradient',
+        self::STATUT_A_VALIDER_SERVICE_DESTINATAIRE => 'bg-info',
+        self::STATUT_ANNULE_INFORMATIQUE => 'bg-danger',
+        self::STATUT_ANNULE_SERVICE_DESTINATAIRE => 'bg-danger',
+        self::STATUT_ANNULE_SERVICE_EMETTEUR => 'bg-danger',
+        self::STATUT_ANNULE => 'bg-danger',
+        self::STATUT_ATTENTE_VALIDATION_DG => 'bg-primary',
+        self::STATUT_A_VALIDER_SERVICE_EMETTEUR => 'bg-primary'
+
+
+    ];
+
+    // Statut nécessitant une opacité réduite
+    public const STATUTS_WITH_OPACITY = [
+        self::STATUT_A_VALIDER_SERVICE_EMETTEUR
+    ];
+
+    /**
+     * Retourne la classe CSS pour un statut donné
+     */
+    public static function getCssClass(string $statut): string
+    {
+        return self::CSS_CLASS_MAP[$statut] ?? '';
+    }
+
+    /**
+     * Retourne le style CSS inline pour un statut donné
+     */
+    public static function getCssStyle(string $statut): string
+    {
+        return in_array($statut, self::STATUTS_WITH_OPACITY)
+            ? '--bs-bg-opacity: .5;'
+            : '';
+    }
 }

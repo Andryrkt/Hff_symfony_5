@@ -3,21 +3,26 @@
 namespace App\Mapper\Hf\Materiel\Badm;
 
 use App\Entity\Hf\Materiel\Badm\Badm;
-use App\Dto\Hf\Materiel\Badm\SecondFormDto;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\Admin\AgenceService\Agence;
-use App\Entity\Admin\AgenceService\Service;
 use App\Entity\Hf\Materiel\Casier\Casier;
-use App\Entity\Hf\Materiel\Badm\TypeMouvement;
+use App\Model\Hf\Materiel\Badm\BadmModel;
+use App\Entity\Admin\AgenceService\Agence;
 use App\Entity\Admin\Statut\StatutDemande;
+use App\Dto\Hf\Materiel\Badm\SecondFormDto;
+use App\Entity\Admin\AgenceService\Service;
+use App\Entity\Hf\Materiel\Badm\TypeMouvement;
 
 class BadmMapper
 {
     private EntityManagerInterface $em;
+    private BadmModel $badmModel;
 
-    public function __construct(EntityManagerInterface $em)
-    {
+    public function __construct(
+        EntityManagerInterface $em,
+        BadmModel $badmModel
+    ) {
         $this->em = $em;
+        $this->badmModel = $badmModel;
     }
 
     public function map(Badm $badm, SecondFormDto $secondFormDto): Badm
@@ -60,6 +65,86 @@ class BadmMapper
 
         ;
         return $badm;
+    }
+
+    /**
+     * Maps a Badm entity to a SecondFormDto.
+     * This method is the inverse of the `map` method.
+     *
+     * @param Badm $badm The Badm entity to map.
+     * @return SecondFormDto The mapped SecondFormDto.
+     */
+    public function reverseMap(Badm $badm): SecondFormDto
+    {
+        $secondFormDto = new SecondFormDto();
+        $numSerieDesignation = $this->badmModel->getNumSerieDesignationMateriel($badm->getIdMateriel());
+
+        // --------------- Caracteristique du matériel ---------------
+        // Ces champs ne sont pas directement stockés dans l'entité Badm
+        // ou ne sont pas mappés par la méthode 'map' d'origine.
+        // Ils devraient être récupérés d'une autre source si nécessaire pour le DTO.
+        $secondFormDto->designation = $numSerieDesignation['designation'];
+        $secondFormDto->idMateriel = $badm->getIdMateriel();
+        $secondFormDto->numParc = $badm->getNumParc();
+        $secondFormDto->numSerie = $numSerieDesignation['num_serie'];
+        // $secondFormDto->groupe = null;
+        // $secondFormDto->constructeur = null;
+        // $secondFormDto->modele = null;
+        // $secondFormDto->anneeDuModele = null;
+        // $secondFormDto->affectation = null;
+        // $secondFormDto->dateAchat = null;
+
+        // --------------- Etat machine -----------------
+        $secondFormDto->heureMachine = $badm->getHeureMachine();
+        $secondFormDto->kmMachine = $badm->getKmMachine();
+
+        // ---------------- Agence, service et casier emetteur ----------------
+        // On récupère les entités liées si elles existent
+        $secondFormDto->emetteur = [
+            'agence' => $badm->getAgenceEmetteurId() ? $badm->getAgenceEmetteurId() : null,
+            'service' => $badm->getServiceEmetteurId() ? $badm->getServiceEmetteurId() : null,
+            'casier' => $badm->getCasierEmetteur() ? $badm->getCasierEmetteur() : null,
+        ];
+
+        // ---------------- Agence, service et casier destinataire ----------------
+        $secondFormDto->destinataire = [
+            'agence' => $badm->getAgenceDebiteurId() ? $badm->getAgenceDebiteurId() : null,
+            'service' => $badm->getServiceDebiteur() ? $badm->getServiceDebiteur() : null,
+            'casier' => $badm->getCasierDestinataire() ? $badm->getCasierDestinataire() : null,
+        ];
+        $secondFormDto->motifMateriel = $badm->getMotifMateriel();
+
+        // ---------------- Entrée en parc ----------------
+        $secondFormDto->etatAchat = $badm->getEtatAchat();
+        $secondFormDto->dateMiseLocation = $badm->getDateMiseLocation();
+
+        // ---------------- Valeur ----------------
+        $secondFormDto->coutAcquisition = $badm->getCoutAcquisition();
+        $secondFormDto->amortissement = $badm->getAmortissement();
+        $secondFormDto->valeurNetComptable = $badm->getValeurNetComptable();
+
+        // ---------------- cession d'actif ----------------
+        $secondFormDto->nomClient = $badm->getNomClient();
+        $secondFormDto->modalitePaiement = $badm->getModalitePaiement();
+        $secondFormDto->prixVenteHt = $badm->getPrixVenteHt();
+
+        // ---------------- Mise au rebut -----------------
+        $secondFormDto->motifMiseRebut = $badm->getMotifMiseRebut();
+        $secondFormDto->pieceJoint01 = $badm->getNomImage();
+        $secondFormDto->pieceJoint02 = $badm->getNomFichier();
+
+        // --------------- mouvement materiel ---------------
+        $secondFormDto->typeMouvement = $badm->getTypeMouvement();
+        $secondFormDto->dateDemande = $badm->getCreatedAt(); // Assuming dateDemande is createdAt
+        $secondFormDto->numeroBadm = $badm->getNumeroBadm();
+        $secondFormDto->statutDemande = $badm->getStatutDemande();
+
+        // ---------------- OR -------------------------
+        // Ces champs ne sont pas mappés par la méthode 'map' d'origine.
+        // $secondFormDto->estOr = $badm->getEstOr();
+        // $secondFormDto->ors = $badm->getOrs();
+
+        return $secondFormDto;
     }
 
     /**
