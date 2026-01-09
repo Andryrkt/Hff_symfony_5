@@ -74,77 +74,83 @@ class BadmMapper
      * @param Badm $badm The Badm entity to map.
      * @return SecondFormDto The mapped SecondFormDto.
      */
-    public function reverseMap(Badm $badm): SecondFormDto
+    public function reverseMap(Badm $badm): ?SecondFormDto
     {
-        $secondFormDto = new SecondFormDto();
-        $numSerieDesignation = $this->badmModel->getNumSerieDesignationMateriel($badm);
+        $infoMaterielDansIps = $this->badmModel->getInfoMateriel($badm);
 
-        // --------------- Caracteristique du matériel ---------------
-        // Ces champs ne sont pas directement stockés dans l'entité Badm
-        // ou ne sont pas mappés par la méthode 'map' d'origine.
-        // Ils devraient être récupérés d'une autre source si nécessaire pour le DTO.
-        $secondFormDto->designation = $numSerieDesignation['designation'];
-        $secondFormDto->idMateriel = $badm->getIdMateriel();
-        $secondFormDto->numParc = $badm->getNumParc();
-        $secondFormDto->numSerie = $numSerieDesignation['num_serie'];
-        // $secondFormDto->groupe = null;
-        // $secondFormDto->constructeur = null;
-        // $secondFormDto->modele = null;
-        // $secondFormDto->anneeDuModele = null;
-        // $secondFormDto->affectation = null;
-        // $secondFormDto->dateAchat = null;
+        if ($infoMaterielDansIps) {
 
-        // --------------- Etat machine -----------------
-        $secondFormDto->heureMachine = $badm->getHeureMachine();
-        $secondFormDto->kmMachine = $badm->getKmMachine();
+            $secondFormDto = new SecondFormDto();
 
-        // ---------------- Agence, service et casier emetteur ----------------
-        // On récupère les entités liées si elles existent
-        $secondFormDto->emetteur = [
-            'agence' => $badm->getAgenceEmetteurId() ? $badm->getAgenceEmetteurId() : null,
-            'service' => $badm->getServiceEmetteurId() ? $badm->getServiceEmetteurId() : null,
-            'casier' => $badm->getCasierEmetteur() ? $badm->getCasierEmetteur() : null,
-        ];
+            // --------------- Caracteristique du matériel ---------------
+            // Ces champs ne sont pas directement stockés dans l'entité Badm
+            // ou ne sont pas mappés par la méthode 'map' d'origine.
+            // Ils devraient être récupérés d'une autre source si nécessaire pour le DTO.
+            $secondFormDto->designation = $infoMaterielDansIps['designation'];
+            $secondFormDto->idMateriel = $badm->getIdMateriel();
+            $secondFormDto->numParc = $badm->getNumParc();
+            $secondFormDto->numSerie = $infoMaterielDansIps['num_serie'];
+            $secondFormDto->groupe = $infoMaterielDansIps['famille'];
+            $secondFormDto->constructeur = $infoMaterielDansIps['constructeur'];
+            $secondFormDto->modele = $infoMaterielDansIps['modele'];
+            $secondFormDto->anneeDuModele = $infoMaterielDansIps['annee_du_modele'];
+            $secondFormDto->affectation = $infoMaterielDansIps['affectation'];
+            $secondFormDto->dateAchat = $infoMaterielDansIps['date_achat'];
 
-        // ---------------- Agence, service et casier destinataire ----------------
-        $secondFormDto->destinataire = [
-            'agence' => $badm->getAgenceDebiteurId() ? $badm->getAgenceDebiteurId() : null,
-            'service' => $badm->getServiceDebiteur() ? $badm->getServiceDebiteur() : null,
-            'casier' => $badm->getCasierDestinataire() ? $badm->getCasierDestinataire() : null,
-        ];
-        $secondFormDto->motifMateriel = $badm->getMotifMateriel();
+            // --------------- Etat machine -----------------
+            $secondFormDto->heureMachine = $badm->getHeureMachine();
+            $secondFormDto->kmMachine = $badm->getKmMachine();
 
-        // ---------------- Entrée en parc ----------------
-        $secondFormDto->etatAchat = $badm->getEtatAchat();
-        $secondFormDto->dateMiseLocation = $badm->getDateMiseLocation();
+            // ---------------- Agence, service et casier emetteur ----------------
+            // On récupère les entités liées si elles existent
+            $secondFormDto->emetteur = [
+                'agence' => $badm->getAgenceEmetteurId() ? $badm->getAgenceEmetteurId() : null,
+                'service' => $badm->getServiceEmetteurId() ? $badm->getServiceEmetteurId() : null,
+                'casier' => $badm->getCasierEmetteur() ? $badm->getCasierEmetteur() : null,
+            ];
 
-        // ---------------- Valeur ----------------
-        $secondFormDto->coutAcquisition = $badm->getCoutAcquisition();
-        $secondFormDto->amortissement = $badm->getAmortissement();
-        $secondFormDto->valeurNetComptable = $badm->getValeurNetComptable();
+            // ---------------- Agence, service et casier destinataire ----------------
+            $secondFormDto->destinataire = [
+                'agence' => $badm->getAgenceDebiteurId() ? $badm->getAgenceDebiteurId() : null,
+                'service' => $badm->getServiceDebiteur() ? $badm->getServiceDebiteur() : null,
+                'casier' => $badm->getCasierDestinataire() ? $badm->getCasierDestinataire() : null,
+            ];
+            $secondFormDto->motifMateriel = $badm->getMotifMateriel();
 
-        // ---------------- cession d'actif ----------------
-        $secondFormDto->nomClient = $badm->getNomClient();
-        $secondFormDto->modalitePaiement = $badm->getModalitePaiement();
-        $secondFormDto->prixVenteHt = $badm->getPrixVenteHt();
+            // ---------------- Entrée en parc ----------------
+            $secondFormDto->etatAchat = $badm->getEtatAchat();
+            $secondFormDto->dateMiseLocation = $badm->getDateMiseLocation();
 
-        // ---------------- Mise au rebut -----------------
-        $secondFormDto->motifMiseRebut = $badm->getMotifMiseRebut();
-        $secondFormDto->pieceJoint01 = $badm->getNomImage();
-        $secondFormDto->pieceJoint02 = $badm->getNomFichier();
+            // ---------------- Valeur ----------------
+            $secondFormDto->coutAcquisition = $badm->getCoutAcquisition();
+            $secondFormDto->amortissement = $badm->getAmortissement();
+            $secondFormDto->valeurNetComptable = $badm->getValeurNetComptable();
 
-        // --------------- mouvement materiel ---------------
-        $secondFormDto->typeMouvement = $badm->getTypeMouvement();
-        $secondFormDto->dateDemande = $badm->getCreatedAt(); // Assuming dateDemande is createdAt
-        $secondFormDto->numeroBadm = $badm->getNumeroBadm();
-        $secondFormDto->statutDemande = $badm->getStatutDemande();
+            // ---------------- cession d'actif ----------------
+            $secondFormDto->nomClient = $badm->getNomClient();
+            $secondFormDto->modalitePaiement = $badm->getModalitePaiement();
+            $secondFormDto->prixVenteHt = $badm->getPrixVenteHt();
 
-        // ---------------- OR -------------------------
-        // Ces champs ne sont pas mappés par la méthode 'map' d'origine.
-        // $secondFormDto->estOr = $badm->getEstOr();
-        // $secondFormDto->ors = $badm->getOrs();
+            // ---------------- Mise au rebut -----------------
+            $secondFormDto->motifMiseRebut = $badm->getMotifMiseRebut();
+            $secondFormDto->pieceJoint01 = $badm->getNomImage();
+            $secondFormDto->pieceJoint02 = $badm->getNomFichier();
 
-        return $secondFormDto;
+            // --------------- mouvement materiel ---------------
+            $secondFormDto->typeMouvement = $badm->getTypeMouvement();
+            $secondFormDto->dateDemande = $badm->getCreatedAt(); // Assuming dateDemande is createdAt
+            $secondFormDto->numeroBadm = $badm->getNumeroBadm();
+            $secondFormDto->statutDemande = $badm->getStatutDemande();
+
+            // ---------------- OR -------------------------
+            // Ces champs ne sont pas mappés par la méthode 'map' d'origine.
+            // $secondFormDto->estOr = $badm->getEstOr();
+            // $secondFormDto->ors = $badm->getOrs();
+
+            return $secondFormDto;
+        } else {
+            return null;
+        }
     }
 
     /**

@@ -19,7 +19,7 @@ class BadmModel
     }
 
 
-    public function getInfoMateriel(FirstFormDto $data): array
+    public function getInfoMateriel(Object $data): array
     {
         $this->databaseInformix->connect();
 
