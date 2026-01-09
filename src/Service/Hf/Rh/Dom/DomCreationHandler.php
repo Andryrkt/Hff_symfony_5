@@ -46,7 +46,7 @@ class DomCreationHandler
         $dom = $this->domFactory->create($secondFormDto);
 
         $this->validateDom($dom);
-        $this->saveDomWithFiles($form, $dom, $pdfService, $secondFormDto);
+        $this->saveWithFiles($form, $dom, $pdfService, $secondFormDto);
 
         return $dom;
     }
@@ -74,7 +74,7 @@ class DomCreationHandler
         }
     }
 
-    private function saveDomWithFiles(FormInterface $form, Dom $dom, DomPdfService $pdfService, SecondFormDto $secondFormDto): void
+    private function saveWithFiles(FormInterface $form, Dom $dom, DomPdfService $pdfService, SecondFormDto $secondFormDto): void
     {
         $this->processFiles($form, $dom, $pdfService, $secondFormDto);
 

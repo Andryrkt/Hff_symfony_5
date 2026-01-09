@@ -49,7 +49,7 @@ class SecondFormDto
     // ---------------- cession d'actif ----------------
     public ?string $nomClient = null;
     public ?string $modalitePaiement = null;
-    public ?float $prixVenteHt = null;
+    public ?float $prixVenteHt = 0;
     // ---------------- Mise au rebut -----------------
     /**
      * @Assert\NotBlank(message="Le motif ne peut pas être vide.", groups={"mise_au_rebut"})
@@ -62,13 +62,17 @@ class SecondFormDto
      * )
      */
     public ?string $motifMiseRebut = null;
-    public ?string $nomImage = null;
-    public ?string $nomFichier = null;
+    public $pieceJoint01 = null; // nomImage
+    public $pieceJoint02 = null; // nomFichier
     // --------------- mouvement materiel ---------------
     public TypeMouvement $typeMouvement;
+    public \DateTime $dateDemande;
     public string $numeroBadm;
     public StatutDemande $statutDemande;
-    public \DateTime $dateDemande;
+    public string $mailUser;
+    // ---------------- OR -------------------------
+    public string $estOr = 'NON';
+    public array $ors = [];
 
 
     public function getTypeMouvementCssClass(): string

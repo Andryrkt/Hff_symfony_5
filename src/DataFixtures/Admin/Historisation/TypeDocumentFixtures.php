@@ -18,7 +18,7 @@ class TypeDocumentFixtures extends Fixture
             ['type' => 'TIK', 'libelle' => 'DEMANDE DE SUPPORT INFORMATIQUE', 'reference' => 'type_tik'],
             ['type' => 'DA', 'libelle' => 'DEMANDE APPROVISIONNEMENT', 'reference' => 'type_da'],
             ['type' => 'DOM', 'libelle' => 'DEMANDE ORDRE DE MISSION', 'reference' => 'type_dom'],
-            ['type' => 'BADM', 'libelle' => 'MOUVEMENT MATERIEL BADM', 'reference' => 'type_badm'],
+            ['type' => 'BDM', 'libelle' => 'MOUVEMENT MATERIEL BADM', 'reference' => 'type_bdm'],
             ['type' => 'CAS', 'libelle' => 'CASIER', 'reference' => 'type_cas'],
             ['type' => 'CDE', 'libelle' => 'COMMANDE', 'reference' => 'type_cde'],
             ['type' => 'DEV', 'libelle' => 'DEVIS', 'reference' => 'type_dev'],

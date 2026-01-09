@@ -2,14 +2,21 @@
 
 namespace App\Controller\Hf\Materiel\Badm\Creation;
 
+use Psr\Log\LoggerInterface;
 use App\Model\Hf\Materiel\Badm\BadmModel;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Service\Hf\Materiel\Badm\BadmPdfService;
 use App\Factory\Hf\Materiel\Badm\SecondFormFactory;
+use App\Service\Hf\Materiel\Badm\BadmCreationHandler;
 use App\Form\Hf\Materiel\Badm\Creation\SecondFormType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
+use App\Constants\Admin\Historisation\TypeDocumentConstants;
+use App\Constants\Admin\Historisation\TypeOperationConstants;
 use App\Service\Hf\Materiel\Badm\BadmBlockingConditionService;
+use App\Service\Historique_operation\HistoriqueOperationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
@@ -17,13 +24,32 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 class SecondFormController extends AbstractController
 {
+    private BadmBlockingConditionService $badmBlockingConditionService;
+    private HistoriqueOperationService $historiqueOperationService;
+    protected LoggerInterface $logger;
+    private BadmCreationHandler $badmCreationHandler;
+    private BadmPdfService $pdfService;
+
+    public function __construct(
+        BadmBlockingConditionService $badmBlockingConditionService,
+        HistoriqueOperationService $historiqueOperationService,
+        LoggerInterface $logger,
+        BadmCreationHandler $badmCreationHandler,
+        BadmPdfService $pdfService
+    ) {
+        $this->badmBlockingConditionService = $badmBlockingConditionService;
+        $this->historiqueOperationService = $historiqueOperationService;
+        $this->logger = $logger;
+        $this->badmCreationHandler = $badmCreationHandler;
+        $this->pdfService = $pdfService;
+    }
+
     /**
      * @Route("/second-form", name="hf_materiel_badm_second_form_index")
      */
     public function index(
         Request $request,
         BadmModel $badmModel,
-        BadmBlockingConditionService $badmBlockingConditionService,
         SecondFormFactory $secondFormFactory,
         ContextAwareBreadcrumbBuilder $breadcrumbBuilder
     ) {
@@ -37,7 +63,7 @@ class SecondFormController extends AbstractController
         $infoMaterielDansIps = $badmModel->getInfoMateriel($firstFormDto);
 
         // 4. CONDITION DE BLOCAGE 
-        $blockingMessage = !$this->isGranted('ROLE_ADMIN') ? $badmBlockingConditionService->checkBlockingConditions($firstFormDto, $infoMaterielDansIps) : null;
+        $blockingMessage = !$this->isGranted('ROLE_ADMIN') ? $this->badmBlockingConditionService->checkBlockingConditionsAvantSoumissionForm($firstFormDto, $infoMaterielDansIps) : null;
         if ($blockingMessage) {
             $this->addFlash('warning', $blockingMessage);
             return $this->redirectToRoute('hf_materiel_badm_first_form_index');
@@ -50,7 +76,10 @@ class SecondFormController extends AbstractController
         $form = $this->createForm(SecondFormType::class, $secondFormDto);
 
         // 7. traitement du formulaire
-        $this->traitementFormulaire($request, $form);
+        $response = $this->traitementFormulaire($request, $form);
+        if ($response) {
+            return $response;
+        }
 
         return $this->render('hf/materiel/badm/creation/second_form.html.twig', [
             'form' => $form->createView(),
@@ -75,12 +104,65 @@ class SecondFormController extends AbstractController
         return $firstFormDto;
     }
 
-    private function traitementFormulaire(Request $request, FormInterface $form)
+    private function traitementFormulaire(Request $request, FormInterface $form): ?RedirectResponse
     {
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->logger->info('Second formulaire soumis et valide.');
+            $this->logger->debug('Données du formulaire', ['data' => $form->getData()]);
 
-            dd($form->getData());
+            // 1. CONDITION DE BLOCAGE 
+            $secondFormDto = $form->getData();
+            $blockingMessage = $this->badmBlockingConditionService->checkBlockingConditionsApresSoumissionForm($secondFormDto);
+            if ($blockingMessage) {
+                $this->addFlash('warning', $blockingMessage);
+                return $this->redirectToRoute('hf_materiel_badm_first_form_index');
+            }
+
+            // 2. processValidForm
+            $redirectResponse = $this->processValidForm($form);
+            if ($redirectResponse) {
+                return $redirectResponse;
+            }
         }
+
+        return null;
+    }
+
+    private function processValidForm(FormInterface $form): ?RedirectResponse
+    {
+        $numeroBadm = 'non-défini';
+        $message = 'Création du Badm.';
+        $success = false;
+
+        try {
+            $badm = $this->badmCreationHandler->handle($form, $this->pdfService);
+            $numeroBadm = $badm->getNumeroBadm();
+            $success = true;
+            $message = 'Le Badm a été créé avec succès.';
+            $this->logger->info($message, ['numero_badm' => $numeroBadm]);
+        } catch (\Throwable $e) {
+            $message = $e->getMessage();
+            $this->logger->error(
+                'Erreur lors de la création du Badm : ' . $message,
+                ['numero_badm' => $numeroBadm, 'exception' => $e]
+            );
+        }
+
+        $this->historiqueOperationService->enregistrer(
+            $numeroBadm,
+            TypeOperationConstants::TYPE_OPERATION_CREATION_NAME,
+            TypeDocumentConstants::TYPE_DOCUMENT_BADM_CODE,
+            $success,
+            $message
+        );
+
+        if ($success) {
+            $this->addFlash('success', $message);
+            return $this->redirectToRoute('hf_materiel_badm_liste_index');
+        }
+
+        $this->addFlash('warning', $message);
+        return null;
     }
 }

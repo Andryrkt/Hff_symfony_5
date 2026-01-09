@@ -44,12 +44,64 @@ class StatutDemandeFixtures extends Fixture
 
             /** =========== Statuts CAS ===============*/
             ['app' => 'CAS', 'code' => 'ATV', 'description' => 'ATTENTE VALIDATION'],
-            ['app' => 'CAS', 'code' => 'VAL', 'description' => 'VALIDER']
+            ['app' => 'CAS', 'code' => 'VAL', 'description' => 'VALIDER'],
 
             /** =========== Statuts BADM ===============*/
+            ['app' => 'BDM', 'code' => 'OUV', 'description' => 'OUVERT'],
+            ['app' => 'BDM', 'code' => 'ENC', 'description' => 'ENCOURS'],
+            ['app' => 'BDM', 'code' => 'CLO', 'description' => 'CLOTURE'],
+            ['app' => 'BDM', 'code' => 'ANN', 'description' => 'ANNULE'],
+            ['app' => 'BDM', 'code' => 'OUV', 'description' => 'A VALIDER SERVICE EMETTEUR'],
+            ['app' => 'BDM', 'code' => 'ANN', 'description' => 'ANNULE SERVICE EMETTEUR'],
+            ['app' => 'BDM', 'code' => 'OUV', 'description' => 'A VALIDER SERVICE DESTINATAIRE'],
+            ['app' => 'BDM', 'code' => 'ANN', 'description' => 'ANNULE SERVICE DESTINATAIRE'],
+            ['app' => 'BDM', 'code' => 'OUV', 'description' => 'ATTENTE VALIDATION DG'],
+            ['app' => 'BDM', 'code' => 'ANN', 'description' => 'ANNULE DG'],
+            ['app' => 'BDM', 'code' => 'OUV', 'description' => 'A TRAITER INFO'],
+            ['app' => 'BDM', 'code' => 'OUV', 'description' => 'A TRAITER COMPTA'],
+            ['app' => 'BDM', 'code' => 'CLO', 'description' => 'CLOTURE COMPTA'],
+            ['app' => 'BDM', 'code' => 'ANN', 'description' => 'ANNULE INFORMATIQUE'],
 
             /** =========== Statuts DIT ===============*/
+            ['app' => 'DIT', 'code' => 'CLA', 'description' => 'CLOTUREE ANNULEE'],
+            ['app' => 'DIT', 'code' => 'CLV', 'description' => 'CLOTUREE VALIDEE'],
+            ['app' => 'DIT', 'code' => 'CLH', 'description' => 'CLOTUREE HORS DELAI'],
+            ['app' => 'DIT', 'code' => 'TE', 'description' => 'TERMINEE'],
+            ['app' => 'DIT', 'code' => 'AAF', 'description' => 'A AFFECTER'],
+            ['app' => 'DIT', 'code' => 'AFF', 'description' => 'AFFECTEE SECTION'],
+
+            /** =========== Statuts TKI ===============*/
+            ['app' => 'TKI', 'code' => 'OUV', 'description' => 'OUVERT'],
+            ['app' => 'TKI', 'code' => 'REF', 'description' => 'REFUDE'],
+            ['app' => 'TKI', 'code' => 'ENC', 'description' => 'ENCOURS'],
+            ['app' => 'TKI', 'code' => 'PLA', 'description' => 'PLANIFIE'],
+            ['app' => 'TKI', 'code' => 'RES', 'description' => 'RESOLU'],
+            ['app' => 'TKI', 'code' => 'ROV', 'description' => 'REOUVERT'],
+            ['app' => 'TKI', 'code' => 'CLO', 'description' => 'CLÔTURE'],
+            ['app' => 'TKI', 'code' => 'SUS', 'description' => 'SUSPENDU'],
+
+            /** =========== Statuts MUT ===============*/
+            ['app' => 'MUT', 'code' => 'OUV', 'description' => 'A VALIDER SERVICE EMETTEUR'],
+            ['app' => 'MUT', 'code' => 'OUV', 'description' => 'A VALIDER SERVICE DESTINATAIRE'],
+            ['app' => 'MUT', 'code' => 'OUV', 'description' => 'PRE-CONTROLE ATELIER'],
+            ['app' => 'MUT', 'code' => 'OUV', 'description' => 'A VALIDER COMPTA'],
+            ['app' => 'MUT', 'code' => 'OUV', 'description' => 'A CONTROLER RH'],
+            ['app' => 'MUT', 'code' => 'ANN', 'description' => 'ANNULE CHEF DE SERVICE DESTINATAIRE'],
+            ['app' => 'MUT', 'code' => 'ANN', 'description' => 'ANNULE CHEF D\'ATELIER'],
+            ['app' => 'MUT', 'code' => 'ANN', 'description' => 'ANNULE CHEF DE SERVICE EMMETTEUR'],
+            ['app' => 'MUT', 'code' => 'ANN', 'description' => 'ANNULE RH'],
+            ['app' => 'MUT', 'code' => 'ANN', 'description' => 'ANNULE COMPTA'],
+            ['app' => 'MUT', 'code' => 'CLO', 'description' => 'CLOTURE'],
+
+            /** ================= CC ================= */
+            ['app' => 'CC', 'code' => 'OUV', 'description' => 'A VALIDER DA'],
+            ['app' => 'CC', 'code' => 'ANN', 'description' => 'ANNULE DA'],
+            ['app' => 'CC', 'code' => 'CLO', 'description' => 'CLOTURE INFO'],
+
+
         ];
+
+
 
         foreach ($statuts as $statutData) {
             $statut = new StatutDemande();

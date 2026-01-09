@@ -57,17 +57,17 @@ class Badm implements CreatedByInterface, AgenceServiceInterface
     /**
      * @ORM\Column(type="float")
      */
-    private $coutAcquisition;
+    private $coutAcquisition = 0;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $amortissement;
+    private $amortissement = 0;
 
     /**
      * @ORM\Column(type="float")
      */
-    private $valeurNetComptable;
+    private $valeurNetComptable = 0;
 
     /**
      * @ORM\Column(type="string", length=50, nullable=true)
@@ -82,7 +82,7 @@ class Badm implements CreatedByInterface, AgenceServiceInterface
     /**
      * @ORM\Column(type="float")
      */
-    private $prixVenteHt;
+    private $prixVenteHt = 0;
 
     /**
      * @ORM\Column(type="string", length=100, nullable=true)
@@ -105,12 +105,12 @@ class Badm implements CreatedByInterface, AgenceServiceInterface
     private $numParc;
 
     /**
-     * @ORM\Column(type="string", length=50, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $nomImage;
 
     /**
-     * @ORM\Column(type="string", length=50, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $nomFichier;
 

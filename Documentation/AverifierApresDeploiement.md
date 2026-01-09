@@ -1,0 +1,1 @@
+- le logo des pdfs s'affiche bien

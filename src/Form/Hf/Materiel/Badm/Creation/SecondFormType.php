@@ -76,9 +76,8 @@ class SecondFormType extends AbstractType
                 [
                     'label' => 'Désignation ',
                     'mapped' => false,
-                    'attr' => [
-                        'disabled' => true
-                    ],
+                    'disabled' => true,
+                    'required' => false,
                     'data' => $options["data"]->designation
                 ]
             )
@@ -88,9 +87,8 @@ class SecondFormType extends AbstractType
                 [
                     'label' => 'ID matériel',
                     'mapped' => false,
-                    'attr' => [
-                        'disabled' => true
-                    ],
+                    'disabled' => true,
+                    'required' => false,
                     'data' => $options["data"]->idMateriel
                 ]
             )
@@ -100,9 +98,8 @@ class SecondFormType extends AbstractType
                 [
                     'label' => 'N° Série ',
                     'mapped' => false,
-                    'attr' => [
-                        'disabled' => true
-                    ],
+                    'disabled' => true,
+                    'required' => false,
                     'data' => $options["data"]->numSerie
                 ]
             )
@@ -122,9 +119,8 @@ class SecondFormType extends AbstractType
                 [
                     'label' => 'Groupe ',
                     'mapped' => false,
-                    'attr' => [
-                        'disabled' => true
-                    ],
+                    'disabled' => true,
+                    'required' => false,
                     'data' => $options["data"]->groupe
                 ]
             )
@@ -134,9 +130,8 @@ class SecondFormType extends AbstractType
                 [
                     'label' => 'Constructeur',
                     'mapped' => false,
-                    'attr' => [
-                        'disabled' => true
-                    ],
+                    'disabled' => true,
+                    'required' => false,
                     'data' => $options["data"]->constructeur
                 ]
             )
@@ -146,9 +141,8 @@ class SecondFormType extends AbstractType
                 [
                     'label' => 'Modèle',
                     'mapped' => false,
-                    'attr' => [
-                        'disabled' => true
-                    ],
+                    'disabled' => true,
+                    'required' => false,
                     'data' => $options["data"]->modele
                 ]
             )
@@ -158,9 +152,8 @@ class SecondFormType extends AbstractType
                 [
                     'label' => 'Année du modèle',
                     'mapped' => false,
-                    'attr' => [
-                        'disabled' => true
-                    ],
+                    'disabled' => true,
+                    'required' => false,
                     'data' => $options["data"]->anneeDuModele
                 ]
             )
@@ -170,9 +163,8 @@ class SecondFormType extends AbstractType
                 [
                     'label' => 'Affectation',
                     'mapped' => false,
-                    'attr' => [
-                        'disabled' => true
-                    ],
+                    'disabled' => true,
+                    'required' => false,
                     'data' => $options["data"]->affectation
                 ]
             )
@@ -182,9 +174,8 @@ class SecondFormType extends AbstractType
                 [
                     'label' => 'Date d’achat ',
                     'mapped' => false,
-                    'attr' => [
-                        'disabled' => true
-                    ],
+                    'disabled' => true,
+                    'required' => false,
                     'data' => $this->formattingService->formatDate($options["data"]->dateAchat)
                 ]
             )
@@ -250,9 +241,7 @@ class SecondFormType extends AbstractType
                 TextType::class,
                 [
                     'label' => 'Motif',
-                    'attr' => [
-                        'disabled' => $typeMouvement !== TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC && $typeMouvement !== TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_AGENCE_SERVICE && $typeMouvement !== TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_DE_CASIER,
-                    ],
+                    'disabled' => $typeMouvement !== TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC && $typeMouvement !== TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_AGENCE_SERVICE && $typeMouvement !== TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_DE_CASIER,
                     'required' => $typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC || $typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_AGENCE_SERVICE || $typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_DE_CASIER,
                 ]
             )
@@ -356,7 +345,7 @@ class SecondFormType extends AbstractType
                 ]
             )
             ->add(
-                'nomImage',
+                'pieceJoint01',
                 FileUploadType::class,
                 [
                     'label' => 'Image (Merci de mettre un fichier image)',
@@ -368,7 +357,7 @@ class SecondFormType extends AbstractType
                 ]
             )
             ->add(
-                'nomFichier',
+                'pieceJoint02',
                 FileUploadType::class,
                 [
                     'label' => 'Fichier (Merci de mettre un fichier PDF)',
@@ -393,9 +382,8 @@ class SecondFormType extends AbstractType
                     'widget' => 'single_text',
                     'html5' => false,
                     'format' => 'dd/MM/yyyy',
-                    'attr' => [
-                        'disabled' => true
-                    ],
+                    'disabled' => true,
+                    'required' => false,
                     'data' => $options["data"]->dateDemande
                 ]
             )

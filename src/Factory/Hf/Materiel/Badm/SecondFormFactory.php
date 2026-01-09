@@ -2,7 +2,6 @@
 
 namespace App\Factory\Hf\Materiel\Badm;
 
-use App\Constants\Admin\AgenceService\AgenceConstants;
 use App\Entity\Admin\PersonnelUser\User;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Hf\Materiel\Casier\Casier;
@@ -10,22 +9,36 @@ use App\Dto\Hf\Materiel\Badm\FirstFormDto;
 use App\Entity\Admin\AgenceService\Agence;
 use App\Dto\Hf\Materiel\Badm\SecondFormDto;
 use App\Entity\Admin\AgenceService\Service;
+use App\Service\Utils\NumeroGeneratorService;
 use Symfony\Component\Security\Core\Security;
 use App\Entity\Hf\Materiel\Badm\TypeMouvement;
+use App\Constants\Admin\AgenceService\AgenceConstants;
 use App\Constants\Admin\AgenceService\ServiceConstants;
+use App\Repository\Admin\Statut\StatutDemandeRepository;
 use App\Constants\Hf\Materiel\Badm\TypeMouvementConstants;
+use App\Constants\Admin\Historisation\TypeDocumentConstants;
+use App\Model\Hf\Materiel\Badm\BadmModel;
 
 class SecondFormFactory
 {
+    private NumeroGeneratorService $numeroGeneratorService;
+    private StatutDemandeRepository $statutDemandeRepository;
     private Security $security;
     private EntityManagerInterface $entityManager;
+    private BadmModel $badmModel;
 
     public function __construct(
         Security $security,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        NumeroGeneratorService $numeroGeneratorService,
+        StatutDemandeRepository $statutDemandeRepository,
+        BadmModel $badmModel
     ) {
         $this->security = $security;
         $this->entityManager = $entityManager;
+        $this->numeroGeneratorService = $numeroGeneratorService;
+        $this->statutDemandeRepository = $statutDemandeRepository;
+        $this->badmModel = $badmModel;
     }
 
     public function create(FirstFormDto $firstFormDto, array $infoMaterielDansIps): SecondFormDto
@@ -85,6 +98,14 @@ class SecondFormFactory
         // Mouvement materiel
         $dto->dateDemande = new \DateTime();
         $dto->typeMouvement = $firstFormDto->typeMouvement;
+        $dto->numeroBadm = $this->numeroGeneratorService->autoGenerateNumero(TypeDocumentConstants::TYPE_DOCUMENT_BADM_CODE, true);
+        $dto->statutDemande = $this->statutDemandeRepository->findOneBy(['codeApplication' => TypeDocumentConstants::TYPE_DOCUMENT_BADM_CODE, 'description' => 'OUVERT']);
+        $dto->mailUser = $user->getEmail();
+
+        //OR
+        $ors = $this->badmModel->getInfoOr($infoMaterielDansIps['num_matricule']);
+        $dto->estOr = empty($ors) ? 'NON' : 'OUI';
+        $dto->ors = $ors;
 
         return $dto;
     }

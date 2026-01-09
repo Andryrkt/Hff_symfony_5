@@ -168,4 +168,24 @@ class AbstractGeneratePdf
         // Move to the next line
         $pdf->Ln(6, true);
     }
+
+    /**
+     * Génère un tableau HTML flexible et l'ajoute au PDF.
+     *
+     * @param TCPDF $pdf L'instance du PDF.
+     * @param array $headerConfig Configuration des en-têtes.
+     * @param array $rows Données du tableau.
+     * @param array $totals Ligne des totaux.
+     * @param array $options Options pour le générateur de tableau.
+     * @param boolean $expre Si vrai, n'affiche pas de message pour un tableau vide.
+     */
+    protected function addTable(TCPDF $pdf, array $headerConfig, array $rows, array $totals = [], array $options = [], bool $expre = false)
+    {
+        $tableGenerator = new PdfTableGeneratorFlexible();
+        $html = $tableGenerator
+            ->setOptions($options)
+            ->generateTable($headerConfig, $rows, $totals, $expre);
+
+        $pdf->writeHTML($html, true, false, true, false, '');
+    }
 }

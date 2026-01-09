@@ -11,7 +11,7 @@ final class TypeDocumentConstants
     public const TYPE_DOCUMENT_TIK_CODE = 'TIK';
     public const TYPE_DOCUMENT_DA_CODE = 'DA';
     public const TYPE_DOCUMENT_DOM_CODE = 'DOM';
-    public const TYPE_DOCUMENT_BADM_CODE = 'BADM';
+    public const TYPE_DOCUMENT_BADM_CODE = 'BDM';
     public const TYPE_DOCUMENT_CAS_CODE = 'CAS';
     public const TYPE_DOCUMENT_CDE_CODE = 'CDE';
     public const TYPE_DOCUMENT_DEV_CODE = 'DEV';

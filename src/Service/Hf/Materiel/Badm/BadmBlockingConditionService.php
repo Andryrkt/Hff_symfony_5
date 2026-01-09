@@ -3,7 +3,8 @@
 namespace App\Service\Hf\Materiel\Badm;
 
 use Psr\Log\LoggerInterface;
-use App\Model\Hf\Materiel\Badm\BadmModel;
+use App\Dto\Hf\Materiel\Badm\FirstFormDto;
+use App\Dto\Hf\Materiel\Badm\SecondFormDto;
 use App\Repository\Hf\Materiel\Badm\BadmRepository;
 use App\Constants\Hf\Materiel\Badm\StatutBadmConstants;
 use App\Constants\Hf\Materiel\Badm\TypeMouvementConstants;
@@ -13,7 +14,6 @@ class BadmBlockingConditionService
 {
     private LoggerInterface $logger;
     private HistoriqueOperationService $historiqueOperationService;
-    private BadmModel $badmModel;
     private BadmRepository $badmRepository;
 
     public function __construct(
@@ -30,10 +30,10 @@ class BadmBlockingConditionService
      * Vérifie les conditions de blocage pour la création d'un BADM.
      * Retourne un message d'erreur si une condition bloquante est rencontrée, sinon null.
      *
-     * @param mixed $dto Le DTO du formulaire (probablement BadmFirstFormDto)
+     * @param FirstFormDto $firstFormDto Le DTO du premier formulaireformulaire 
      * @return string|null Le message d'erreur ou null si tout est OK
      */
-    public function checkBlockingConditions($dto, array $infoMaterielDansIps): ?string
+    public function checkBlockingConditionsAvantSoumissionForm(FirstFormDto $firstFormDto, array $infoMaterielDansIps): ?string
     {
 
         // bloqué si:
@@ -50,7 +50,7 @@ class BadmBlockingConditionService
         // 2.2 le statut du badm dans la base de donnée est encore sur l'un des statut encours de traitement pour l'une des type de mouvement
         if (
             $infoMaterielDansIntranet
-            && $dto->typeMouvement === $infoMaterielDansIntranet->getTypeMouvement()
+            && $firstFormDto->typeMouvement->getDescription() === $infoMaterielDansIntranet->getTypeMouvement()->getDescription()
             && in_array($infoMaterielDansIntranet->getStatutDemande()->getDescription(), StatutBadmConstants::getStatutsEncoursDeTraitement())
         ) {
             $message = 'ce matériel est encours de traitement pour ce type de mouvement.';
@@ -61,7 +61,7 @@ class BadmBlockingConditionService
         // 2.3 le type de mouvement est ENTREE EN PARC et le code affect n'est pas 'VTE'
         if (
             $infoMaterielDansIntranet
-            && $dto->typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC
+            && $firstFormDto->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_ENTREE_EN_PARC
             && $infoMaterielDansIps['code_affect'] !== 'VTE'
         ) {
             $message = 'Ce matériel est déjà en PARC.';
@@ -72,7 +72,7 @@ class BadmBlockingConditionService
         // 2.4 le type de mouvement est CHANGEMENT AGENCE/SERVICE et le code affect est 'VTE'
         if (
             $infoMaterielDansIntranet
-            && $dto->typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_AGENCE_SERVICE
+            && $firstFormDto->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_AGENCE_SERVICE
             && $infoMaterielDansIps['code_affect'] === 'VTE'
         ) {
             $message = 'L\'agence et le service associés à ce matériel ne peuvent pas être modifiés.';
@@ -83,7 +83,7 @@ class BadmBlockingConditionService
         // 2.5 le type de mouvement est CHANGEMENT AGENCE/SERVICE et le code affect n'est ni 'LCD' ni 'IMM'
         if (
             $infoMaterielDansIntranet
-            && $dto->typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_AGENCE_SERVICE
+            && $firstFormDto->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_AGENCE_SERVICE
             && !in_array($infoMaterielDansIps['code_affect'], ['LCD', 'IMM'])
         ) {
             $message = 'L\'affectation du matériel ne permet pas cette opération.';
@@ -94,7 +94,7 @@ class BadmBlockingConditionService
         // 2.6 le type de mouvement est CESSION D'ACTIF et le code affect n'est ni 'LCD' ni 'IMM'
         if (
             $infoMaterielDansIntranet
-            && $dto->typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_CESSION_DACTIF
+            && $firstFormDto->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_CESSION_DACTIF
             && !in_array($infoMaterielDansIps['code_affect'], ['LCD', 'IMM'])
         ) {
             $message = 'Ce matériel ne peut pas mise en cession d\'actif.';
@@ -105,7 +105,7 @@ class BadmBlockingConditionService
         // 2.7 le type de mouvement est MISE AU REBUT et le code affect est 'CAS'
         if (
             $infoMaterielDansIntranet
-            && $dto->typeMouvement === TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT
+            && $firstFormDto->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT
             && $infoMaterielDansIps['code_affect'] === 'CAS'
         ) {
             $message = 'Ce matériel ne peut pas être mis au rebut.';
@@ -113,10 +113,34 @@ class BadmBlockingConditionService
             return $message;
         }
 
-        // TODO : 2.8 le role de l'utilisateur connecter n'est pas 'ROLE_HF_ADMIN'
+        // TODO : 2.8 l'utilisateur n'a pas le permission sur l'agence et service du materiel
+        // if (in_array($agenceMaterielId, $user->getAgenceAutoriserIds()) && in_array($serviceMaterilId, $user->getServiceAutoriserIds())) {
+        //     $message = 'vous n\'êtes pas autoriser à consulter ce matériel.';
+        //     $this->handleBlockingCondition($message);
+        //     return $message;
+        // }
 
-        // TODO : 2.9 l'utilisateur n'a pas le permission sur l'agence et service du materiel
 
+        return null;
+    }
+
+    public function checkBlockingConditionsApresSoumissionForm(SecondFormDto $dto): ?string
+    {
+
+        // 1. le choix du type devrait être changement de casier
+        if (
+            ($dto->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_CHANGEMENT_AGENCE_SERVICE
+                && $dto->emetteur['agence'] === $dto->destinataire['agence']
+                && $dto->emetteur['service'] === $dto->destinataire['service']
+            )
+            ||
+            ($dto->destinataire['agence'] === null
+                && $dto->destinataire['service'] === null)
+        ) {
+            $message = 'le choix du type devrait être Changement de Casier.';
+            $this->handleBlockingCondition($message);
+            return $message;
+        }
         return null;
     }
 

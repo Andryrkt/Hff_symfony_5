@@ -71,6 +71,11 @@ class HistoriqueOperationService
             throw new \InvalidArgumentException(sprintf('Le code de type de document "%s" est invalide.', $typeDocumentCode));
         }
 
+        if (!$this->em->isOpen()) {
+            $this->logger->error(sprintf('Impossible d\'enregistrer l\'historique pour le document "%s" : l\'EntityManager est fermé.', $numeroDocument));
+            return;
+        }
+
         $historique = new HistoriqueOperationDocument();
         $historique
             ->setNumeroDocument($numeroDocument)
@@ -86,7 +91,7 @@ class HistoriqueOperationService
             $this->logger->info(sprintf('Opération "%s" sur document "%s" enregistrée avec succès par "%s".', $typeOperation, $numeroDocument, $user->getUserIdentifier()));
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Erreur lors de l\'enregistrement de l\'historique pour le document "%s" : %s', $numeroDocument, $e->getMessage()));
-            throw new \RuntimeException('Erreur lors de l\'enregistrement de l\'historique de l\'opération.', 0, $e);
+            // On ne relance pas d'exception ici pour ne pas masquer l'erreur initiale si ce service est appelé dans un bloc finally
         }
     }
 }
