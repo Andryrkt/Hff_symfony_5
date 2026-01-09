@@ -217,7 +217,7 @@ class AgenceServiceCasierType extends AbstractType
         return null;
     }
 
-    private function getAgenceFromFormData(array $data): ?Agence
+    private function getAgenceFromFormData(?array $data): ?Agence
     {
         if (isset($data['agence']) && $data['agence']) {
             return $this->em->getRepository(Agence::class)->find($data['agence']);
@@ -226,7 +226,7 @@ class AgenceServiceCasierType extends AbstractType
         return null;
     }
 
-    private function getServiceFromFormData(array $data): ?Service
+    private function getServiceFromFormData(?array $data): ?Service
     {
         if (isset($data['service']) && $data['service']) {
             return $this->em->getRepository(Service::class)->find($data['service']);
@@ -235,7 +235,7 @@ class AgenceServiceCasierType extends AbstractType
         return null;
     }
 
-    private function getCasierFromFormData(array $data): ?Casier
+    private function getCasierFromFormData(?array $data): ?Casier
     {
         if (isset($data['casier']) && $data['casier']) {
             return $this->em->getRepository(Casier::class)->find($data['casier']);

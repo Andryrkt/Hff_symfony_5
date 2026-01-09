@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use App\Dto\Hf\Materiel\Badm\SecondFormDto;
 use App\Form\Common\AgenceServiceCasierType;
+use App\Form\DataTransformer\NumberTransformer;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -333,17 +334,19 @@ class SecondFormType extends AbstractType
                     'disabled' => $options["data"]->typeMouvement->getDescription() !== TypeMouvementConstants::TYPE_MOUVEMENT_CESSION_DACTIF,
                     'required' => $options["data"]->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_CESSION_DACTIF,
                 ]
-            )
-            // =============== MISE AU REBUT ==============
-            ->add(
-                'motifMiseRebut',
-                TextType::class,
-                [
-                    'label' => 'Motif de mise au rebut',
-                    'disabled' =>  $options["data"]->typeMouvement->getDescription() !== TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT,
-                    'required' => $options["data"]->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT,
-                ]
-            )
+            );
+
+        $builder->get('prixVenteHt')->addModelTransformer(new NumberTransformer());
+        // =============== MISE AU REBUT ==============
+        $builder->add(
+            'motifMiseRebut',
+            TextType::class,
+            [
+                'label' => 'Motif de mise au rebut',
+                'disabled' =>  $options["data"]->typeMouvement->getDescription() !== TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT,
+                'required' => $options["data"]->typeMouvement->getDescription() === TypeMouvementConstants::TYPE_MOUVEMENT_MISE_AU_REBUT,
+            ]
+        )
             ->add(
                 'pieceJoint01',
                 FileUploadType::class,

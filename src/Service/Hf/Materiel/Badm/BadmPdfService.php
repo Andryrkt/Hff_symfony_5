@@ -169,7 +169,7 @@ class BadmPdfService extends AbstractGeneratePdf
         $pdf->cell(63, 6, $dto->emetteur['agence']->getCode() . ' - ' . $dto->emetteur['service']->getCode(), 1, 0, '', false, '', 0, false, 'T', 'M');
         $pdf->setAbsX(130);
         $pdf->cell(20, 6, 'Casier :', 0, 0, '', false, '', 0, false, 'T', 'M');
-        $pdf->cell(0, 6, $dto->emetteur['casier']->getNom(), 1, 0, '', false, '', 0, false, 'T', 'M');
+        $pdf->cell(0, 6, $dto->emetteur['casier'] ? $dto->emetteur['casier']->getNom() : '', 1, 0, '', false, '', 0, false, 'T', 'M');
         $pdf->Ln(10, true);
 
 
@@ -189,7 +189,7 @@ class BadmPdfService extends AbstractGeneratePdf
         $pdf->cell(63, 6, $dto->destinataire['agence']->getCode() . ' - ' . $dto->destinataire['service']->getCode(), 1, 0, '', false, '', 0, false, 'T', 'M');
         $pdf->setAbsX(130);
         $pdf->cell(20, 6, 'Casier :', 0, 0, '', false, '', 0, false, 'T', 'M');
-        $pdf->cell(0, 6, $dto->destinataire['casier']->getNom(), 1, 0, '', false, '', 0, false, 'T', 'M');
+        $pdf->cell(0, 6, $dto->destinataire['casier'] ? $dto->destinataire['casier']->getNom() : '', 1, 0, '', false, '', 0, false, 'T', 'M');
         $pdf->Ln(10, true);
 
 
