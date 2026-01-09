@@ -99,9 +99,19 @@
 		{# DEBUT Cession d’actif#}
 		<div class="row">{{ formMacro.sousTitre('Cession d’actif', {class: 'sousTitre'})}}</div>
 		<div class="row">
-			<div class="col-12 col-md-6 col-lg-4">{{ form_row(form.nomClient)}}</div>
+			<div class="col-12 col-md-6 col-lg-4" data-controller="character-limiter components--uppercase" data-character-limiter-max-length-value="50">
+			{{ form_row(form.nomClient, {'attr': {
+                        'data-character-limiter-target': 'input', 
+                        'data-components--uppercase-target': 'input',
+                        'data-action': 'input->character-limiter#limiterCaracteres'
+                    }})}}</div>
 			<div class="col-12 col-md-6 col-lg-4">{{ form_row(form.modalitePaiement)}}</div>
-			<div class="col-12 col-md-6 col-lg-4">{{ form_row(form.prixVenteHt)}}</div>
+			<div class="col-12 col-md-6 col-lg-4" data-controller="number-formatter">
+				{{ form_row(form.prixVenteHt, {'attr': {
+                        'data-number-formatter-target': 'input',
+                        'data-action': 'input->number-formatter#formatNumber'
+                    }})}}
+			</div>
 		</div>
 		{# FIN Cession d’actif#}
 
