@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Command\Migration;
+namespace App\Command\Migration\Admin\PersonnelUser;
 
-
-use App\Service\Migration\Admin\PersonnelUser\PersonnelMigrationMapper;
-use Doctrine\DBAL\Connection;
+use App\Service\Migration\Admin\PersonnelUser\UserMigrationMapper;
+use App\Service\Migration\Utils\LegacyDataFetcher;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -15,27 +14,27 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Commande de migration des données Personnel depuis l'ancienne base de données
+ * Commande de migration des données User depuis l'ancienne base de données
  */
-class MigratePersonnelDataCommand extends Command
+class MigrateUserDataCommand extends Command
 {
-    protected static $defaultName = 'app:migrate:personnel-data';
-    protected static $defaultDescription = 'Migre les données Personnel de l\'ancienne base vers la nouvelle structure';
+    protected static $defaultName = 'app:migrate:user-data';
+    protected static $defaultDescription = 'Migre les données User de l\'ancienne base vers la nouvelle structure';
 
     private EntityManagerInterface $em;
-    private Connection $legacyConnection;
-    private PersonnelMigrationMapper $mapper;
+    private LegacyDataFetcher $legacyFetcher;
+    private UserMigrationMapper $mapper;
     private LoggerInterface $logger;
 
     public function __construct(
         EntityManagerInterface $em,
-        Connection $legacyConnection,
-        PersonnelMigrationMapper $mapper,
+        LegacyDataFetcher $legacyFetcher,
+        UserMigrationMapper $mapper,
         LoggerInterface $migrationLogger
     ) {
         parent::__construct();
         $this->em = $em;
-        $this->legacyConnection = $legacyConnection;
+        $this->legacyFetcher = $legacyFetcher;
         $this->mapper = $mapper;
         $this->logger = $migrationLogger;
     }
@@ -56,22 +55,22 @@ class MigratePersonnelDataCommand extends Command
             ->addOption('update', 'u', InputOption::VALUE_NONE, 'Met à jour les enregistrements existants au lieu de les ignorer')
             ->setHelp(
                 <<<'HELP'
-Cette commande migre les données de la table personnels de l'ancienne base de données
-vers la nouvelle structure de l'entité Personnel.
+Cette commande migre les données de la table utilisateurs de l'ancienne base de données
+vers la nouvelle structure de l'entité User.
 
 Exemples d'utilisation:
 
   # Test avec 10 enregistrements en mode dry-run
-  php bin/console app:migrate:personnel-data --dry-run --limit=10
+  php bin/console app:migrate:user-data --dry-run --limit=10
 
   # Migration complète avec lots de 50
-  php bin/console app:migrate:personnel-data --batch-size=50
+  php bin/console app:migrate:user-data --batch-size=50
 
   # Reprendre une migration à partir de l'enregistrement 1000
-  php bin/console app:migrate:personnel-data --offset=1000
+  php bin/console app:migrate:user-data --offset=1000
 
   # Mettre à jour les enregistrements existants
-  php bin/console app:migrate:personnel-data --update
+  php bin/console app:migrate:user-data --update
 HELP
             );
     }
@@ -85,7 +84,7 @@ HELP
         $offset = (int) $input->getOption('offset');
         $updateExisting = $input->getOption('update');
 
-        $io->title('Migration des données Personnel');
+        $io->title('Migration des données User');
 
         if ($dryRun) {
             $io->warning('Mode DRY-RUN activé - Aucune donnée ne sera persistée');
@@ -106,7 +105,7 @@ HELP
 
         try {
             // Compte le nombre total d'enregistrements à migrer
-            $totalCount = $this->countLegacyRecords($limit, $offset);
+            $totalCount = $this->countLegacyRecords($limit);
 
             if ($totalCount === 0) {
                 $io->warning('Aucun enregistrement à migrer');
@@ -129,33 +128,33 @@ HELP
                 $currentBatchSize = min($batchSize, $totalCount - $processedCount);
 
                 // Récupère un lot de données
-                $legacyRecords = $this->fetchLegacyRecords($currentBatchSize, $currentOffset);
+                $legacyRecords = $this->legacyFetcher->getLegacyUsers($currentBatchSize, $currentOffset);
 
                 foreach ($legacyRecords as $legacyData) {
                     $stats['total']++;
 
                     try {
-                        // Vérifie si le personnel existe déjà (par matricule)
-                        $existingPersonnel = $this->mapper->findExistingByMatricule($legacyData['matricule'] ?? null);
+                        // Vérifie si le user existe déjà (par login ou matricule)
+                        $existingUser = $this->mapper->findExistingUser($legacyData);
 
-                        if ($existingPersonnel && !$updateExisting) {
+                        if ($existingUser && !$updateExisting) {
                             $stats['skipped']++;
-                            $this->logger->info('Personnel déjà existant (ignoré)', [
-                                'matricule' => $legacyData['Matricule'] ?? 'N/A',
+                            $this->logger->info('User déjà existant (ignoré)', [
+                                'username' => $legacyData['nom_utilisateur'] ?? 'N/A',
                             ]);
                             $progressBar->advance();
                             continue;
                         }
 
-                        if ($existingPersonnel && $updateExisting) {
+                        if ($existingUser && $updateExisting) {
                             // Mise à jour
-                            $personnel = $this->mapper->updateExisting($existingPersonnel, $legacyData);
+                            $user = $this->mapper->updateExisting($existingUser, $legacyData);
                             $stats['updated']++;
                         } else {
                             // Création
-                            $personnel = $this->mapper->mapOldToNew($legacyData);
+                            $user = $this->mapper->mapOldToNew($legacyData);
 
-                            if ($personnel === null) {
+                            if ($user === null) {
                                 $stats['skipped']++;
                                 $this->logger->warning('Enregistrement ignoré (mapping failed)', [
                                     'old_id' => $legacyData['id'] ?? 'unknown',
@@ -167,7 +166,7 @@ HELP
 
                         // Persiste si pas en mode dry-run
                         if (!$dryRun) {
-                            $this->em->persist($personnel);
+                            $this->em->persist($user);
                         }
 
                         $stats['success']++;
@@ -211,7 +210,7 @@ HELP
             return Command::SUCCESS;
         } catch (\Exception $e) {
             $io->error('Erreur fatale lors de la migration: ' . $e->getMessage());
-            $this->logger->critical('Erreur fatale lors de la migration Personnel', [
+            $this->logger->critical('Erreur fatale lors de la migration User', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);
@@ -222,46 +221,16 @@ HELP
     /**
      * Compte le nombre d'enregistrements dans l'ancienne base
      */
-    private function countLegacyRecords(?int $limit, int $offset): int
+    private function countLegacyRecords(?int $limit): int
     {
-        $sql = "SELECT COUNT(*) as total FROM Personnel";
-
-
+        $nombre = $this->legacyFetcher->countLegacyUsers();
 
         if ($limit !== null) {
-            $nombre = $this->legacyConnection->fetchOne($sql);
-            return min($limit, (int) $nombre);
+            return min($limit, $nombre);
         }
 
-        $nombre = $this->legacyConnection->fetchOne($sql);
-        return (int) $nombre;
+        return $nombre;
     }
-
-    /**
-     * Récupère un lot d'enregistrements de l'ancienne base de données
-     * 
-     * @param int $limit Nombre maximum d'enregistrements à récupérer
-     * @param int $offset Position de départ pour la pagination
-     * @return array Tableau unique contenant tous les enregistrements fusionnés
-     * @throws \RuntimeException Si une erreur de base de données survient
-     */
-    private function fetchLegacyRecords(int $limit, int $offset): array
-    {
-        $sql = <<<SQL
-                SELECT *
-                FROM Personnel
-                ORDER BY id
-                OFFSET :offset ROWS
-                FETCH NEXT :limit ROWS ONLY
-        SQL;
-
-        $parameters = [
-            'offset' => $offset,
-            'limit' => $limit,
-        ];
-        return  $this->legacyConnection->fetchAllAssociative($sql, $parameters);
-    }
-
 
     /**
      * Affiche les statistiques de migration

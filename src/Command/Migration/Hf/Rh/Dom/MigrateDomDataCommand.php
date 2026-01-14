@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Command\Migration;
+namespace App\Command\Migration\Hf\Rh\Dom;
 
 
 use App\Service\Migration\Hf\Rh\Dom\DomMigrationMapper;
