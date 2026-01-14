@@ -2,6 +2,9 @@
 
 namespace App\Contract\Export;
 
+use App\Contract\Dto\SearchDtoInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
 /**
  * Interface pour les contrôleurs d'export Excel
  * 
@@ -30,4 +33,11 @@ interface ExcelExportInterface
      * @return string Nom du fichier (sans extension)
      */
     public function getFilename(): string;
+
+    /**
+     * Retourne le DTO de recherche qui est récupérer depuis la session
+     * 
+     * @return object DTO de recherche
+     */
+    public function getSearchDto(SessionInterface $session): SearchDtoInterface;
 }

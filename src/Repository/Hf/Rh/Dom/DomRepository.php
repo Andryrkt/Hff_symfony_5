@@ -11,6 +11,7 @@ use App\Entity\Hf\Rh\Dom\SousTypeDocument;
 use Symfony\Component\Security\Core\Security;
 use App\Service\Security\ContextAccessService;
 use App\Repository\Traits\DynamicContextFilterTrait;
+use App\Repository\Traits\PaginatableRepositoryTrait;
 use App\Constants\Admin\Historisation\TypeDocumentConstants;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -26,6 +27,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 class DomRepository extends ServiceEntityRepository
 {
     use DynamicContextFilterTrait;
+    use PaginatableRepositoryTrait;
 
     private const TYPE_MISSION_ECARTER = [
         SousTypeDocument::CODE_COMPLEMENT,
@@ -120,20 +122,7 @@ class DomRepository extends ServiceEntityRepository
             'statut' => 's.description',
         ];
 
-        // Récupérer les paramètres de tri depuis le DTO
-        $sortBy = $domSearchDto->sortBy ?? 'numeroOrdreMission';
-        $sortOrder = strtoupper($domSearchDto->sortOrder ?? 'DESC');
-
-        // Validation de sécurité
-        if (!isset($sortableColumns[$sortBy])) {
-            $sortBy = 'numeroOrdreMission'; // Valeur par défaut sécurisée
-        }
-        if (!in_array($sortOrder, ['ASC', 'DESC'])) {
-            $sortOrder = 'DESC'; // Valeur par défaut sécurisée
-        }
-
-        // Récupérer la limite depuis le DTO
-        $limit = $domSearchDto->limit ?? 50;
+        [$limit, $sortBy, $sortOrder] = $this->sortAndLimit($domSearchDto, $sortableColumns, 'numeroOrdreMission');
 
         // 1. Créer le QueryBuilder avec les jointures et chargement eager des relations
         $queryBuilder = $this->createQueryBuilder('d')
@@ -165,6 +154,7 @@ class DomRepository extends ServiceEntityRepository
             'lastPage'    => $lastPage,
         ];
     }
+
     public function findFilteredExcel(DomSearchDto $domSearchDto)
     {
         // Mapping des colonnes triables (whitelist de sécurité)
@@ -178,17 +168,7 @@ class DomRepository extends ServiceEntityRepository
             'statut' => 's.description',
         ];
 
-        // Récupérer les paramètres de tri depuis le DTO
-        $sortBy = $domSearchDto->sortBy ?? 'numeroOrdreMission';
-        $sortOrder = strtoupper($domSearchDto->sortOrder ?? 'DESC');
-
-        // Validation de sécurité
-        if (!isset($sortableColumns[$sortBy])) {
-            $sortBy = 'numeroOrdreMission'; // Valeur par défaut sécurisée
-        }
-        if (!in_array($sortOrder, ['ASC', 'DESC'])) {
-            $sortOrder = 'DESC'; // Valeur par défaut sécurisée
-        }
+        [$limit, $sortBy, $sortOrder] = $this->sortAndLimit($domSearchDto, $sortableColumns, 'numeroOrdreMission');
 
         // 1. Créer le QueryBuilder avec les jointures et chargement eager des relations
         $queryBuilder = $this->createQueryBuilder('d')
@@ -209,6 +189,7 @@ class DomRepository extends ServiceEntityRepository
 
         return $queryBuilder->getQuery()->getResult();
     }
+
 
     /**
      * Filtre pour le statut

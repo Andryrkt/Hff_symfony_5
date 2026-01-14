@@ -9,6 +9,7 @@ use App\Model\Hf\Materiel\Badm\BadmModel;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Constants\Admin\Historisation\TypeDocumentConstants;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
+use App\Repository\Traits\PaginatableRepositoryTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
@@ -21,6 +22,8 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
  */
 class BadmRepository extends ServiceEntityRepository
 {
+    use PaginatableRepositoryTrait;
+
     private BadmModel $badmModel;
 
     public function __construct(ManagerRegistry $registry, BadmModel $badmModel)
@@ -67,31 +70,15 @@ class BadmRepository extends ServiceEntityRepository
         return $result ? array_values($result)[0] : null;
     }
 
-    private function sortAndLimit($searchDto, array $sortableColumns, string $defaultValue): array
-    {
-        // Récupérer les paramètres de tri depuis le DTO
-        $sortBy = $searchDto->sortBy ?? $defaultValue;
-        $sortOrder = strtoupper($searchDto->sortOrder ?? 'DESC');
-
-        // Validation de sécurité
-        if (!isset($sortableColumns[$sortBy])) {
-            $sortBy = $defaultValue; // Valeur par défaut sécurisée
-        }
-        if (!in_array($sortOrder, ['ASC', 'DESC'])) {
-            $sortOrder = 'DESC'; // Valeur par défaut sécurisée
-        }
-
-        // Récupérer la limite depuis le DTO
-        $limit = $searchDto->limit ?? 50;
-
-        return [$limit, $sortBy, $sortOrder];
-    }
 
     public function findPaginatedAndFiltered(int $page = 1, int $limit = 10, searchDto $searchDto)
     {
         // Mapping des colonnes triables (whitelist de sécurité)
         $sortableColumns = [
-            'numeroBadm' => 'b.numeroBadm'
+            'numeroBadm' => 'b.numeroBadm',
+            'dateDemande' => 'b.createdAt',
+            'typeMouvement' => 'tm.description',
+            'statut' => 's.description',
         ];
 
         [$limit, $sortBy, $sortOrder] = $this->sortAndLimit($searchDto, $sortableColumns, 'numeroBadm');
@@ -126,6 +113,38 @@ class BadmRepository extends ServiceEntityRepository
             'currentPage' => $page,
             'lastPage'    => $lastPage,
         ];
+    }
+
+    public function findFilteredExcel(SearchDto $searchDto)
+    {
+        $sortableColumns = [
+            'numeroBadm' => 'b.numeroBadm',
+            'dateDemande' => 'b.createdAt',
+            'typeMouvement' => 'tm.description',
+            'statut' => 's.description',
+        ];
+
+        [$limit, $sortBy, $sortOrder] = $this->sortAndLimit($searchDto, $sortableColumns, 'numeroBadm');
+
+        // 1. Créer le QueryBuilder avec les jointures et chargement eager des relations
+        $queryBuilder = $this->createQueryBuilder('b')
+            ->leftJoin('b.typeMouvement', 'tm')
+            ->addSelect('tm')  // Évite le problème N+1
+            ->leftJoin('b.statutDemande', 's')
+            ->addSelect('s');  // Évite le problème N+1
+
+        // 2. Appliquer les filtres de recherche
+        $this->filtredDate($queryBuilder, $searchDto);
+        $this->filtredAgenceService($queryBuilder, $searchDto);
+        $this->filtredStatut($queryBuilder, $searchDto);
+        $this->filtredIdentiteMateriel($queryBuilder, $searchDto);
+        $this->filtred($queryBuilder, $searchDto);
+
+        // 3. Ordre et pagination
+        $queryBuilder->orderBy($sortableColumns[$sortBy], $sortOrder);
+
+
+        return $queryBuilder->getQuery()->getResult();
     }
 
     /**

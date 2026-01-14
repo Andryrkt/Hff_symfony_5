@@ -2,12 +2,13 @@
 
 namespace App\Dto\Hf\Rh\Dom;
 
-use App\Entity\Hf\Rh\Dom\SousTypeDocument;
-use App\Entity\Admin\Statut\StatutDemande;
-
+use App\Contract\Dto\SearchDtoInterface;
 use App\Contract\PaginationDtoInterface;
 
-class DomSearchDto implements PaginationDtoInterface
+use App\Entity\Admin\Statut\StatutDemande;
+use App\Entity\Hf\Rh\Dom\SousTypeDocument;
+
+class DomSearchDto implements PaginationDtoInterface, SearchDtoInterface
 {
     public ?StatutDemande $statut = null;
     public ?SousTypeDocument $sousTypeDocument = null;
