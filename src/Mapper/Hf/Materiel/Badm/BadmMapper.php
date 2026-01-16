@@ -88,7 +88,7 @@ class BadmMapper
             // Ils devraient être récupérés d'une autre source si nécessaire pour le DTO.
             $secondFormDto->designation = $infoMaterielDansIps['designation'];
             $secondFormDto->idMateriel = $badm->getIdMateriel();
-            $secondFormDto->numParc = $badm->getNumParc();
+            $secondFormDto->numParc = $infoMaterielDansIps['num_parc'];
             $secondFormDto->numSerie = $infoMaterielDansIps['num_serie'];
             $secondFormDto->groupe = $infoMaterielDansIps['famille'];
             $secondFormDto->constructeur = $infoMaterielDansIps['constructeur'];

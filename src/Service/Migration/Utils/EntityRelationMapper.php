@@ -43,12 +43,12 @@ class EntityRelationMapper
             return null;
         }
 
-        $codeStatut = $this->legacyDataFetcher->getStatutDemandeCode($oldData['ID_Statut_Demande']);
-        if ($codeStatut) {
+        $descriptionStatut = $this->legacyDataFetcher->getStatutDemandeDescription($oldData['ID_Statut_Demande']);
+        if ($descriptionStatut) {
             $statut = $this->em->getRepository(StatutDemande::class)
                 ->findOneBy([
                     'codeApplication' => $codeApplication,
-                    'codeStatut' => $codeStatut
+                    'description' => $descriptionStatut
                 ]);
         }
 
@@ -56,89 +56,14 @@ class EntityRelationMapper
         if (!$statut) {
             $this->logger->warning('StatutDemande non trouvé', [
                 'ID_Statut_Demande' => $oldData['ID_Statut_Demande'],
-                'Code_Statut' => $oldData['Code_Statut'] ?? null,
+                'Description_Statut' => $descriptionStatut ?? null,
             ]);
         }
 
         return $statut;
     }
 
-    /**
-     * Mappe la relation SousTypeDocument
-     * Stratégie : ID → Code (via legacy DB)
-     */
-    public function mapSousTypeDocument(array $oldData): ?SousTypeDocument
-    {
-        if (empty($oldData['Sous_Type_Document'])) {
-            return null;
-        }
 
-        // récupérer le code depuis l'ancienne base
-        $codeSousType = $this->legacyDataFetcher->getSousTypeDocumentCode($oldData['Sous_Type_Document']);
-        if ($codeSousType) {
-            $sousType = $this->em->getRepository(SousTypeDocument::class)
-                ->findOneBy(['codeSousType' => $codeSousType]);
-        }
-
-
-        if (!$sousType) {
-            $this->logger->warning('SousTypeDocument non trouvé', [
-                'Sous_Type_Document' => $oldData['Sous_Type_Document'],
-            ]);
-        }
-
-        return $sousType;
-    }
-
-    /**
-     * Mappe la relation Site
-     * Stratégie : ID → Nom (depuis oldData)
-     */
-    public function mapSite(array $oldData): ?Site
-    {
-        if (empty($oldData['Site'])) { // il existe déjà le nomZone du site dans l'ancien table
-            return null;
-        }
-
-
-        // Si pas trouvé et qu'on a le champ Site (string), chercher par nomZone
-        $site = $this->em->getRepository(Site::class)
-            ->findOneBy(['nomZone' => $oldData['Site']]);
-
-        if (!$site) {
-            $this->logger->warning('Site non trouvé', [
-                'site_id' => $oldData['site_id'],
-                'Site' => $oldData['Site'] ?? null,
-            ]);
-        }
-
-        return $site;
-    }
-
-    /**
-     * Mappe la relation Categorie
-     * Stratégie : ID → Description (depuis oldData)
-     */
-    public function mapCategorie(array $oldData): ?Categorie
-    {
-        if (empty($oldData['Categorie'])) { // il existe déjà le descritpion du categorie dans l'ancien table
-            return null;
-        }
-
-
-        // Si pas trouvé et qu'on a le champ Categorie (string), chercher par description
-        $categorie = $this->em->getRepository(Categorie::class)
-            ->findOneBy(['description' => trim($oldData['Categorie'])]);
-
-        if (!$categorie) {
-            $this->logger->warning('Categorie non trouvée', [
-                'category_id' => $oldData['category_id'],
-                'Categorie' => $oldData['Categorie'] ?? null,
-            ]);
-        }
-
-        return $categorie;
-    }
 
     /**
      * Mappe une Agence
@@ -241,5 +166,87 @@ class EntityRelationMapper
     public function mapFullName(int $matricule): ?string
     {
         return $this->legacyDataFetcher->getFullName($matricule) ? $this->legacyDataFetcher->getFullName($matricule)[0]['fullname'] : null;
+    }
+
+
+    /**========================================================
+     *  DEMANDE D'ORDRE DE MISSION DOM
+     *=======================================================*/
+
+    /**
+     * Mappe la relation SousTypeDocument
+     * Stratégie : ID → Code (via legacy DB)
+     */
+    public function mapSousTypeDocument(array $oldData): ?SousTypeDocument
+    {
+        if (empty($oldData['Sous_Type_Document'])) {
+            return null;
+        }
+
+        // récupérer le code depuis l'ancienne base
+        $codeSousType = $this->legacyDataFetcher->getSousTypeDocumentCode($oldData['Sous_Type_Document']);
+        if ($codeSousType) {
+            $sousType = $this->em->getRepository(SousTypeDocument::class)
+                ->findOneBy(['codeSousType' => $codeSousType]);
+        }
+
+
+        if (!$sousType) {
+            $this->logger->warning('SousTypeDocument non trouvé', [
+                'Sous_Type_Document' => $oldData['Sous_Type_Document'],
+            ]);
+        }
+
+        return $sousType;
+    }
+
+    /**
+     * Mappe la relation Site
+     * Stratégie : ID → Nom (depuis oldData)
+     */
+    public function mapSite(array $oldData): ?Site
+    {
+        if (empty($oldData['Site'])) { // il existe déjà le nomZone du site dans l'ancien table
+            return null;
+        }
+
+
+        // Si pas trouvé et qu'on a le champ Site (string), chercher par nomZone
+        $site = $this->em->getRepository(Site::class)
+            ->findOneBy(['nomZone' => $oldData['Site']]);
+
+        if (!$site) {
+            $this->logger->warning('Site non trouvé', [
+                'site_id' => $oldData['site_id'],
+                'Site' => $oldData['Site'] ?? null,
+            ]);
+        }
+
+        return $site;
+    }
+
+    /**
+     * Mappe la relation Categorie
+     * Stratégie : ID → Description (depuis oldData)
+     */
+    public function mapCategorie(array $oldData): ?Categorie
+    {
+        if (empty($oldData['Categorie'])) { // il existe déjà le descritpion du categorie dans l'ancien table
+            return null;
+        }
+
+
+        // Si pas trouvé et qu'on a le champ Categorie (string), chercher par description
+        $categorie = $this->em->getRepository(Categorie::class)
+            ->findOneBy(['description' => trim($oldData['Categorie'])]);
+
+        if (!$categorie) {
+            $this->logger->warning('Categorie non trouvée', [
+                'category_id' => $oldData['category_id'],
+                'Categorie' => $oldData['Categorie'] ?? null,
+            ]);
+        }
+
+        return $categorie;
     }
 }

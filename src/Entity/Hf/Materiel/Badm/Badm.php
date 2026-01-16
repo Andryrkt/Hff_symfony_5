@@ -51,9 +51,23 @@ class Badm implements CreatedByInterface, AgenceServiceInterface
     private $etatAchat;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="date", nullable=true)
      */
     private $dateMiseLocation;
+
+    // ... (lines 58-190 omitted)
+
+    public function getDateMiseLocation(): ?\DateTimeInterface
+    {
+        return $this->dateMiseLocation;
+    }
+
+    public function setDateMiseLocation(?\DateTimeInterface $dateMiseLocation): self
+    {
+        $this->dateMiseLocation = $dateMiseLocation;
+
+        return $this;
+    }
 
     /**
      * @ORM\Column(type="float")
@@ -188,17 +202,7 @@ class Badm implements CreatedByInterface, AgenceServiceInterface
         return $this;
     }
 
-    public function getDateMiseLocation(): ?\DateTimeInterface
-    {
-        return $this->dateMiseLocation;
-    }
 
-    public function setDateMiseLocation(\DateTimeInterface $dateMiseLocation): self
-    {
-        $this->dateMiseLocation = $dateMiseLocation;
-
-        return $this;
-    }
 
     public function getCoutAcquisition(): ?float
     {
@@ -313,7 +317,7 @@ class Badm implements CreatedByInterface, AgenceServiceInterface
         return $this->numParc;
     }
 
-    public function setNumParc(string $numParc): self
+    public function setNumParc(?string $numParc): self
     {
         $this->numParc = $numParc;
 

@@ -22,18 +22,18 @@ class LegacyDataFetcher
     }
 
     /**
-     * Récupère le code Statut depuis l'ancienne base - Statut_demande
+     * Récupère la description Statut depuis l'ancienne base - Statut_demande
      */
-    public function getStatutDemandeCode(int $id): ?string
+    public function getStatutDemandeDescription(int $id): ?string
     {
         try {
             $result = $this->legacyConnection->fetchAssociative(
-                'SELECT Code_Statut FROM Statut_demande WHERE ID_Statut_Demande = :id',
+                'SELECT Description FROM Statut_demande WHERE ID_Statut_Demande = :id',
                 ['id' => $id]
             );
-            return $result['Code_Statut'] ?? null;
+            return $result['Description'] ?? null;
         } catch (\Exception $e) {
-            $this->logger->error('Erreur récupération code statut', [
+            $this->logger->error('Erreur récupération description statut', [
                 'id' => $id,
                 'error' => $e->getMessage(),
             ]);

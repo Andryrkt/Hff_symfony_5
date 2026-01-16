@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Command\Delete;
+namespace App\Command\Delete\Admin;
 
-use App\Entity\Admin\PersonnelUser\Personnel;
 use App\Entity\Admin\PersonnelUser\User;
 use App\Entity\Admin\PersonnelUser\UserAccess;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,10 +11,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class DeletePersonnelDataCommand extends Command
+class DeleteUserDataCommand extends Command
 {
-    protected static $defaultName = 'app:delete-personnel-data';
-    protected static $defaultDescription = 'Supprime toutes les données des tables UserAccess, User et Personnel';
+    protected static $defaultName = 'app:delete-user-data';
+    protected static $defaultDescription = 'Supprime toutes les données des tables UserAccess et User';
 
     private EntityManagerInterface $entityManager;
     private LoggerInterface $logger;
@@ -35,7 +34,7 @@ class DeletePersonnelDataCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $this->logger->info('Début de la suppression des données Personnel, User et UserAccess.');
+        $this->logger->info('Début de la suppression des données User et UserAccess.');
 
         try {
             $this->logger->info('Suppression des données de la table UserAccess...');
@@ -44,20 +43,15 @@ class DeletePersonnelDataCommand extends Command
             $this->logger->info('Suppression des données de la table User...');
             $this->entityManager->createQuery('DELETE FROM ' . User::class)->execute();
 
-            $this->logger->info('Suppression des données de la table Personnel...');
-            $this->entityManager->createQuery('DELETE FROM ' . Personnel::class)->execute();
-            
-            // flush est inutile avec des requêtes DELETE DQL qui s'exécutent directement en base
-            // $this->entityManager->flush();
-
+            // flush est inutile avec des requêtes DELETE DQL
         } catch (\Exception $e) {
             $this->logger->error('Une erreur est survenue lors de la suppression des données.', ['exception' => $e]);
-            $io->error('Une erreur est survenue. Consultez le fichier de log "delete_personnel.log" pour plus de détails.');
+            $io->error('Une erreur est survenue. Consultez le fichier de log "delete_user.log" pour plus de détails.');
             return Command::FAILURE;
         }
 
-        $this->logger->info('Toutes les données des tables UserAccess, User et Personnel ont été supprimées avec succès.');
-        $io->success('Suppression terminée avec succès. Les détails sont dans le fichier de log "delete_personnel.log".');
+        $this->logger->info('Toutes les données des tables UserAccess et User ont été supprimées avec succès.');
+        $io->success('Suppression terminée avec succès. Les détails sont dans le fichier de log "delete_user.log".');
 
         return Command::SUCCESS;
     }

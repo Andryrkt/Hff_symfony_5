@@ -1,12 +1,17 @@
 services:
-  App\Command\Delete\DeletePersonnelDataCommand:
+  App\Command\Delete\Admin\DeletePersonnelDataCommand:
     bind:
       $logger: '@monolog.logger.migration_personnel_delete'
 
-  App\Command\Delete\DeleteUserDataCommand:
+  App\Command\Delete\Admin\DeleteUserDataCommand:
     bind:
       $logger: '@monolog.logger.migration_user_delete'
 
-  App\Command\Delete\DeleteDomDataCommand:
+  App\Command\Delete\Hf\Rh\DeleteDomDataCommand:
     bind:
       $logger: '@monolog.logger.migration_dom_delete'
+
+  App\Command\Delete\Hf\Materiel\Badm\DeleteBadmDataCommand:
+    public: true
+    bind:
+      $logger: '@monolog.logger.migration_badm_delete'

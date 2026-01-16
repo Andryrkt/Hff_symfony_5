@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Command\Delete;
+namespace App\Command\Delete\Hf\Rh;
 
 use App\Entity\Hf\Rh\Dom\Dom;
 use Doctrine\ORM\EntityManagerInterface;
