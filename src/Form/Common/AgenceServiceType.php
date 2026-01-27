@@ -145,4 +145,19 @@ class AgenceServiceType extends AbstractType
             'service_class' => null,
         ]);
     }
+
+    public function finishView(\Symfony\Component\Form\FormView $view, FormInterface $form, array $options): void
+    {
+        if ($options['render_type'] === 'hidden') {
+            $this->addSelectedLabel($view->children['agence'], $form->get('agence')->getData());
+            $this->addSelectedLabel($view->children['service'], $form->get('service')->getData());
+        }
+    }
+
+    private function addSelectedLabel(\Symfony\Component\Form\FormView $view, $data): void
+    {
+        if (is_object($data) && method_exists($data, 'getCode') && method_exists($data, 'getNom')) {
+            $view->vars['selected_label'] = $data->getCode() . ' ' . $data->getNom();
+        }
+    }
 }

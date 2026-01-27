@@ -41,8 +41,8 @@ class FormFactory
             'agence' => $agence,
             'service' => $service
         ];
-        $dto->worNiveauUrgence = $this->em->getRepository(WorNiveauUrgence::class)
-            ->findOneBy(['code' => WorNiveauUrgenceConstants::NIVEAU_URGENCE_P1]);
+        $dto->niveauUrgence = $this->em->getRepository(WorNiveauUrgence::class)
+            ->findOneBy(['code' => WorNiveauUrgenceConstants::NIVEAU_URGENCE_P2]);
 
         return $dto;
     }

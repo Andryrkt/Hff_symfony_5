@@ -40,6 +40,8 @@
 	{# Manually render Selects to avoid EntityType overhead. JS populates them. #}
 	{% set agenceField = attribute(form, type).agence %}
 	{% set serviceField = attribute(form, type).service %}
+	{% do agenceField.setRendered() %}
+	{% do serviceField.setRendered() %}
 
 	{% if options.layout == 'horizontal' %}
 		<div class="row align-items-end">
@@ -49,11 +51,9 @@
 					class="spinner-container">
 					{# Manual Select replacing form_widget #}
 					<select id="{{ agenceField.vars.id }}" name="{{ agenceField.vars.full_name }}" class="form-select {{ options.agenceClass }}" {% if agenceField.vars.required %} required="required" {% endif %}>
-						<option value="">{{ options.agence_placeholder|default('-- Choisir une agence --') }}</option>
-						{# Options populated by JS via agencesJson #}
-						{% if agenceField.vars.value %}
-							<option value="{{ agenceField.vars.value }}" selected="selected">{{ agenceField.vars.value }}</option>
-						{% endif %}
+						{% for choice in agenceField.vars.choices %}
+							<option value="{{ choice.value }}" {% if choice.value == agenceField.vars.value %} selected="selected" {% endif %}>{{ choice.label }}</option>
+						{% endfor %}
 					</select>
 
 					{% include 'components/spinner.html.twig' with {
@@ -70,9 +70,9 @@
 					{{ form_label(serviceField) }}
 					<select id="{{ serviceField.vars.id }}" name="{{ serviceField.vars.full_name }}" class="form-select {{ options.serviceClass }}">
 						<option value="">{{ options.service_placeholder|default('-- Choisir un service --') }}</option>
-						{% if serviceField.vars.value %}
-							<option value="{{ serviceField.vars.value }}" selected="selected">{{ serviceField.vars.value }}</option>
-						{% endif %}
+						{% for choice in serviceField.vars.choices %}
+							<option value="{{ choice.value }}" {% if choice.value == serviceField.vars.value %} selected="selected" {% endif %}>{{ choice.label }}</option>
+						{% endfor %}
 					</select>
 					{{ form_errors(serviceField) }}
 				</div>
@@ -83,9 +83,9 @@
 		<div class="spinner-container">
 			<select id="{{ agenceField.vars.id }}" name="{{ agenceField.vars.full_name }}" class="form-select {{ options.agenceClass }}">
 				<option value="">{{ options.agence_placeholder|default('-- Choisir une agence --') }}</option>
-				{% if agenceField.vars.value %}
-					<option value="{{ agenceField.vars.value }}" selected="selected">{{ agenceField.vars.value }}</option>
-				{% endif %}
+				{% for choice in agenceField.vars.choices %}
+					<option value="{{ choice.value }}" {% if choice.value == agenceField.vars.value %} selected="selected" {% endif %}>{{ choice.label }}</option>
+				{% endfor %}
 			</select>
 			{% include 'components/spinner.html.twig' with {
                 'id': options.spinnerId,
@@ -99,9 +99,9 @@
 			{{ form_label(serviceField) }}
 			<select id="{{ serviceField.vars.id }}" name="{{ serviceField.vars.full_name }}" class="form-select {{ options.serviceClass }}">
 				<option value="">{{ options.service_placeholder|default('-- Choisir un service --') }}</option>
-				{% if serviceField.vars.value %}
-					<option value="{{ serviceField.vars.value }}" selected="selected">{{ serviceField.vars.value }}</option>
-				{% endif %}
+				{% for choice in serviceField.vars.choices %}
+					<option value="{{ choice.value }}" {% if choice.value == serviceField.vars.value %} selected="selected" {% endif %}>{{ choice.label }}</option>
+				{% endfor %}
 			</select>
 			{{ form_errors(serviceField) }}
 		</div>

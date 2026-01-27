@@ -18,7 +18,7 @@ class FormDto
 
     // --------------- info client --------------
     public ?string $nomClient = null;
-    public ?string $numeroTelClient = null;
+    public ?string $numeroTel = null;
     public ?string $mailClient = null;
     public ?string $clientSousContrat = null;
     public ?string $numeroClient = null;
@@ -37,6 +37,9 @@ class FormDto
     public ?int $idMateriel = null;
     public ?int $heureMachine = null;
     public ?int $kmMachine = null;
+    public ?string $numParc = null;
+    public ?string $numSerie = null;
+
 
     //  --------------- OR ---------------------
     public ?string $numeroOr = null;
@@ -78,7 +81,7 @@ class FormDto
     /**
      * @Assert\NotBlank(message="le niveau d'urgence doit être sélectionné.")
      */
-    public ?WorNiveauUrgence $worNiveauUrgence = null;
+    public ?WorNiveauUrgence $niveauUrgence = null;
 
     //-----------------Section -----------------
     public ?string $sectionAffectee = null;
@@ -99,7 +102,7 @@ class FormDto
      *     mimeTypesMessage = "Merci de télécharger un fichier PDF valide."
      * )
      */
-    public $pieceJointe01 = null;
+    public $pieceJoint01 = null;
     /**
      * @Assert\File(
      *     maxSize = "5M",
@@ -107,7 +110,7 @@ class FormDto
      *     mimeTypesMessage = "Merci de télécharger un fichier PDF valide."
      * )
      */
-    public $pieceJointe02 = null;
+    public $pieceJoint02 = null;
     /**
      * @Assert\File(
      *     maxSize = "5M",
@@ -115,7 +118,7 @@ class FormDto
      *     mimeTypesMessage = "Merci de télécharger un fichier PDF valide."
      * )
      */
-    public $pieceJointe03 = null;
+    public $pieceJoint03 = null;
 
     // --------------- info sur le DIT ---------------
     public ?string $numeroDit = null;
@@ -129,7 +132,7 @@ class FormDto
      *      maxMessage="L'objet de la demande ne peut pas dépasser {{ limit }} caractères"
      * )
      */
-    public ?string $objectDemande = null;
+    public ?string $objetDemande = null;
     /**
      * @Assert\NotBlank(message="Le detail de la demande ne peut pas être vide.")
      * @Assert\Length(
@@ -145,11 +148,11 @@ class FormDto
     /**
      * @Assert\NotBlank(message="le type de document doit être sélectionné.")
      */
-    public ?WorTypeDocument $worTypeDocument = null;
+    public ?WorTypeDocument $typeDocument = null;
     /**
      * @Assert\NotBlank(message="la catégorie doit être sélectionnée.")
      */
-    public ?CategorieAteApp $categorieAteApp = null;
+    public ?CategorieAteApp $categorieDemande = null;
     public ?StatutDemande $statutDemande = null;
 
     // ------------------ Autre --------------

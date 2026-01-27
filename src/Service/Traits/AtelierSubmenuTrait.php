@@ -4,6 +4,14 @@ namespace App\Service\Traits;
 
 trait AtelierSubmenuTrait
 {
+    protected function ditSubmenu(): array
+    {
+        return [
+            ['label' => 'Nouvelle demande', 'route' => 'hf_atelier_dit_form_index', 'icon' => 'fas fa-plus'],
+            ['label' => 'Consultation', 'route' => 'hf_atelier_dit_liste_index', 'icon' => 'fas fa-search']
+        ];
+    }
+
     protected function atelierSubmenu(): array
     {
         return [
@@ -12,10 +20,7 @@ trait AtelierSubmenuTrait
                 'label' => 'Demande d\'intervention',
                 'icon' => 'fas fa-tools',
                 'route' => null,
-                'submenu' => [
-                    ['label' => 'Nouvelle demande', 'icon' => 'fas fa-plus', 'route' => '#'],
-                    ['label' => 'Consultation', 'icon' => 'fas fa-search', 'route' => '#']
-                ]
+                'submenu' => $this->ditSubmenu()
             ],
             // ======== Glossaire OR ========== 
             [

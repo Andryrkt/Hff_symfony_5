@@ -2,6 +2,7 @@
 
 namespace App\Form\Hf\Atelier\Dit;
 
+use App\Constants\Hf\Dit\WorTypeDocumentConstants;
 use Doctrine\ORM\EntityRepository;
 use App\Dto\Hf\Atelier\Dit\FormDto;
 use App\Entity\Hf\Atelier\Dit\CategorieAteApp;
@@ -22,7 +23,7 @@ use App\Repository\Hf\Atelier\Dit\WorTypeDocumentRepository;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
-class Formtype extends AbstractType
+class DitFormType extends AbstractType
 {
     const TYPE_REPARATION = [
         'EN COURS' => 'EN COURS',
@@ -61,18 +62,18 @@ class Formtype extends AbstractType
             ])
             ->add('estDitAvoir', CheckboxType::class, [
                 'required' => false, // obligatoire false
-                'label'    => "Cette demande est un avoir (annulation de la" . $options['data']->getNumeroDemandeIntervention() . ")",
+                'label'    => "Cette demande est un avoir (annulation de la" . $options['data']->numeroDit . ")",
             ])
             ->add('estDitRefacturation', CheckboxType::class, [
                 'required' => false, //obligatoire false
-                'label'    => "Cette demande est une refacturation (reprise de la DIT " . $options['data']->getNumeroDemandeIntervention() . " avec nouvelle facturation>",
+                'label'    => "Cette demande est une refacturation (reprise de la DIT " . $options['data']->numeroDit . " avec nouvelle facturation>",
             ])
         ;
 
         $this->addInfoDit($builder);
         $this->addIntervention($builder);
         $this->addClient($builder);
-        $this->addAgenceServiceDebiteur($builder, $options['data']);
+        $this->addAgenceService($builder, $options['data']);
         $this->addReparation($builder);
         $this->addInfoMateriel($builder);
         $this->addPieceJoint($builder);
@@ -120,8 +121,8 @@ class Formtype extends AbstractType
                     'required' => true,
                     'query_builder' => function (WorTypeDocumentRepository $repository) {
                         return $repository->createQueryBuilder('w')
-                            ->where('w.id >= :id')
-                            ->setParameter('id', 5)
+                            ->where('w.description IN (:description)')
+                            ->setParameter('description', [WorTypeDocumentConstants::TYPE_DOCUMENT_MAINTENANCE_PREVENTIVE, WorTypeDocumentConstants::TYPE_DOCUMENT_MAINTENANCE_CURATIVE, WorTypeDocumentConstants::TYPE_DOCUMENT_AUTRES])
                             ->orderBy('w.description', 'ASC');
                     }
                 ]
@@ -139,7 +140,7 @@ class Formtype extends AbstractType
                 ]
             )
             ->add(
-                'internetExterne',
+                'interneExterne',
                 ChoiceType::class,
                 [
                     'label' => "Interne et Externe *",
@@ -203,18 +204,18 @@ class Formtype extends AbstractType
     private function addIntervention(FormBuilderInterface $builder)
     {
         $builder->add(
-            'idNiveauUrgence',
+            'niveauUrgence',
             EntityType::class,
             [
                 'label' => 'Niveau d\'urgence *',
                 'label_html' => true,
                 'placeholder' => false,
                 'class' => WorNiveauUrgence::class,
-                'choice_label' => 'description',
+                'choice_label' => 'code',
                 'required' => false,
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('n')
-                        ->orderBy('n.description', 'DESC');
+                        ->orderBy('n.code', 'DESC');
                 },
             ]
         )
@@ -400,7 +401,7 @@ class Formtype extends AbstractType
         ;
     }
 
-    private function addAgenceServiceDebiteur(FormBuilderInterface $builder, $data): void
+    private function addAgenceService(FormBuilderInterface $builder, $data): void
     {
         // $agences = $this->em->getRepository(Agence::class)->findAll();
         // $agencesData = [];
@@ -438,7 +439,7 @@ class Formtype extends AbstractType
                 'data' => $data->serviceUser ?? null,
             ])
             ->add('debiteur', AgenceServiceType::class, [
-                'render_type' => 'hidden',
+                'render_type' => 'select',
                 'label' => false,
                 'required' => false,
                 'mapped' => false,

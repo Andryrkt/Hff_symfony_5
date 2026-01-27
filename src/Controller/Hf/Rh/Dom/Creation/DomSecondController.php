@@ -4,7 +4,7 @@ namespace App\Controller\Hf\Rh\Dom\Creation;
 
 use App\Service\Hf\Rh\Dom\DomPdfService;
 use Symfony\Component\HttpFoundation\Request;
-use App\Service\Admin\AgenceSerializerService;
+
 use App\Factory\Hf\Rh\Dom\SecondFormDtoFactory;
 use App\Form\Hf\Rh\Dom\creation\SecondFormType;
 use Symfony\Component\Routing\Annotation\Route;
@@ -25,8 +25,7 @@ final class DomSecondController extends AbstractDomFormController
         Request $request,
         DomPdfService $pdfService,
         ContextAwareBreadcrumbBuilder $breadcrumbBuilder,
-        SecondFormDtoFactory $secondFormDtoFactory,
-        AgenceSerializerService $agenceSerializerService
+        SecondFormDtoFactory $secondFormDtoFactory
     ) {
         // Démarrer le diagnostic de performance
         $this->denyAccessUnlessGranted('RH_ORDRE_MISSION_CREATE');
@@ -56,7 +55,6 @@ final class DomSecondController extends AbstractDomFormController
         return $this->render('hf/rh/dom/creation/secondForm.html.twig', [
             'form'          => $formView,
             'secondFormDto' => $form->getData(),
-            'agencesJson'   => $agenceSerializerService->serializeAgencesForDropdown(),
             'breadcrumbs'   => $breadcrumbBuilder->build('dom_second_form'),
         ]);
     }

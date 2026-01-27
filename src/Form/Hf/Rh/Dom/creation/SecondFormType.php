@@ -85,7 +85,7 @@ class SecondFormType extends AbstractType
     private function addDebiteurSection(FormBuilderInterface $builder, $data): void
     {
         $builder->add('debiteur', AgenceServiceType::class, [
-            'render_type' => 'hidden',
+            'render_type' => 'select',
             'label' => false,
             'required' => false,
             'mapped' => false,
