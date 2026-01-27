@@ -108,3 +108,10 @@
 		<div></div>
 	</div>
 {% endmacro %}
+
+{# ========= niveau urgence ========== #}
+{% macro niveauUrgenceField(form_field) %}
+	{{ form_label(form_field, '<a href="#" data-bs-toggle="modal" data-bs-target="#niveauUrgence" class="text-decoration-none">Niveau d\'urgence <i class="fa fa-info-circle"></i></a>', { 'label_html': true }) }}
+	{{ form_widget(form_field) }}
+	{% include 'partials/_modal_niveau_urgence.html.twig' %}
+{% endmacro %}

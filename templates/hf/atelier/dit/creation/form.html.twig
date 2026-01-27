@@ -12,117 +12,109 @@
 {% import "macros/form_macros.html.twig" as formMacros %}
 
 {% block content %}
-<div class=" container mt-6 mb-4">
-	<div class="card">
-		<div class="card-body">
-			<div class="container">
-				<div class="row">
-					<div class="col-12 col-md-11">
-						<h3 class="perso-titre">
-							Formulaire Demande d'intervention
-						</h3>
+	<div class=" container mt-6 mb-4">
+		<div class="card">
+			<div class="card-body">
+				<div class="container">
+					{{ form_start(form) }}
+					{{ form_errors(form)}}
+
+					<div class="row">
+						<div class="d-none">
+							{{ form_row(form.estDitAvoir)}}
+							{{ form_row(form.estDitRefacturation)}}
+						</div>
+						{{ form_row(form.objetDemande)}}
+						<div class="mb-3 position-relative">
+							{{ form_row(form.detailDemande) }}
+							<span id="charCount" class="position-absolute bottom-0 end-0 p-0 small text-muted"></span>
+						</div>
 					</div>
-				</div>
-				{{ form_start(form) }}
-				{{ form_errors(form)}}
 
-				<div class="row">
-					<div class="d-none">
-						{{ form_row(form.estDitAvoir)}}
-						{{ form_row(form.estDitRefacturation)}}
+					<div class="row">
+						<div class="col-12 col-md-2">{{ form_row(form.typeDocument) }}</div>
+						<div class="col-12 col-md-2">{{ form_row(form.categorieDemande) }}</div>
+						<div class="col-12 col-md-2">{{ form_row(form.interneExterne)}}</div>
+						<div class="col-12 col-md-2">{{ form_row(form.demandeDevis)}}</div>
+						<div class="col-12 col-md-2">{{ form_row(form.livraisonPartiel)}}</div>
+						<div class="col-12 col-md-2">{{ form_row(form.avisRecouvrement)}}</div>
 					</div>
-					{{ form_row(form.objetDemande)}}
-					<div class="mb-3 position-relative">
-						{{ form_row(form.detailDemande) }}
-						<span id="charCount" class="position-absolute bottom-0 end-0 p-0 small text-muted"></span>
-					</div>
-				</div>
-
-				<div class="row">
-					<div class="col-12 col-md-2">{{ form_row(form.typeDocument) }}</div>
-					<div class="col-12 col-md-2">{{ form_row(form.categorieDemande) }}</div>
-					<div class="col-12 col-md-2">{{ form_row(form.interneExterne)}}</div>
-					<div class="col-12 col-md-2">{{ form_row(form.demandeDevis)}}</div>
-					<div class="col-12 col-md-2">{{ form_row(form.livraisonPartiel)}}</div>
-					<div class="col-12 col-md-2">{{ form_row(form.avisRecouvrement)}}</div>
-				</div>
 
 
-				<div class="row">
-					<div class="col-12 col-md-6">
-						{{ formMacros.sousTitre('Agence et Service', {class: 'sousTitre'})}}
-						<div class="row">
-							<div class="col-12 col-md-6 mt-2">Débiteur
-								<hr></div>
-							<div class="col-12 col-md-6 mt-2">Emetteur
-								<hr></div>
+					<div class="row">
+						<div class="col-12 col-md-6">
+							{{ formMacros.sousTitre('Agence et Service', {class: 'sousTitre'})}}
+							<div class="row">
+								<div class="col-12 col-md-6 mt-2">Débiteur
+									<hr></div>
+								<div class="col-12 col-md-6 mt-2">Emetteur
+									<hr></div>
+							</div>
+
+							<div class="row">
+								<div class="col-12 col-md-6">
+									{{ formMacros.debiteurOuEmetteurFields(form, 'debiteur') }}
+								</div>
+								<div class="col-12 col-md-6">
+									{{ form_row(form.agenceUser)}}
+									{{ form_row(form.serviceUser)}}
+								</div>
+							</div>
+
+
+							{# Info Client #}
+							{{ formMacros.sousTitre('Info Client', {class: 'sousTitre'})}}
+							<div class="row">
+								<div class="col-12 col-md-6">
+									{{ form_row(form.numeroClient)}}
+									<div id="suggestion-numClient" class="suggestions-container"></div>
+									<div id="loader-numClient" class="spinner" style="display: none;"></div>
+									{{ form_row(form.nomClient)}}
+									<div id="suggestion-nomClient" class="suggestions-container"></div>
+									<div id="loader-nomClient" class="spinner" style="display: none;"></div>
+									{{ form_row(form.clientSousContrat)}}
+								</div>
+								<div class="col-12 col-md-6">
+									{{ form_row(form.numeroTel)}}
+									{{ form_row(form.mailClient)}}
+								</div>
+							</div>
+							<div class="row">
+								<span id="erreurClient"></span>
+							</div>
+
+
+							{# Information Matériel #}
+							{{ formMacros.sousTitre('Information Matériel', {class: 'sousTitre'})}}
+							<div class="row">
+								<div class="col-12 col-md-4">
+									{{ form_row(form.idMateriel)}}
+									<div id="suggestion-idMateriel" class="suggestions-container"></div>
+									<div id="loader-idMateriel" class="spinner d-flex align-items-center" style="display: none;"></div>
+
+								</div>
+								<div class="col-12 col-md-4">
+									{{ form_row(form.numParc)}}
+									<div id="suggestion-numParc" class="suggestions-container"></div>
+									<div id="loader-numParc" class="spinner" style="display: none;"></div>
+								</div>
+								<div class="col-12 col-md-4">
+									{{ form_row(form.numSerie)}}
+									<div id="suggestion-numSerie" class="suggestions-container"></div>
+									<div id="loader-numSerie" class="spinner" style="display: none;"></div>
+								</div>
+							</div>
+							<div class="row">
+								<div id="error-idMateriel" class="text-danger"></div>
+							</div>
+							<div id="containerInfoMateriel"></div>
+
 						</div>
-
-						<div class="row">
-							<div class="col-12 col-md-6">
-								{{ formMacros.debiteurOuEmetteurFields(form, 'debiteur') }}
-							</div>
-							<div class="col-12 col-md-6">
-								{{ form_row(form.agenceUser)}}
-								{{ form_row(form.serviceUser)}}
-							</div>
-						</div>
-
-
-						{# Info Client #}
-						{{ formMacros.sousTitre('Info Client', {class: 'sousTitre'})}}
-						<div class="row">
-							<div class="col-12 col-md-6">
-								{{ form_row(form.numeroClient)}}
-								<div id="suggestion-numClient" class="suggestions-container"></div>
-								<div id="loader-numClient" class="spinner" style="display: none;"></div>
-								{{ form_row(form.nomClient)}}
-								<div id="suggestion-nomClient" class="suggestions-container"></div>
-								<div id="loader-nomClient" class="spinner" style="display: none;"></div>
-								{{ form_row(form.clientSousContrat)}}
-							</div>
-							<div class="col-12 col-md-6">
-								{{ form_row(form.numeroTel)}}
-								{{ form_row(form.mailClient)}}
-							</div>
-						</div>
-						<div class="row">
-							<span id="erreurClient"></span>
-						</div>
-
-
-						{# Information Matériel #}
-						{{ formMacros.sousTitre('Information Matériel', {class: 'sousTitre'})}}
-						<div class="row">
-							<div class="col-12 col-md-4">
-								{{ form_row(form.idMateriel)}}
-								<div id="suggestion-idMateriel" class="suggestions-container"></div>
-								<div id="loader-idMateriel" class="spinner d-flex align-items-center" style="display: none;"></div>
-
-							</div>
-							<div class="col-12 col-md-4">
-								{{ form_row(form.numParc)}}
-								<div id="suggestion-numParc" class="suggestions-container"></div>
-								<div id="loader-numParc" class="spinner" style="display: none;"></div>
-							</div>
-							<div class="col-12 col-md-4">
-								{{ form_row(form.numSerie)}}
-								<div id="suggestion-numSerie" class="suggestions-container"></div>
-								<div id="loader-numSerie" class="spinner" style="display: none;"></div>
-							</div>
-						</div>
-						<div class="row">
-							<div id="error-idMateriel" class="text-danger"></div>
-						</div>
-						<div id="containerInfoMateriel"></div>
-
-					</div>
-					<div class="col-12 col-md-6">
-						{{ formMacros.sousTitre('Intervention', {class: 'sousTitre'})}}
-						<div class="row">
-							<div class="col-12 col-md-6">
-								{{ form_label(form.niveauUrgence, '<a href="#" data-bs-toggle="modal" data-bs-target="#niveauUrgence" data-id="{{item.numeroDemandeIntervention}}" id="numOr">Niveau d\'urgence</a>', { 'label_html': true }) }}
-								{{ form_widget(form.niveauUrgence) }}
+						<div class="col-12 col-md-6">
+							{{ formMacros.sousTitre('Intervention', {class: 'sousTitre'})}}
+							<div class="row">
+								<div class="col-12 col-md-6">
+									{{ formMacros.niveauUrgenceField(form.niveauUrgence) }}
 								</div>
 								<div class="col-12 col-md-6">
 									{{ form_row(form.datePrevueTravaux)}}
@@ -137,8 +129,8 @@
 									{{ form_row(form.reparationRealise) }}
 								</div>
 							</div>
-							<div class="row" >
-							<div class="col-12 col-md-6"></div>
+							<div class="row">
+								<div class="col-12 col-md-6"></div>
 								<div class="col-12 col-md-6" id="ate_pol_tana_container" style="display: none;">
 									{{ form_row(form.estAtePolTana) }}
 								</div>
@@ -159,10 +151,10 @@
 
 					</div>
 					<div class="row">
-	                    <div class="d-flex justify-content-end mt-2">
-		                    {% import "macros/actions.html.twig" as actions %}
-		                    {{ actions.submit_button('Enregistrer', 'fa fa-print', 'btn-warning', true, 'Confirmez-vous la création de cette demande d\'ordre de mission ?', 'Veuillez ne pas quitter la page pendant la création de la demande.', 'Création de la demande d\'ordre de mission') }}
-	                    </div>
+						<div class="d-flex justify-content-end mt-2">
+							{% import "macros/actions.html.twig" as actions %}
+							{{ actions.submit_button('Enregistrer', 'fa fa-print', 'btn-warning', true, 'Confirmez-vous la création de cette demande d\'ordre de mission ?', 'Veuillez ne pas quitter la page pendant la création de la demande.', 'Création de la demande d\'ordre de mission') }}
+						</div>
 					</div>
 
 					{{ form_end(form) }}
@@ -173,11 +165,6 @@
 
 		<div id="materielInfos"></div>
 	</div>
-</div>
-{% endblock %}
-
-
-{% block javascripts %}
-	{{ parent() }}
-	{{ agence_service_data() }}
-{% endblock %}
+</div>{% endblock %}{% block javascripts %}
+{{ parent() }}
+{{ agence_service_data() }}{% endblock %}
