@@ -51,6 +51,9 @@ export class StimulusAutoloader {
             // Handlers
             { name: 'badm-second-form', import: () => import('@/controllers/pages/hf/materiel/badm/badm_second_form_controller') },
             { name: 'badm-first-form', import: () => import('@controllers/pages/hf/materiel/badm/badm_first_form_controller') },
+
+            // DIT
+            { name: 'pages--hf--atelier--dit--dit-form', import: () => import('@controllers/pages/hf/atelier/dit/dit_form_controller') },
         ];
 
         let coreLoaded = 0;

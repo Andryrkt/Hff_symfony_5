@@ -26,11 +26,7 @@ class BadmModel
         try {
             $conditions = $this->buildMaterielSearchConditions($data);
 
-            if (empty($conditions)) {
-                return [];
-            }
-
-            $whereClause = ' AND (' . implode(' AND ', $conditions) . ')';
+            $whereClause = !empty($conditions) ? ' AND (' . implode(' AND ', $conditions) . ')' : '';
 
             $statement = "SELECT
                             case  when mmat_succ in (select asuc_parc from Informix.agr_succ) then asuc_num else mmat_succ end as code_agence,

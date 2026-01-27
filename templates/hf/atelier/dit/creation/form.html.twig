@@ -85,29 +85,31 @@
 
 
 							{# Information Matériel #}
-							{{ formMacros.sousTitre('Information Matériel', {class: 'sousTitre'})}}
-							<div class="row">
-								<div class="col-12 col-md-4">
-									{{ form_row(form.idMateriel)}}
-									<div id="suggestion-idMateriel" class="suggestions-container"></div>
-									<div id="loader-idMateriel" class="spinner d-flex align-items-center" style="display: none;"></div>
+							<div data-controller="pages--hf--atelier--dit--dit-form">
+								{{ formMacros.sousTitre('Information Matériel', {class: 'sousTitre'})}}
+								<div class="row">
+									<div class="col-12 col-md-4">
+										{{ form_row(form.idMateriel)}}
+										<div id="suggestion-idMateriel" class="suggestions-container"></div>
+										<div id="loader-idMateriel" class="spinner d-flex align-items-center" style="display: none;"></div>
 
+									</div>
+									<div class="col-12 col-md-4">
+										{{ form_row(form.numParc)}}
+										<div id="suggestion-numParc" class="suggestions-container"></div>
+										<div id="loader-numParc" class="spinner" style="display: none;"></div>
+									</div>
+									<div class="col-12 col-md-4">
+										{{ form_row(form.numSerie)}}
+										<div id="suggestion-numSerie" class="suggestions-container"></div>
+										<div id="loader-numSerie" class="spinner" style="display: none;"></div>
+									</div>
 								</div>
-								<div class="col-12 col-md-4">
-									{{ form_row(form.numParc)}}
-									<div id="suggestion-numParc" class="suggestions-container"></div>
-									<div id="loader-numParc" class="spinner" style="display: none;"></div>
+								<div class="row">
+									<div id="error-idMateriel" class="text-danger"></div>
 								</div>
-								<div class="col-12 col-md-4">
-									{{ form_row(form.numSerie)}}
-									<div id="suggestion-numSerie" class="suggestions-container"></div>
-									<div id="loader-numSerie" class="spinner" style="display: none;"></div>
-								</div>
+								<div id="containerInfoMateriel"></div>
 							</div>
-							<div class="row">
-								<div id="error-idMateriel" class="text-danger"></div>
-							</div>
-							<div id="containerInfoMateriel"></div>
 
 						</div>
 						<div class="col-12 col-md-6">
