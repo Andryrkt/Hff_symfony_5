@@ -74,6 +74,16 @@ services:
       $searchDn: "%env(resolve:LDAP_SEARCH_DN)%"
       $searchPassword: "%env(resolve:LDAP_SEARCH_PASSWORD)%"
 
+  App\Security\ApiJsonAuthenticator:
+    arguments:
+      $ldap: '@Symfony\Component\Ldap\Ldap'
+      $userProvider: '@App\Security\LdapUserProvider'
+      $searchDn: "%env(resolve:LDAP_SEARCH_DN)%"
+      $searchPassword: "%env(resolve:LDAP_SEARCH_PASSWORD)%"
+      $baseDn: "DC=fraise,DC=hff,DC=mg"
+      $uidKey: "sAMAccountName"
+      $successHandler: '@App\Security\JwtAuthenticationSuccessHandler'
+
   # extension twig pour l'asset des images
   App\Twig\WebpackAssetExtension:
     tags: [ "twig.extension" ]

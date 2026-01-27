@@ -201,3 +201,7 @@ docs/build/
 docs/_build/
 docs/*.log
 ###< Documentation ###
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
