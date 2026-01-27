@@ -40,21 +40,17 @@
 	{# Manually render Selects to avoid EntityType overhead. JS populates them. #}
 	{% set agenceField = attribute(form, type).agence %}
 	{% set serviceField = attribute(form, type).service %}
-	{% do agenceField.setRendered() %}
-	{% do serviceField.setRendered() %}
 
 	{% if options.layout == 'horizontal' %}
 		<div class="row align-items-end">
 			<div class="col-md-6">
 				{{ form_label(agenceField) }}
-				<div
-					class="spinner-container">
-					{# Manual Select replacing form_widget #}
-					<select id="{{ agenceField.vars.id }}" name="{{ agenceField.vars.full_name }}" class="form-select {{ options.agenceClass }}" {% if agenceField.vars.required %} required="required" {% endif %}>
-						{% for choice in agenceField.vars.choices %}
-							<option value="{{ choice.value }}" {% if choice.value == agenceField.vars.value %} selected="selected" {% endif %}>{{ choice.label }}</option>
-						{% endfor %}
-					</select>
+				<div class="spinner-container">
+					{{ form_widget(agenceField, {
+						'attr': {
+							'class': 'form-select ' ~ options.agenceClass
+						}
+					}) }}
 
 					{% include 'components/spinner.html.twig' with {
                         'id': options.spinnerId,
@@ -68,12 +64,11 @@
 			<div class="col-md-6">
 				<div id="{{ options.serviceContainerId }}">
 					{{ form_label(serviceField) }}
-					<select id="{{ serviceField.vars.id }}" name="{{ serviceField.vars.full_name }}" class="form-select {{ options.serviceClass }}">
-						<option value="">{{ options.service_placeholder|default('-- Choisir un service --') }}</option>
-						{% for choice in serviceField.vars.choices %}
-							<option value="{{ choice.value }}" {% if choice.value == serviceField.vars.value %} selected="selected" {% endif %}>{{ choice.label }}</option>
-						{% endfor %}
-					</select>
+					{{ form_widget(serviceField, {
+						'attr': {
+							'class': 'form-select ' ~ options.serviceClass
+						}
+					}) }}
 					{{ form_errors(serviceField) }}
 				</div>
 			</div>
@@ -81,12 +76,11 @@
 	{% else %}
 		{{ form_label(agenceField) }}
 		<div class="spinner-container">
-			<select id="{{ agenceField.vars.id }}" name="{{ agenceField.vars.full_name }}" class="form-select {{ options.agenceClass }}">
-				<option value="">{{ options.agence_placeholder|default('-- Choisir une agence --') }}</option>
-				{% for choice in agenceField.vars.choices %}
-					<option value="{{ choice.value }}" {% if choice.value == agenceField.vars.value %} selected="selected" {% endif %}>{{ choice.label }}</option>
-				{% endfor %}
-			</select>
+			{{ form_widget(agenceField, {
+				'attr': {
+					'class': 'form-select ' ~ options.agenceClass
+				}
+			}) }}
 			{% include 'components/spinner.html.twig' with {
                 'id': options.spinnerId,
                 'size': options.spinnerSize,
@@ -97,12 +91,11 @@
 
 		<div id="{{ options.serviceContainerId }}" class="mb-3">
 			{{ form_label(serviceField) }}
-			<select id="{{ serviceField.vars.id }}" name="{{ serviceField.vars.full_name }}" class="form-select {{ options.serviceClass }}">
-				<option value="">{{ options.service_placeholder|default('-- Choisir un service --') }}</option>
-				{% for choice in serviceField.vars.choices %}
-					<option value="{{ choice.value }}" {% if choice.value == serviceField.vars.value %} selected="selected" {% endif %}>{{ choice.label }}</option>
-				{% endfor %}
-			</select>
+			{{ form_widget(serviceField, {
+				'attr': {
+					'class': 'form-select ' ~ options.serviceClass
+				}
+			}) }}
 			{{ form_errors(serviceField) }}
 		</div>
 	{% endif %}

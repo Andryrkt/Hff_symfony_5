@@ -112,6 +112,11 @@ function optionParDefaut(selectElement: HTMLSelectElement | null, placeholder: s
 
 function populateAgenceOptions(selectElement: HTMLSelectElement): void {
     const currentValue = selectElement.value;
+    // Capture the text of the currently selected option in case we need to restore it
+    let currentText = "";
+    if (selectElement.selectedIndex >= 0) {
+        currentText = selectElement.options[selectElement.selectedIndex].text;
+    }
 
     // Attempt to preserve placeholder text from the server-rendered HTML
     let placeholderText = "-- Choisir une Agence --";
@@ -123,17 +128,30 @@ function populateAgenceOptions(selectElement: HTMLSelectElement): void {
 
     optionParDefaut(selectElement, placeholderText);
 
+    let valueFound = false;
+
     if (Array.isArray(agencesData)) {
         agencesData.forEach((agence) => {
             const option = document.createElement("option");
             option.value = String(agence.id);
             option.text = agence.code + " " + agence.nom;
             selectElement.add(option);
+
+            if (String(agence.id) === currentValue) {
+                valueFound = true;
+            }
         });
     }
 
     // Restore selection
     if (currentValue) {
+        // If the value was not found in the new data, re-create the option
+        if (!valueFound && currentText) {
+            const option = document.createElement("option");
+            option.value = currentValue;
+            option.text = currentText;
+            selectElement.add(option);
+        }
         selectElement.value = currentValue;
     }
 }
@@ -171,6 +189,10 @@ export function initAgenceServiceHandlers(): void {
 
             // Sauvegarder la valeur pré-sélectionnée du service avant de réinitialiser
             const preselectedServiceValue = config.serviceInput?.value || '';
+            let preselectedServiceText = '';
+            if (config.serviceInput && config.serviceInput.selectedIndex >= 0) {
+                preselectedServiceText = config.serviceInput.options[config.serviceInput.selectedIndex].text;
+            }
 
             optionParDefaut(config.serviceInput, "-- Choisir un Service --");
             config.agenceInput.addEventListener("change", () =>
@@ -180,12 +202,21 @@ export function initAgenceServiceHandlers(): void {
             // Si une agence est pré-sélectionnée, charger ses services et restaurer la sélection du service
             if (config.agenceInput.value) {
                 handleAgenceChange(key);
-                
+
                 // Restaurer la sélection du service après un court délai pour s'assurer que les options sont chargées
                 if (preselectedServiceValue && config.serviceInput) {
                     setTimeout(() => {
                         if (config.serviceInput) {
                             config.serviceInput.value = preselectedServiceValue;
+
+                            // Si la valeur n'a pas pu être sélectionnée (car absente de la liste), on la recrée
+                            if (config.serviceInput.value !== preselectedServiceValue && preselectedServiceText) {
+                                const option = document.createElement("option");
+                                option.value = preselectedServiceValue;
+                                option.text = preselectedServiceText;
+                                config.serviceInput.add(option);
+                                config.serviceInput.value = preselectedServiceValue;
+                            }
                         }
                     }, 10);
                 }
