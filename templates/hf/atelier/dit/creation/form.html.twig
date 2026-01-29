@@ -34,7 +34,14 @@
 					<div class="row">
 						<div class="col-12 col-md-2">{{ form_row(form.typeDocument) }}</div>
 						<div class="col-12 col-md-2">{{ form_row(form.categorieDemande) }}</div>
-						<div class="col-12 col-md-2">{{ form_row(form.interneExterne)}}</div>
+						<div class="col-12 col-md-2">{{ form_row(form.interneExterne, {
+							'attr': {
+								'data-informations': {
+									'agenceId': app.user.agence.id|default(''),
+									'serviceId': app.user.service.id|default('')
+								}|json_encode
+							}
+						})}}</div>
 						<div class="col-12 col-md-2">{{ form_row(form.demandeDevis)}}</div>
 						<div class="col-12 col-md-2">{{ form_row(form.livraisonPartiel)}}</div>
 						<div class="col-12 col-md-2">{{ form_row(form.avisRecouvrement)}}</div>

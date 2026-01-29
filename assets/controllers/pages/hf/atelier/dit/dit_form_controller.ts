@@ -132,6 +132,65 @@ export default class extends Controller {
                 `${item.num_matricule} - ${item.num_parc} - ${item.num_serie}`,
         });
 
+        // --- Logique Interne / Externe ---
+        const interneExterneInput = document.querySelector("#dit_form_interneExterne") as HTMLSelectElement;
+        const nomClientInput = document.querySelector("#dit_form_nomClient") as HTMLInputElement;
+        const numClientInput = document.querySelector("#dit_form_numeroClient") as HTMLInputElement;
+        const numTelInput = document.querySelector("#dit_form_numeroTel") as HTMLInputElement;
+        const clientSousContratInput = document.querySelector("#dit_form_clientSousContrat") as HTMLSelectElement;
+        const mailClientInput = document.querySelector("#dit_form_mailClient") as HTMLInputElement;
+        const demandeDevisInput = document.querySelector("#dit_form_demandeDevis") as HTMLSelectElement;
+        const agenceDebiteurInput = document.querySelector("#dit_form_debiteur_agence") as HTMLSelectElement;
+        const serviceDebiteurInput = document.querySelector("#dit_form_debiteur_service") as HTMLSelectElement;
+
+        const toggleInterneExterne = () => {
+            const isInterne = interneExterneInput.value === "INTERNE";
+            const isExterne = interneExterneInput.value === "EXTERNE";
+
+            const infoData = interneExterneInput.dataset.informations;
+            const parsedData = infoData ? JSON.parse(infoData) : { agenceId: "", serviceId: "" };
+
+            // Champs Client
+            [nomClientInput, numClientInput, numTelInput, mailClientInput].forEach(input => {
+                if (input) {
+                    input.disabled = isInterne;
+                    if (isExterne) input.setAttribute("required", "true");
+                    else input.removeAttribute("required");
+                }
+            });
+
+            if (clientSousContratInput) clientSousContratInput.disabled = isInterne;
+
+            // Demande de devis
+            if (demandeDevisInput) {
+                demandeDevisInput.disabled = isInterne;
+                demandeDevisInput.value = isExterne ? "OUI" : "NON";
+            }
+
+            // Agence et Service Débiteur
+            if (agenceDebiteurInput && serviceDebiteurInput) {
+                agenceDebiteurInput.disabled = isExterne;
+                serviceDebiteurInput.disabled = isExterne;
+
+                if (isInterne) {
+                    agenceDebiteurInput.value = parsedData.agenceId;
+                    serviceDebiteurInput.value = parsedData.serviceId;
+                    // Forcer le dispatch d'un événement change pour TomSelect ou autres managers
+                    agenceDebiteurInput.dispatchEvent(new Event('change'));
+                } else if (isExterne) {
+                    agenceDebiteurInput.value = "";
+                    serviceDebiteurInput.value = "";
+                    agenceDebiteurInput.dispatchEvent(new Event('change'));
+                }
+            }
+        };
+
+        if (interneExterneInput) {
+            interneExterneInput.addEventListener("change", toggleInterneExterne);
+            // Initialisation au chargement
+            toggleInterneExterne();
+        }
+
         function createMaterielInfoDisplay(container, data) {
             if (!container) {
                 console.error("Container not found.");
