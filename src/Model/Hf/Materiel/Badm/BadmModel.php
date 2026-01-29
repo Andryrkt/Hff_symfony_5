@@ -72,7 +72,7 @@ class BadmModel
             ";
 
             $result = $this->databaseInformix->executeQuery($statement);
-            $rows = $this->databaseInformix->fetchScalarResults($result);
+            $rows = $whereClause ?  $this->databaseInformix->fetchScalarResults($result) : $this->databaseInformix->fetchResults($result);
 
             return $rows;
         } finally {

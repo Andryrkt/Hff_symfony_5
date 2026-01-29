@@ -50,11 +50,11 @@ class HomeCardService
             if ($this->security->isGranted('APPLICATION_ACCESS', $vignette)) {
                 $cardData = $this->getCardData($vignette->getNom());
                 $cards[] = new HomeCard(
-                    $vignette->getNom(),
+                    trim($vignette->getNom()),
                     $vignette->getDescription() ?? '',
                     $cardData['icon'],
                     $cardData['color'],
-                    $this->getLinksForVignette($vignette->getNom())
+                    $this->getLinksForVignette(trim($vignette->getNom()))
                 );
             }
         }
@@ -159,11 +159,11 @@ class HomeCardService
         $cardData = $this->getCardData($vignette->getNom());
 
         return new HomeCard(
-            $vignette->getNom(),
+            trim($vignette->getNom()),
             $vignette->getDescription() ?? '',
             $cardData['icon'],
             $cardData['color'],
-            $this->getLinksForVignette($vignette->getNom())
+            $this->getLinksForVignette(trim($vignette->getNom()))
         );
     }
 }

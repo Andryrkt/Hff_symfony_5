@@ -17,8 +17,41 @@ export default class extends Controller {
             return;
         }
 
+        const CACHE_KEY = "hff_materiels_cache";
+        const CACHE_EXPIRY = 3600 * 1000; // 1 heure
+
+        let materielsCache: any[] | null = null;
+        let materielsPromise: Promise<any[]> | null = null;
+
         async function fetchMateriels() {
-            return await fetchManager.get(`api/fetch-materiel`);
+            // 1. Vérifier le cache en mémoire vive (le plus rapide)
+            if (materielsCache) return materielsCache;
+
+            // 2. Vérifier le localStorage (persistance entre pages/sessions)
+            const cached = localStorage.getItem(CACHE_KEY);
+            if (cached) {
+                const { data, timestamp } = JSON.parse(cached);
+                if (Date.now() - timestamp < CACHE_EXPIRY) {
+                    materielsCache = data;
+                    return data;
+                }
+            }
+
+            // 3. Mutualiser les requêtes réseau (si plusieurs appels simultanés)
+            if (!materielsPromise) {
+                materielsPromise = fetchManager.get('ajax/fetch-materiel').then(data => {
+                    materielsCache = data;
+                    localStorage.setItem(CACHE_KEY, JSON.stringify({
+                        data: data,
+                        timestamp: Date.now()
+                    }));
+                    return data;
+                }).finally(() => {
+                    materielsPromise = null;
+                });
+            }
+
+            return materielsPromise;
         }
 
         function displayMateriel(item) {

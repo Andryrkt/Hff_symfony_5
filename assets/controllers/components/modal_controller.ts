@@ -32,7 +32,7 @@ export default class extends Controller {
     private async loadCardContent(cardId: string) {
         this.modalContentTarget.innerHTML = this.loadingHtml();
         try {
-            const response = await fetch(`/api/home/card/${encodeURIComponent(cardId)}`);
+            const response = await fetch(`/ajax/home/card/${encodeURIComponent(cardId)}`);
             if (!response.ok) throw new Error(`Erreur serveur (statut: ${response.status})`);
             const data = await response.json();
             this.displayCardContent(data);

@@ -72,7 +72,7 @@ class DatabaseInformix implements DatabaseConnectionInterface
         $rows = [];
         if ($result) {
             while ($row = odbc_fetch_array($result)) {
-                $rows[] = $row;
+                $rows[] = $this->convertToUtf8($row);
             }
         }
         return $rows;
@@ -88,10 +88,28 @@ class DatabaseInformix implements DatabaseConnectionInterface
             // Récupérer la première ligne
             $row = odbc_fetch_array($result);
             if ($row !== false) {
-                return $row; // Retourne directement le tableau associatif
+                return $this->convertToUtf8($row); // Retourne directement le tableau associatif converti
             }
         }
         return []; // Tableau vide si pas de résultat
+    }
+
+    /**
+     * Convertit récursivement les données en UTF-8
+     */
+    private function convertToUtf8($data)
+    {
+        if (is_array($data)) {
+            foreach ($data as $key => $value) {
+                $data[$key] = $this->convertToUtf8($value);
+            }
+        } elseif (is_string($data)) {
+            // Détecte l'encodage et convertit en UTF-8 si nécessaire
+            // On utilise 'auto' pour détecter l'encodage source, ou on force ISO-8859-1 vers UTF-8
+            return mb_convert_encoding($data, 'UTF-8', 'ISO-8859-1, UTF-8, ASCII');
+        }
+
+        return $data;
     }
 
     /**
