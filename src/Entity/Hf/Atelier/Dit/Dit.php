@@ -230,6 +230,21 @@ class Dit implements CreatedByInterface, AgenceServiceInterface
      */
     private $statutDemande;
 
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    private $pieceJoint01;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    private $pieceJoint02;
+
+    /**
+     * @ORM\Column(type="string", length=100, nullable=true)
+     */
+    private $pieceJoint03;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -711,6 +726,42 @@ class Dit implements CreatedByInterface, AgenceServiceInterface
     public function setStatutDemande(?StatutDemande $statutDemande): self
     {
         $this->statutDemande = $statutDemande;
+
+        return $this;
+    }
+
+    public function getPieceJoint01(): ?string
+    {
+        return $this->pieceJoint01;
+    }
+
+    public function setPieceJoint01(?string $pieceJoint01): self
+    {
+        $this->pieceJoint01 = $pieceJoint01;
+
+        return $this;
+    }
+
+    public function getPieceJoint02(): ?string
+    {
+        return $this->pieceJoint02;
+    }
+
+    public function setPieceJoint02(?string $pieceJoint02): self
+    {
+        $this->pieceJoint02 = $pieceJoint02;
+
+        return $this;
+    }
+
+    public function getPieceJoint03(): ?string
+    {
+        return $this->pieceJoint03;
+    }
+
+    public function setPieceJoint03(?string $pieceJoint03): self
+    {
+        $this->pieceJoint03 = $pieceJoint03;
 
         return $this;
     }

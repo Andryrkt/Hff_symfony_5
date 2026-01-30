@@ -4,8 +4,10 @@ namespace App\Controller\Hf\Atelier\Dit\Creation;
 
 use Psr\Log\LoggerInterface;
 use App\Form\Hf\Atelier\Dit\DitFormType;
+use App\Service\Hf\Atelier\Dit\PdfService;
 use App\Factory\Hf\Atelier\Dit\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
+use App\Service\Hf\Atelier\Dit\CreationHandler;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use App\Service\Historique_operation\HistoriqueOperationService;
@@ -14,30 +16,17 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 /**
  * @Route("/hf/atelier/dit")
  */
-class FormController extends AbstractController
+class FormController extends AbstractDitFormController
 {
-
-    private HistoriqueOperationService $historiqueOperationService;
-    protected LoggerInterface $logger;
-    private ContextAwareBreadcrumbBuilder $breadcrumbBuilder;
-
-
-    public function __construct(
-        HistoriqueOperationService $historiqueOperationService,
-        LoggerInterface $logger,
-        ContextAwareBreadcrumbBuilder $breadcrumbBuilder
-    ) {
-        $this->historiqueOperationService = $historiqueOperationService;
-        $this->logger = $logger;
-        $this->breadcrumbBuilder = $breadcrumbBuilder;
-    }
 
     /**
      * @Route("/form", name="hf_atelier_dit_form_index")
      */
     public function index(
         FormFactory $formFactory,
-        Request $request
+        Request $request,
+        PdfService $pdfService,
+        CreationHandler $creationHandler
     ) {
         // 1. gerer l'accés 
         $this->denyAccessUnlessGranted('ATELIER_DIT_CREATE');
@@ -49,13 +38,9 @@ class FormController extends AbstractController
         $form = $this->createForm(DitFormType::class, $dto);
 
         // 4. gerer la soumission du formulaire
-        $form->handleRequest($request);
+        $this->traitementFormulaire($request, $form, $pdfService, $creationHandler);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $dto = $form->getData();
-            // $formFactory->save();
-            return $this->redirectToRoute('hf_atelier_dit_list_index');
-        }
+        $this->logger->info('✅ Fin du chargement du formulaire DIT');
 
         return $this->render('hf/atelier/dit/creation/form.html.twig', [
             'form' => $form->createView(),
