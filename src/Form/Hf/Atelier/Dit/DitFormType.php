@@ -264,7 +264,7 @@ class DitFormType extends AbstractType
                     'disabled' => true,
                     'class' => 'nomClient noEntrer autocomplete',
                     'autocomplete' => 'off',
-                    'data-autocomplete-url' => 'autocomplete/all-client' //  la route de l'autocomplétion
+                    'data-autocomplete-url' => 'ajax/autocomplete/all-client' //  la route de l'autocomplétion
                 ]
             ]
         )
@@ -278,7 +278,7 @@ class DitFormType extends AbstractType
                         'disabled' => true,
                         'class' => 'numClient noEntrer autocomplete',
                         'autocomplete' => 'off',
-                        'data-autocomplete-url' => 'autocomplete/all-client' // la route de l'autocomplétion
+                        'data-autocomplete-url' => 'ajax/autocomplete/all-client' // la route de l'autocomplétion
                     ]
                 ]
             )

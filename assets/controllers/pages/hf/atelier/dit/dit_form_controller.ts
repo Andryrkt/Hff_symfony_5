@@ -169,6 +169,7 @@ export default class extends Controller {
 
             // Agence et Service Débiteur
             if (agenceDebiteurInput && serviceDebiteurInput) {
+                // Désactivé si Externe
                 agenceDebiteurInput.disabled = isExterne;
                 serviceDebiteurInput.disabled = isExterne;
 
@@ -189,6 +190,78 @@ export default class extends Controller {
             interneExterneInput.addEventListener("change", toggleInterneExterne);
             // Initialisation au chargement
             toggleInterneExterne();
+        }
+
+        // --- Autocomplete Clients ---
+        const CLIENTS_CACHE_KEY = "hff_clients_cache";
+        const CLIENTS_CACHE_EXPIRY = 3600 * 1000; // 1 heure
+        let clientsCache: any[] | null = null;
+        let clientsPromise: Promise<any[]> | null = null;
+
+        async function fetchClients() {
+            // 1. Mémoire vive
+            if (clientsCache) return clientsCache;
+
+            // 2. LocalStorage
+            const cached = localStorage.getItem(CLIENTS_CACHE_KEY);
+            if (cached) {
+                const { data, timestamp } = JSON.parse(cached);
+                if (Date.now() - timestamp < CLIENTS_CACHE_EXPIRY) {
+                    clientsCache = data;
+                    return data;
+                }
+            }
+
+            // 3. Réseau (mutualisé)
+            if (!clientsPromise) {
+                const url = numClientInput?.getAttribute("data-autocomplete-url") || "ajax/autocomplete/all-client";
+                clientsPromise = fetchManager.get(url).then(data => {
+                    clientsCache = data;
+                    localStorage.setItem(CLIENTS_CACHE_KEY, JSON.stringify({
+                        data: data,
+                        timestamp: Date.now()
+                    }));
+                    return data;
+                }).finally(() => {
+                    clientsPromise = null;
+                });
+            }
+            return clientsPromise;
+        }
+
+        function displayClients(item) {
+            return `${item.num_client} - ${item.nom_client}`;
+        }
+
+        function onSelectClients(item) {
+            if (numClientInput) numClientInput.value = item.num_client;
+            if (nomClientInput) nomClientInput.value = item.nom_client;
+        }
+
+        if (numClientInput) {
+            new AutoComplete({
+                inputElement: numClientInput,
+                suggestionContainer: document.querySelector("#suggestion-numClient") as HTMLElement,
+                loaderElement: document.querySelector("#loader-numClient") as HTMLElement,
+                debounceDelay: 300,
+                fetchDataCallback: fetchClients,
+                displayItemCallback: displayClients,
+                onSelectCallback: onSelectClients,
+                itemToStringCallback: (item) => `${item.num_client} - ${item.nom_client}`,
+            });
+        }
+
+        if (nomClientInput) {
+            new AutoComplete({
+                inputElement: nomClientInput,
+                suggestionContainer: document.querySelector("#suggestion-nomClient") as HTMLElement,
+                loaderElement: document.querySelector("#loader-nomClient") as HTMLElement,
+                debounceDelay: 300,
+                fetchDataCallback: fetchClients,
+                displayItemCallback: displayClients,
+                onSelectCallback: onSelectClients,
+                itemToStringCallback: (item) => `${item.num_client} - ${item.nom_client}`,
+            });
         }
 
         function createMaterielInfoDisplay(container, data) {

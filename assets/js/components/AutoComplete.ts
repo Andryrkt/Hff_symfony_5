@@ -1,7 +1,7 @@
 export interface AutoCompleteOptions {
     inputElement: HTMLInputElement;
     suggestionContainer: HTMLElement;
-    fetchDataCallback: () => Promise<any[]>;
+    fetchDataCallback: (query?: string) => Promise<any[]>;
     displayItemCallback: (item: any) => string;
     onSelectCallback: (item: any) => void;
     loaderElement?: HTMLElement | null;
@@ -9,12 +9,13 @@ export interface AutoCompleteOptions {
     itemToStringForBlur?: (item: any) => string;
     onBlurCallback?: (found: boolean) => void;
     debounceDelay?: number;
+    serverSide?: boolean;
 }
 
 export class AutoComplete {
     inputElement: HTMLInputElement;
     suggestionContainer: HTMLElement;
-    fetchDataCallback: () => Promise<any[]>;
+    fetchDataCallback: (query?: string) => Promise<any[]>;
     displayItemCallback: (item: any) => string;
     onSelectCallback: (item: any) => void;
     loaderElement: HTMLElement | null;
@@ -22,6 +23,7 @@ export class AutoComplete {
     itemToStringForBlur: ((item: any) => string) | null;
     onBlurCallback: ((found: boolean) => void) | null;
     debounceDelay: number;
+    serverSide: boolean;
     data: any[];
     filteredData: any[];
     activeIndex: number;
@@ -38,6 +40,7 @@ export class AutoComplete {
         itemToStringForBlur = null,
         onBlurCallback = null,
         debounceDelay = 300,
+        serverSide = false,
     }: AutoCompleteOptions) {
         this.inputElement = inputElement;
         this.suggestionContainer = suggestionContainer;
@@ -49,6 +52,7 @@ export class AutoComplete {
         this.itemToStringForBlur = itemToStringForBlur || null;
         this.onBlurCallback = onBlurCallback || null;
         this.debounceDelay = debounceDelay;
+        this.serverSide = serverSide;
 
         this.data = [];
         this.filteredData = [];
@@ -59,13 +63,15 @@ export class AutoComplete {
     }
 
     async init() {
-        this.toggleLoader(true);
-        try {
-            this.data = await this.fetchDataCallback();
-        } catch (error) {
-            console.error("Erreur lors du chargement des données :", error);
+        if (!this.serverSide) {
+            this.toggleLoader(true);
+            try {
+                this.data = await this.fetchDataCallback();
+            } catch (error) {
+                console.error("Erreur lors du chargement des données :", error);
+            }
+            this.toggleLoader(false);
         }
-        this.toggleLoader(false);
 
         this.inputElement.addEventListener("input", () => this.onInput());
         this.inputElement.addEventListener("keydown", (e) => this.onKeyDown(e));
@@ -98,8 +104,21 @@ export class AutoComplete {
 
     onInput() {
         clearTimeout(this.typingTimeout);
-        this.typingTimeout = setTimeout(() => {
-            this.filterData(this.inputElement.value.trim());
+        this.typingTimeout = setTimeout(async () => {
+            const value = this.inputElement.value.trim();
+            if (this.serverSide && value !== "") {
+                this.toggleLoader(true);
+                try {
+                    this.data = await this.fetchDataCallback(value);
+                    this.filteredData = this.data;
+                    this.showSuggestions(this.filteredData);
+                } catch (error) {
+                    console.error("Erreur lors du chargement des données (server-side) :", error);
+                }
+                this.toggleLoader(false);
+            } else {
+                this.filterData(value);
+            }
         }, this.debounceDelay);
     }
 
