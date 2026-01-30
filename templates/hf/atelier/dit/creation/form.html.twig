@@ -33,8 +33,13 @@
                 			})}}
 						</div>
 						<div class="mb-3 position-relative">
-							{{ form_row(form.detailDemande) }}
-							<span id="charCount" class="position-absolute bottom-0 end-0 p-0 small text-muted"></span>
+							{{ form_row(form.detailDemande, {
+                                'attr': {
+                                    'data-pages--hf--atelier--dit--dit-form-target': 'detailDemande',
+                                    'data-action': 'input->pages--hf--atelier--dit--dit-form#updateCharCount'
+                                }
+                            }) }}
+							<span id="charCount" data-pages--hf--atelier--dit--dit-form-target="charCount" class="position-absolute bottom-0 end-0 p-0 small text-muted"></span>
 						</div>
 					</div>
 
@@ -43,13 +48,15 @@
 						<div class="col-12 col-md-2">{{ form_row(form.categorieDemande) }}</div>
 						<div class="col-12 col-md-2">{{ form_row(form.interneExterne, {
 							'attr': {
+                                'data-pages--hf--atelier--dit--dit-form-target': 'interneExterne',
+                                'data-action': 'change->pages--hf--atelier--dit--dit-form#toggleInterneExterne',
 								'data-informations': {
 									'agenceId': app.user.agence.id|default(''),
 									'serviceId': app.user.service.id|default('')
 								}|json_encode
 							}
 						})}}</div>
-						<div class="col-12 col-md-2">{{ form_row(form.demandeDevis)}}</div>
+						<div class="col-12 col-md-2">{{ form_row(form.demandeDevis, {'attr': {'data-pages--hf--atelier--dit--dit-form-target': 'demandeDevis'}})}}</div>
 						<div class="col-12 col-md-2">{{ form_row(form.livraisonPartiel)}}</div>
 						<div class="col-12 col-md-2">{{ form_row(form.avisRecouvrement)}}</div>
 					</div>
@@ -67,7 +74,10 @@
 
 							<div class="row">
 								<div class="col-12 col-md-6">
-									{{ formMacros.debiteurOuEmetteurFields(form, 'debiteur') }}
+									{{ formMacros.debiteurOuEmetteurFields(form, 'debiteur', {
+                                        'agence_attr': {'data-pages--hf--atelier--dit--dit-form-target': 'debiteurAgence'},
+                                        'service_attr': {'data-pages--hf--atelier--dit--dit-form-target': 'debiteurService'}
+                                    }) }}
 								</div>
 								<div class="col-12 col-md-6">
 									{{ form_row(form.agenceUser)}}
@@ -80,24 +90,24 @@
 							{{ formMacros.sousTitre('Info Client', {class: 'sousTitre'})}}
 							<div class="row">
 								<div class="col-12 col-md-6">
-									{{ form_row(form.numeroClient)}}
+									{{ form_row(form.numeroClient, {'attr': {'data-pages--hf--atelier--dit--dit-form-target': 'numeroClient'}})}}
 									<div id="suggestion-numClient" class="suggestions-container"></div>
 									<div id="loader-numClient" class="spinner" style="display: none;"></div>
-									{{ form_row(form.nomClient)}}
+									{{ form_row(form.nomClient, {'attr': {'data-pages--hf--atelier--dit--dit-form-target': 'nomClient'}})}}
 									<div id="suggestion-nomClient" class="suggestions-container"></div>
 									<div id="loader-nomClient" class="spinner" style="display: none;"></div>
-									{{ form_row(form.clientSousContrat)}}
+									{{ form_row(form.clientSousContrat, {'attr': {'data-pages--hf--atelier--dit--dit-form-target': 'clientSousContrat'}})}}
 								</div>
 								<div class="col-12 col-md-6" data-controller="number-only character-limiter" data-character-limiter-max-length-value="10">
 									{{ form_row(form.numeroTel, {
 										'attr': {
 											'data-character-limiter-target': 'input', 
 											'data-number-only-target': 'input',
-											'data-action': 'input->character-limiter#limiterCaracteres',
-											'data-action': 'input->number-only#filter'
+											'data-action': 'input->character-limiter#limiterCaracteres input->number-only#filter',
+                                            'data-pages--hf--atelier--dit--dit-form-target': 'numeroTel'
 										}
 									})}}
-									{{ form_row(form.mailClient)}}
+									{{ form_row(form.mailClient, {'attr': {'data-pages--hf--atelier--dit--dit-form-target': 'mailClient'}})}}
 								</div>
 							</div>
 							<div class="row">
@@ -110,18 +120,18 @@
 								{{ formMacros.sousTitre('Information Matériel', {class: 'sousTitre'})}}
 								<div class="row">
 									<div class="col-12 col-md-4">
-										{{ form_row(form.idMateriel)}}
+										{{ form_row(form.idMateriel, {'attr': {'data-pages--hf--atelier--dit--dit-form-target': 'idMateriel'}})}}
 										<div id="suggestion-idMateriel" class="suggestions-container"></div>
 										<div id="loader-idMateriel" class="spinner d-flex align-items-center" style="display: none;"></div>
 
 									</div>
 									<div class="col-12 col-md-4">
-										{{ form_row(form.numParc)}}
+										{{ form_row(form.numParc, {'attr': {'data-pages--hf--atelier--dit--dit-form-target': 'numParc'}})}}
 										<div id="suggestion-numParc" class="suggestions-container"></div>
 										<div id="loader-numParc" class="spinner" style="display: none;"></div>
 									</div>
 									<div class="col-12 col-md-4">
-										{{ form_row(form.numSerie)}}
+										{{ form_row(form.numSerie, {'attr': {'data-pages--hf--atelier--dit--dit-form-target': 'numSerie'}})}}
 										<div id="suggestion-numSerie" class="suggestions-container"></div>
 										<div id="loader-numSerie" class="spinner" style="display: none;"></div>
 									</div>
@@ -129,7 +139,7 @@
 								<div class="row">
 									<div id="error-idMateriel" class="text-danger"></div>
 								</div>
-								<div id="containerInfoMateriel"></div>
+								<div id="containerInfoMateriel" data-pages--hf--atelier--dit--dit-form-target="containerInfoMateriel"></div>
 							</div>
 
 						</div>
@@ -149,13 +159,23 @@
 									{{ form_row(form.typeReparation) }}
 								</div>
 								<div class="col-12 col-md-6">
-									{{ form_row(form.reparationRealise) }}
+									{{ form_row(form.reparationRealise, {
+                                        'attr': {
+                                            'data-pages--hf--atelier--dit--dit-form-target': 'reparationRealise',
+                                            'data-action': 'change->pages--hf--atelier--dit--dit-form#handleReparationChange'
+                                        }
+                                    }) }}
 								</div>
 							</div>
 							<div class="row">
 								<div class="col-12 col-md-6"></div>
-								<div class="col-12 col-md-6" id="ate_pol_tana_container" style="display: none;">
-									{{ form_row(form.estAtePolTana) }}
+								<div class="col-12 col-md-6" id="ate_pol_tana_container" data-pages--hf--atelier--dit--dit-form-target="atePolTanaContainer" style="display: none;">
+									{{ form_row(form.estAtePolTana, {
+                                        'attr': {
+                                            'data-pages--hf--atelier--dit--dit-form-target': 'atePolTanaInput',
+                                            'data-action': 'change->pages--hf--atelier--dit--dit-form#handleAtePolTanaChange'
+                                        }
+                                    }) }}
 								</div>
 							</div>
 

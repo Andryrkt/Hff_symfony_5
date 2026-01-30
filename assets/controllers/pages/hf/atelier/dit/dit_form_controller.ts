@@ -1,381 +1,342 @@
 import { Controller } from "@hotwired/stimulus";
 import { FetchManager } from "../../../../../js/utils/FetchManager";
 import { AutoComplete } from "../../../../../js/components/AutoComplete";
+import Swal from "sweetalert2";
 
 export default class extends Controller {
+    static targets = [
+        "detailDemande", "charCount", "interneExterne", "demandeDevis",
+        "debiteurAgence", "debiteurService", "numeroClient", "nomClient",
+        "clientSousContrat", "numeroTel", "mailClient", "idMateriel",
+        "numParc", "numSerie", "containerInfoMateriel", "reparationRealise",
+        "atePolTanaContainer", "atePolTanaInput"
+    ];
+
+    declare readonly detailDemandeTarget: HTMLTextAreaElement;
+    declare readonly hasDetailDemandeTarget: boolean;
+    declare readonly charCountTarget: HTMLElement;
+    declare readonly hasCharCountTarget: boolean;
+    declare readonly interneExterneTarget: HTMLSelectElement;
+    declare readonly hasInterneExterneTarget: boolean;
+    declare readonly demandeDevisTarget: HTMLSelectElement;
+    declare readonly hasDemandeDevisTarget: boolean;
+    declare readonly debiteurAgenceTarget: HTMLSelectElement;
+    declare readonly hasDebiteurAgenceTarget: boolean;
+    declare readonly debiteurServiceTarget: HTMLSelectElement;
+    declare readonly hasDebiteurServiceTarget: boolean;
+    declare readonly numeroClientTarget: HTMLInputElement;
+    declare readonly hasNumeroClientTarget: boolean;
+    declare readonly nomClientTarget: HTMLInputElement;
+    declare readonly hasNomClientTarget: boolean;
+    declare readonly clientSousContratTarget: HTMLSelectElement;
+    declare readonly hasClientSousContratTarget: boolean;
+    declare readonly numeroTelTarget: HTMLInputElement;
+    declare readonly hasNumeroTelTarget: boolean;
+    declare readonly mailClientTarget: HTMLInputElement;
+    declare readonly hasMailClientTarget: boolean;
+    declare readonly idMaterielTarget: HTMLInputElement;
+    declare readonly hasIdMaterielTarget: boolean;
+    declare readonly numParcTarget: HTMLInputElement;
+    declare readonly hasNumParcTarget: boolean;
+    declare readonly numSerieTarget: HTMLInputElement;
+    declare readonly hasNumSerieTarget: boolean;
+    declare readonly containerInfoMaterielTarget: HTMLElement;
+    declare readonly hasContainerInfoMaterielTarget: boolean;
+    declare readonly reparationRealiseTarget: HTMLSelectElement;
+    declare readonly hasReparationRealiseTarget: boolean;
+    declare readonly atePolTanaContainerTarget: HTMLElement;
+    declare readonly hasAtePolTanaContainerTarget: boolean;
+    declare readonly atePolTanaInputTarget: HTMLInputElement;
+    declare readonly hasAtePolTanaInputTarget: boolean;
+
+    private fetchManager: FetchManager;
+    private materielsCache: any[] | null = null;
+    private materielsPromise: Promise<any[]> | null = null;
+    private clientsCache: any[] | null = null;
+    private clientsPromise: Promise<any[]> | null = null;
+
+    private readonly CACHE_EXPIRY = 3600 * 1000; // 1 heure
+    private readonly MATERIELS_CACHE_KEY = "hff_materiels_cache";
+    private readonly CLIENTS_CACHE_KEY = "hff_clients_cache";
+    private readonly MAX_CHARACTERS = 1800;
+
     connect() {
-        const fetchManager = new FetchManager();
-        let lastSelectedItem = null;
+        this.fetchManager = new FetchManager();
+        this.initializeInteractions();
+        this.initializeAutocompletes();
+    }
 
-        const idMaterielInput = document.querySelector("#dit_form_idMateriel") as HTMLInputElement;
-        const numParcInput = document.querySelector("#dit_form_numParc") as HTMLInputElement;
-        const numSerieInput = document.querySelector("#dit_form_numSerie") as HTMLInputElement;
-        const containerInfoMateriel = document.querySelector("#containerInfoMateriel") as HTMLElement;
+    // --- Initialisations ---
 
-        if (!idMaterielInput || !numParcInput || !numSerieInput || !containerInfoMateriel) {
-            console.error("DitFormController: One or more required elements not found.");
+    private initializeInteractions() {
+        // Initialisation du compteur de caractères
+        this.updateCharCount();
+
+        // Initialisation de la logique Interne/Externe
+        this.toggleInterneExterne();
+
+        // Initialisation de la visibilité ATE POL TANA
+        this.updateAtePolTanaVisibility();
+    }
+
+    private initializeAutocompletes() {
+        this.setupMaterielAutocomplete(this.idMaterielTarget, "#suggestion-idMateriel", "#loader-idMateriel");
+        this.setupMaterielAutocomplete(this.numSerieTarget, "#suggestion-numSerie", "#loader-numSerie");
+        this.setupMaterielAutocomplete(this.numParcTarget, "#suggestion-numParc", "#loader-numParc");
+
+        this.setupClientAutocomplete(this.numeroClientTarget, "#suggestion-numClient", "#loader-numClient");
+        this.setupClientAutocomplete(this.nomClientTarget, "#suggestion-nomClient", "#loader-nomClient");
+    }
+
+    // --- Logique Compteur de Caractères ---
+
+    updateCharCount() {
+        if (!this.hasDetailDemandeTarget || !this.hasCharCountTarget) return;
+
+        let text = this.detailDemandeTarget.value;
+        let lineBreaks = (text.match(/\n/g) || []).length;
+        let adjustedLength = text.length + lineBreaks * 130;
+
+        if (adjustedLength > this.MAX_CHARACTERS) {
+            let excessCharacters = adjustedLength - this.MAX_CHARACTERS;
+            while (excessCharacters > 0 && text.length > 0) {
+                let lastChar = text[text.length - 1];
+                excessCharacters -= (lastChar === "\n" ? 130 : 1);
+                text = text.substring(0, text.length - 1);
+            }
+            this.detailDemandeTarget.value = text;
+            adjustedLength = this.MAX_CHARACTERS;
+        }
+
+        let remaining = this.MAX_CHARACTERS - adjustedLength;
+        this.charCountTarget.textContent = `Il vous reste ${Math.max(0, remaining)} caractères.`;
+        this.charCountTarget.style.color = remaining <= 0 ? "red" : "gray";
+    }
+
+    // --- Logique Interne / Externe ---
+
+    toggleInterneExterne() {
+        if (!this.hasInterneExterneTarget) return;
+
+        const isInterne = this.interneExterneTarget.value === "INTERNE";
+        const isExterne = this.interneExterneTarget.value === "EXTERNE";
+        const infoData = this.interneExterneTarget.dataset.informations;
+        const parsedData = infoData ? JSON.parse(infoData) : { agenceId: "", serviceId: "" };
+
+        // Champs Client
+        const clientFields = [this.nomClientTarget, this.numeroClientTarget, this.numeroTelTarget, this.mailClientTarget];
+        clientFields.forEach(input => {
+            if (input) {
+                input.disabled = isInterne;
+                if (isExterne) input.setAttribute("required", "true");
+                else input.removeAttribute("required");
+            }
+        });
+
+        if (this.hasClientSousContratTarget) this.clientSousContratTarget.disabled = isInterne;
+
+        // Demande de devis
+        if (this.hasDemandeDevisTarget) {
+            this.demandeDevisTarget.disabled = isInterne;
+            this.demandeDevisTarget.value = isExterne ? "OUI" : "NON";
+        }
+
+        // Agence et Service Débiteur
+        if (this.hasDebiteurAgenceTarget && this.hasDebiteurServiceTarget) {
+            this.debiteurAgenceTarget.disabled = isExterne;
+            this.debiteurServiceTarget.disabled = isExterne;
+
+            if (isInterne) {
+                this.debiteurAgenceTarget.value = parsedData.agenceId;
+                this.debiteurServiceTarget.value = parsedData.serviceId;
+            } else if (isExterne) {
+                this.debiteurAgenceTarget.value = "";
+                this.debiteurServiceTarget.value = "";
+            }
+            this.debiteurAgenceTarget.dispatchEvent(new Event('change'));
+        }
+    }
+
+    // --- Logique Réparation et ATE POL TANA ---
+
+    handleReparationChange() {
+        this.updateAtePolTanaVisibility();
+
+        if (this.reparationRealiseTarget.value === "ATE POL TANA") {
+            Swal.fire({
+                title: "Attention !",
+                html: `Le type de document doit être "<b>Maintenance curative</b>" et la catégorie de demande est "<b>REPARATION</b>"`,
+                icon: "warning",
+                confirmButtonColor: "#fbbb01",
+                confirmButtonText: "OUI",
+            });
+        }
+    }
+
+    private updateAtePolTanaVisibility() {
+        const valuesAutorisees = ["ATE TANA", "ATE MAS", "ATE STAR"];
+        const visible = valuesAutorisees.includes(this.reparationRealiseTarget.value);
+
+        if (this.hasAtePolTanaContainerTarget) {
+            this.atePolTanaContainerTarget.style.display = visible ? "block" : "none";
+            if (!visible && this.hasAtePolTanaInputTarget) {
+                this.atePolTanaInputTarget.checked = false;
+            }
+        }
+    }
+
+    handleAtePolTanaChange() {
+        if (this.hasAtePolTanaInputTarget && this.atePolTanaInputTarget.checked) {
+            Swal.fire({
+                title: "Êtes-vous sûr ?",
+                html: `Les travaux seront réalisés par l'${this.reparationRealiseTarget.value} en sollicitant également l'ATE POL TANA, une deuxième DIT sera créée automatiquement.<br>
+                <b>Cliquer sur OUI pour confirmer et NON pour abandonner.</b>`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#fbbb01",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "OUI",
+                cancelButtonText: "NON",
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+            }).then((result) => {
+                this.atePolTanaInputTarget.checked = result.isConfirmed;
+            });
+        }
+    }
+
+    // --- Data Fetching & Autocomplete ---
+
+    private async fetchMateriels() {
+        if (this.materielsCache) return this.materielsCache;
+
+        const cached = localStorage.getItem(this.MATERIELS_CACHE_KEY);
+        if (cached) {
+            const { data, timestamp } = JSON.parse(cached);
+            if (Date.now() - timestamp < this.CACHE_EXPIRY) {
+                this.materielsCache = data;
+                return data;
+            }
+        }
+
+        if (!this.materielsPromise) {
+            this.materielsPromise = this.fetchManager.get('ajax/fetch-materiel').then(data => {
+                this.materielsCache = data;
+                localStorage.setItem(this.MATERIELS_CACHE_KEY, JSON.stringify({ data, timestamp: Date.now() }));
+                return data;
+            }).finally(() => this.materielsPromise = null);
+        }
+        return this.materielsPromise;
+    }
+
+    private async fetchClients() {
+        if (this.clientsCache) return this.clientsCache;
+
+        const cached = localStorage.getItem(this.CLIENTS_CACHE_KEY);
+        if (cached) {
+            const { data, timestamp } = JSON.parse(cached);
+            if (Date.now() - timestamp < this.CACHE_EXPIRY) {
+                this.clientsCache = data;
+                return data;
+            }
+        }
+
+        if (!this.clientsPromise) {
+            const url = this.numeroClientTarget.getAttribute("data-autocomplete-url") || "ajax/autocomplete/all-client";
+            this.clientsPromise = this.fetchManager.get(url).then(data => {
+                this.clientsCache = data;
+                localStorage.setItem(this.CLIENTS_CACHE_KEY, JSON.stringify({ data, timestamp: Date.now() }));
+                return data;
+            }).finally(() => this.clientsPromise = null);
+        }
+        return this.clientsPromise;
+    }
+
+    private setupMaterielAutocomplete(input: HTMLInputElement, suggestionId: string, loaderId: string) {
+        new AutoComplete({
+            inputElement: input,
+            suggestionContainer: document.querySelector(suggestionId) as HTMLElement,
+            loaderElement: document.querySelector(loaderId) as HTMLElement,
+            debounceDelay: 300,
+            fetchDataCallback: this.fetchMateriels.bind(this),
+            displayItemCallback: (item) => `Id: ${item.num_matricule} - Parc: ${item.num_parc} - S/N: ${item.num_serie}`,
+            onSelectCallback: (item) => this.onSelectMateriel(item),
+            itemToStringCallback: (item) => `${item.num_matricule} - ${item.num_parc} - ${item.num_serie}`,
+            onBlurCallback: (found) => { if (!found) this.handleMaterielNotFound(input.value) }
+        });
+    }
+
+    private setupClientAutocomplete(input: HTMLInputElement, suggestionId: string, loaderId: string) {
+        new AutoComplete({
+            inputElement: input,
+            suggestionContainer: document.querySelector(suggestionId) as HTMLElement,
+            loaderElement: document.querySelector(loaderId) as HTMLElement,
+            debounceDelay: 300,
+            fetchDataCallback: this.fetchClients.bind(this),
+            displayItemCallback: (item) => `${item.num_client} - ${item.nom_client}`,
+            onSelectCallback: (item) => this.onSelectClient(item),
+            itemToStringCallback: (item) => `${item.num_client} - ${item.nom_client}`,
+        });
+    }
+
+    private onSelectMateriel(item: any) {
+        this.idMaterielTarget.value = item.num_matricule;
+        this.numParcTarget.value = item.num_parc;
+        this.numSerieTarget.value = item.num_serie;
+        this.createMaterielInfoDisplay(item);
+    }
+
+    private onSelectClient(item: any) {
+        this.numeroClientTarget.value = item.num_client;
+        this.nomClientTarget.value = item.nom_client;
+    }
+
+    private handleMaterielNotFound(value: string) {
+        if (!value) return;
+        this.containerInfoMaterielTarget.innerHTML = `
+            <div class="text-danger fw-bold">Aucun matériel trouvé pour "${value}". Veuillez choisir un élément dans la liste.</div>
+        `;
+    }
+
+    // --- Affichage Informations Matériel ---
+
+    private createMaterielInfoDisplay(data: any) {
+        if (!data || Object.keys(data).length === 0) {
+            this.containerInfoMaterielTarget.innerHTML = `<div class="text-danger fw-bold">Aucune information disponible.</div>`;
             return;
         }
 
-        const CACHE_KEY = "hff_materiels_cache";
-        const CACHE_EXPIRY = 3600 * 1000; // 1 heure
+        const fields = [
+            { label: "Constructeur", key: "constructeur" },
+            { label: "Désignation", key: "designation" },
+            { label: "KM", key: "km" },
+            { label: "N° Parc", key: "num_parc" },
+            { label: "Modèle", key: "modele" },
+            { label: "Casier", key: "casier_emetteur" },
+            { label: "Heures", key: "heure" },
+            { label: "N° Serie", key: "num_serie" },
+            { label: "Id Materiel", key: "num_matricule" },
+        ];
 
-        let materielsCache: any[] | null = null;
-        let materielsPromise: Promise<any[]> | null = null;
+        const createFieldHtml = (f: any) => `
+            <li class="fw-bold">
+                ${f.label} :
+                <div class="border border-secondary border-3 rounded px-4 bg-secondary-subtle">
+                    ${data[f.key] || "<span class='text-danger'>Non disponible</span>"}
+                </div>
+            </li>
+        `;
 
-        async function fetchMateriels() {
-            // 1. Vérifier le cache en mémoire vive (le plus rapide)
-            if (materielsCache) return materielsCache;
+        const leftCol = fields.slice(0, 4).map(createFieldHtml).join("");
+        const rightCol = fields.slice(4).map(createFieldHtml).join("");
 
-            // 2. Vérifier le localStorage (persistance entre pages/sessions)
-            const cached = localStorage.getItem(CACHE_KEY);
-            if (cached) {
-                const { data, timestamp } = JSON.parse(cached);
-                if (Date.now() - timestamp < CACHE_EXPIRY) {
-                    materielsCache = data;
-                    return data;
-                }
-            }
-
-            // 3. Mutualiser les requêtes réseau (si plusieurs appels simultanés)
-            if (!materielsPromise) {
-                materielsPromise = fetchManager.get('ajax/fetch-materiel').then(data => {
-                    materielsCache = data;
-                    localStorage.setItem(CACHE_KEY, JSON.stringify({
-                        data: data,
-                        timestamp: Date.now()
-                    }));
-                    return data;
-                }).finally(() => {
-                    materielsPromise = null;
-                });
-            }
-
-            return materielsPromise;
-        }
-
-        function displayMateriel(item) {
-            return `Id: ${item.num_matricule} - Parc: ${item.num_parc} - S/N: ${item.num_serie}`;
-        }
-
-        // Met à jour les champs et la fiche
-        function onSelectMateriels(item) {
-            lastSelectedItem = item;
-
-            idMaterielInput.value = item.num_matricule;
-            numParcInput.value = item.num_parc;
-            numSerieInput.value = item.num_serie;
-
-            createMaterielInfoDisplay(containerInfoMateriel, item);
-        }
-
-        // Vérifie si la valeur tapée correspond à un item connu
-        async function validateInput(input, keyToCompare) {
-            const data = await fetchMateriels();
-            const match = data.find((item) => item[keyToCompare] === input.value);
-
-            if (!match) {
-                containerInfoMateriel.innerHTML = `
-      <div class="text-danger fw-bold">Aucun matériel trouvé pour "${input.value}". Veuillez choisir un élément dans la liste.</div>
-    `;
-                lastSelectedItem = null;
-            }
-        }
-
-        // Écouteurs de perte de focus pour chaque champ
-        idMaterielInput.addEventListener("blur", () =>
-            validateInput(idMaterielInput, "num_matricule")
-        );
-        numParcInput.addEventListener("blur", () =>
-            validateInput(numParcInput, "num_parc")
-        );
-        numSerieInput.addEventListener("blur", () =>
-            validateInput(numSerieInput, "num_serie")
-        );
-
-        //Activation sur le champ Id Matériel
-        new AutoComplete({
-            inputElement: idMaterielInput,
-            suggestionContainer: document.querySelector("#suggestion-idMateriel"),
-            loaderElement: document.querySelector("#loader-idMateriel"), // Ajout du loader
-            debounceDelay: 300, // Délai en ms
-            fetchDataCallback: fetchMateriels,
-            displayItemCallback: displayMateriel,
-            onSelectCallback: onSelectMateriels,
-            itemToStringCallback: (item) =>
-                `${item.num_matricule} - ${item.num_parc} - ${item.num_serie}`,
-        });
-
-        //Activation sur le champ numSerie
-        new AutoComplete({
-            inputElement: numSerieInput,
-            suggestionContainer: document.querySelector("#suggestion-numSerie"),
-            loaderElement: document.querySelector("#loader-numSerie"), // Ajout du loader
-            debounceDelay: 300, // Délai en ms
-            fetchDataCallback: fetchMateriels,
-            displayItemCallback: displayMateriel,
-            onSelectCallback: onSelectMateriels,
-            itemToStringCallback: (item) =>
-                `${item.num_matricule} - ${item.num_parc} - ${item.num_serie}`,
-        });
-
-        //Activation sur le champ numParc
-        new AutoComplete({
-            inputElement: numParcInput,
-            suggestionContainer: document.querySelector("#suggestion-numParc"),
-            loaderElement: document.querySelector("#loader-numParc"), // Ajout du loader
-            debounceDelay: 300, // Délai en ms
-            fetchDataCallback: fetchMateriels,
-            displayItemCallback: displayMateriel,
-            onSelectCallback: onSelectMateriels,
-            itemToStringCallback: (item) =>
-                `${item.num_matricule} - ${item.num_parc} - ${item.num_serie}`,
-        });
-
-        // --- Logique Interne / Externe ---
-        const interneExterneInput = document.querySelector("#dit_form_interneExterne") as HTMLSelectElement;
-        const nomClientInput = document.querySelector("#dit_form_nomClient") as HTMLInputElement;
-        const numClientInput = document.querySelector("#dit_form_numeroClient") as HTMLInputElement;
-        const numTelInput = document.querySelector("#dit_form_numeroTel") as HTMLInputElement;
-        const clientSousContratInput = document.querySelector("#dit_form_clientSousContrat") as HTMLSelectElement;
-        const mailClientInput = document.querySelector("#dit_form_mailClient") as HTMLInputElement;
-        const demandeDevisInput = document.querySelector("#dit_form_demandeDevis") as HTMLSelectElement;
-        const agenceDebiteurInput = document.querySelector("#dit_form_debiteur_agence") as HTMLSelectElement;
-        const serviceDebiteurInput = document.querySelector("#dit_form_debiteur_service") as HTMLSelectElement;
-
-        const toggleInterneExterne = () => {
-            const isInterne = interneExterneInput.value === "INTERNE";
-            const isExterne = interneExterneInput.value === "EXTERNE";
-
-            const infoData = interneExterneInput.dataset.informations;
-            const parsedData = infoData ? JSON.parse(infoData) : { agenceId: "", serviceId: "" };
-
-            // Champs Client
-            [nomClientInput, numClientInput, numTelInput, mailClientInput].forEach(input => {
-                if (input) {
-                    input.disabled = isInterne;
-                    if (isExterne) input.setAttribute("required", "true");
-                    else input.removeAttribute("required");
-                }
-            });
-
-            if (clientSousContratInput) clientSousContratInput.disabled = isInterne;
-
-            // Demande de devis
-            if (demandeDevisInput) {
-                demandeDevisInput.disabled = isInterne;
-                demandeDevisInput.value = isExterne ? "OUI" : "NON";
-            }
-
-            // Agence et Service Débiteur
-            if (agenceDebiteurInput && serviceDebiteurInput) {
-                // Désactivé si Externe
-                agenceDebiteurInput.disabled = isExterne;
-                serviceDebiteurInput.disabled = isExterne;
-
-                if (isInterne) {
-                    agenceDebiteurInput.value = parsedData.agenceId;
-                    serviceDebiteurInput.value = parsedData.serviceId;
-                    // Forcer le dispatch d'un événement change pour TomSelect ou autres managers
-                    agenceDebiteurInput.dispatchEvent(new Event('change'));
-                } else if (isExterne) {
-                    agenceDebiteurInput.value = "";
-                    serviceDebiteurInput.value = "";
-                    agenceDebiteurInput.dispatchEvent(new Event('change'));
-                }
-            }
-        };
-
-        if (interneExterneInput) {
-            interneExterneInput.addEventListener("change", toggleInterneExterne);
-            // Initialisation au chargement
-            toggleInterneExterne();
-        }
-
-        // --- Autocomplete Clients ---
-        const CLIENTS_CACHE_KEY = "hff_clients_cache";
-        const CLIENTS_CACHE_EXPIRY = 3600 * 1000; // 1 heure
-        let clientsCache: any[] | null = null;
-        let clientsPromise: Promise<any[]> | null = null;
-
-        async function fetchClients() {
-            // 1. Mémoire vive
-            if (clientsCache) return clientsCache;
-
-            // 2. LocalStorage
-            const cached = localStorage.getItem(CLIENTS_CACHE_KEY);
-            if (cached) {
-                const { data, timestamp } = JSON.parse(cached);
-                if (Date.now() - timestamp < CLIENTS_CACHE_EXPIRY) {
-                    clientsCache = data;
-                    return data;
-                }
-            }
-
-            // 3. Réseau (mutualisé)
-            if (!clientsPromise) {
-                const url = numClientInput?.getAttribute("data-autocomplete-url") || "ajax/autocomplete/all-client";
-                clientsPromise = fetchManager.get(url).then(data => {
-                    clientsCache = data;
-                    localStorage.setItem(CLIENTS_CACHE_KEY, JSON.stringify({
-                        data: data,
-                        timestamp: Date.now()
-                    }));
-                    return data;
-                }).finally(() => {
-                    clientsPromise = null;
-                });
-            }
-            return clientsPromise;
-        }
-
-        function displayClients(item) {
-            return `${item.num_client} - ${item.nom_client}`;
-        }
-
-        function onSelectClients(item) {
-            if (numClientInput) numClientInput.value = item.num_client;
-            if (nomClientInput) nomClientInput.value = item.nom_client;
-        }
-
-        if (numClientInput) {
-            new AutoComplete({
-                inputElement: numClientInput,
-                suggestionContainer: document.querySelector("#suggestion-numClient") as HTMLElement,
-                loaderElement: document.querySelector("#loader-numClient") as HTMLElement,
-                debounceDelay: 300,
-                fetchDataCallback: fetchClients,
-                displayItemCallback: displayClients,
-                onSelectCallback: onSelectClients,
-                itemToStringCallback: (item) => `${item.num_client} - ${item.nom_client}`,
-            });
-        }
-
-        if (nomClientInput) {
-            new AutoComplete({
-                inputElement: nomClientInput,
-                suggestionContainer: document.querySelector("#suggestion-nomClient") as HTMLElement,
-                loaderElement: document.querySelector("#loader-nomClient") as HTMLElement,
-                debounceDelay: 300,
-                fetchDataCallback: fetchClients,
-                displayItemCallback: displayClients,
-                onSelectCallback: onSelectClients,
-                itemToStringCallback: (item) => `${item.num_client} - ${item.nom_client}`,
-            });
-        }
-
-        // --- Logique Compteur de Caractères (Détail Demande) ---
-        const textarea = document.querySelector(".detailDemande") as HTMLTextAreaElement;
-        const charCount = document.getElementById("charCount") as HTMLElement;
-        const MAX_CHARACTERS = 1800;
-
-        if (textarea && charCount) {
-            // Initialisation du compteur
-            const updateCount = () => {
-                let text = textarea.value;
-                let lineBreaks = (text.match(/\n/g) || []).length;
-                let adjustedLength = text.length + lineBreaks * 130;
-
-                // Bloquer l'ajout de texte si la limite est atteinte
-                if (adjustedLength > MAX_CHARACTERS) {
-                    let excessCharacters = adjustedLength - MAX_CHARACTERS;
-
-                    while (excessCharacters > 0 && text.length > 0) {
-                        let lastChar = text[text.length - 1];
-                        if (lastChar === "\n") {
-                            excessCharacters -= 130;
-                        } else {
-                            excessCharacters -= 1;
-                        }
-                        text = text.substring(0, text.length - 1);
-                    }
-                    textarea.value = text;
-                    adjustedLength = MAX_CHARACTERS;
-                }
-
-                let remainingCharacters = MAX_CHARACTERS - adjustedLength;
-                charCount.textContent = `Il vous reste ${remainingCharacters >= 0 ? remainingCharacters : 0} caractères.`;
-                charCount.style.color = remainingCharacters <= 0 ? "red" : "gray";
-            };
-
-            textarea.addEventListener("input", updateCount);
-            // Initialisation
-            updateCount();
-        }
-
-        function createMaterielInfoDisplay(container, data) {
-            if (!container) {
-                console.error("Container not found.");
-                return;
-            }
-
-            if (!hasValidData(data)) {
-                showNoDataMessage(container);
-                return;
-            }
-
-            const fields = getMaterielFields();
-            container.innerHTML = buildMaterielHtml(fields, data);
-        }
-
-        // Vérifie si les données sont valides
-        function hasValidData(data) {
-            return data && Object.keys(data).length > 0;
-        }
-
-        // Affiche un message d'absence de données
-        function showNoDataMessage(container) {
-            container.innerHTML = `<div class="text-danger fw-bold">Aucune information disponible pour ce matériel.</div>`;
-        }
-
-        // Retourne la liste des champs à afficher
-        function getMaterielFields() {
-            return [
-                { label: "Constructeur", key: "constructeur" },
-                { label: "Désignation", key: "designation" },
-                { label: "KM", key: "km" },
-                { label: "N° Parc", key: "num_parc" },
-                { label: "Modèle", key: "modele" },
-                { label: "Casier", key: "casier_emetteur" },
-                { label: "Heures", key: "heure" },
-                { label: "N° Serie", key: "num_serie" },
-                { label: "Id Materiel", key: "num_matricule" },
-            ];
-        }
-
-        // Construit le HTML complet à injecter dans le container
-        function buildMaterielHtml(fields, data) {
-            const createFieldHtml = (label, value) => `
-    <li class="fw-bold">
-      ${label} :
-      <div class="border border-secondary border-3 rounded px-4 bg-secondary-subtle">
-        ${value || "<span class='text-danger'>Non disponible</span>"}
-      </div>
-    </li>
-  `;
-
-            const leftColumn = fields
-                .slice(0, 4)
-                .map((field) => createFieldHtml(field.label, data[field.key]))
-                .join("");
-
-            const rightColumn = fields
-                .slice(4)
-                .map((field) => createFieldHtml(field.label, data[field.key]))
-                .join("");
-
-            return `
-    <ul class="list-unstyled">
-      <div class="row">
-        <div class="col-12 col-md-6">
-          ${leftColumn}
-        </div>
-        <div class="col-12 col-md-6">
-          ${rightColumn}
-        </div>
-      </div>
-    </ul>
-  `;
-        }
+        this.containerInfoMaterielTarget.innerHTML = `
+            <ul class="list-unstyled">
+                <div class="row">
+                    <div class="col-12 col-md-6">${leftCol}</div>
+                    <div class="col-12 col-md-6">${rightCol}</div>
+                </div>
+            </ul>
+        `;
     }
 }
