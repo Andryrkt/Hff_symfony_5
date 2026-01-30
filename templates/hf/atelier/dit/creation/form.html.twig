@@ -24,7 +24,14 @@
 							{{ form_row(form.estDitAvoir)}}
 							{{ form_row(form.estDitRefacturation)}}
 						</div>
-						{{ form_row(form.objetDemande)}}
+						<div data-controller="character-limiter" data-character-limiter-max-length-value="86">
+							{{ form_row(form.objetDemande,  {
+                    		'attr': {
+                        		'data-character-limiter-target': 'input', 
+                        		'data-action': 'input->character-limiter#limiterCaracteres'
+                    			}
+                			})}}
+						</div>
 						<div class="mb-3 position-relative">
 							{{ form_row(form.detailDemande) }}
 							<span id="charCount" class="position-absolute bottom-0 end-0 p-0 small text-muted"></span>
@@ -81,8 +88,15 @@
 									<div id="loader-nomClient" class="spinner" style="display: none;"></div>
 									{{ form_row(form.clientSousContrat)}}
 								</div>
-								<div class="col-12 col-md-6">
-									{{ form_row(form.numeroTel)}}
+								<div class="col-12 col-md-6" data-controller="number-only character-limiter" data-character-limiter-max-length-value="10">
+									{{ form_row(form.numeroTel, {
+										'attr': {
+											'data-character-limiter-target': 'input', 
+											'data-number-only-target': 'input',
+											'data-action': 'input->character-limiter#limiterCaracteres',
+											'data-action': 'input->number-only#filter'
+										}
+									})}}
 									{{ form_row(form.mailClient)}}
 								</div>
 							</div>
