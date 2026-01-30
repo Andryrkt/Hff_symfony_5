@@ -8,6 +8,42 @@ export interface ValidationResult {
 }
 
 /**
+ * Récupère le texte du label associé à un champ
+ */
+function getFieldLabel(field: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement): string {
+    if (field.dataset.fieldName) {
+        return field.dataset.fieldName;
+    }
+
+    // Chercher un label avec l'attribut 'for'
+    if (field.id) {
+        const label = document.querySelector(`label[for="${field.id}"]`);
+        if (label && label.textContent) {
+            return cleanLabelText(label.textContent);
+        }
+    }
+
+    // Chercher un parent label
+    const parentLabel = field.closest('label');
+    if (parentLabel && parentLabel.textContent) {
+        return cleanLabelText(parentLabel.textContent);
+    }
+
+    // Fallback sur le nom technique
+    return field.getAttribute('name') || field.id || 'Ce champ';
+}
+
+/**
+ * Nettoie le texte du label (retire les astérisques et mentions d'aide)
+ */
+function cleanLabelText(text: string): string {
+    return text
+        .replace(/\*/g, '') // Retire les astérisques
+        .replace(/\(.*?\)/g, '') // Retire les mentions entre parenthèses comme (*EXTERNE)
+        .trim();
+}
+
+/**
  * Valide tous les champs obligatoires d'un formulaire
  * @param form Le formulaire à valider
  * @returns Résultat de la validation avec la liste des erreurs
@@ -19,7 +55,7 @@ export function validateFormFields(form: HTMLFormElement): ValidationResult {
 
     requiredFields.forEach((field) => {
         const errorElement = document.querySelector(`#error-${field.id}`);
-        const fieldName = field.dataset.fieldName || field.name || field.id || 'Ce champ';
+        const fieldLabel = getFieldLabel(field);
 
         // Vérifier si le champ est vide
         const isEmpty = !field.value.trim();
@@ -29,12 +65,12 @@ export function validateFormFields(form: HTMLFormElement): ValidationResult {
             field.classList.add('border', 'border-danger');
 
             // Créer le message d'erreur
-            const errorMessage = `Le champ "<span class="text-danger text-decoration-underline">${fieldName}</span>" est obligatoire`;
+            const errorMessage = `Le champ "<span class="text-danger text-decoration-underline">${fieldLabel}</span>" est obligatoire`;
             errors.push(errorMessage);
 
             // Afficher l'erreur si un élément d'erreur existe
             if (errorElement) {
-                errorElement.textContent = errorMessage;
+                errorElement.textContent = `Ce champ est obligatoire`;
                 errorElement.classList.add('text-danger');
             }
 
