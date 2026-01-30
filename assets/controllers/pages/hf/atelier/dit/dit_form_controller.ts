@@ -264,6 +264,45 @@ export default class extends Controller {
             });
         }
 
+        // --- Logique Compteur de Caractères (Détail Demande) ---
+        const textarea = document.querySelector(".detailDemande") as HTMLTextAreaElement;
+        const charCount = document.getElementById("charCount") as HTMLElement;
+        const MAX_CHARACTERS = 1800;
+
+        if (textarea && charCount) {
+            // Initialisation du compteur
+            const updateCount = () => {
+                let text = textarea.value;
+                let lineBreaks = (text.match(/\n/g) || []).length;
+                let adjustedLength = text.length + lineBreaks * 130;
+
+                // Bloquer l'ajout de texte si la limite est atteinte
+                if (adjustedLength > MAX_CHARACTERS) {
+                    let excessCharacters = adjustedLength - MAX_CHARACTERS;
+
+                    while (excessCharacters > 0 && text.length > 0) {
+                        let lastChar = text[text.length - 1];
+                        if (lastChar === "\n") {
+                            excessCharacters -= 130;
+                        } else {
+                            excessCharacters -= 1;
+                        }
+                        text = text.substring(0, text.length - 1);
+                    }
+                    textarea.value = text;
+                    adjustedLength = MAX_CHARACTERS;
+                }
+
+                let remainingCharacters = MAX_CHARACTERS - adjustedLength;
+                charCount.textContent = `Il vous reste ${remainingCharacters >= 0 ? remainingCharacters : 0} caractères.`;
+                charCount.style.color = remainingCharacters <= 0 ? "red" : "gray";
+            };
+
+            textarea.addEventListener("input", updateCount);
+            // Initialisation
+            updateCount();
+        }
+
         function createMaterielInfoDisplay(container, data) {
             if (!container) {
                 console.error("Container not found.");
