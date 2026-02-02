@@ -74,10 +74,6 @@ class Mapper
             // ----------------- Dit Refacturation ----------------------
             ->setNumeroDemandeDitRefacturation($dto->numeroDemandeDitRefacturation)
             ->setEstDitRefacturation($dto->estDitRefacturation)
-            // --------------- Piece Joint ----------------------
-            ->setPieceJoint01($dto->pieceJoint01)
-            ->setPieceJoint02($dto->pieceJoint02)
-            ->setPieceJoint03($dto->pieceJoint03)
             // ------------------ Autre --------------
             ->setNumeroMigration($dto->numeroMigration)
             ->setEstAtePolTana($dto->estAtePolTana)

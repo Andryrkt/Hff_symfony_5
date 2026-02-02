@@ -61,37 +61,46 @@ class FormFactory
         ];
         $dto->niveauUrgence = $this->em->getRepository(WorNiveauUrgence::class)
             ->findOneBy(['code' => WorNiveauUrgenceConstants::NIVEAU_URGENCE_P2]);
+        $dto->demandeDevis = 'NON';
+        $dto->clientSousContrat = 'NON';
 
         $dto->dateDemande = new \DateTime();
         $dto->numeroDit = $this->numeroGeneratorService->autoGenerateNumero(TypeDocumentConstants::TYPE_DOCUMENT_DIT_CODE, true);
         $dto->mailDemandeur = $user->getEmail();
 
-        $dto->historiqueMateriel = $this->historiqueInterventionMateriel($dto->idMateriel, $dto->reparationRealise);
-
-        if ($dto->idMateriel !== null) {
-            $infoMateriel = $this->ditModel->getInfoMateriel($dto);
-            if ($infoMateriel) {
-                $dto->coutAcquisition = $infoMateriel['cout_acquisition'];
-                $dto->amortissement = $infoMateriel['amortissement'];
-                $dto->valeurNetComptable = $dto->getValeurNetComptable();
-                $dto->chargeEntretient = $infoMateriel['charge_entretien'];
-                $dto->chargeLocative = $infoMateriel['charge_locative'];
-                $dto->chiffreAffaire = $infoMateriel['chiffre_affaires'];
-                $dto->resultatExploitation = $dto->getResultatExploitation();
-
-                $dto->modele = $infoMateriel['modele'];
-                $dto->designation = $infoMateriel['designation'];
-                $dto->constructeur = $infoMateriel['constructeur'];
-                $dto->casier = $infoMateriel['casier_emetteur'];
-                $dto->idMateriel = $infoMateriel['num_matricule'];
-                $dto->numSerie = $infoMateriel['num_serie'];
-                $dto->numParc = $infoMateriel['num_parc'];
-                $dto->heureMachine = $infoMateriel['heure'];
-                $dto->kmMachine = $infoMateriel['km'];
-            }
-        }
+        $this->enrichDtoWithMaterielInfo($dto);
 
         return $dto;
+    }
+
+    public function enrichDtoWithMaterielInfo(FormDto $dto): void
+    {
+        if ($dto->idMateriel === null) {
+            return;
+        }
+
+        $dto->historiqueMateriel = $this->historiqueInterventionMateriel($dto->idMateriel, $dto->reparationRealise);
+
+        $infoMateriel = $this->ditModel->getInfoMateriel($dto);
+        if ($infoMateriel) {
+            $dto->coutAcquisition = $infoMateriel['cout_acquisition'];
+            $dto->amortissement = $infoMateriel['amortissement'];
+            $dto->valeurNetComptable = $dto->getValeurNetComptable();
+            $dto->chargeEntretient = $infoMateriel['charge_entretien'];
+            $dto->chargeLocative = $infoMateriel['charge_locative'];
+            $dto->chiffreAffaire = $infoMateriel['chiffre_affaires'];
+            $dto->resultatExploitation = $dto->getResultatExploitation();
+
+            $dto->modele = $infoMateriel['modele'];
+            $dto->designation = $infoMateriel['designation'];
+            $dto->constructeur = $infoMateriel['constructeur'];
+            $dto->casier = $infoMateriel['casier_emetteur'];
+            $dto->idMateriel = $infoMateriel['num_matricule'];
+            $dto->numSerie = $infoMateriel['num_serie'];
+            $dto->numParc = $infoMateriel['num_parc'];
+            $dto->heureMachine = $infoMateriel['heure'];
+            $dto->kmMachine = $infoMateriel['km'];
+        }
     }
 
     private function historiqueInterventionMateriel(?int $idMateriel, ?string $reparationRealise): array

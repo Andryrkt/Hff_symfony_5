@@ -72,7 +72,8 @@ class AgenceServiceType extends AbstractType
                     return $agence->getCode() . ' ' . $agence->getNom();
                 },
                 'placeholder' => $options['agence_placeholder'],
-                'required' => $options['agence_required']
+                'required' => $options['agence_required'],
+                'disabled' => $options['disabled']
             ]);
 
         // Pré-set data
@@ -103,7 +104,8 @@ class AgenceServiceType extends AbstractType
             },
             'placeholder' => $options['service_placeholder'],
             'choices' => $services,
-            'required' => $options['service_required']
+            'required' => $options['service_required'],
+            'disabled' => $options['disabled']
         ]);
     }
 
@@ -143,6 +145,7 @@ class AgenceServiceType extends AbstractType
             // Options for hidden mode
             'agence_class' => null,
             'service_class' => null,
+            'disabled' => false,
         ]);
     }
 

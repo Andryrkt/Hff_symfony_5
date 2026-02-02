@@ -33,7 +33,7 @@ class FormDto
     public ?\DateTimeInterface $dateValidationOr = null;
 
     // ----------------- Devis ----------------------
-    public ?string $demandeDevis = null;
+    public ?string $demandeDevis = 'NON';
     public ?string $numeroDevisRattacher = null;
     public ?string $statutDevis = null;
 
@@ -45,7 +45,7 @@ class FormDto
 
 
     // ------------ Annulation ---------------
-    public ?bool $estAnnuler = null;
+    public bool $estAnnuler = false;
     public ?\DateTimeInterface $dateAnnulation = null;
 
     // -----------------Reparation ----------------
@@ -73,11 +73,11 @@ class FormDto
 
     // ----------------- Dit Avoir ----------------------
     public ?string $numeroDemandeDitAvoir = null;
-    public ?bool $estDitAvoir = null;
+    public bool $estDitAvoir = false;
 
     // ----------------- Dit Refacturation ----------------------
     public ?string $numeroDemandeDitRefacturation = null;
-    public ?bool $estDitRefacturation = null;
+    public bool $estDitRefacturation = false;
 
     // --------------- Piece Joint ----------------------
     /**

@@ -181,7 +181,7 @@ class Dit implements CreatedByInterface, AgenceServiceInterface
     private $numeroDemandeDitAvoir;
 
     /**
-     * @ORM\Column(type="string", length=11)
+     * @ORM\Column(type="string", length=11, nullable=true)
      */
     private $numeroDemandeDitRefacturation;
 
@@ -615,7 +615,7 @@ class Dit implements CreatedByInterface, AgenceServiceInterface
         return $this->numeroDemandeDitRefacturation;
     }
 
-    public function setNumeroDemandeDitRefacturation(string $numeroDemandeDitRefacturation): self
+    public function setNumeroDemandeDitRefacturation(?string $numeroDemandeDitRefacturation): self
     {
         $this->numeroDemandeDitRefacturation = $numeroDemandeDitRefacturation;
 

@@ -169,9 +169,7 @@ class DitFormType extends AbstractType
                     'placeholder' => false,
                     'required' => false,
                     'data' => 'NON',
-                    'attr' => [
-                        'disabled' => true,
-                    ]
+                    'disabled' => true,
                 ]
             )
 
@@ -260,8 +258,8 @@ class DitFormType extends AbstractType
             [
                 'label' => 'Nom du client (*EXTERNE)',
                 'required' => false,
+                'disabled' => true,
                 'attr' => [
-                    'disabled' => true,
                     'class' => 'nomClient noEntrer autocomplete',
                     'autocomplete' => 'off',
                     'data-autocomplete-url' => 'ajax/autocomplete/all-client' //  la route de l'autocomplétion
@@ -274,8 +272,8 @@ class DitFormType extends AbstractType
                 [
                     'label' => 'Numéro du client (*EXTERNE)',
                     'required' => false,
+                    'disabled' => true,
                     'attr' => [
-                        'disabled' => true,
                         'class' => 'numClient noEntrer autocomplete',
                         'autocomplete' => 'off',
                         'data-autocomplete-url' => 'ajax/autocomplete/all-client' // la route de l'autocomplétion
@@ -289,8 +287,8 @@ class DitFormType extends AbstractType
 
                     'label' => 'N° téléphone (*EXTERNE)',
                     'required' => false,
+                    'disabled' => true,
                     'attr' => [
-                        'disabled' => true,
                         'class' => 'numTel'
                     ]
                 ]
@@ -302,9 +300,9 @@ class DitFormType extends AbstractType
 
                     'label' => "E-mail du client (*EXTERNE)",
                     'required' => false,
+                    'disabled' => true,
                     'attr' => [
                         'class' => 'mailClient',
-                        'disabled' => true,
                     ],
                 ]
             )
@@ -314,8 +312,8 @@ class DitFormType extends AbstractType
                 'placeholder' => false,
                 'required' => false,
                 'data' => 'NON',
+                'disabled' => true,
                 'attr' => [
-                    'disabled' => true,
                     'class' => 'clientSousContrat'
                 ]
             ])
@@ -415,9 +413,7 @@ class DitFormType extends AbstractType
                 'agence_placeholder' => '-- Agence Emetteur --',
                 'service_placeholder' => '-- Service Emetteur --',
                 'data' => $data->emetteur ?? [],
-                'attr' => [
-                    'disabled' => true,
-                ],
+                'disabled' => true,
             ])
             ->add('debiteur', AgenceServiceType::class, [
                 'render_type' => 'select',

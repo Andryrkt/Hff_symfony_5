@@ -85,7 +85,7 @@ class AbstractDitFormController extends AbstractController
 
         if ($success) {
             $this->addFlash('success', $message);
-            return $this->redirectToRoute('hf_atelier_dit_list_index');
+            return $this->redirectToRoute('hf_atelier_dit_liste_index');
         }
 
         $this->addFlash('warning', $message);
