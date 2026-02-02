@@ -403,40 +403,21 @@ class DitFormType extends AbstractType
 
     private function addAgenceService(FormBuilderInterface $builder, $data): void
     {
-        // $agences = $this->em->getRepository(Agence::class)->findAll();
-        // $agencesData = [];
-        // foreach ($agences as $agence) {
-        //     $servicesData = [];
-        //     foreach ($agence->getServices() as $service) {
-        //         $servicesData[] = [
-        //             'id' => $service->getId(),
-        //             'code' => $service->getCode(),
-        //             'nom' => $service->getNom(),
-        //         ];
-        //     }
-        //     $agencesData[] = [
-        //         'id' => $agence->getId(),
-        //         'code' => $agence->getCode(),
-        //         'nom' => $agence->getNom(),
-        //         'services' => $servicesData,
-        //         'casiers' => $casiersData,
-        //     ];
-        // }
 
         $builder
-            ->add('agenceUser', TextType::class, [
-                'mapped' => false,
-                'label' => 'Agence',
+            ->add('emetteur', AgenceServiceType::class, [
+                'render_type' => 'select',
+                'label' => false,
                 'required' => false,
-                'attr' => ['disabled' => true],
-                'data' => $data->agenceUser ?? null,
-            ])
-            ->add('serviceUser', TextType::class, [
                 'mapped' => false,
-                'label' => 'Service',
-                'required' => false,
-                'attr' => ['disabled' => true],
-                'data' => $data->serviceUser ?? null,
+                'agence_label' => 'Agence Emetteur',
+                'service_label' => 'Service Emetteur',
+                'agence_placeholder' => '-- Agence Emetteur --',
+                'service_placeholder' => '-- Service Emetteur --',
+                'data' => $data->emetteur ?? [],
+                'attr' => [
+                    'disabled' => true,
+                ],
             ])
             ->add('debiteur', AgenceServiceType::class, [
                 'render_type' => 'select',

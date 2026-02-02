@@ -7,12 +7,12 @@ use App\Entity\Hf\Atelier\Dit\CategorieAteApp;
 use App\Entity\Hf\Atelier\Dit\WorTypeDocument;
 use App\Entity\Hf\Atelier\Dit\WorNiveauUrgence;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Constants\Admin\Historisation\TypeDocumentConstants;
 
 class FormDto
 {
     // ---------------- Agence, service emetteur ----------------
-    public ?string $agenceUser = null;
-    public ?string $serviceUser = null;
+    public array $emetteur = [];
     // ---------------- Agence, service débiteur ----------------
     public array $debiteur = [];
 
@@ -24,21 +24,6 @@ class FormDto
     public ?string $numeroClient = null;
     public ?string $libelleClient = null;
 
-    // ------ info matériel -----
-    /**
-     * @Assert\NotBlank(message="L\id materiel ne peut pas être vide.")
-     * @Assert\Length(
-     *      min=5,
-     *      max=5,
-     *      minMessage="L\id materiel doit comporter au moins {{ limit }} caractères",
-     *      maxMessage="L\id materiel ne peut pas dépasser {{ limit }} caractères"
-     * )
-     */
-    public ?int $idMateriel = null;
-    public ?int $heureMachine = null;
-    public ?int $kmMachine = null;
-    public ?string $numParc = null;
-    public ?string $numSerie = null;
 
 
     //  --------------- OR ---------------------
@@ -155,7 +140,49 @@ class FormDto
     public ?CategorieAteApp $categorieDemande = null;
     public ?StatutDemande $statutDemande = null;
 
+     // ------ info matériel -----
+    /**
+     * @Assert\NotBlank(message="L\id materiel ne peut pas être vide.")
+     * @Assert\Length(
+     *      min=5,
+     *      max=5,
+     *      minMessage="L\id materiel doit comporter au moins {{ limit }} caractères",
+     *      maxMessage="L\id materiel ne peut pas dépasser {{ limit }} caractères"
+     * )
+     */
+    public ?int $idMateriel = null;
+    public int $heureMachine = 0;
+    public int $kmMachine = 0;
+    public ?string $numParc = null;
+    public ?string $numSerie = null;
+
     // ------------------ Autre --------------
     public ?int $numeroMigration = null;
     public ?bool $estAtePolTana = null;
+    public ?\DateTimeInterface $dateDemande = null;
+    public array $historiqueMateriel = [];
+    public ?string $mailDemandeur = null;
+
+    public ?float $coutAcquisition = null;
+    public ?float $amortissement = null;
+    public ?float $valeurNetComptable = null;
+    public ?float $chargeEntretient = null;
+    public ?float $chargeLocative = null;
+    public ?float $chiffreAffaire = null;
+    public ?float $resultatExploitation = null;
+
+    public ?string $modele = null;
+    public ?string $designation = null;
+    public ?string $constructeur = null;
+    public ?string $casier = null;
+
+    public function getValeurNetComptable(): float
+    {
+        return $this->valeurNetComptable = $this->coutAcquisition - $this->amortissement;
+    }
+
+    public function getResultatExploitation(): float
+    {
+        return $this->resultatExploitation = $this->chiffreAffaire - $this->chargeLocative - $this->chargeEntretient;
+    }
 }

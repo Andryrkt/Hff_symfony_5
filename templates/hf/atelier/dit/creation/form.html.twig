@@ -80,8 +80,10 @@
                                     }) }}
 								</div>
 								<div class="col-12 col-md-6">
-									{{ form_row(form.agenceUser)}}
-									{{ form_row(form.serviceUser)}}
+									{{ formMacros.debiteurOuEmetteurFields(form, 'emetteur', {
+                                        'agence_attr': {'data-pages--hf--atelier--dit--dit-form-target': 'emetteurAgence'},
+                                        'service_attr': {'data-pages--hf--atelier--dit--dit-form-target': 'emetteurService'}
+                                    }) }}
 								</div>
 							</div>
 

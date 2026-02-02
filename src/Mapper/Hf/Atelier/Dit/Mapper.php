@@ -83,8 +83,8 @@ class Mapper
             ->setEstAtePolTana($dto->estAtePolTana)
 
             // ---------------- Agence, service emetteur ----------------
-            ->setAgenceEmetteurId($this->reFetchEntity(Agence::class, $dto->agenceUser))
-            ->setServiceEmetteurId($this->reFetchEntity(Service::class, $dto->serviceUser))
+            ->setAgenceEmetteurId($this->reFetchEntity(Agence::class, $dto->emetteur['agence']))
+            ->setServiceEmetteurId($this->reFetchEntity(Service::class, $dto->emetteur['service']))
             // ---------------- Agence, service destinataire ----------------
             ->setAgenceDebiteurId($this->reFetchEntity(Agence::class, $dto->debiteur['agence']))
             ->setServiceDebiteur($this->reFetchEntity(Service::class, $dto->debiteur['service']))
@@ -152,8 +152,10 @@ class Mapper
         $dto->estAtePolTana = $dit->isEstAtePolTana();
 
         // ---------------- Agence, service emetteur ----------------
-        $dto->agenceUser = $dit->getAgenceEmetteurId();
-        $dto->serviceUser = $dit->getServiceEmetteurId();
+        $dto->emetteur = [
+            'agence' => $dit->getAgenceEmetteurId(),
+            'service' => $dit->getServiceEmetteurId()
+        ];
         // ---------------- Agence, service destinataire ----------------
         $dto->debiteur = [
             'agence' => $dit->getAgenceDebiteurId(),
