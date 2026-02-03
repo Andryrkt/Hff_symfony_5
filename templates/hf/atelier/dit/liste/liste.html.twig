@@ -77,44 +77,20 @@
 					{# Début Action #}
 					<td class="align-middle" style="padding: 0px">
 						{{ include('partials/_ellipsis_dropdown.html.twig', {
-							id: 'dit-actions-' ~ item.id,
-							items: [
-								{
-									label: 'Dupliquer',
-									route: 'dit_duplication',
-									route_params: {id: item.id, numDit: item.numeroDemandeIntervention}
-								},
-								item.estOrASoumi ? {
-									label: 'Soumission document à valider',
-									route: 'dit_validationDit',
-									route_params: {id: item.id, numDit: item.numeroDemandeIntervention}
-								} : null,
-								{
-									label: 'Dossier DIT',
-									route: 'dw_interv_ate_avec_dit',
-									route_params: {numDit: item.numeroDemandeIntervention},
-									attributes: 'target="_blank"'
-								},
-								item.estAnnulable ? {
-									label: 'Clôturer la DIT',
-									route: 'cloturer_annuler_dit_liste',
-									route_params: {id: item.id},
-									class: 'fw-bold clotureDit',
-									attributes: 'data-id="' ~ item.id ~ '"'
-								} : null
-							]|filter(v => v is not null)
+							id: 'dit-actions-' ~ item.numeroDit,
+							items: item.buttons,
 						}) }}
 					</td>
 					{# Fin Actions #}
 
 					{# DEBUT Statut #}
 
-					<td class="{{item.statutCssClass}}">{{item.idStatutDemande.description | trim}}</td>
+					<td class="{{item.statutCssClass}}">{{item.statutDemande.description | trim}}</td>
 
 					{# FIN Statut #}
 
 					<td>
-						<a href="{{ path("dit_validationDit", {id: item.id, numDit: item.numeroDemandeIntervention})}}" target="_blank" data-bs-toggle="tooltip" title="Afficher le détail">{{ item.numeroDemandeIntervention }}</a>
+						<a href="{{ path("hf_atelier_dit_liste_detail", {numDit: item.numeroDit})}}" target="_blank" data-bs-toggle="tooltip" title="Afficher le détail">{{ item.numeroDit }}</a>
 					</td>
 					<td>{{ item.reparationRealise}}</td>
 					<td>{{ item.typeDocument.description}}</td>

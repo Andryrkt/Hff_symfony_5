@@ -9,14 +9,20 @@ use App\Entity\Admin\AgenceService\Agence;
 use App\Entity\Admin\AgenceService\Service;
 
 
+use App\Factory\Hf\Atelier\Dit\ButtonsFactory;
+
+
 class Mapper
 {
     private EntityManagerInterface $em;
+    private ButtonsFactory $buttonsFactory;
 
     public function __construct(
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        ButtonsFactory $buttonsFactory
     ) {
         $this->em = $em;
+        $this->buttonsFactory = $buttonsFactory;
     }
 
     public function map(FormDto $dto): Dit
@@ -158,6 +164,11 @@ class Mapper
             'agence' => $dit->getAgenceDebiteurId(),
             'service' => $dit->getServiceDebiteur(),
         ];
+
+        // ---------------- Conditions et Boutons ----------------
+        $dto->estOrASoumi = $dit->estOrASoumi();
+        $dto->estAnnulable = $dit->estAnnulable();
+        $dto->buttons = $this->buttonsFactory->generateEllipsisButtons($dto);
 
         return $dto;
     }

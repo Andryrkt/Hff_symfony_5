@@ -13,6 +13,10 @@ use App\Constants\Admin\Historisation\TypeDocumentConstants;
 
 class FormDto
 {
+    public array $buttons = [];
+    public bool $estOrASoumi = false;
+    public bool $estAnnulable = false;
+
     // ---------------- Agence, service emetteur ----------------
     public array $emetteur = [];
     // ---------------- Agence, service débiteur ----------------

@@ -60,7 +60,11 @@ class DitRepository extends ServiceEntityRepository implements PaginatedReposito
         [$limit, $sortBy, $sortOrder] = $this->sortAndLimit($searchDto, $sortableColumns, 'numeroDit');
 
         $queryBuilder = $this->createQueryBuilder('d')
-            ->leftJoin('d.idStatutDemande', 's')
+            ->leftJoin('d.worNiveauUrgence', 'wn')
+            ->addSelect('wn')
+            ->leftJoin('d.worTypeDocument', 'wd')
+            ->addSelect('wd')
+            ->leftJoin('d.statutDemande', 's')
             ->addSelect('s');
 
         // TODO: Appliquer les filtres spécifiques ici si nécessaire

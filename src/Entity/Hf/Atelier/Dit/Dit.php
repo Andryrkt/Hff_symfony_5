@@ -765,4 +765,22 @@ class Dit implements CreatedByInterface, AgenceServiceInterface
 
         return $this;
     }
+    public function estAnnulable(): bool
+    {
+        if ($this->statutDemande === null) {
+            return true;
+        }
+
+        $desc = trim($this->statutDemande->getDescription());
+        return !in_array($desc, [
+            \App\Constants\Hf\Atelier\Dit\StatutDitConstants::STATUT_CLOTUREE_VALIDEE,
+            \App\Constants\Hf\Atelier\Dit\StatutDitConstants::STATUT_CLOTUREE_ANNULEE,
+            \App\Constants\Hf\Atelier\Dit\StatutDitConstants::STATUT_CLOTUREE_HORS_DELAI
+        ]);
+    }
+
+    public function estOrASoumi(): bool
+    {
+        return !empty($this->numeroOr);
+    }
 }

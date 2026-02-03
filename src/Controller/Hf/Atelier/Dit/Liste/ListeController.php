@@ -7,6 +7,7 @@ use App\Mapper\Hf\Atelier\Dit\Mapper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Hf\Atelier\Dit\DitRepository;
+use App\Constants\Hf\Atelier\Dit\ButtonsConstants;
 use App\Controller\Traits\PaginationAndSortingTrait;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -38,7 +39,8 @@ class ListeController extends AbstractController
             'queryParams' => $request->query->all(),
             'currentSort' => $searchDto->sortBy,
             'currentOrder' => $searchDto->sortOrder,
-            'routeName' => 'hf_atelier_dit_liste_index'
+            'routeName' => 'hf_atelier_dit_liste_index',
+            'buttons' => ButtonsConstants::BUTTONS_ACTIONS,
         ]);
     }
 }
