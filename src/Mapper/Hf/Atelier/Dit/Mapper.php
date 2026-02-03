@@ -89,8 +89,9 @@ class Mapper
         return $dit;
     }
 
-    public function reverseMap(FormDto $dto, Dit $dit): FormDto
+    public function reverseMap(Dit $dit): FormDto
     {
+        $dto = new FormDto();
         // -----------------Reparation ----------------
         $dto->typeReparation = $dit->getTypeReparation();
         $dto->reparationRealise = $dit->getReparationRealise();

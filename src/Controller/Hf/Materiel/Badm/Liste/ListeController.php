@@ -51,11 +51,7 @@ class ListeController extends AbstractController
         }
 
         // 4. Récupération des données à afficher
-        $page = $this->handlePaginationAndSorting($request, $searchDto);
-        $paginationDatas = $badmRepository->findPaginatedAndFiltered($page, $searchDto->limit, $searchDto);
-        $paginationDatas['data'] = array_map(function ($item) use ($badmMapper) {
-            return $badmMapper->reverseMap($item);
-        }, $paginationDatas['data']); // transform en secondFormDto
+        $paginationDatas = $this->getPaginatedData($request, $searchDto, $badmRepository, $badmMapper);
 
         return $this->render('hf/materiel/badm/liste/liste.html.twig', [
             'paginationData' => $paginationDatas,

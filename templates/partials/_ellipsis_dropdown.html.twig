@@ -10,11 +10,11 @@
 		{% for item in items %}
 			<li>
 				{% if item.route is defined %}
-					<a class="custom-dropdown-item {{ item.class|default('fw-bold') }}" href="{{ path(item.route, item.route_params|default({})) }}">
+					<a class="custom-dropdown-item {{ item.class|default('fw-bold') }}" href="{{ path(item.route, item.route_params|default({})) }}" {{ item.attributes|default('')|raw }}>
 						{{ item.label }}
 					</a>
 				{% elseif item.url is defined %}
-					<a class="custom-dropdown-item {{ item.class|default('fw-bold') }}" href="{{ item.url }}">
+					<a class="custom-dropdown-item {{ item.class|default('fw-bold') }}" href="{{ item.url }}" {{ item.attributes|default('')|raw }}>
 						{{ item.label }}
 					</a>
 				{% elseif item.type == 'divider' %}
@@ -23,6 +23,10 @@
 					<button class="custom-dropdown-item {{ item.class|default('fw-bold') }}" data-action="{{ item.action|default('') }}" {{ item.attributes|default('')|raw }}>
 						{{ item.label }}
 					</button>
+				{% else %}
+					<a class="custom-dropdown-item {{ item.class|default('fw-bold') }}" href="{{ item.href|default('#') }}" {{ item.attributes|default('')|raw }}>
+						{{ item.label }}
+					</a>
 				{% endif %}
 			</li>
 		{% endfor %}

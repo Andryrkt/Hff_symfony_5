@@ -2,6 +2,8 @@
 
 namespace App\Repository\Hf\Materiel\Badm;
 
+use App\Contract\Repository\PaginatedRepositoryInterface;
+use App\Contract\Dto\SearchDtoInterface;
 use Doctrine\ORM\QueryBuilder;
 use App\Entity\Hf\Materiel\Badm\Badm;
 use App\Dto\Hf\Materiel\Badm\searchDto;
@@ -20,7 +22,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
  * @method Badm[]    findAll()
  * @method Badm[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class BadmRepository extends ServiceEntityRepository
+class BadmRepository extends ServiceEntityRepository implements PaginatedRepositoryInterface
 {
     use PaginatableRepositoryTrait;
 
@@ -71,7 +73,13 @@ class BadmRepository extends ServiceEntityRepository
     }
 
 
-    public function findPaginatedAndFiltered(int $page = 1, int $limit = 10, searchDto $searchDto)
+    /**
+     * @param int $page
+     * @param int $limit
+     * @param SearchDtoInterface|searchDto $searchDto
+     * @return array
+     */
+    public function findPaginatedAndFiltered(int $page, int $limit, SearchDtoInterface $searchDto): array
     {
         // Mapping des colonnes triables (whitelist de sécurité)
         $sortableColumns = [

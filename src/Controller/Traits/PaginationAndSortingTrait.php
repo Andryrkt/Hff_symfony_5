@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controller\Traits;
 
+use App\Contract\Dto\SearchDtoInterface;
+use App\Contract\Repository\PaginatedRepositoryInterface;
 use App\Contract\PaginationDtoInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -40,5 +42,32 @@ trait PaginationAndSortingTrait
 
         // Page
         return $request->query->getInt('page', 1);
+    }
+
+    /**
+     * Centralizes the logic to get paginated, filtered and mapped data.
+     *
+     * @param Request $request
+     * @param SearchDtoInterface $searchDto
+     * @param PaginatedRepositoryInterface $repository
+     * @param mixed|null $mapper The mapper which MAY implement reverseMap
+     * @return array
+     */
+    protected function getPaginatedData(
+        Request $request,
+        SearchDtoInterface $searchDto,
+        PaginatedRepositoryInterface $repository,
+        $mapper = null
+    ): array {
+        $page = $this->handlePaginationAndSorting($request, $searchDto);
+        $paginationDatas = $repository->findPaginatedAndFiltered($page, $searchDto->limit, $searchDto);
+
+        if ($mapper && method_exists($mapper, 'reverseMap')) {
+            $paginationDatas['data'] = array_map(function ($item) use ($mapper) {
+                return $mapper->reverseMap($item);
+            }, $paginationDatas['data']);
+        }
+
+        return $paginationDatas;
     }
 }

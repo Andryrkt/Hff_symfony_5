@@ -1,0 +1,169 @@
+{% extends 'base.html.twig' %}
+
+{% import 'macros/_sortable_macros.html.twig' as sortable %}
+
+{% block title %}Liste des DIT
+{% endblock %}
+
+{% block content %}
+{% set mots_a_supprimer = ['Chef section', 'Chef de section', 'Responsable section', 'Chef d\'équipe'] %}
+<div class="sticky-header-titre">
+	<div class="container">
+		{% include 'partials/flash_messages.html.twig' %}
+		<div class="row">
+			<div class=" col-12 col-md-5 my-3">
+				<i class="fa-solid fa-circle text-info"></i>
+				<small class="text-info">Partiellement dispo |</small>
+				<i class="fa-solid fa-circle text-primary"></i>
+				<small class="text-primary">Complet non livré |</small>
+				<i class="fa-solid fa-circle text-warning"></i>
+				<small class="text-warning">Partiellement livré |</small>
+				<i class="fa-solid fa-circle text-success"></i>
+				<small class="text-success">Tout livré
+				</small>
+			</div>
+		</div>
+		{% include "partials/_pagination_haut.html.twig" with {
+			buttons: buttons,
+			currentPage: paginationData['currentPage'],
+			totalPages: paginationData['lastPage'],
+			resultCount: paginationData['totalItems'],
+			routeName: routeName,
+			criteria: queryParams
+		} %}
+	</div>
+</div>
+
+<div
+	class="container-fluid">
+	<!-- DEBUT tableau -->
+
+	<table class="table table-sticky">
+		<thead class="table-dark align-middle">
+			<tr>
+				<th>
+					<i class="fas fa-ellipsis-vertical"></i>
+				</th>
+				<th>Statut</th>
+				<th>N° DIT</th>
+				<th>Réalisé par</th>
+				<th>Type document</th>
+				<th>Niveau urgence</th>
+				<th>Catégorie</th>
+				<th>N° Série</th>
+				<th>N° Parc</th>
+				<th>Date Demande</th>
+				<th>Int / Ext</th>
+				<th>Emetteur</th>
+				<th>Débiteur</th>
+				<th>Objet</th>
+				<th>Section affectée</th>
+				<th>N° devis</th>
+				<th>Statut Devis</th>
+				<th>N° OR</th>
+				<th class="fw-bold">Statut OR</th>
+				<th>Montant Total OR</th>
+				<th>Date Soumission OR</th>
+				<th>Statut facture</th>
+				<th>RI</th>
+				<th>Nbr PJ</th>
+				<th>Utilisateur</th>
+			</tr>
+		</thead>
+		<tbody>
+			{# DEBUT LOGIQUE #}
+			{% for item in data %}
+				<tr>
+					{# Début Action #}
+					<td class="align-middle" style="padding: 0px">
+						{{ include('partials/_ellipsis_dropdown.html.twig', {
+							id: 'dit-actions-' ~ item.id,
+							items: [
+								{
+									label: 'Dupliquer',
+									route: 'dit_duplication',
+									route_params: {id: item.id, numDit: item.numeroDemandeIntervention}
+								},
+								item.estOrASoumi ? {
+									label: 'Soumission document à valider',
+									route: 'dit_validationDit',
+									route_params: {id: item.id, numDit: item.numeroDemandeIntervention}
+								} : null,
+								{
+									label: 'Dossier DIT',
+									route: 'dw_interv_ate_avec_dit',
+									route_params: {numDit: item.numeroDemandeIntervention},
+									attributes: 'target="_blank"'
+								},
+								item.estAnnulable ? {
+									label: 'Clôturer la DIT',
+									route: 'cloturer_annuler_dit_liste',
+									route_params: {id: item.id},
+									class: 'fw-bold clotureDit',
+									attributes: 'data-id="' ~ item.id ~ '"'
+								} : null
+							]|filter(v => v is not null)
+						}) }}
+					</td>
+					{# Fin Actions #}
+
+					{# DEBUT Statut #}
+
+					<td class="{{item.statutCssClass}}">{{item.idStatutDemande.description | trim}}</td>
+
+					{# FIN Statut #}
+
+					<td>
+						<a href="{{ path("dit_validationDit", {id: item.id, numDit: item.numeroDemandeIntervention})}}" target="_blank" data-bs-toggle="tooltip" title="Afficher le détail">{{ item.numeroDemandeIntervention }}</a>
+					</td>
+					<td>{{ item.reparationRealise}}</td>
+					<td>{{ item.typeDocument.description}}</td>
+					<td class="text-center">
+						{{ item.idNiveauUrgence.description}}
+					</td>
+					<td>{{item.categorieDemande.libelleCategorieAteApp}}</td>
+					<td>{{ item.numSerie}}</td>
+					<td>{{ item.numParc}}</td>
+					<td>{{ item.dateDemande|date('d/m/Y')}}</td>
+					<td>{{ item.internetExterne}}</td>
+					<td>{{ item.agenceServiceEmetteur }}</td>
+					<td>{{ item.agenceServiceDebiteur}}</td>
+					<td>{{ item.objetDemande}}</td>
+					<td>
+						<a href="#" data-bs-toggle="modal" data-bs-target="#sectionAffectee" data-id="{{item.id}}" id="">
+							{{ item.sectionAffectee | remove_words(mots_a_supprimer)}}
+						</a>
+					</td>
+							<td>{{item.numeroDevisRattache}}</td>
+							<td>{{ item.statutDevis}}</td>
+							<td>
+								{% if item.numeroOr != '' %}
+									<a href="#" data-bs-toggle="modal" data-bs-target="#listeCommande" data-id="{{item.numeroOr}}" id="numOr" class="{{item.statutOrCssClass}} text-black" data-bs-toggle="tooltip" title="lister les commandes">{{ item.numeroOr}}</a>
+								{% endif %}
+							</td>
+
+							<td class="fw-bold ">{{ item.statutor}}</td>
+							<td style="text-align: right;">{{ item.montantTotalOR is not null ? item.montantTotalOR|number_format(2, ',', '.') : '' }}</td>
+							<td>{{ item.dateSoumissionOR is not null ? item.dateSoumissionOR|date('d/m/Y') : '' }}</td>
+
+							<td>
+								<a href="#" data-bs-toggle="modal" data-bs-target="#facturation" data-id="{{item.numeroOr}}" id="numOr">{{item.etatFacturation}}</a>
+							</td>
+							<td>
+								<a href="#" data-bs-toggle="modal" data-bs-target="#ri" data-id="{{item.numeroOr}}" id="numOr" data-bs-toggle="tooltip" title="lister les intervention soumis RI">{{ item.ri}}</a>
+							</td>
+							<td class="text-center">{{ item.nbrPj}}</td>
+							<td>{{ item.utilisateurDemandeur|upper }}</td>
+
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+	</div>
+{% include "partials/_pagination_bas.html.twig" with {
+				currentPage: paginationData['currentPage'],
+				totalPages: paginationData['totalItems']
+			} %}
+	<!-- FIN tableau -->
+
+{% endblock %}

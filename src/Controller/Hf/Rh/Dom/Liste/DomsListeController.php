@@ -55,8 +55,7 @@ class DomsListeController extends AbstractController
         }
 
         // 4. recupération des données à afficher avec filtrage par agence
-        $page = $this->handlePaginationAndSorting($request, $domSearchDto);
-        $paginationData = $domRepository->findPaginatedAndFiltered($page, $domSearchDto->limit, $domSearchDto);
+        $paginationData = $this->getPaginatedData($request, $domSearchDto, $domRepository);
 
         return $this->render(
             'hf/rh/dom/liste/liste.html.twig',

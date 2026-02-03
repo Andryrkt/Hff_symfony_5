@@ -2,6 +2,8 @@
 
 namespace App\Repository\Hf\Rh\Dom;
 
+use App\Contract\Repository\PaginatedRepositoryInterface;
+use App\Contract\Dto\SearchDtoInterface;
 use App\Entity\Hf\Rh\Dom\Dom;
 use Doctrine\ORM\QueryBuilder;
 use App\Dto\Hf\Rh\Dom\DomSearchDto;
@@ -24,7 +26,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
  * @method Dom[]    findAll()
  * @method Dom[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class DomRepository extends ServiceEntityRepository
+class DomRepository extends ServiceEntityRepository implements PaginatedRepositoryInterface
 {
     use DynamicContextFilterTrait;
     use PaginatableRepositoryTrait;
@@ -109,7 +111,13 @@ class DomRepository extends ServiceEntityRepository
         ;
     }
 
-    public function findPaginatedAndFiltered(int $page = 1, int $limit = 10, DomSearchDto $domSearchDto)
+    /**
+     * @param int $page
+     * @param int $limit
+     * @param SearchDtoInterface|DomSearchDto $domSearchDto
+     * @return array
+     */
+    public function findPaginatedAndFiltered(int $page, int $limit, SearchDtoInterface $domSearchDto): array
     {
         // Mapping des colonnes triables (whitelist de sécurité)
         $sortableColumns = [

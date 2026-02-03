@@ -2,4 +2,6 @@
 
 namespace App\Contract\Dto;
 
-interface SearchDtoInterface {}
+use App\Contract\PaginationDtoInterface;
+
+interface SearchDtoInterface extends PaginationDtoInterface {}

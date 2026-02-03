@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Constants\Hf\Dit;
+namespace App\Constants\Hf\Atelier\Dit;
 
 final class WorNiveauUrgenceConstants
 {

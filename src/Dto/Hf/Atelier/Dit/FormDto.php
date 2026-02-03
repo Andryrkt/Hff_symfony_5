@@ -6,6 +6,8 @@ use App\Entity\Admin\Statut\StatutDemande;
 use App\Entity\Hf\Atelier\Dit\CategorieAteApp;
 use App\Entity\Hf\Atelier\Dit\WorTypeDocument;
 use App\Entity\Hf\Atelier\Dit\WorNiveauUrgence;
+use App\Constants\Hf\Atelier\Dit\StatutDitConstants;
+use App\Constants\Hf\Atelier\Dit\Ors\StatutOrConstant;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Constants\Admin\Historisation\TypeDocumentConstants;
 
@@ -176,13 +178,55 @@ class FormDto
     public ?string $constructeur = null;
     public ?string $casier = null;
 
+    /**
+     * Retourne la valeur net comptable après calcule
+     * 
+     * @return float
+     */
     public function getValeurNetComptable(): float
     {
         return $this->valeurNetComptable = $this->coutAcquisition - $this->amortissement;
     }
 
+    /**
+     * Retourne le résultat d'exploitation après calcule
+     * 
+     * @return float
+     */
     public function getResultatExploitation(): float
     {
         return $this->resultatExploitation = $this->chiffreAffaire - $this->chargeLocative - $this->chargeEntretient;
+    }
+
+    /**
+     * Retourne la classe CSS appropriée pour le statut de la demande
+     * Utilise StatutDomConstants pour centraliser la logique
+     * 
+     * @return string
+     */
+    public function getStatutCssClass(): string
+    {
+        if (!$this->statutDemande) {
+            return '';
+        }
+
+        $description = trim($this->statutDemande->getDescription());
+        return StatutDitConstants::getCssClass($description);
+    }
+
+    /**
+     * Retourne la classe CSS appropriée pour le statut de la commande
+     * Utilise StatutOrConstant pour centraliser la logique
+     * 
+     * @return string
+     */
+    public function getStatutOrCssClass(): string
+    {
+        if (!$this->statutOr) {
+            return '';
+        }
+
+        $description = trim($this->statutOr);
+        return StatutOrConstant::getCssClass($description);
     }
 }
