@@ -38,6 +38,8 @@ class FormDto
     public ?string $statutOr = null;
     public ?\DateTimeInterface $dateOr = null;
     public ?\DateTimeInterface $dateValidationOr = null;
+    public ?float $montantTotalOR = null;
+    public ?\DateTimeInterface $dateSoumissionOr = null;
 
     // ----------------- Devis ----------------------
     public ?string $demandeDevis = 'NON';
@@ -183,6 +185,7 @@ class FormDto
     public array $historiqueMateriel = [];
     public ?string $mailDemandeur = null;
     public ?User $demandeur = null;
+    public int $nbrPj = 0;
 
 
 
