@@ -9,6 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Hf\Atelier\Dit\DitRepository;
 use App\Constants\Hf\Atelier\Dit\ButtonsConstants;
 use App\Controller\Traits\PaginationAndSortingTrait;
+use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
@@ -25,7 +26,8 @@ class ListeController extends AbstractController
         Request $request,
         DitRepository $ditRepository,
         Mapper $ditMapper,
-        SearchDto $searchDto
+        SearchDto $searchDto,
+        ContextAwareBreadcrumbBuilder $breadcrumbBuilder
     ) {
         // 1. gerer l'accés 
         $this->denyAccessUnlessGranted('ATELIER_DIT_VIEW');
@@ -41,6 +43,7 @@ class ListeController extends AbstractController
             'currentOrder' => $searchDto->sortOrder,
             'routeName' => 'hf_atelier_dit_liste_index',
             'buttons' => ButtonsConstants::BUTTONS_ACTIONS,
+            'breadcrumbs' => $breadcrumbBuilder->build('hf_atelier_dit_liste_index')
         ]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Dto\Hf\Atelier\Dit;
 
+use App\Entity\Admin\PersonnelUser\User;
 use App\Entity\Admin\Statut\StatutDemande;
 use App\Entity\Hf\Atelier\Dit\CategorieAteApp;
 use App\Entity\Hf\Atelier\Dit\WorTypeDocument;
@@ -162,13 +163,6 @@ class FormDto
     public ?string $numParc = null;
     public ?string $numSerie = null;
 
-    // ------------------ Autre --------------
-    public ?int $numeroMigration = null;
-    public ?bool $estAtePolTana = null;
-    public ?\DateTimeInterface $dateDemande = null;
-    public array $historiqueMateriel = [];
-    public ?string $mailDemandeur = null;
-
     public ?float $coutAcquisition = null;
     public ?float $amortissement = null;
     public ?float $valeurNetComptable = null;
@@ -181,6 +175,16 @@ class FormDto
     public ?string $designation = null;
     public ?string $constructeur = null;
     public ?string $casier = null;
+
+    // ------------------ Autre --------------
+    public ?int $numeroMigration = null;
+    public ?bool $estAtePolTana = null;
+    public ?\DateTimeInterface $dateDemande = null;
+    public array $historiqueMateriel = [];
+    public ?string $mailDemandeur = null;
+    public ?User $demandeur = null;
+
+
 
     /**
      * Retourne la valeur net comptable après calcule

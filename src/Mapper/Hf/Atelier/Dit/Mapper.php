@@ -10,19 +10,22 @@ use App\Entity\Admin\AgenceService\Service;
 
 
 use App\Factory\Hf\Atelier\Dit\ButtonsFactory;
-
+use App\Factory\Hf\Atelier\Dit\FormFactory;
 
 class Mapper
 {
     private EntityManagerInterface $em;
     private ButtonsFactory $buttonsFactory;
+    private FormFactory $formFactory;
 
     public function __construct(
         EntityManagerInterface $em,
-        ButtonsFactory $buttonsFactory
+        ButtonsFactory $buttonsFactory,
+        FormFactory $formFactory
     ) {
         $this->em = $em;
         $this->buttonsFactory = $buttonsFactory;
+        $this->formFactory = $formFactory;
     }
 
     public function map(FormDto $dto): Dit
@@ -123,8 +126,7 @@ class Mapper
         $dto->libelleClient = $dit->getLibelleClient();
         // ------ info matériel -----
         $dto->idMateriel = $dit->getIdMateriel();
-        $dto->heureMachine = $dit->getHeureMachine();
-        $dto->kmMachine = $dit->getKmMachine();
+        $this->formFactory->enrichDtoWithMaterielInfo($dto);
         //  --------------- OR ---------------------
         $dto->dateOr = $dit->getDateOr();
         $dto->numeroOr = $dit->getNumeroOr();
@@ -153,6 +155,7 @@ class Mapper
         // ------------------ Autre --------------
         $dto->numeroMigration = $dit->getNumeroMigration();
         $dto->estAtePolTana = $dit->isEstAtePolTana();
+        $dto->demandeur = $dit->getCreatedBy();
 
         // ---------------- Agence, service emetteur ----------------
         $dto->emetteur = [

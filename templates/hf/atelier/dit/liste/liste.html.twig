@@ -78,64 +78,61 @@
 					<td class="align-middle" style="padding: 0px">
 						{{ include('partials/_ellipsis_dropdown.html.twig', {
 							id: 'dit-actions-' ~ item.numeroDit,
+							icon: 'fas fa-ellipsis-vertical',
 							items: item.buttons,
 						}) }}
 					</td>
 					{# Fin Actions #}
-
 					{# DEBUT Statut #}
-
-					<td class="{{item.statutCssClass}}">{{item.statutDemande.description | trim}}</td>
-
+					<td class="{{item.statutCssClass}}">{{item.statutDemande.description}}</td>
 					{# FIN Statut #}
-
 					<td>
 						<a href="{{ path("hf_atelier_dit_liste_detail", {numDit: item.numeroDit})}}" target="_blank" data-bs-toggle="tooltip" title="Afficher le détail">{{ item.numeroDit }}</a>
 					</td>
 					<td>{{ item.reparationRealise}}</td>
 					<td>{{ item.typeDocument.description}}</td>
 					<td class="text-center">
-						{{ item.idNiveauUrgence.description}}
+						{{ item.niveauUrgence.code}}
 					</td>
 					<td>{{item.categorieDemande.libelleCategorieAteApp}}</td>
 					<td>{{ item.numSerie}}</td>
 					<td>{{ item.numParc}}</td>
 					<td>{{ item.dateDemande|date('d/m/Y')}}</td>
-					<td>{{ item.internetExterne}}</td>
-					<td>{{ item.agenceServiceEmetteur }}</td>
-					<td>{{ item.agenceServiceDebiteur}}</td>
+					<td>{{ item.interneExterne}}</td>
+					<td>{{ item.emetteur.agence.code ~ '-' ~ item.emetteur.service.code}}</td>
+					<td>{{ item.debiteur.agence.code ~ '-' ~ item.debiteur.service.code}}</td>
 					<td>{{ item.objetDemande}}</td>
 					<td>
 						<a href="#" data-bs-toggle="modal" data-bs-target="#sectionAffectee" data-id="{{item.id}}" id="">
 							{{ item.sectionAffectee | remove_words(mots_a_supprimer)}}
 						</a>
 					</td>
-							<td>{{item.numeroDevisRattache}}</td>
-							<td>{{ item.statutDevis}}</td>
-							<td>
-								{% if item.numeroOr != '' %}
-									<a href="#" data-bs-toggle="modal" data-bs-target="#listeCommande" data-id="{{item.numeroOr}}" id="numOr" class="{{item.statutOrCssClass}} text-black" data-bs-toggle="tooltip" title="lister les commandes">{{ item.numeroOr}}</a>
-								{% endif %}
-							</td>
+					<td>{{item.numeroDevisRattache}}</td>
+					<td>{{ item.statutDevis}}</td>
+					<td>
+						{% if item.numeroOr != '' %}
+							<a href="#" data-bs-toggle="modal" data-bs-target="#listeCommande" data-id="{{item.numeroOr}}" id="numOr" class="{{item.statutOrCssClass}} text-black" data-bs-toggle="tooltip" title="lister les commandes">{{ item.numeroOr}}</a>
+						{% endif %}
+					</td>
 
-							<td class="fw-bold ">{{ item.statutor}}</td>
-							<td style="text-align: right;">{{ item.montantTotalOR is not null ? item.montantTotalOR|number_format(2, ',', '.') : '' }}</td>
-							<td>{{ item.dateSoumissionOR is not null ? item.dateSoumissionOR|date('d/m/Y') : '' }}</td>
+					<td class="fw-bold ">{{ item.statutor}}</td>
+					<td style="text-align: right;">{{ item.montantTotalOR is not null ? item.montantTotalOR|number_format(2, ',', '.') : '' }}</td>
+					<td>{{ item.dateSoumissionOR is not null ? item.dateSoumissionOR|date('d/m/Y') : '' }}</td>
 
-							<td>
-								<a href="#" data-bs-toggle="modal" data-bs-target="#facturation" data-id="{{item.numeroOr}}" id="numOr">{{item.etatFacturation}}</a>
-							</td>
-							<td>
-								<a href="#" data-bs-toggle="modal" data-bs-target="#ri" data-id="{{item.numeroOr}}" id="numOr" data-bs-toggle="tooltip" title="lister les intervention soumis RI">{{ item.ri}}</a>
-							</td>
-							<td class="text-center">{{ item.nbrPj}}</td>
-							<td>{{ item.utilisateurDemandeur|upper }}</td>
+					<td>
+						<a href="#" data-bs-toggle="modal" data-bs-target="#facturation" data-id="{{item.numeroOr}}" id="numOr">{{item.etatFacturation}}</a>
+					</td>
+					<td>
+						<a href="#" data-bs-toggle="modal" data-bs-target="#ri" data-id="{{item.numeroOr}}" id="numOr" data-bs-toggle="tooltip" title="lister les intervention soumis RI">{{ item.ri}}</a>
+					</td>
+					<td class="text-center">{{ item.nbrPj}}</td>
+					<td>{{ item.demandeur.username|upper }}</td>
 
-						</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-	</div>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
 {% include "partials/_pagination_bas.html.twig" with {
 				currentPage: paginationData['currentPage'],
 				totalPages: paginationData['totalItems']

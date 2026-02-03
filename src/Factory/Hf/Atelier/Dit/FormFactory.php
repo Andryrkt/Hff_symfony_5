@@ -8,11 +8,12 @@ use App\Entity\Admin\PersonnelUser\User;
 use App\Service\Utils\FormattingService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Admin\AgenceService\Agence;
+use App\Entity\Admin\Statut\StatutDemande;
 use App\Entity\Admin\AgenceService\Service;
 use App\Service\Utils\NumeroGeneratorService;
 use Symfony\Component\Security\Core\Security;
 use App\Entity\Hf\Atelier\Dit\WorNiveauUrgence;
-use App\Constants\Hf\Dit\WorNiveauUrgenceConstants;
+use App\Constants\Hf\Atelier\Dit\WorNiveauUrgenceConstants;
 use App\Constants\Admin\Historisation\TypeDocumentConstants;
 
 class FormFactory
@@ -67,6 +68,7 @@ class FormFactory
         $dto->dateDemande = new \DateTime();
         $dto->numeroDit = $this->numeroGeneratorService->autoGenerateNumero(TypeDocumentConstants::TYPE_DOCUMENT_DIT_CODE, true);
         $dto->mailDemandeur = $user->getEmail();
+        $dto->statutDemande = $this->em->getRepository(StatutDemande::class)->findOneBy(['codeApplication' => TypeDocumentConstants::TYPE_DOCUMENT_DIT_CODE, 'description' => 'A AFFECTER']);
 
         $this->enrichDtoWithMaterielInfo($dto);
 
