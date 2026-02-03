@@ -2,6 +2,7 @@
 
 namespace App\Dto\Hf\Materiel\Badm;
 
+use App\Contract\Dto\PaginationDtoTrait;
 use App\Contract\Dto\SearchDtoInterface;
 use App\Contract\PaginationDtoInterface;
 use App\Entity\Admin\Statut\StatutDemande;
@@ -23,26 +24,10 @@ class SearchDto implements PaginationDtoInterface, SearchDtoInterface
 
 
 
-    // Pagination et tri
-    public int $limit = 50;
-    public string $sortBy = 'numeroBadm';
-    public string $sortOrder = 'DESC';
+    use PaginationDtoTrait;
 
-    public function setLimit(int $limit): self
+    public function __construct()
     {
-        $this->limit = $limit;
-        return $this;
-    }
-
-    public function setSortBy(string $sortBy): self
-    {
-        $this->sortBy = $sortBy;
-        return $this;
-    }
-
-    public function setSortOrder(string $sortOrder): self
-    {
-        $this->sortOrder = $sortOrder;
-        return $this;
+        $this->sortBy = 'numeroBadm';
     }
 }
