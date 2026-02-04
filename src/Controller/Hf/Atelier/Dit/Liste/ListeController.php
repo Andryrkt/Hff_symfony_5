@@ -4,6 +4,7 @@ namespace App\Controller\Hf\Atelier\Dit\Liste;
 
 use App\Dto\Hf\Atelier\Dit\SearchDto;
 use App\Mapper\Hf\Atelier\Dit\Mapper;
+use App\Form\Hf\Atelier\Dit\SearchType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Hf\Atelier\Dit\DitRepository;
@@ -32,6 +33,21 @@ class ListeController extends AbstractController
         // 1. gerer l'accés 
         $this->denyAccessUnlessGranted('ATELIER_DIT_VIEW');
 
+        // 2. creation du formulaire de recherhce
+        $form = $this->createForm(SearchType::class, $searchDto, [
+            'method' => 'GET'
+        ]);
+
+        // 3. traitement du formulaire
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $searchDto = $form->getData();
+            // stocage des donner dans le session
+            $session = $request->getSession();
+            $session->set('search_dto', $searchDto);
+        }
+
         // 4. Récupération des données à afficher
         $paginationDatas = $this->getPaginatedData($request, $searchDto, $ditRepository, $ditMapper);
 
@@ -43,7 +59,8 @@ class ListeController extends AbstractController
             'currentOrder' => $searchDto->sortOrder,
             'routeName' => 'hf_atelier_dit_liste_index',
             'buttons' => ButtonsConstants::BUTTONS_ACTIONS,
-            'breadcrumbs' => $breadcrumbBuilder->build('hf_atelier_dit_liste_index')
+            'breadcrumbs' => $breadcrumbBuilder->build('hf_atelier_dit_liste_index'),
+            'form' => $form->createView(),
         ]);
     }
 }

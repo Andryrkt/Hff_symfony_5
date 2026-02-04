@@ -10,6 +10,11 @@
 <div class="sticky-header-titre">
 	<div class="container">
 		{% include 'partials/flash_messages.html.twig' %}
+
+		{% include "hf/atelier/dit/liste/_formulaireRecherche.html.twig" with{
+			form : form
+		}%}
+
 		<div class="row">
 			<div class=" col-12 col-md-5 my-3">
 				<i class="fa-solid fa-circle text-info"></i>

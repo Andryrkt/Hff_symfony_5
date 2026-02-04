@@ -245,6 +245,21 @@ class Dit implements CreatedByInterface, AgenceServiceInterface
      */
     private $pieceJoint03;
 
+    /**
+     * @ORM\Column(type="string", length=200, nullable=true)
+     */
+    private $sectionSupport1;
+
+    /**
+     * @ORM\Column(type="string", length=200, nullable=true)
+     */
+    private $sectionSupport2;
+
+    /**
+     * @ORM\Column(type="string", length=200, nullable=true)
+     */
+    private $sectionSupport3;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -782,5 +797,41 @@ class Dit implements CreatedByInterface, AgenceServiceInterface
     public function estOrASoumi(): bool
     {
         return !empty($this->numeroOr);
+    }
+
+    public function getSectionSupport1(): ?string
+    {
+        return $this->sectionSupport1;
+    }
+
+    public function setSectionSupport1(?string $sectionSupport1): self
+    {
+        $this->sectionSupport1 = $sectionSupport1;
+
+        return $this;
+    }
+
+    public function getSectionSupport2(): ?string
+    {
+        return $this->sectionSupport2;
+    }
+
+    public function setSectionSupport2(?string $sectionSupport2): self
+    {
+        $this->sectionSupport2 = $sectionSupport2;
+
+        return $this;
+    }
+
+    public function getSectionSupport3(): ?string
+    {
+        return $this->sectionSupport3;
+    }
+
+    public function setSectionSupport3(?string $sectionSupport3): self
+    {
+        $this->sectionSupport3 = $sectionSupport3;
+
+        return $this;
     }
 }

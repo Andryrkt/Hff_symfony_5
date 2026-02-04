@@ -2,13 +2,12 @@
 
 namespace App\Form\Hf\Atelier\Dit;
 
-use App\Constants\Hf\Dit\WorTypeDocumentConstants;
 use Doctrine\ORM\EntityRepository;
 use App\Dto\Hf\Atelier\Dit\FormDto;
-use App\Entity\Hf\Atelier\Dit\CategorieAteApp;
 use App\Form\Common\FileUploadType;
 use App\Form\Common\AgenceServiceType;
 use Symfony\Component\Form\AbstractType;
+use App\Entity\Hf\Atelier\Dit\CategorieAteApp;
 use App\Entity\Hf\Atelier\Dit\WorTypeDocument;
 use App\Entity\Hf\Atelier\Dit\WorNiveauUrgence;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -18,6 +17,7 @@ use Symfony\Component\Form\Extension\Core\Type\TelType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use App\Constants\Hf\Atelier\Dit\WorTypeDocumentConstants;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Repository\Hf\Atelier\Dit\WorTypeDocumentRepository;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;

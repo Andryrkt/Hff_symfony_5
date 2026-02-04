@@ -84,28 +84,71 @@ class DitRepository extends ServiceEntityRepository implements PaginatedReposito
         ];
     }
 
-    //    /**
-    //     * @return Dit[] Returns an array of Dit objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('d')
-    //            ->andWhere('d.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('d.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /** DIT SEARCH section DEBUT  */
+    public function findSectionSupport1()
+    {
+        $result = $this->createQueryBuilder('d')
+            ->select('DISTINCT d.sectionSupport1')
+            ->where('d.sectionAffectee IS NOT NULL')
+            ->andWhere('d.sectionAffectee != :sectionAffectee')
+            ->setParameter('sectionAffectee', ' ')
+            ->andWhere('d.sectionAffectee != :sectionAffecte')
+            ->setParameter('sectionAffecte', 'Autres')
+            ->getQuery()
+            ->getScalarResult();
+        return array_column($result, 'sectionSupport1');
+    }
 
-    //    public function findOneBySomeField($value): ?Dit
-    //    {
-    //        return $this->createQueryBuilder('d')
-    //            ->andWhere('d.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function findSectionSupport2()
+    {
+        $result = $this->createQueryBuilder('d')
+            ->select('DISTINCT d.sectionSupport2')
+            ->where('d.sectionAffectee IS NOT NULL')
+            ->andWhere('d.sectionAffectee != :sectionAffectee')
+            ->setParameter('sectionAffectee', ' ')
+            ->andWhere('d.sectionAffectee != :sectionAffecte')
+            ->setParameter('sectionAffecte', 'Autres')
+            ->getQuery()
+            ->getScalarResult();
+        return array_column($result, 'sectionSupport2');
+    }
+
+    public function findSectionSupport3()
+    {
+        $result = $this->createQueryBuilder('d')
+            ->select('DISTINCT d.sectionSupport3')
+            ->where('d.sectionAffectee IS NOT NULL')
+            ->andWhere('d.sectionAffectee != :sectionAffectee')
+            ->setParameter('sectionAffectee', ' ')
+            ->andWhere('d.sectionAffectee != :sectionAffecte')
+            ->setParameter('sectionAffecte', 'Autres')
+            ->getQuery()
+            ->getScalarResult();
+        return array_column($result, 'sectionSupport3');
+    }
+
+    public function findSectionAffectee()
+    {
+        $result = $this->createQueryBuilder('d')
+            ->select('DISTINCT d.sectionAffectee')
+            ->where('d.sectionAffectee IS NOT NULL')
+            ->andWhere('d.sectionAffectee != :sectionAffectee')
+            ->setParameter('sectionAffectee', ' ')
+            ->andWhere('d.sectionAffectee != :sectionAffecte')
+            ->setParameter('sectionAffecte', 'Autres')
+            ->getQuery()
+            ->getScalarResult();
+        return array_column($result, 'sectionAffectee');
+    }
+
+    public function findStatutOr()
+    {
+        $result = $this->createQueryBuilder('d')
+            ->select('DISTINCT d.statutOr')
+            ->where('d.statutOr IS NOT NULL')
+            ->getQuery()
+            ->getScalarResult();
+        return array_column($result, 'statutOr');
+    }
+    /** DIT SEARCH section FIN  */
 }
