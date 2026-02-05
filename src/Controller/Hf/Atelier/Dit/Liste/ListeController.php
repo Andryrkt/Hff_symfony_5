@@ -43,6 +43,7 @@ class ListeController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $searchDto = $form->getData();
+            dd($searchDto);
             // stocage des donner dans le session
             $session = $request->getSession();
             $session->set('search_dto', $searchDto);

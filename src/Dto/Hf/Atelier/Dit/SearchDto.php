@@ -21,7 +21,7 @@ class SearchDto implements PaginationDtoInterface, SearchDtoInterface
 
     public ?WorNiveauUrgence $niveauUrgence = null;
     public ?StatutDemande $statut = null;
-    public ?int $idMateriel = 0;
+    public ?int $idMateriel = null;
     public ?WorTypeDocument $typeDocument = null;
     public ?string $internetExterne = '';
     public ?string $numParc = '';

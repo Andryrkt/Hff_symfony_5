@@ -4,11 +4,12 @@ namespace App\Repository\Hf\Atelier\Dit;
 
 use App\Entity\Hf\Atelier\Dit\Dit;
 use App\Contract\Dto\SearchDtoInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use App\Repository\Traits\PaginatableRepositoryTrait;
 use App\Contract\Repository\PaginatedRepositoryInterface;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator as DoctrinePaginator;
-use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Service\Hf\Atelier\Dit\DitSearchFilter;
 
 /**
  * @extends ServiceEntityRepository<Dit>
@@ -21,9 +22,13 @@ use Doctrine\Persistence\ManagerRegistry;
 class DitRepository extends ServiceEntityRepository implements PaginatedRepositoryInterface
 {
     use PaginatableRepositoryTrait;
-    public function __construct(ManagerRegistry $registry)
+
+    private $searchFilter;
+
+    public function __construct(ManagerRegistry $registry, DitSearchFilter $searchFilter)
     {
         parent::__construct($registry, Dit::class);
+        $this->searchFilter = $searchFilter;
     }
 
     public function add(Dit $entity, bool $flush = false): void
@@ -67,7 +72,8 @@ class DitRepository extends ServiceEntityRepository implements PaginatedReposito
             ->leftJoin('d.statutDemande', 's')
             ->addSelect('s');
 
-        // TODO: Appliquer les filtres spécifiques ici si nécessaire
+        // Appliquer les filtres via le service dédié
+        $this->searchFilter->applyFilters($queryBuilder, $searchDto);
 
         $queryBuilder->orderBy($sortableColumns[$sortBy], $sortOrder)
             ->setFirstResult(($page - 1) * $limit)
@@ -85,63 +91,27 @@ class DitRepository extends ServiceEntityRepository implements PaginatedReposito
     }
 
     /** DIT SEARCH section DEBUT  */
-    public function findSectionSupport1()
+    public function findSectionSupport1(): array
     {
-        $result = $this->createQueryBuilder('d')
-            ->select('DISTINCT d.sectionSupport1')
-            ->where('d.sectionAffectee IS NOT NULL')
-            ->andWhere('d.sectionAffectee != :sectionAffectee')
-            ->setParameter('sectionAffectee', ' ')
-            ->andWhere('d.sectionAffectee != :sectionAffecte')
-            ->setParameter('sectionAffecte', 'Autres')
-            ->getQuery()
-            ->getScalarResult();
-        return array_column($result, 'sectionSupport1');
+        return $this->findDistinctValues('sectionSupport1');
     }
 
-    public function findSectionSupport2()
+    public function findSectionSupport2(): array
     {
-        $result = $this->createQueryBuilder('d')
-            ->select('DISTINCT d.sectionSupport2')
-            ->where('d.sectionAffectee IS NOT NULL')
-            ->andWhere('d.sectionAffectee != :sectionAffectee')
-            ->setParameter('sectionAffectee', ' ')
-            ->andWhere('d.sectionAffectee != :sectionAffecte')
-            ->setParameter('sectionAffecte', 'Autres')
-            ->getQuery()
-            ->getScalarResult();
-        return array_column($result, 'sectionSupport2');
+        return $this->findDistinctValues('sectionSupport2');
     }
 
-    public function findSectionSupport3()
+    public function findSectionSupport3(): array
     {
-        $result = $this->createQueryBuilder('d')
-            ->select('DISTINCT d.sectionSupport3')
-            ->where('d.sectionAffectee IS NOT NULL')
-            ->andWhere('d.sectionAffectee != :sectionAffectee')
-            ->setParameter('sectionAffectee', ' ')
-            ->andWhere('d.sectionAffectee != :sectionAffecte')
-            ->setParameter('sectionAffecte', 'Autres')
-            ->getQuery()
-            ->getScalarResult();
-        return array_column($result, 'sectionSupport3');
+        return $this->findDistinctValues('sectionSupport3');
     }
 
-    public function findSectionAffectee()
+    public function findSectionAffectee(): array
     {
-        $result = $this->createQueryBuilder('d')
-            ->select('DISTINCT d.sectionAffectee')
-            ->where('d.sectionAffectee IS NOT NULL')
-            ->andWhere('d.sectionAffectee != :sectionAffectee')
-            ->setParameter('sectionAffectee', ' ')
-            ->andWhere('d.sectionAffectee != :sectionAffecte')
-            ->setParameter('sectionAffecte', 'Autres')
-            ->getQuery()
-            ->getScalarResult();
-        return array_column($result, 'sectionAffectee');
+        return $this->findDistinctValues('sectionAffectee');
     }
 
-    public function findStatutOr()
+    public function findStatutOr(): array
     {
         $result = $this->createQueryBuilder('d')
             ->select('DISTINCT d.statutOr')
@@ -149,6 +119,23 @@ class DitRepository extends ServiceEntityRepository implements PaginatedReposito
             ->getQuery()
             ->getScalarResult();
         return array_column($result, 'statutOr');
+    }
+
+    /**
+     * Méthode générique pour récupérer les valeurs distinctes d'un champ
+     */
+    private function findDistinctValues(string $field): array
+    {
+        $result = $this->createQueryBuilder('d')
+            ->select("DISTINCT d.$field")
+            ->where("d.$field IS NOT NULL")
+            ->andWhere("d.sectionAffectee IS NOT NULL")
+            ->andWhere("d.sectionAffectee != ' '")
+            ->andWhere("d.sectionAffectee != 'Autres'")
+            ->getQuery()
+            ->getScalarResult();
+
+        return array_column($result, $field);
     }
     /** DIT SEARCH section FIN  */
 }
