@@ -13,7 +13,8 @@ export class SessionManager {
     /**
      * Initialise la gestion de session
      */
-    public init(): void {
+    public init(chronometer: any = null): void {
+        this.chronometer = chronometer;
         this.setupEventListeners();
         this.resetTimeout();
     }

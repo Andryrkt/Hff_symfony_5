@@ -80,8 +80,10 @@ class App {
      * Initialise les gestionnaires
      */
     private initManagers(): void {
-        new ChronometerManager().init();
-        new SessionManager().init();
+        const chronometer = new ChronometerManager();
+        chronometer.init();
+
+        new SessionManager().init(chronometer);
         new ToastManager().init();
         new SubmenuManager().init();
         initPagination();
