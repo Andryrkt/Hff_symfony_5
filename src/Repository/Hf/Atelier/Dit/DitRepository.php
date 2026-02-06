@@ -90,7 +90,7 @@ class DitRepository extends ServiceEntityRepository implements PaginatedReposito
         ];
     }
 
-    /** DIT SEARCH section DEBUT  */
+    /** DIT section DEBUT  */
     public function findSectionSupport1(): array
     {
         return $this->findDistinctValues('sectionSupport1');
@@ -137,5 +137,5 @@ class DitRepository extends ServiceEntityRepository implements PaginatedReposito
 
         return array_column($result, $field);
     }
-    /** DIT SEARCH section FIN  */
+    /** DIT section FIN  */
 }
