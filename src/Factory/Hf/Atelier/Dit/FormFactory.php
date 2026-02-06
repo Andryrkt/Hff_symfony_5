@@ -97,6 +97,7 @@ class FormFactory
             $dto->designation = $infoMateriel['designation'];
             $dto->constructeur = $infoMateriel['constructeur'];
             $dto->casier = $infoMateriel['casier_emetteur'];
+            $dto->marque = $infoMateriel['marque'];
             $dto->idMateriel = $infoMateriel['num_matricule'];
             $dto->numSerie = $infoMateriel['num_serie'];
             $dto->numParc = $infoMateriel['num_parc'];

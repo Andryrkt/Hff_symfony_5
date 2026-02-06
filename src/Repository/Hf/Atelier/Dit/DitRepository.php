@@ -50,6 +50,8 @@ class DitRepository extends ServiceEntityRepository implements PaginatedReposito
     }
 
     /**
+     * Recupérer les informations à afficher sur la liste selon les filtres
+     * 
      * @param int $page
      * @param int $limit
      * @param SearchDtoInterface $searchDto
@@ -88,6 +90,32 @@ class DitRepository extends ServiceEntityRepository implements PaginatedReposito
             'currentPage' => $page,
             'lastPage'    => (int) ceil($totalItems / $limit),
         ];
+    }
+
+    public function findFilteredExcel(SearchDtoInterface $searchDto): array
+    {
+        $sortableColumns = [
+            'numeroDit' => 'd.numeroDit',
+            'dateDemande' => 'd.createdAt',
+        ];
+
+        [$limit, $sortBy, $sortOrder] = $this->sortAndLimit($searchDto, $sortableColumns, 'numeroDit');
+
+        $queryBuilder = $this->createQueryBuilder('d')
+            ->leftJoin('d.worNiveauUrgence', 'wn')
+            ->addSelect('wn')
+            ->leftJoin('d.worTypeDocument', 'wd')
+            ->addSelect('wd')
+            ->leftJoin('d.statutDemande', 's')
+            ->addSelect('s');
+
+        // 2. Appliquer les filtres de recherche
+        // $this->searchFilter->applyFilters($queryBuilder, $searchDto);
+
+        // 3. Ordre
+        $queryBuilder->orderBy($sortableColumns[$sortBy], $sortOrder);
+
+        return $queryBuilder->getQuery()->getResult();
     }
 
     /** DIT section DEBUT  */

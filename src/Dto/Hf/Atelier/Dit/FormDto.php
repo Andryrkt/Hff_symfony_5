@@ -177,6 +177,7 @@ class FormDto
     public ?string $designation = null;
     public ?string $constructeur = null;
     public ?string $casier = null;
+    public ?string $marque = null;
 
     // ------------------ Autre --------------
     public ?int $numeroMigration = null;

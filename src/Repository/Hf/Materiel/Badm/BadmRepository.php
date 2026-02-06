@@ -148,7 +148,7 @@ class BadmRepository extends ServiceEntityRepository implements PaginatedReposit
         $this->filtredIdentiteMateriel($queryBuilder, $searchDto);
         $this->filtred($queryBuilder, $searchDto);
 
-        // 3. Ordre et pagination
+        // 3. Ordre
         $queryBuilder->orderBy($sortableColumns[$sortBy], $sortOrder);
 
 

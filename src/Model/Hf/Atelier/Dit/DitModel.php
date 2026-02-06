@@ -99,6 +99,7 @@ class DitModel
         mmat_nummat as num_matricule,
         trim(mmat_numserie) as num_serie,
         trim(mmat_recalph) as num_parc,
+        trim(mmat_marqmat) as marque,
 
         (select mhir_compteur from mat_hir a where a.mhir_nummat = mmat_nummat and a.mhir_daterel = (select max(b.mhir_daterel) from mat_hir b where b.mhir_nummat = a.mhir_nummat)) as heure,
         (select mhir_cumcomp from mat_hir a where a.mhir_nummat = mmat_nummat and a.mhir_daterel = (select max(b.mhir_daterel) from mat_hir b where b.mhir_nummat = a.mhir_nummat)) as km,
