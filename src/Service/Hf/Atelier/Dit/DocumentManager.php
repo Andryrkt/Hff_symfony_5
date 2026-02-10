@@ -58,8 +58,8 @@ class DocumentManager
      */
     public function archiveToDocuware(Dit $dit, PdfService $pdfService, string $finalPdfPath, string $finalPdfName): void
     {
-        $docuwarePath = $this->params->get('docuware_directory') . '/BADM/' . $finalPdfName;
         $numero = $dit->getNumeroDit();
+        $docuwarePath = $this->params->get('docuware_directory') . '/dit/' . $numero . '/' . $finalPdfName;
 
         $success = false;
         $message = 'Copie vers Docuware.';

@@ -166,4 +166,25 @@ class DitRepository extends ServiceEntityRepository implements PaginatedReposito
         return array_column($result, $field);
     }
     /** DIT section FIN  */
+
+    /** DIT A ANNULER DEBUT */
+    public function getNumDitAAnnuler()
+    {
+        $dateNow = new \DateTime(); // maintenant
+        $dateYesterday = (clone $dateNow)->modify('-1 day'); // 1 jour avant
+
+        return $this->createQueryBuilder('d')
+            ->select('d.numeroDemandeIntervention')
+            ->where('d.aAnnuler = :aAnnuler')
+            ->andWhere('d.dateAnnulation BETWEEN :yesterday AND :now')
+            ->setParameters([
+                'aAnnuler' => 1,
+                'yesterday' => $dateYesterday,
+                'now' => $dateNow,
+            ])
+            ->getQuery()
+            ->getSingleColumnResult()
+        ;
+    }
+    /** DIT A ANNULER FIN */
 }

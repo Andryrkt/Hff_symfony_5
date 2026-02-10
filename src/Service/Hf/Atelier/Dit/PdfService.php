@@ -21,6 +21,18 @@ class PdfService extends AbstractGeneratePdf
         $this->formattingService = $formattingService;
     }
 
+    /**
+     * copie du csv cloturer/annuler dans docuware
+     *
+     * @param string $fileNameDw
+     * @param string $filePathUplode
+     * 
+     * @return void
+     */
+    public function copyCsvCloturerAnnulerToDw(string $fileNameDw, string $filePathUplode)
+    {
+        $this->copyFile($filePathUplode, $fileNameDw);
+    }
 
     /**
      * copie du pdf fusioner dans docuware
@@ -30,7 +42,7 @@ class PdfService extends AbstractGeneratePdf
      * 
      * @return void
      */
-    public function copyToDW($docuwarePath, $finalPdfPath)
+    public function copyToDW(string $docuwarePath, string $finalPdfPath)
     {
         $this->copyFile($docuwarePath, $finalPdfPath);
     }
