@@ -21,6 +21,7 @@ class TypeOperationFixtures extends Fixture
             ['type' => 'DB_SAVE', 'reference' => 'type_db_save'],
             ['type' => 'DW_COPY', 'reference' => 'type_dw_copy'],
             ['type' => 'FILE_UPLOAD', 'reference' => 'type_file_upload'],
+            ['type' => 'ANNULATION', 'reference' => 'type_annulation'],
 
         ];
 
