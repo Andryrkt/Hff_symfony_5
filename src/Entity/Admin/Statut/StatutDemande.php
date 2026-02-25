@@ -43,7 +43,7 @@ class StatutDemande
     private $description;
 
     /**
-     * @ORM\OneToMany(targetEntity=Dom::class, mappedBy="idStatutDemande")
+     * @ORM\OneToMany(targetEntity="App\Entity\Hf\Rh\Dom\Dom", mappedBy="idStatutDemande")
      */
     private $doms;
 
@@ -113,14 +113,14 @@ class StatutDemande
     }
 
     /**
-     * @return Collection<int, Dom>
+     * @return Collection<int, \App\Entity\Hf\Rh\Dom\Dom>
      */
     public function getDoms(): Collection
     {
         return $this->doms;
     }
 
-    public function addDom(Dom $dom): self
+    public function addDom(\App\Entity\Hf\Rh\Dom\Dom $dom): self
     {
         if (!$this->doms->contains($dom)) {
             $this->doms[] = $dom;
@@ -130,7 +130,7 @@ class StatutDemande
         return $this;
     }
 
-    public function removeDom(Dom $dom): self
+    public function removeDom(\App\Entity\Hf\Rh\Dom\Dom $dom): self
     {
         if ($this->doms->removeElement($dom)) {
             // set the owning side to null (unless already changed)

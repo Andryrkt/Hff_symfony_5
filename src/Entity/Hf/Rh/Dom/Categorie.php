@@ -19,7 +19,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 class Categorie
 {
     use TimestampableTrait;
-    
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -43,7 +43,7 @@ class Categorie
     private $indemnites;
 
     /**
-     * @ORM\OneToMany(targetEntity=Dom::class, mappedBy="categoryId")
+     * @ORM\OneToMany(targetEntity="App\Entity\Hf\Rh\Dom\Dom", mappedBy="categoryId")
      */
     private $doms;
 
@@ -118,14 +118,14 @@ class Categorie
     }
 
     /**
-     * @return Collection<int, Dom>
+     * @return Collection<int, \App\Entity\Hf\Rh\Dom\Dom>
      */
     public function getDoms(): Collection
     {
         return $this->doms;
     }
 
-    public function addDom(Dom $dom): self
+    public function addDom(\App\Entity\Hf\Rh\Dom\Dom $dom): self
     {
         if (!$this->doms->contains($dom)) {
             $this->doms[] = $dom;
@@ -135,7 +135,7 @@ class Categorie
         return $this;
     }
 
-    public function removeDom(Dom $dom): self
+    public function removeDom(\App\Entity\Hf\Rh\Dom\Dom $dom): self
     {
         if ($this->doms->removeElement($dom)) {
             // set the owning side to null (unless already changed)

@@ -94,14 +94,12 @@ when@test:
                 type: stream
                 path: "%kernel.logs_dir%/%kernel.environment%.log"
                 level: debug
-            # Ajout du handler symfony_mailer pour l'environnement de test
-            email_errors_test: # Donnez un nom unique au handler
-                type: symfony_mailer
-                from_email: 'noreply@votredomaine.com'
-                to_email: ['%env(ADMIN_EMAIL)%']
-                subject: 'HFF - Erreur Application (TEST) :: %%message%%'
+            # Utilisation du NotifierHandler pour l'environnement de test (cohérent avec la prod)
+            notifier_test:
+                type: service
+                id: App\Logger\NotifierHandler
                 level: error
-                content_type: text/html
+                channels: ["!event"]
 
 when@prod:
     monolog:
