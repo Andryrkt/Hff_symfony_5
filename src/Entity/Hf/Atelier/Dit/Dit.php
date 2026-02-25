@@ -260,6 +260,55 @@ class Dit implements CreatedByInterface, AgenceServiceInterface
      */
     private $sectionSupport3;
 
+    /**=====================================================
+     * FONCTION PERSONALISE
+     *=====================================================*/
+    public function estAnnulable(): bool
+    {
+        if ($this->statutDemande === null) {
+            return true;
+        }
+
+        $desc = trim($this->statutDemande->getDescription());
+        return !in_array($desc, [
+            \App\Constants\Hf\Atelier\Dit\StatutDitConstants::STATUT_CLOTUREE_VALIDEE,
+            \App\Constants\Hf\Atelier\Dit\StatutDitConstants::STATUT_CLOTUREE_ANNULEE,
+            \App\Constants\Hf\Atelier\Dit\StatutDitConstants::STATUT_CLOTUREE_HORS_DELAI
+        ]);
+    }
+
+    // TODO: à modifier lorsque la creation du soumission OR est fait (inspirer du foction commenter en dessous)
+    public function estOrASoumi(): bool
+    {
+        return !empty($this->numeroOr);
+    }
+    // private function ajoutEstOrASoumis($paginationData, $em)
+    // {
+    //     foreach ($paginationData as $value) {
+
+    //         $statutAffecterSection = $value->getIdStatutDemande()->getId() === DemandeIntervention::STATUT_AFFECTEE_SECTION; //AFFECTER_SECTION
+    //         $statutCloturerValider = $value->getIdStatutDemande()->getId() === DemandeIntervention::STATUT_CLOTUREE_VALIDER; //CLOTUREE_VALIDER
+    //         $statutTerminer = $value->getIdStatutDemande()->getId() === DemandeIntervention::STATUT_TERMINER; //TERMINER
+    //         $estOrSoumis = $em->getRepository(DitOrsSoumisAValidation::class)->existsNumOrEtDit($value->getNumeroOR(), $value->getNumeroDemandeIntervention());
+
+    //         if ($statutAffecterSection && !$estOrSoumis) { //si la statut DIT est AFFACTER SECTION et il n'y a pas encore d'OR déjà soumi (c'est la première soumission)
+    //             $value->setEstOrASoumi(true); //affichage du boutton Soumission document à valider
+    //         } elseif ($value->getInternetExterne() == 'EXTERNE' && $value->getIdStatutDemande()->getId() === 53) { // 
+    //             $value->setEstOrASoumi(true);
+    //         } elseif ($statutCloturerValider && !$estOrSoumis) {
+    //             $value->setEstOrASoumi(false); //cacher le boutton Soumission document à valider
+    //         } elseif ($statutCloturerValider && $estOrSoumis) {
+    //             $value->setEstOrASoumi(true);
+    //         }
+    //         elseif ($statutTerminer) { // affichage du bouton Soumission document à valider si le statut dit "TERMINER"
+    //             $value->setEstOrASoumi(true);
+    //         } else {
+    //             $value->setEstOrASoumi(false);
+    //         }
+    //     }
+    // }
+    /**======================================================== */
+
     public function getId(): ?int
     {
         return $this->id;
@@ -779,24 +828,6 @@ class Dit implements CreatedByInterface, AgenceServiceInterface
         $this->pieceJoint03 = $pieceJoint03;
 
         return $this;
-    }
-    public function estAnnulable(): bool
-    {
-        if ($this->statutDemande === null) {
-            return true;
-        }
-
-        $desc = trim($this->statutDemande->getDescription());
-        return !in_array($desc, [
-            \App\Constants\Hf\Atelier\Dit\StatutDitConstants::STATUT_CLOTUREE_VALIDEE,
-            \App\Constants\Hf\Atelier\Dit\StatutDitConstants::STATUT_CLOTUREE_ANNULEE,
-            \App\Constants\Hf\Atelier\Dit\StatutDitConstants::STATUT_CLOTUREE_HORS_DELAI
-        ]);
-    }
-
-    public function estOrASoumi(): bool
-    {
-        return !empty($this->numeroOr);
     }
 
     public function getSectionSupport1(): ?string
