@@ -146,7 +146,6 @@ class DitFormType extends AbstractType
                     'label' => "Interne et Externe *",
                     'choices' => self::INTERNE_EXTERNE,
                     'placeholder' => false,
-                    'data' => 'INTERNE',
                     'required' => false,
                     // 'attr' => [
                     //     'class' => 'interneExterne',
@@ -168,7 +167,6 @@ class DitFormType extends AbstractType
                     'choices' => self::OUI_NON,
                     'placeholder' => false,
                     'required' => false,
-                    'data' => 'NON',
                     'disabled' => true,
                 ]
             )
@@ -181,7 +179,6 @@ class DitFormType extends AbstractType
                     'choices' => self::OUI_NON,
                     'placeholder' => false,
                     'required' => false,
-                    'data' => 'NON'
                 ]
             )
 
@@ -194,7 +191,6 @@ class DitFormType extends AbstractType
                     'choices' => self::OUI_NON,
                     'placeholder' => false,
                     'required' => false,
-                    'data' => 'NON'
                 ]
             )
         ;
@@ -235,7 +231,6 @@ class DitFormType extends AbstractType
                 'choices' => self::TYPE_REPARATION,
                 'placeholder' => false,
                 'required' => true,
-                'data' => 'A REALISER'
             ]
         )
             ->add(
@@ -311,7 +306,6 @@ class DitFormType extends AbstractType
                 'choices' => self::OUI_NON,
                 'placeholder' => false,
                 'required' => false,
-                'data' => 'NON',
                 'disabled' => true,
                 'attr' => [
                     'class' => 'clientSousContrat'

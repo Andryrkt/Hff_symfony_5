@@ -30,8 +30,20 @@ class DuplicationController extends AbstractDitFormController
         $form = $this->createForm(DitFormType::class, $dto);
 
         return $this->render('hf/atelier/dit/creation/duplication.html.twig', [
-            'form' => $form->createView(),
+            'form'       => $form->createView(),
             'breadcrumbs' => $this->breadcrumbBuilder->build('hf_atelier_dit_creation_duplication'),
+            'materielData' => $dto->idMateriel ? json_encode([
+                'num_matricule'  => $dto->idMateriel,
+                'num_parc'       => $dto->numParc,
+                'num_serie'      => $dto->numSerie,
+                'constructeur'   => $dto->constructeur,
+                'designation'    => $dto->designation,
+                'modele'         => $dto->modele,
+                'marque'         => $dto->marque,
+                'casier_emetteur' => $dto->casier,
+                'heure'          => $dto->heureMachine,
+                'km'             => $dto->kmMachine,
+            ]) : null,
         ]);
     }
 }

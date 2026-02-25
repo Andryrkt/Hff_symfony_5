@@ -63,7 +63,11 @@ class FormFactory
         ];
         $dto->niveauUrgence = $this->em->getRepository(WorNiveauUrgence::class)
             ->findOneBy(['code' => WorNiveauUrgenceConstants::NIVEAU_URGENCE_P2]);
+        $dto->interneExterne = 'INTERNE';
         $dto->demandeDevis = 'NON';
+        $dto->avisRecouvrement = 'NON';
+        $dto->livraisonPartiel = 'NON';
+        $dto->typeReparation = 'A REALISER';
         $dto->clientSousContrat = 'NON';
 
         $dto->dateDemande = new \DateTime();

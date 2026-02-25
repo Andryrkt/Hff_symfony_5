@@ -12,6 +12,10 @@ export default class extends Controller {
         "atePolTanaContainer", "atePolTanaInput"
     ];
 
+    static values = {
+        materielData: { type: String, default: '' }
+    };
+
     declare readonly detailDemandeTarget: HTMLTextAreaElement;
     declare readonly hasDetailDemandeTarget: boolean;
     declare readonly charCountTarget: HTMLElement;
@@ -49,6 +53,9 @@ export default class extends Controller {
     declare readonly atePolTanaInputTarget: HTMLInputElement;
     declare readonly hasAtePolTanaInputTarget: boolean;
 
+    declare materielDataValue: string;
+    declare readonly hasMaterielDataValue: boolean;
+
     private fetchManager: FetchManager;
     private materielsCache: any[] | null = null;
     private materielsPromise: Promise<any[]> | null = null;
@@ -64,6 +71,7 @@ export default class extends Controller {
         this.fetchManager = new FetchManager();
         this.initializeInteractions();
         this.initializeAutocompletes();
+        this.initializeMaterielInfo();
     }
 
     // --- Initialisations ---
@@ -77,6 +85,21 @@ export default class extends Controller {
 
         // Initialisation de la visibilité ATE POL TANA
         this.updateAtePolTanaVisibility();
+    }
+
+    // --- Initialisation des infos matériel au chargement (duplication) ---
+
+    private initializeMaterielInfo() {
+        if (!this.hasMaterielDataValue || !this.materielDataValue) return;
+
+        try {
+            const data = JSON.parse(this.materielDataValue);
+            if (data && data.num_matricule) {
+                this.createMaterielInfoDisplay(data);
+            }
+        } catch (e) {
+            console.error('Erreur lors de la lecture des données matériel initiales :', e);
+        }
     }
 
     private initializeAutocompletes() {
