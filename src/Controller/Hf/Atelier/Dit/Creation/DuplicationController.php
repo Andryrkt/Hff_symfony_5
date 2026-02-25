@@ -36,7 +36,10 @@ class DuplicationController extends AbstractDitFormController
         $form = $this->createForm(DitFormType::class, $dto);
 
         // 4. gerer la soumission du formulaire
-        $this->traitementFormulaire($request, $form, $pdfService, $creationHandler);
+        $redirectResponse = $this->traitementFormulaire($request, $form, $pdfService, $creationHandler);
+        if ($redirectResponse) {
+            return $redirectResponse;
+        }
 
         return $this->render('hf/atelier/dit/creation/duplication.html.twig', [
             'form'       => $form->createView(),

@@ -36,7 +36,10 @@ class FormController extends AbstractDitFormController
         $form = $this->createForm(DitFormType::class, $dto);
 
         // 4. gerer la soumission du formulaire
-        $this->traitementFormulaire($request, $form, $pdfService, $creationHandler);
+        $redirectResponse = $this->traitementFormulaire($request, $form, $pdfService, $creationHandler);
+        if ($redirectResponse) {
+            return $redirectResponse;
+        }
 
         $this->logger->info('✅ Fin du chargement du formulaire DIT');
 
