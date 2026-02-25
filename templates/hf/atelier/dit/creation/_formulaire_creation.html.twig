@@ -181,7 +181,28 @@
 <div class="row">
 	<div class="d-flex justify-content-end mt-2">
 		{% import "macros/actions.html.twig" as actions %}
-		{{ actions.submit_button('Enregistrer', 'fa fa-print', 'btn-warning', true, 'Confirmez-vous la création de cette demande d\'ordre de mission ?', 'Veuillez ne pas quitter la page pendant la création de la demande.', 'Création de la demande d\'ordre de mission') }}
+		{% set isDuplication = isDuplication is defined and isDuplication %}
+		{% if isDuplication %}
+			{{ actions.submit_button(
+				'Enregistrer',
+				'fa fa-copy',
+				'btn-warning',
+				true,
+				'Confirmez-vous la duplication de cette demande ?',
+				'Veuillez ne pas quitter la page pendant la duplication de la demande.',
+				'Duplication de la demande d\'ordre de mission'
+			) }}
+		{% else %}
+			{{ actions.submit_button(
+				'Enregistrer',
+				'fa fa-print',
+				'btn-warning',
+				true,
+				'Confirmez-vous la création de cette demande d\'ordre de mission ?',
+				'Veuillez ne pas quitter la page pendant la création de la demande.',
+				'Création de la demande d\'ordre de mission'
+			) }}
+		{% endif %}
 	</div>
 </div>
 

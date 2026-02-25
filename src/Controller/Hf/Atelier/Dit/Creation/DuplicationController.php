@@ -3,7 +3,10 @@
 namespace App\Controller\Hf\Atelier\Dit\Creation;
 
 use App\Form\Hf\Atelier\Dit\DitFormType;
+use App\Service\Hf\Atelier\Dit\PdfService;
 use App\Factory\Hf\Atelier\Dit\FormFactory;
+use Symfony\Component\HttpFoundation\Request;
+use App\Service\Hf\Atelier\Dit\CreationHandler;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Controller\Hf\Atelier\Dit\Creation\AbstractDitFormController;
 
@@ -18,7 +21,10 @@ class DuplicationController extends AbstractDitFormController
      */
     public function index(
         string $numDit,
-        FormFactory $formFactory
+        FormFactory $formFactory,
+        Request $request,
+        PdfService $pdfService,
+        CreationHandler $creationHandler
     ) {
         // 1. gerer l'accés 
         $this->denyAccessUnlessGranted('ATELIER_DIT_CREATE');
@@ -28,6 +34,9 @@ class DuplicationController extends AbstractDitFormController
 
         // 3. creation du formulaire
         $form = $this->createForm(DitFormType::class, $dto);
+
+        // 4. gerer la soumission du formulaire
+        $this->traitementFormulaire($request, $form, $pdfService, $creationHandler);
 
         return $this->render('hf/atelier/dit/creation/duplication.html.twig', [
             'form'       => $form->createView(),
