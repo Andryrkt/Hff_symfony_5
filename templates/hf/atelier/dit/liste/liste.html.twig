@@ -138,10 +138,33 @@
 		</tbody>
 	</table>
 </div>
-{% include "partials/_pagination_bas.html.twig" with {
+	{% include "partials/_pagination_bas.html.twig" with {
 				currentPage: paginationData['currentPage'],
 				totalPages: paginationData['lastPage']
 			} %}
 	<!-- FIN tableau -->
 
+	{{ include('hf/atelier/dit/liste/_modal_soumission_document_a_validation.html.twig', {'soumissionForm': soumissionForm}) }}
+
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			var soumissionDocModal = document.getElementById('soumissionDocModal');
+			if (soumissionDocModal) {
+				soumissionDocModal.addEventListener('show.bs.modal', function(event) {
+					var button = event.relatedTarget;
+					var numDit = button.getAttribute('data-numdit');
+					
+					var modalNumDit = soumissionDocModal.querySelector('#modalNumDit');
+					var hiddenNumDit = soumissionDocModal.querySelector('#hiddenNumDit');
+					
+					modalNumDit.textContent = numDit;
+					hiddenNumDit.value = numDit;
+				});
+			}
+		});
+	</script>
 {% endblock %}

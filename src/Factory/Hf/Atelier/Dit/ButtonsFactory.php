@@ -29,8 +29,9 @@ class ButtonsFactory
         if ($dto->estOrASoumi) {
             $buttons[] = [
                 'label' => 'Soumission document à valider',
-                'route' => 'hf_atelier_dit_liste_detail',
-                'route_params' => ['numDit' => $dto->numeroDit],
+                'url' => '#',
+                'class' => 'soumissionDoc fw-bold',
+                'attributes' => 'data-bs-toggle="modal" data-bs-target="#soumissionDocModal" data-numdit="' . $dto->numeroDit . '"',
             ];
         }
 
