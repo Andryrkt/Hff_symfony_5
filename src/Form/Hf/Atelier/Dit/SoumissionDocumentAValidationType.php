@@ -22,8 +22,9 @@ class SoumissionDocumentAValidationType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('numeroDit', \Symfony\Component\Form\Extension\Core\Type\HiddenType::class)
             ->add(
-                'SoumissionDocumentAValidation',
+                'docDansDW',
                 ChoiceType::class,
                 [
                     'label' => 'Docs à intégrer dans DW',

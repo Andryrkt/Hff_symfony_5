@@ -11,8 +11,8 @@
 			<div class="modal-body mb-2">
 				<div class="container">
 					{{ form_start(soumissionForm) }}
-					{{ form_row(soumissionForm.SoumissionDocumentAValidation) }}
-					<input type="hidden" name="numDit" id="hiddenNumDit">
+					{{ form_row(soumissionForm.docDansDW) }}
+					{{ form_widget(soumissionForm.numeroDit, {'id': 'hiddenNumDit'}) }}
 
 					<div class="d-flex justify-content-end mt-3">
 						<button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Annuler</button>

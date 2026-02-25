@@ -44,7 +44,10 @@ class ListeController extends AbstractController
 
         // 4. Création et traitement du formulaire de soumission de document (pour la modal)
         $soumissionForm = $this->createForm(SoumissionDocumentAValidationType::class);
-        $this->traitementFormulaireSoumissionDocumentAValidation($request, $soumissionForm);
+        $response = $this->traitementFormulaireSoumissionDocumentAValidation($request, $soumissionForm);
+        if ($response) {
+            return $response;
+        }
 
         return $this->render('hf/atelier/dit/liste/liste.html.twig', [
             'data' => $paginationDatas['data'],
@@ -66,20 +69,36 @@ class ListeController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $searchDto = $form->getData();
-            dd($searchDto);
             // stocage des donner dans le session
             $session = $request->getSession();
             $session->set('search_dto', $searchDto);
         }
     }
 
-    private function traitementFormulaireSoumissionDocumentAValidation(Request $request, FormInterface $soumissionForm): void
+    private function traitementFormulaireSoumissionDocumentAValidation(Request $request, FormInterface $soumissionForm): ?\Symfony\Component\HttpFoundation\Response
     {
         $soumissionForm->handleRequest($request);
 
         if ($soumissionForm->isSubmitted() && $soumissionForm->isValid()) {
-            $soumissionDto = $soumissionForm->getData();
-            dd($soumissionDto);
+            $soumissionDoc = $soumissionForm->getData();
+            $numeroDit = $soumissionDoc['numeroDit'];
+            $docDansDW = $soumissionDoc['docDansDW'];
+
+            if ($docDansDW === 'OR') {
+                return $this->redirectToRoute("hf_atelier_dit_soumission_ors_index", ['numDit' => $numeroDit]);
+            } elseif ($docDansDW === 'FACTURE') {
+                return $this->redirectToRoute("hf_atelier_dit_soumission_facture_index", ['numDit' => $numeroDit]);
+            } elseif ($docDansDW === 'RI') {
+                return $this->redirectToRoute("hf_atelier_dit_soumission_ri_index", ['numDit' => $numeroDit]);
+            } elseif ($docDansDW === 'DEVIS-VP') {
+                return $this->redirectToRoute("hf_atelier_dit_soumission_devis_index", ['numDit' => $numeroDit, 'type' => 'VP']);
+            } elseif ($docDansDW === 'DEVIS-VA') {
+                return $this->redirectToRoute("hf_atelier_dit_soumission_devis_index", ['numDit' => $numeroDit, 'type' => 'VA']);
+            } elseif ($docDansDW === 'BC') {
+                return $this->redirectToRoute("hf_atelier_dit_soumission_bc_index", ['numDit' => $numeroDit]);
+            }
         }
+
+        return null;
     }
 }
