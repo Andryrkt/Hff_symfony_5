@@ -2,16 +2,14 @@
 
 namespace App\Controller\Hf\Atelier\Dit\Creation;
 
-use Psr\Log\LoggerInterface;
+
 use App\Form\Hf\Atelier\Dit\DitFormType;
 use App\Service\Hf\Atelier\Dit\PdfService;
 use App\Factory\Hf\Atelier\Dit\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\Hf\Atelier\Dit\CreationHandler;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
-use App\Service\Historique_operation\HistoriqueOperationService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+
 
 /**
  * @Route("/hf/atelier/dit")

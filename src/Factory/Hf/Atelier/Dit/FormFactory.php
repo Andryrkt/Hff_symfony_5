@@ -2,6 +2,7 @@
 
 namespace App\Factory\Hf\Atelier\Dit;
 
+use App\Entity\Hf\Atelier\Dit\Dit;
 use App\Dto\Hf\Atelier\Dit\FormDto;
 use App\Model\Hf\Atelier\Dit\DitModel;
 use App\Entity\Admin\PersonnelUser\User;
@@ -69,6 +70,68 @@ class FormFactory
         $dto->numeroDit = $this->numeroGeneratorService->autoGenerateNumero(TypeDocumentConstants::TYPE_DOCUMENT_DIT_CODE, true);
         $dto->mailDemandeur = $user->getEmail();
         $dto->statutDemande = $this->em->getRepository(StatutDemande::class)->findOneBy(['codeApplication' => TypeDocumentConstants::TYPE_DOCUMENT_DIT_CODE, 'description' => 'A AFFECTER']);
+
+        $this->enrichDtoWithMaterielInfo($dto);
+
+        return $dto;
+    }
+
+    public function duplicate(string $numDit): FormDto
+    {
+        $dto = new FormDto();
+        /** @var User */
+        $user = $this->security->getUser();
+
+        if (!$user instanceof User) {
+            throw new \RuntimeException('User not authenticated');
+        }
+
+        $dit = $this->em->getRepository(Dit::class)->findOneBy(['numeroDit' => $numDit]);
+
+
+        $dto->emetteur = [
+            'agence' => $dit->getAgenceEmetteurId(),
+            'service' => $dit->getServiceEmetteurId()
+        ];
+        $dto->debiteur = [
+            'agence' => $dit->getAgenceDebiteurId(),
+            'service' => $dit->getServiceDebiteur()
+        ];
+        $dto->niveauUrgence = $dit->getWorNiveauUrgence();
+        $dto->demandeDevis = $dit->getDemandeDevis();
+        $dto->clientSousContrat = $dit->getClientSousContrat();
+
+        $dto->dateDemande = new \DateTime();
+        $dto->numeroDit = $this->numeroGeneratorService->autoGenerateNumero(TypeDocumentConstants::TYPE_DOCUMENT_DIT_CODE, true);
+        $dto->mailDemandeur = $user->getEmail();
+        $dto->statutDemande = $this->em->getRepository(StatutDemande::class)
+            ->findOneBy(['codeApplication' => TypeDocumentConstants::TYPE_DOCUMENT_DIT_CODE, 'description' => 'A AFFECTER']);
+
+        // recupération des informations pour le duplication
+        $dto->objetDemande = $dit->getObjectDemande();
+        $dto->detailDemande = $dit->getDetailDemande();
+        $dto->typeDocument = $dit->getWorTypeDocument();
+        $dto->categorieDemande = $dit->getCategorieAteApp();
+        $dto->interneExterne = $dit->getInterneExterne();
+        $dto->demandeDevis = $dit->getDemandeDevis();
+        $dto->livraisonPartiel = $dit->getLivraisonPartiel();
+        $dto->avisRecouvrement = $dit->getAvisRecouvrement();
+        $dto->datePrevueTravaux = $dit->getDatePrevueTravaux();
+        $dto->typeReparation = $dit->getTypeReparation();
+        $dto->reparationRealise = $dit->getReparationRealise();
+
+
+        $dto->numeroClient = $dit->getNumeroClient();
+        $dto->nomClient = $dit->getNomClient();
+        $dto->numeroTel = $dit->getNumeroTelClient();
+        $dto->mailClient = $dit->getMailClient();
+        $dto->clientSousContrat = $dit->getClientSousContrat();
+
+        $dto->pieceJoint01 = $dit->getPieceJoint01();
+        $dto->pieceJoint02 = $dit->getPieceJoint02();
+        $dto->pieceJoint03 = $dit->getPieceJoint03();
+
+        $dto->idMateriel = $dit->getIdMateriel();
 
         $this->enrichDtoWithMaterielInfo($dto);
 

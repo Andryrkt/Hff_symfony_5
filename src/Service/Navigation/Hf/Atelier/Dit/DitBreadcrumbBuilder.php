@@ -26,6 +26,7 @@ class DitBreadcrumbBuilder extends BaseBreadcrumbBuilder implements BreadcrumbBu
         return in_array($context, [
             'hf_atelier_dit_liste_index',
             'hf_atelier_dit_form_index',
+            'hf_atelier_dit_creation_duplication'
         ]);
     }
 
@@ -42,6 +43,9 @@ class DitBreadcrumbBuilder extends BaseBreadcrumbBuilder implements BreadcrumbBu
                 break;
             case 'hf_atelier_dit_liste_index':
                 $items = $this->buildListeBreadcrumb();
+                break;
+            case 'hf_atelier_dit_creation_duplication':
+                $items = $this->buildDuplicationBreadcrumb();
                 break;
             default:
                 throw new \InvalidArgumentException("Unsupported product context: {$context}");
@@ -70,6 +74,14 @@ class DitBreadcrumbBuilder extends BaseBreadcrumbBuilder implements BreadcrumbBu
     {
         return $this->buildBaseBreadcrumb()
             ->add("Création dit")
+            ->setBackRoute('hf_atelier_dit_liste_index')
+            ->get();
+    }
+
+    private function buildDuplicationBreadcrumb(): array
+    {
+        return $this->buildBaseBreadcrumb()
+            ->add("Duplication dit")
             ->setBackRoute('hf_atelier_dit_liste_index')
             ->get();
     }

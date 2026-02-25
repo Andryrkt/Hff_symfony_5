@@ -1,0 +1,188 @@
+{% import "macros/form_macros.html.twig" as formMacros %}
+{{ form_start(form) }}
+{{ form_errors(form)}}
+
+<div class="row">
+	<div class="d-none">
+		{{ form_row(form.estDitAvoir)}}
+		{{ form_row(form.estDitRefacturation)}}
+	</div>
+	<div data-controller="character-limiter" data-character-limiter-max-length-value="86">
+		{{ form_row(form.objetDemande,  {
+                    		'attr': {
+                        		'data-character-limiter-target': 'input', 
+                        		'data-action': 'input->character-limiter#limiterCaracteres'
+                    			}
+                			})}}
+	</div>
+	<div class="mb-3 position-relative">
+		{{ form_row(form.detailDemande, {
+                                'attr': {
+                                    'data-pages--hf--atelier--dit--dit-form-target': 'detailDemande',
+                                    'data-action': 'input->pages--hf--atelier--dit--dit-form#updateCharCount'
+                                }
+                            }) }}
+		<span id="charCount" data-pages--hf--atelier--dit--dit-form-target="charCount" class="position-absolute bottom-0 end-0 p-0 small text-muted"></span>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-12 col-md-2">{{ form_row(form.typeDocument) }}</div>
+	<div class="col-12 col-md-2">{{ form_row(form.categorieDemande) }}</div>
+	<div class="col-12 col-md-2">{{ form_row(form.interneExterne, {
+							'attr': {
+                                'data-pages--hf--atelier--dit--dit-form-target': 'interneExterne',
+                                'data-action': 'change->pages--hf--atelier--dit--dit-form#toggleInterneExterne',
+								'data-informations': {
+									'agenceId': app.user.agence.id|default(''),
+									'serviceId': app.user.service.id|default('')
+								}|json_encode
+							}
+						})}}</div>
+	<div class="col-12 col-md-2">{{ form_row(form.demandeDevis, {'attr': {'data-pages--hf--atelier--dit--dit-form-target': 'demandeDevis'}})}}</div>
+	<div class="col-12 col-md-2">{{ form_row(form.livraisonPartiel)}}</div>
+	<div class="col-12 col-md-2">{{ form_row(form.avisRecouvrement)}}</div>
+</div>
+
+
+<div class="row">
+	<div class="col-12 col-md-6">
+		{{ formMacros.sousTitre('Agence et Service', {class: 'sousTitre'})}}
+		<div class="row">
+			<div class="col-12 col-md-6 mt-2">Débiteur
+				<hr></div>
+			<div class="col-12 col-md-6 mt-2">Emetteur
+				<hr></div>
+		</div>
+
+		<div class="row">
+			<div class="col-12 col-md-6">
+				{{ formMacros.debiteurOuEmetteurFields(form, 'debiteur', {
+                                        'agence_attr': {'data-pages--hf--atelier--dit--dit-form-target': 'debiteurAgence'},
+                                        'service_attr': {'data-pages--hf--atelier--dit--dit-form-target': 'debiteurService'}
+                                    }) }}
+			</div>
+			<div class="col-12 col-md-6">
+				{{ formMacros.debiteurOuEmetteurFields(form, 'emetteur', {
+                                        'agence_attr': {'data-pages--hf--atelier--dit--dit-form-target': 'emetteurAgence'},
+                                        'service_attr': {'data-pages--hf--atelier--dit--dit-form-target': 'emetteurService'}
+                                    }) }}
+			</div>
+		</div>
+
+
+		{# Info Client #}
+		{{ formMacros.sousTitre('Info Client', {class: 'sousTitre'})}}
+		<div class="row">
+			<div class="col-12 col-md-6">
+				{{ form_row(form.numeroClient, {'attr': {'data-pages--hf--atelier--dit--dit-form-target': 'numeroClient'}})}}
+				<div id="suggestion-numClient" class="suggestions-container"></div>
+				<div id="loader-numClient" class="spinner" style="display: none;"></div>
+				{{ form_row(form.nomClient, {'attr': {'data-pages--hf--atelier--dit--dit-form-target': 'nomClient'}})}}
+				<div id="suggestion-nomClient" class="suggestions-container"></div>
+				<div id="loader-nomClient" class="spinner" style="display: none;"></div>
+				{{ form_row(form.clientSousContrat, {'attr': {'data-pages--hf--atelier--dit--dit-form-target': 'clientSousContrat'}})}}
+			</div>
+			<div class="col-12 col-md-6" data-controller="number-only character-limiter" data-character-limiter-max-length-value="10">
+				{{ form_row(form.numeroTel, {
+										'attr': {
+											'data-character-limiter-target': 'input', 
+											'data-number-only-target': 'input',
+											'data-action': 'input->character-limiter#limiterCaracteres input->number-only#filter',
+                                            'data-pages--hf--atelier--dit--dit-form-target': 'numeroTel'
+										}
+									})}}
+				{{ form_row(form.mailClient, {'attr': {'data-pages--hf--atelier--dit--dit-form-target': 'mailClient'}})}}
+			</div>
+		</div>
+		<div class="row">
+			<span id="erreurClient"></span>
+		</div>
+
+
+		{# Information Matériel #}
+		<div>
+			{{ formMacros.sousTitre('Information Matériel', {class: 'sousTitre'})}}
+			<div class="row">
+				<div class="col-12 col-md-4">
+					{{ form_row(form.idMateriel, {'attr': {'data-pages--hf--atelier--dit--dit-form-target': 'idMateriel'}})}}
+					<div id="suggestion-idMateriel" class="suggestions-container"></div>
+					<div id="loader-idMateriel" class="spinner d-flex align-items-center" style="display: none;"></div>
+
+				</div>
+				<div class="col-12 col-md-4">
+					{{ form_row(form.numParc, {'attr': {'data-pages--hf--atelier--dit--dit-form-target': 'numParc'}})}}
+					<div id="suggestion-numParc" class="suggestions-container"></div>
+					<div id="loader-numParc" class="spinner" style="display: none;"></div>
+				</div>
+				<div class="col-12 col-md-4">
+					{{ form_row(form.numSerie, {'attr': {'data-pages--hf--atelier--dit--dit-form-target': 'numSerie'}})}}
+					<div id="suggestion-numSerie" class="suggestions-container"></div>
+					<div id="loader-numSerie" class="spinner" style="display: none;"></div>
+				</div>
+			</div>
+			<div class="row">
+				<div id="error-idMateriel" class="text-danger"></div>
+			</div>
+			<div id="containerInfoMateriel" data-pages--hf--atelier--dit--dit-form-target="containerInfoMateriel"></div>
+		</div>
+
+	</div>
+	<div class="col-12 col-md-6">
+		{{ formMacros.sousTitre('Intervention', {class: 'sousTitre'})}}
+		<div class="row">
+			<div class="col-12 col-md-6">
+				{{ formMacros.niveauUrgenceField(form.niveauUrgence) }}
+			</div>
+			<div class="col-12 col-md-6">
+				{{ form_row(form.datePrevueTravaux)}}
+			</div>
+		</div>
+		{{ formMacros.sousTitre('Réparation', {class: 'sousTitre'})}}
+		<div class="row">
+			<div class="col-12 col-md-6">
+				{{ form_row(form.typeReparation) }}
+			</div>
+			<div class="col-12 col-md-6">
+				{{ form_row(form.reparationRealise, {
+                                        'attr': {
+                                            'data-pages--hf--atelier--dit--dit-form-target': 'reparationRealise',
+                                            'data-action': 'change->pages--hf--atelier--dit--dit-form#handleReparationChange'
+                                        }
+                                    }) }}
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12 col-md-6"></div>
+			<div class="col-12 col-md-6" id="ate_pol_tana_container" data-pages--hf--atelier--dit--dit-form-target="atePolTanaContainer" style="display: none;">
+				{{ form_row(form.estAtePolTana, {
+                                        'attr': {
+                                            'data-pages--hf--atelier--dit--dit-form-target': 'atePolTanaInput',
+                                            'data-action': 'change->pages--hf--atelier--dit--dit-form#handleAtePolTanaChange'
+                                        }
+                                    }) }}
+			</div>
+		</div>
+
+		{# Piece Jointes #}
+		{{ formMacros.sousTitre('Pièces Jointes', {class: 'sousTitre'})}}
+
+		{{ form_row(form.pieceJoint01)}}
+		{{ form_errors(form.pieceJoint01)}}
+
+		{{ form_row(form.pieceJoint02)}}
+		{{ form_errors(form.pieceJoint02) }}
+
+		{{ form_row(form.pieceJoint03)}}
+		{{ form_errors(form.pieceJoint03) }}
+	</div>
+
+</div>
+<div class="row">
+	<div class="d-flex justify-content-end mt-2">
+		{% import "macros/actions.html.twig" as actions %}
+		{{ actions.submit_button('Enregistrer', 'fa fa-print', 'btn-warning', true, 'Confirmez-vous la création de cette demande d\'ordre de mission ?', 'Veuillez ne pas quitter la page pendant la création de la demande.', 'Création de la demande d\'ordre de mission') }}
+	</div>
+</div>
+
+{{ form_end(form) }}
