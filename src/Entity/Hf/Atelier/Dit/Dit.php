@@ -91,7 +91,7 @@ class Dit implements CreatedByInterface, AgenceServiceInterface
     private $clientSousContrat;
 
     /**
-     * @ORM\Column(type="string", length=100)
+     * @ORM\Column(type="string", length=255)
      */
     private $objectDemande;
 
@@ -141,7 +141,7 @@ class Dit implements CreatedByInterface, AgenceServiceInterface
     private $sectionAffectee;
 
     /**
-     * @ORM\Column(type="string", length=20, nullable=true)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $statutOr;
 

@@ -14,7 +14,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class MigrateDomDataCommand extends Command
+class MigrateDitDataCommand extends Command
 {
     protected static $defaultName = 'app:migrate:dit-data';
     protected static $defaultdescription = 'Migre les données DIT de l\'ancienne base vers la nouvelle structure';
@@ -40,7 +40,7 @@ class MigrateDomDataCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('dry-run', null, InputOption::VALUE_REQUIRED, 'Exécute la migration sans persister les données')
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Exécute la migration sans persister les données')
             ->addOption('batch-size', 'b', InputOption::VALUE_REQUIRED, 'Nombre d\'enregistrements à traiter par lot', 50)
             ->addOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Nombre maximum d\'eneregistrments à migrer (pour test)', null)
             ->addOption('offset', 'o', InputOption::VALUE_REQUIRED, 'Décalage de départ (pour reprendre une migration)', 0)

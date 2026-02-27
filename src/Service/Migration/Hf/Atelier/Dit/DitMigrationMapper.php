@@ -97,18 +97,18 @@ class DitMigrationMapper
             // section
             ->setSectionAffectee($oldData['section_affectee'] ?? null)
             // Annulation
-            ->setEstAnnuler($oldData['a_annuler'] ?? null)
+            ->setEstAnnuler($oldData['a_annuler'] ?? false)
             // Avoir
-            ->setEstDitAvoir($oldData['a_dit_avoir'] ?? null)
-            ->setEstDitRefacturation($oldData['a_dit_refacturation'] ?? null)
+            ->setEstDitAvoir($oldData['a_dit_avoir'] ?? false)
+            ->setEstDitRefacturation($oldData['a_dit_refacturation'] ?? false)
             ->setNumeroDemandeDitAvoir($oldData['numero_demande_dit_avoir'] ?? null)
             ->setNumeroDemandeDitRefacturation($oldData['numero_demande_dit_refacturation'] ?? null)
             //Matériel
             ->setIdMateriel($oldData['ID_Materiel'] ?? 0)
-            ->setHeureMachine($oldData['heure_machine'] ?? null)
-            ->setKmMachine($oldData['km_machine'] ?? null)
+            ->setHeureMachine($oldData['heure_machine'] ?? 0)
+            ->setKmMachine($oldData['km_machine'] ?? 0)
             // Autres
-            ->setEstAtePolTana($oldData['a_ate_pol_tana'] ?? null)
+            ->setEstAtePolTana($oldData['a_ate_pol_tana'] ?? false)
             ->setNumeroMigration($oldData['num_migr'] ?? null)
 
         ;
