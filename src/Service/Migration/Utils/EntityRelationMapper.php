@@ -39,11 +39,11 @@ class EntityRelationMapper
      */
     public function mapStatutDemande(array $oldData, string $codeApplication): ?StatutDemande
     {
-        if (empty($oldData['ID_Statut_Demande'])) {
+        if (empty($oldData['ID_Statut_Demande']) && empty($oldData['id_statut_demande'])) {
             return null;
         }
 
-        $descriptionStatut = $this->legacyDataFetcher->getStatutDemandeDescription($oldData['ID_Statut_Demande']);
+        $descriptionStatut = $this->legacyDataFetcher->getStatutDemandeDescription($oldData['ID_Statut_Demande'] ?? $oldData['id_statut_demande']);
         if ($descriptionStatut) {
             $statut = $this->em->getRepository(StatutDemande::class)
                 ->findOneBy([
@@ -55,7 +55,7 @@ class EntityRelationMapper
 
         if (!$statut) {
             $this->logger->warning('StatutDemande non trouvé', [
-                'ID_Statut_Demande' => $oldData['ID_Statut_Demande'],
+                'ID_Statut_Demande' => $oldData['ID_Statut_Demande'] ?? $oldData['id_statut_demande'],
                 'Description_Statut' => $descriptionStatut ?? null,
             ]);
         }

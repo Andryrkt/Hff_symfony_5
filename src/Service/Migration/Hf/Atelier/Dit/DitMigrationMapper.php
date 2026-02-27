@@ -94,8 +94,7 @@ class DitMigrationMapper
             ->setEtatFacturation($oldData['etat_facturation'] ?? null)
             //RI
             ->setRi($oldData['ri'] ?? '0/0')
-            // section
-            ->setSectionAffectee($oldData['section_affectee'] ?? null)
+
             // Annulation
             ->setEstAnnuler($oldData['a_annuler'] ?? false)
             // Avoir
@@ -107,6 +106,15 @@ class DitMigrationMapper
             ->setIdMateriel($oldData['ID_Materiel'] ?? 0)
             ->setHeureMachine($oldData['heure_machine'] ?? 0)
             ->setKmMachine($oldData['km_machine'] ?? 0)
+            // piece joint
+            ->setPieceJoint01($oldData['piece_joint1'] ?? null)
+            ->setPieceJoint02($oldData['piece_joint2'] ?? null)
+            ->setPieceJoint03($oldData['piece_joint'] ?? null)
+            // section
+            ->setSectionAffectee($oldData['section_affectee'] ?? null)
+            ->setSectionSupport1($oldData['section_support_1'] ?? null)
+            ->setSectionSupport2($oldData['section_support_2'] ?? null)
+            ->setSectionSupport3($oldData['section_support_3'] ?? null)
             // Autres
             ->setEstAtePolTana($oldData['a_ate_pol_tana'] ?? false)
             ->setNumeroMigration($oldData['num_migr'] ?? null)
@@ -148,34 +156,27 @@ class DitMigrationMapper
     {
 
         // type de document
-        if (empty($oldData['type_document'])) {
-            $typeDocument = $this->findWorTypeDocument($oldData['type_document']);
+        if (!empty($oldData['type_document'])) {
+            $typeDocument = $this->findWorTypeDocument((int)$oldData['type_document']);
+
             if ($typeDocument) {
                 $dit->setWorTypeDocument($typeDocument);
             }
         }
 
         // niveau d'urgence
-        if (empty($oldData['id_niveau_urgence'])) {
-            $niveauUrgence = $this->findWorNiveauUrgence($oldData['id_niveau_urgence']);
+        if (!empty($oldData['id_niveau_urgence'])) {
+            $niveauUrgence = $this->findWorNiveauUrgence((int)$oldData['id_niveau_urgence']);
             if ($niveauUrgence) {
                 $dit->setWorNiveauUrgence($niveauUrgence);
             }
         }
 
-        // niveau d'urgence
-        if (empty($oldData['categorie_demande'])) {
-            $categorieAte = $this->findCategorieAte($oldData['categorie_demande']);
+        // categorie ate
+        if (!empty($oldData['categorie_demande'])) {
+            $categorieAte = $this->findCategorieAte((int) $oldData['categorie_demande']);
             if ($categorieAte) {
                 $dit->setCategorieAteApp($categorieAte);
-            }
-        }
-
-        // CreatedBy (User)
-        if (!empty($oldData['Nom_Session_Utilisateur'])) {
-            $user = $this->relationMapper->mapUser($oldData['Nom_Session_Utilisateur']);
-            if ($user) {
-                $dit->setCreatedBy($user);
             }
         }
 
@@ -183,6 +184,14 @@ class DitMigrationMapper
         $statut = $this->relationMapper->mapStatutDemande($oldData, 'DIT');
         if ($statut) {
             $dit->setStatutDemande($statut);
+        }
+
+        // CreatedBy (User)
+        if (!empty($oldData['utilisateur_demandeur'])) {
+            $user = $this->relationMapper->mapUser($oldData['utilisateur_demandeur']);
+            if ($user) {
+                $dit->setCreatedBy($user);
+            }
         }
 
         // Relations Agence et Service émetteur
@@ -232,7 +241,7 @@ class DitMigrationMapper
         if (empty($codeDocument)) return null;
 
         $worTypeDocumentRepository = $this->em->getRepository(WorTypeDocument::class);
-        return $worTypeDocumentRepository->findOneBy(['code' => $codeDocument]);
+        return $worTypeDocumentRepository->findOneBy(['codeDocument' => $codeDocument]);
     }
 
     /**
@@ -274,7 +283,7 @@ class DitMigrationMapper
         if (empty($codeDocument)) return null;
 
         $worNiveauUrgenceRepository = $this->em->getRepository(WorNiveauUrgence::class);
-        return $worNiveauUrgenceRepository->findOneBy(['description' => $codeDocument]);
+        return $worNiveauUrgenceRepository->findOneBy(['code' => $codeDocument]);
     }
 
     private function findDescriptionNiveauUrgence(int $id)
@@ -310,7 +319,7 @@ class DitMigrationMapper
         if (empty($libelle)) return null;
 
         $categorieAteRepository = $this->em->getRepository(CategorieAteApp::class);
-        return $categorieAteRepository->findOneBy(['code' => $libelle]);
+        return $categorieAteRepository->findOneBy(['libelleCategorieAteApp' => $libelle]);
     }
 
     private function findLibelleCategorieAte(int $id)

@@ -137,7 +137,7 @@ HELP
                                 'numero_dit' => $numeroDit,
                                 'reason' => 'Doublon dans le flux (batch)'
                             ];
-                            $this->logger->info('BADM doublon dans le flux (ignoré)', [
+                            $this->logger->info('DIT doublon dans le flux (ignoré)', [
                                 'numero_dit' => $numeroDit,
                                 'old_id' => $legacyId,
                             ]);
@@ -145,13 +145,13 @@ HELP
                             continue;
                         }
 
-                        // Vérifie si le BADM existe déjà (par numeroBadm) dans la BDD
+                        // Vérifie si le DIT existe déjà (par numeroDit) dans la BDD
                         if ($numeroDit) {
-                            $existingBadm = $this->em->getRepository(Dit::class)->findOneBy([
+                            $existingDit = $this->em->getRepository(Dit::class)->findOneBy([
                                 'numeroDit' => $numeroDit
                             ]);
 
-                            if ($existingBadm) {
+                            if ($existingDit) {
                                 $stats['skipped']++;
                                 $processedNumeros[$numeroDit] = true;
                                 $skippedRecords[] = [
@@ -159,7 +159,7 @@ HELP
                                     'numero_dit' => $numeroDit,
                                     'reason' => 'Existe déjà en BDD'
                                 ];
-                                $this->logger->info('BADM déjà existant (ignoré)', [
+                                $this->logger->info('DIT déjà existant (ignoré)', [
                                     'numero_dit' => $numeroDit,
                                     'old_id' => $legacyId,
                                 ]);
@@ -173,7 +173,7 @@ HELP
 
                         if ($dit === null) {
                             $stats['skipped']++;
-                            $this->logger->warning('Enregistrement BADM ignoré (mapping failed)', [
+                            $this->logger->warning('Enregistrement DIT ignoré (mapping failed)', [
                                 'old_id' => $legacyId,
                             ]);
                             continue;
@@ -191,7 +191,7 @@ HELP
                         $stats['success']++;
                     } catch (\Exception $e) {
                         $stats['errors']++;
-                        $this->logger->error('Erreur lors de la migration d\'un enregistrement BADM', [
+                        $this->logger->error('Erreur lors de la migration d\'un enregistrement DIT', [
                             'old_id' => $legacyData['ID_DIT'] ?? 'unknown',
                             'error' => $e->getMessage(),
                             'trace' => $e->getTraceAsString(),
@@ -232,7 +232,7 @@ HELP
                 return Command::FAILURE;
             }
 
-            $io->success('Migration BADM terminée avec succès !');
+            $io->success('Migration DIT terminée avec succès !');
             return Command::SUCCESS;
         } catch (\Exception $e) {
             $io->error('Erreur fatale lors de la migration: ' . $e->getMessage());
