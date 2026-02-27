@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity\Hf\Atelier\Dit\Ors;
+namespace App\Entity\Hf\Atelier\Dit\Soumission\Ors;
 
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Traits\CreatedByTrait;

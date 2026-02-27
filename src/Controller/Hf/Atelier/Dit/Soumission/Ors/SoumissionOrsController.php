@@ -15,6 +15,9 @@ class SoumissionOrsController extends AbstractController
      */
     public function index(string $numDit)
     {
+        // 1. gerer l'accés 
+        $this->denyAccessUnlessGranted('ATELIER_DIT_SOUMISSION_ORS');
+
         return $this->render('hf/atelier/dit/soumission/ors/index.html.twig', [
             'numDit' => $numDit,
         ]);

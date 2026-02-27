@@ -84,18 +84,27 @@ class ListeController extends AbstractController
             $numeroDit = $soumissionDoc['numeroDit'];
             $docDansDW = $soumissionDoc['docDansDW'];
 
-            if ($docDansDW === 'OR') {
-                return $this->redirectToRoute("hf_atelier_dit_soumission_ors_index", ['numDit' => $numeroDit]);
-            } elseif ($docDansDW === 'FACTURE') {
-                return $this->redirectToRoute("hf_atelier_dit_soumission_facture_index", ['numDit' => $numeroDit]);
-            } elseif ($docDansDW === 'RI') {
-                return $this->redirectToRoute("hf_atelier_dit_soumission_ri_index", ['numDit' => $numeroDit]);
-            } elseif ($docDansDW === 'DEVIS-VP') {
-                return $this->redirectToRoute("hf_atelier_dit_soumission_devis_index", ['numDit' => $numeroDit, 'type' => 'VP']);
-            } elseif ($docDansDW === 'DEVIS-VA') {
-                return $this->redirectToRoute("hf_atelier_dit_soumission_devis_index", ['numDit' => $numeroDit, 'type' => 'VA']);
-            } elseif ($docDansDW === 'BC') {
-                return $this->redirectToRoute("hf_atelier_dit_soumission_bc_index", ['numDit' => $numeroDit]);
+            switch ($docDansDW) {
+                case 'OR':
+                    return $this->redirectToRoute("hf_atelier_dit_soumission_ors_index", ['numDit' => $numeroDit]);
+
+                case 'FACTURE':
+                    return $this->redirectToRoute("hf_atelier_dit_soumission_facture_index", ['numDit' => $numeroDit]);
+
+                case 'RI':
+                    return $this->redirectToRoute("hf_atelier_dit_soumission_ri_index", ['numDit' => $numeroDit]);
+
+                case 'DEVIS-VP':
+                    return $this->redirectToRoute("hf_atelier_dit_soumission_devis_index", ['numDit' => $numeroDit, 'type' => 'VP']);
+
+                case 'DEVIS-VA':
+                    return $this->redirectToRoute("hf_atelier_dit_soumission_devis_index", ['numDit' => $numeroDit, 'type' => 'VA']);
+
+                case 'BC':
+                    return $this->redirectToRoute("hf_atelier_dit_soumission_bc_index", ['numDit' => $numeroDit]);
+
+                default:
+                    return null; // ou gérer le cas par défaut
             }
         }
 
