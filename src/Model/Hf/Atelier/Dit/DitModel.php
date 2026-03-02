@@ -28,13 +28,29 @@ class DitModel
         try {
             $estPneumatique = in_array($reparationRealise, ['ATE POL TANA']);
             $estPiece = in_array($reparationRealise, ['ATE TANA', 'ATE STAR', 'ATE MAS']);
-            $constructeurPneumatique = $this->parameters->get('app.constructeurs.pneumatique') . ",'PNE'";
-            $constructeurPiece = $this->parameters->get('app.constructeurs.pieces_magasin') . "," . $this->parameters->get('app.constructeurs.lub') . "," . $this->parameters->get('app.constructeurs.achat_locaux') . ",'SHE'";
+
+            $prepareList = function ($params) {
+                $list = array_filter(array_map('trim', $params));
+                return !empty($list) ? implode(',', $list) : "";
+            };
+
+            $constructeurPneumatique = $prepareList([
+                $this->parameters->get('app.constructeurs.pneumatique'),
+                "'PNE'"
+            ]);
+
+            $constructeurPiece = $prepareList([
+                $this->parameters->get('app.constructeurs.pieces_magasin'),
+                $this->parameters->get('app.constructeurs.lub'),
+                $this->parameters->get('app.constructeurs.achat_locaux'),
+                "'SHE'"
+            ]);
+
             $conditionConstructeur = "";
 
-            if ($estPneumatique) {
+            if ($estPneumatique && $constructeurPneumatique) {
                 $conditionConstructeur = "AND slor_constp IN ($constructeurPneumatique)";
-            } else if ($estPiece) {
+            } elseif ($estPiece && $constructeurPiece) {
                 $conditionConstructeur = "AND slor_constp IN ($constructeurPiece)";
             }
 
@@ -92,32 +108,58 @@ class DitModel
 
             $statement = "SELECT
 
-        mmat_marqmat as constructeur,
-        trim(mmat_desi) as designation,
-        trim(mmat_typmat) as modele,
-        trim(mmat_numparc) as casier_emetteur,
-        mmat_nummat as num_matricule,
-        trim(mmat_numserie) as num_serie,
-        trim(mmat_recalph) as num_parc,
-        trim(mmat_marqmat) as marque,
+                mmat_marqmat as constructeur,
+                trim(mmat_desi) as designation,
+                trim(mmat_typmat) as modele,
+                trim(mmat_numparc) as casier_emetteur,
+                mmat_nummat as num_matricule,
+                trim(mmat_numserie) as num_serie,
+                trim(mmat_recalph) as num_parc,
+                trim(mmat_marqmat) as marque,
 
-        (select mhir_compteur from mat_hir a where a.mhir_nummat = mmat_nummat and a.mhir_daterel = (select max(b.mhir_daterel) from mat_hir b where b.mhir_nummat = a.mhir_nummat)) as heure,
-        (select mhir_cumcomp from mat_hir a where a.mhir_nummat = mmat_nummat and a.mhir_daterel = (select max(b.mhir_daterel) from mat_hir b where b.mhir_nummat = a.mhir_nummat)) as km,
-        (select nvl(sum(mofi_mt),0) from Informix.mat_ofi where mofi_classe = 30 and mofi_ssclasse in (10,11,12,13,14,16,17,18,19) and mofi_numbil = mbil_numbil and mofi_typmt = 'R') as cout_acquisition,
-        (select nvl(sum(mofi_mt),0) from mat_ofi where mofi_classe = 30 and mofi_ssclasse = 15 and mofi_numbil = mbil_numbil and mofi_typmt = 'R') as amortissement,
+                (select mhir_compteur from mat_hir a where a.mhir_nummat = mmat_nummat and a.mhir_daterel = (select max(b.mhir_daterel) from mat_hir b where b.mhir_nummat = a.mhir_nummat)) as heure,
+                (select mhir_cumcomp from mat_hir a where a.mhir_nummat = mmat_nummat and a.mhir_daterel = (select max(b.mhir_daterel) from mat_hir b where b.mhir_nummat = a.mhir_nummat)) as km,
+                (select nvl(sum(mofi_mt),0) from Informix.mat_ofi where mofi_classe = 30 and mofi_ssclasse in (10,11,12,13,14,16,17,18,19) and mofi_numbil = mbil_numbil and mofi_typmt = 'R') as cout_acquisition,
+                (select nvl(sum(mofi_mt),0) from mat_ofi where mofi_classe = 30 and mofi_ssclasse = 15 and mofi_numbil = mbil_numbil and mofi_typmt = 'R') as amortissement,
 
-        (select nvl(sum(mofi_mt),0) from mat_ofi where mofi_classe = 10 and mofi_ssclasse in (100,21,22,23) and mofi_numbil = mbil_numbil and mofi_typmt = 'R') as chiffre_affaires,
-        (select nvl(sum(mofi_mt),0) from mat_ofi where mofi_classe = 40 and mofi_ssclasse in (100,110) and mofi_numbil = mbil_numbil and mofi_typmt = 'R') as charge_locative,
-        (select nvl(sum(mofi_mt),0) from mat_ofi where mofi_classe = 40 and mofi_ssclasse in (21,22,23) and mofi_numbil = mbil_numbil and mofi_typmt = 'R') as charge_entretien
-      
-      FROM MAT_MAT
-      LEFT JOIN mat_bil on mbil_nummat = mmat_nummat and mbil_dateclot <= '01/01/1900' and mbil_dateclot = '12/31/1899'
-      WHERE MMAT_ETSTOCK in ('ST','AT', '--')
-      $whereClause
-      ";
+                (select nvl(sum(mofi_mt),0) from mat_ofi where mofi_classe = 10 and mofi_ssclasse in (100,21,22,23) and mofi_numbil = mbil_numbil and mofi_typmt = 'R') as chiffre_affaires,
+                (select nvl(sum(mofi_mt),0) from mat_ofi where mofi_classe = 40 and mofi_ssclasse in (100,110) and mofi_numbil = mbil_numbil and mofi_typmt = 'R') as charge_locative,
+                (select nvl(sum(mofi_mt),0) from mat_ofi where mofi_classe = 40 and mofi_ssclasse in (21,22,23) and mofi_numbil = mbil_numbil and mofi_typmt = 'R') as charge_entretien
+            
+            FROM MAT_MAT
+            LEFT JOIN mat_bil on mbil_nummat = mmat_nummat and mbil_dateclot <= '01/01/1900' and mbil_dateclot = '12/31/1899'
+            WHERE MMAT_ETSTOCK in ('ST','AT', '--')
+            $whereClause
+            ";
 
             $result = $this->databaseInformix->executeQuery($statement);
             $rows = $this->databaseInformix->fetchScalarResults($result);
+
+            return $rows;
+        } finally {
+            $this->databaseInformix->close();
+        }
+    }
+
+    public function getNumeroOrBatch(array $numeroDits): array
+    {
+        if (empty($numeroDits)) {
+            return [];
+        }
+
+        $this->databaseInformix->connect();
+
+        try {
+            $ids = "'" . implode("','", $numeroDits) . "'";
+            $statement = " SELECT
+                seor_numor AS numero_or,
+                trim(seor_refdem) as numero_dit
+            FROM informix.sav_eor
+            WHERE trim(seor_refdem) IN ($ids)
+            ";
+
+            $result = $this->databaseInformix->executeQuery($statement);
+            $rows = $this->databaseInformix->fetchResults($result);
 
             return $rows;
         } finally {
