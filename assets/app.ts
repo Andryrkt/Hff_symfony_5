@@ -11,6 +11,7 @@ import { StimulusAutoloader } from "./utils/stimulus-autoloader";
 
 // Import des styles et bibliothèques
 import "bootstrap";
+import "@hotwired/turbo";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "@fortawesome/fontawesome-free/js/all.min.js";
 import "./styles/app.scss";

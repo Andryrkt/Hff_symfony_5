@@ -7,6 +7,7 @@
 
 {% block content %}
 {% set mots_a_supprimer = ['Chef section', 'Chef de section', 'Responsable section', 'Chef d\'équipe'] %}
+<turbo-frame id="dit-list-frame">
 <div class="sticky-header-titre">
 	<div class="container">
 		{% include 'partials/flash_messages.html.twig' %}
@@ -153,6 +154,7 @@
 	<!-- FIN tableau -->
 	{% include 'hf/atelier/dit/liste/_modal_soumission_document_a_validation.html.twig' %}
 </div>
+</turbo-frame>
 
 {% endblock %}
 

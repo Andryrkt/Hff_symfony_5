@@ -17,15 +17,18 @@ class Mapper
     private EntityManagerInterface $em;
     private ButtonsFactory $buttonsFactory;
     private FormFactory $formFactory;
+    private \App\Model\Hf\Atelier\Dit\DitModel $ditModel;
 
     public function __construct(
         EntityManagerInterface $em,
         ButtonsFactory $buttonsFactory,
-        FormFactory $formFactory
+        FormFactory $formFactory,
+        \App\Model\Hf\Atelier\Dit\DitModel $ditModel
     ) {
         $this->em = $em;
         $this->buttonsFactory = $buttonsFactory;
         $this->formFactory = $formFactory;
+        $this->ditModel = $ditModel;
     }
 
     public function map(FormDto $dto): Dit
@@ -98,7 +101,38 @@ class Mapper
         return $dit;
     }
 
-    public function reverseMap(Dit $dit): FormDto
+    /**
+     * Version optimisée pour les listes (Batch Processing)
+     */
+    public function reverseMapList(array $entities): array
+    {
+        if (empty($entities)) {
+            return [];
+        }
+
+        // 1. Collecter tous les IDs matériels pour le batch
+        $idMateriels = array_unique(array_filter(array_map(fn($e) => $e->getIdMateriel(), $entities)));
+
+        // 2. Récupérer les infos matérielles en une seule fois
+        $materielInfos = $this->ditModel->getInfoMaterielBatch($idMateriels);
+
+        // 3. Mapper chaque entité
+        return array_map(function ($entity) use ($materielInfos) {
+            $dto = $this->reverseMap($entity, false); // false = pas d'enrichissement individuel
+
+            // Appliquer les infos du batch (numSerie et numParc nécessaires à la liste)
+            $idMat = $entity->getIdMateriel();
+            if ($idMat && isset($materielInfos[$idMat])) {
+                $info = $materielInfos[$idMat];
+                $dto->numSerie = $info['num_serie'] ?? null;
+                $dto->numParc = $info['num_parc'] ?? null;
+            }
+
+            return $dto;
+        }, $entities);
+    }
+
+    public function reverseMap(Dit $dit, bool $fullEnrichment = true): FormDto
     {
         $dto = new FormDto();
         // -----------------Reparation ----------------
@@ -126,7 +160,9 @@ class Mapper
         $dto->libelleClient = $dit->getLibelleClient();
         // ------ info matériel -----
         $dto->idMateriel = $dit->getIdMateriel();
-        $this->formFactory->enrichDtoWithMaterielInfo($dto);
+        if ($fullEnrichment) {
+            $this->formFactory->enrichDtoWithMaterielInfo($dto);
+        }
         //  --------------- OR ---------------------
         $dto->dateOr = $dit->getDateOr();
         $dto->numeroOr = $dit->getNumeroOr();

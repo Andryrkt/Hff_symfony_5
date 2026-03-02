@@ -6,7 +6,6 @@ use App\Dto\Hf\Atelier\Dit\SearchDto;
 use App\Mapper\Hf\Atelier\Dit\Mapper;
 use App\Form\Hf\Atelier\Dit\SearchType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\Hf\Atelier\Dit\DitRepository;
 use App\Constants\Hf\Atelier\Dit\ButtonsConstants;
 use App\Controller\Traits\PaginationAndSortingTrait;
@@ -39,8 +38,11 @@ class ListeController extends AbstractController
         $form = $this->createForm(SearchType::class, $searchDto, ['method' => 'GET']);
         $this->traitementFormulaireDeRecherche($request, $form);
 
-        // 3. Récupération des données à afficher
-        $paginationDatas = $this->getPaginatedData($request, $searchDto, $ditRepository, $ditMapper);
+        // 3. Récupération des données à afficher (sans mapping auto pour plus de perf)
+        $paginationDatas = $this->getPaginatedData($request, $searchDto, $ditRepository, null);
+
+        // Mapping optimisé en batch
+        $paginationDatas['data'] = $ditMapper->reverseMapList($paginationDatas['data']);
 
         // 4. Création et traitement du formulaire de soumission de document (pour la modal)
         $soumissionForm = $this->createForm(SoumissionDocumentAValidationType::class);

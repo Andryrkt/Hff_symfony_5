@@ -94,6 +94,21 @@ export default class extends Controller {
     }
 
     /**
+     * Soumet le formulaire de recherche automatiquement
+     */
+    submitFilter() {
+        const form = document.querySelector('#dit-search-form') as HTMLFormElement;
+        if (form) {
+            // Utiliser requestSubmit pour que Turbo capte l'événement
+            if (typeof form.requestSubmit === 'function') {
+                form.requestSubmit();
+            } else {
+                form.submit();
+            }
+        }
+    }
+
+    /**
      * Met à jour les conteneurs DOM avec les nouveaux numéros OR trouvés
      * @param results 
      */

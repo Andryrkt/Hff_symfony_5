@@ -141,6 +141,39 @@ class DitModel
         }
     }
 
+    public function getInfoMaterielBatch(array $idMateriels): array
+    {
+        if (empty($idMateriels)) {
+            return [];
+        }
+
+        $this->databaseInformix->connect();
+
+        try {
+            $ids = implode(',', $idMateriels);
+            $statement = " SELECT
+                mmat_nummat AS num_matricule,
+                trim(mmat_numserie) AS num_serie,
+                trim(mmat_recalph) AS num_parc
+            FROM MAT_MAT
+            WHERE mmat_nummat IN ($ids)
+            ";
+
+            $result = $this->databaseInformix->executeQuery($statement);
+            $rows = $this->databaseInformix->fetchResults($result);
+
+            // Indexer par num_matricule pour un accès rapide
+            $indexed = [];
+            foreach ($rows as $row) {
+                $indexed[$row['num_matricule']] = $row;
+            }
+
+            return $indexed;
+        } finally {
+            $this->databaseInformix->close();
+        }
+    }
+
     public function getNumeroOrBatch(array $numeroDits): array
     {
         if (empty($numeroDits)) {
