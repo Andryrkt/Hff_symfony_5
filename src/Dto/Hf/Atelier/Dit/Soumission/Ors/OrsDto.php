@@ -2,6 +2,7 @@
 
 namespace App\Dto\Hf\Atelier\Dit\Soumission\Ors;
 
+
 class OrsDto
 {
     public $numeroDit;
@@ -19,4 +20,8 @@ class OrsDto
     public $numeroVersion;
     public $statut;
     public $pieceFaibleActiviteAchat;
+    public $pieceJoint01;
+    public $pieceJoint02;
+    public $pieceJoint03;
+    public $pieceJoint04;
 }
