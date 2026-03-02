@@ -8,7 +8,7 @@
 				Formulaire de recherche
 			</button>
 		</h2>
-		<div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#formAccordion">
+		<div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#formAccordion" data-action="shown.bs.collapse->pages--hf--atelier--dit--dit-list#updateStickyOffset hidden.bs.collapse->pages--hf--atelier--dit--dit-list#updateStickyOffset">
 			<div class="accordion-body">
 				{{ form_start(form, {'method': 'GET', 'attr': {'data-action': 'change->pages--hf--atelier--dit--dit-list#submitFilter', 'id': 'dit-search-form'}}) }}
 				<div class="row">

@@ -1,18 +1,13 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 	<head>
 		{% block head %}
 			<meta charset="utf-8">
-
-
 			{% block stylesheets %}
 				{{ encore_entry_link_tags('app') }}
 			{% endblock %}
-
 			<link href="{{ asset('build/images/favicon.jpg') }}" type="image/x-icon" rel="shortcut icon">
-			<title>
-				HFF Intranet |
+			<title>HFF Intranet |
 				{% block title %}{% endblock %}
 			</title>
 		{% endblock %}
@@ -20,30 +15,25 @@
 
 	<body data-turbo-suppress-warning>
 		<div class="main-content">
-			{% block nav %}
-				{% include 'partials/_navbar.html.twig' %}
-				{% if breadcrumbs is defined and breadcrumbs is not empty %}
-					{% include 'partials/_breadcrumb.html.twig' with { breadcrumb: breadcrumbs } %}
-				{% endif %}
-			{% endblock %}
-
-			<div>
-				{% block bandeau %}
-					<!-- Bandeau sur la page d'accueil -->
+			<div class="sticky-top main-header-sticky" id="app-main-header">
+				{% block nav %}
+					{% include 'partials/_navbar.html.twig' %}
+					{% if breadcrumbs is defined and breadcrumbs is not empty %}
+						<div class="container-fluid px-4 py-1 bg-light border-bottom">
+							{% include 'partials/_breadcrumb.html.twig' with { breadcrumb: breadcrumbs } %}
+						</div>
+					{% endif %}
 				{% endblock %}
-
-
-				{% block content %}{% endblock %}
 			</div>
-		</div>
 
-		{# {% include "partials/_footer.html.twig" %} #}
-		{% include "partials/_loading_overlay.html.twig" %}
+			<div class="content-body"> {% block bandeau %}{% endblock %}{% block content %}{% endblock %}
+				</div>
+			</div>
 
+			{% include "partials/_loading_overlay.html.twig" %}
 
-		{% block javascripts %}
-			{{ encore_entry_script_tags('app') }}
-		{% endblock %}
-	</body>
-
-</html>
+			{% block javascripts %}
+				{{ encore_entry_script_tags('app') }}
+			{% endblock %}
+		</body>
+	</html>

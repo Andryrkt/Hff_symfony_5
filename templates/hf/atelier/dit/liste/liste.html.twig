@@ -7,8 +7,8 @@
 
 {% block content %}
 {% set mots_a_supprimer = ['Chef section', 'Chef de section', 'Responsable section', 'Chef d\'équipe'] %}
-<turbo-frame id="dit-list-frame">
-<div class="sticky-header-titre">
+<turbo-frame id="dit-list-frame" {{ stimulus_controller('pages--hf--atelier--dit--dit-list') }}>
+<div class="sticky-header-titre" data-pages--hf--atelier--dit--dit-list-target="headerTitre">
 	<div class="container">
 		{% include 'partials/flash_messages.html.twig' %}
 
@@ -40,9 +40,7 @@
 	</div>
 </div>
 
-<div
-	class="container-fluid"
-	{{ stimulus_controller('pages--hf--atelier--dit--dit-list') }}>
+<div class="container-fluid">
 	<!-- DEBUT tableau -->
 
 	<table class="table table-sticky">

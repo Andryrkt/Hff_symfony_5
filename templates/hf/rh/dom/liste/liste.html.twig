@@ -6,53 +6,55 @@
 {% endblock %}
 
 {% block content %}
-	<div class="container" id="agence-service-data" data-agences="{{ agencesJson|e('html_attr') }}" data-controller="dom-liste">
-		{% include 'partials/flash_messages.html.twig' %}
+	<div class="container-fluid" id="agence-service-data" data-agences="{{ agencesJson|e('html_attr') }}" data-controller="dom-liste components--list-sticky">
+		<div class="sticky-header-titre" data-components--list-sticky-target="headerTitre">
+			<div class="container">
+				{% include 'partials/flash_messages.html.twig' %}
 
-		{% include "hf/rh/dom/liste/_formulaireRecherche.html.twig" with{
-			form : form
-		}%}
+				{% include "hf/rh/dom/liste/_formulaireRecherche.html.twig" with{
+					form : form
+				}%}
+
+				{% include "partials/_pagination_haut.html.twig" with {
+					buttons: buttons,
+					currentPage: paginationData['currentPage'],
+					totalPages: paginationData['lastPage'],
+					resultCount: paginationData['totalItems'],
+					routeName: routeName,
+					criteria: queryParams
+				} %}
+			</div>
+		</div>
 
 
-		{% include "partials/_pagination_haut.html.twig" with {
-			buttons: buttons,
-			currentPage: paginationData['currentPage'],
-			totalPages: paginationData['lastPage'],
-			resultCount: paginationData['totalItems'],
-			routeName: routeName,
-			criteria: queryParams
-		} %}
-	</div>
-
-
-	<div class="container-fluid">
-		<table class="table rounded table-plein-ecran">
-			<thead class="table-dark">
-				<tr>
-					<th>
-						<i class="fas fa-ellipsis-vertical"></i>
-					</th>
-					{{ sortable.header('Statut', 'statut', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
-					{{ sortable.header('Sous type', 'typeDocument', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
-					{{ sortable.header('N° DOM', 'numeroOrdreMission', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
-					{{ sortable.header('Date de demande', 'dateDemande', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
-					<th>Motif de déplacemnt</th>
-					{{ sortable.header('Matricule', 'matricule', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
-					<th>Agence\Service</th>
-					{{ sortable.header('Date de début', 'dateDebut', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
-					{{ sortable.header('Date de fin', 'dateFin', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
-					<th>Client</th>
-					<th>Lieu d'intervention</th>
-					<th>Total général payer</th>
-					<th>Devis</th>
-				</tr>
-			</thead>
-			<tbody>
-				{% for item in paginationData['data'] %}
+		<div class="container-fluid mt-3">
+			<table class="table rounded table-plein-ecran table-sticky">
+				<thead class="table-dark">
 					<tr>
-						{# Début Action #}
-						<td style="padding: 0px;" class="align-middle">
-							{{ include('partials/_ellipsis_dropdown.html.twig', {
+						<th>
+							<i class="fas fa-ellipsis-vertical"></i>
+						</th>
+						{{ sortable.header('Statut', 'statut', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
+						{{ sortable.header('Sous type', 'typeDocument', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
+						{{ sortable.header('N° DOM', 'numeroOrdreMission', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
+						{{ sortable.header('Date de demande', 'dateDemande', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
+						<th>Motif de déplacemnt</th>
+						{{ sortable.header('Matricule', 'matricule', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
+						<th>Agence\Service</th>
+						{{ sortable.header('Date de début', 'dateDebut', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
+						{{ sortable.header('Date de fin', 'dateFin', routeName, queryParams, currentSort, currentOrder, 'text-center') }}
+						<th>Client</th>
+						<th>Lieu d'intervention</th>
+						<th>Total général payer</th>
+						<th>Devis</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for item in paginationData['data'] %}
+						<tr>
+							{# Début Action #}
+							<td style="padding: 0px;" class="align-middle">
+								{{ include('partials/_ellipsis_dropdown.html.twig', {
 									id: 'mission-actions',
 									icon: 'fas fa-ellipsis-vertical',
 									items: [
@@ -67,36 +69,36 @@
 										}
 									]
 								}) }}
-						</td>
-						{# Fin Actions #}
+							</td>
+							{# Fin Actions #}
 
-						{# >>>===== DEBUT Statut  ======= La logique CSS est maintenant gérée par les méthodes getStatutCssClass() et getStatutCssStyle() de l'entité Dom #}
-						<td class="{{ item.statutCssClass }}" style="{{ item.statutCssStyle }}">{{ item.idStatutDemande.description }}</td>
-						{# <<<===== FIN Statut ==== #}
-						<td>{{ item.sousTypeDocument.codeSousType }}</td>
-						<td>
-							<a href="{{ path('dom_detail', {'numeroOrdreMission': item.numeroOrdreMission}) }}" target="_blank">
-								{{ item.numeroOrdreMission }}
-							</a>
-						</td>
-						<td class="text-center">{{ item.dateDemande | date('d/m/Y')}}</td>
-						<td>{{ item.motifDeplacement}}</td>
-						<td class="text-center">{{ item.matricule }}</td>
-						<td>{{ item.libelleCodeAgenceService}}</td>
-						<td class="text-center">{{ item.dateDebut | date('d/m/Y')}}</td>
-						<td class="text-center">{{ item.dateFin | date('d/m/Y') }}</td>
-						<td>{{ item.client}}</td>
-						<td>{{ item.lieuIntervention}}</td>
-						<td class="text-end">{{ item.totalGeneralPayer}}</td>
-						<td>{{ item.devis}}</td>
-					</tr>
-				{% endfor %}
-			</tbody>
-		</table>
+							{# >>>===== DEBUT Statut  ======= La logique CSS est maintenant gérée par les méthodes getStatutCssClass() et getStatutCssStyle() de l'entité Dom #}
+							<td class="{{ item.statutCssClass }}" style="{{ item.statutCssStyle }}">{{ item.idStatutDemande.description }}</td>
+							{# <<<===== FIN Statut ==== #}
+							<td>{{ item.sousTypeDocument.codeSousType }}</td>
+							<td>
+								<a href="{{ path('dom_detail', {'numeroOrdreMission': item.numeroOrdreMission}) }}" target="_blank">
+									{{ item.numeroOrdreMission }}
+								</a>
+							</td>
+							<td class="text-center">{{ item.dateDemande | date('d/m/Y')}}</td>
+							<td>{{ item.motifDeplacement}}</td>
+							<td class="text-center">{{ item.matricule }}</td>
+							<td>{{ item.libelleCodeAgenceService}}</td>
+							<td class="text-center">{{ item.dateDebut | date('d/m/Y')}}</td>
+							<td class="text-center">{{ item.dateFin | date('d/m/Y') }}</td>
+							<td>{{ item.client}}</td>
+							<td>{{ item.lieuIntervention}}</td>
+							<td class="text-end">{{ item.totalGeneralPayer}}</td>
+							<td>{{ item.devis}}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
 
-		{% include "partials/_pagination_bas.html.twig" with {
+			{% include "partials/_pagination_bas.html.twig" with {
 			currentPage: paginationData['currentPage'],
 			totalPages: paginationData['totalItems']
 		} %}
-	</div>
-{% endblock %}
+		</div>
+	{% endblock %}
