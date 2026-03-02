@@ -17,17 +17,7 @@
 		}%}
 
 		<div class="row">
-			<div class=" col-12 col-md-5 my-3">
-				<i class="fa-solid fa-circle text-info"></i>
-				<small class="text-info">Partiellement dispo |</small>
-				<i class="fa-solid fa-circle text-primary"></i>
-				<small class="text-primary">Complet non livré |</small>
-				<i class="fa-solid fa-circle text-warning"></i>
-				<small class="text-warning">Partiellement livré |</small>
-				<i class="fa-solid fa-circle text-success"></i>
-				<small class="text-success">Tout livré
-				</small>
-			</div>
+			{% include 'partials/_legende_statuts.html.twig' with { items: legende } %}
 		</div>
 		{% include "partials/_pagination_haut.html.twig" with {
 			buttons: buttons,

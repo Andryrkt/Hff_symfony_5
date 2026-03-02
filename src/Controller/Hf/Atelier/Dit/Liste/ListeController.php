@@ -8,6 +8,7 @@ use App\Form\Hf\Atelier\Dit\SearchType;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\Hf\Atelier\Dit\DitRepository;
 use App\Constants\Hf\Atelier\Dit\ButtonsConstants;
+use App\Constants\Hf\Atelier\Dit\LegendeConstant;
 use App\Controller\Traits\PaginationAndSortingTrait;
 use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use App\Form\Hf\Atelier\Dit\SoumissionDocumentAValidationType;
@@ -59,6 +60,7 @@ class ListeController extends AbstractController
             'currentOrder' => $searchDto->sortOrder,
             'routeName' => 'hf_atelier_dit_liste_index',
             'buttons' => ButtonsConstants::BUTTONS_ACTIONS,
+            'legende' => LegendeConstant::LEGENDE_DIT,
             'breadcrumbs' => $breadcrumbBuilder->build('hf_atelier_dit_liste_index'),
             'form' => $form->createView(),
             'soumissionForm' => $soumissionForm->createView(),
