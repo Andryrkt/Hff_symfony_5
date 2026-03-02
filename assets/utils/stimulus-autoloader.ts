@@ -54,6 +54,7 @@ export class StimulusAutoloader {
 
             // DIT
             { name: 'pages--hf--atelier--dit--dit-form', import: () => import('@controllers/pages/hf/atelier/dit/dit_form_controller') },
+            { name: 'pages--hf--atelier--dit--dit-list', import: () => import('@controllers/pages/hf/atelier/dit/dit_list_controller') },
         ];
 
         let coreLoaded = 0;

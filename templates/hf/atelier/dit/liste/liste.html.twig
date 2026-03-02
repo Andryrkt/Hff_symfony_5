@@ -40,7 +40,8 @@
 </div>
 
 <div
-	class="container-fluid">
+	class="container-fluid"
+	{{ stimulus_controller('pages--hf--atelier--dit--dit-list') }}>
 	<!-- DEBUT tableau -->
 
 	<table class="table table-sticky">
@@ -116,6 +117,7 @@
 					<td>{{ item.statutDevis}}</td>
 					<td id="or-container-{{ item.numeroDit }}" 
 						class="or-polling-container" 
+						data-pages--hf--atelier--dit--dit-list-target="pollingContainer"
 						data-num-dit="{{ item.numeroDit }}"
 						data-has-or="{{ item.numeroOr != '' ? 'true' : 'false' }}">
 						{% if item.numeroOr != '' %}
@@ -144,86 +146,16 @@
 			{% endfor %}
 		</tbody>
 	</table>
-</div>
 	{% include "partials/_pagination_bas.html.twig" with {
 				currentPage: paginationData['currentPage'],
 				totalPages: paginationData['lastPage']
 			} %}
 	<!-- FIN tableau -->
-
-	{{ include('hf/atelier/dit/liste/_modal_soumission_document_a_validation.html.twig', {'soumissionForm': soumissionForm}) }}
+	{% include 'hf/atelier/dit/liste/_modal_soumission_document_a_validation.html.twig' %}
+</div>
 
 {% endblock %}
 
 {% block javascripts %}
 	{{ parent() }}
-	<script>
-		document.addEventListener('DOMContentLoaded', function() {
-			// Gestion de la modal de soumission
-			var soumissionDocModal = document.getElementById('soumissionDocModal');
-			if (soumissionDocModal) {
-				soumissionDocModal.addEventListener('show.bs.modal', function(event) {
-					var button = event.relatedTarget;
-					var numDit = button.getAttribute('data-numdit');
-					
-					var modalNumDit = soumissionDocModal.querySelector('#modalNumDit');
-					var hiddenNumDit = soumissionDocModal.querySelector('#hiddenNumDit');
-					
-					modalNumDit.textContent = numDit;
-					hiddenNumDit.value = numDit;
-				});
-			}
-
-			// Polling pour le numéro OR (Mode Batch - Haute Performance)
-			const startPolling = () => {
-				const intervalId = setInterval(async () => {
-					const pendingContainers = document.querySelectorAll('.or-polling-container[data-has-or="false"]');
-					if (pendingContainers.length === 0) {
-						clearInterval(intervalId);
-						return;
-					}
-
-					const numeroDits = Array.from(pendingContainers).map(c => c.getAttribute('data-num-dit'));
-
-					try {
-						const response = await fetch('/hf/atelier/dit/async/check-numero-or-batch', {
-							method: 'POST',
-							headers: {
-								'Content-Type': 'application/json',
-								'X-Requested-With': 'XMLHttpRequest'
-							},
-							body: JSON.stringify({ numeroDits: numeroDits })
-						});
-
-						if (!response.ok) return;
-						const data = await response.json();
-						
-						if (data.results && Object.keys(data.results).length > 0) {
-							for (const [numDit, numeroOr] of Object.entries(data.results)) {
-								const container = document.querySelector(`.or-polling-container[data-num-dit="${numDit}"]`);
-								if (container) {
-									container.setAttribute('data-has-or', 'true');
-									container.innerHTML = `
-										<a href="#" data-bs-toggle="modal" data-bs-target="#listeCommande" data-id="${numeroOr}" class="numOr-link text-black" data-bs-toggle="tooltip" title="lister les commandes">
-											${numeroOr}
-										</a>
-									`;
-									
-									if (typeof showToast === 'function') {
-										showToast('Succès', `Le numéro OR pour la DIT ${numDit} a été récupéré : ${numeroOr}`, 'success');
-									}
-								}
-							}
-						}
-					} catch (error) {
-						console.error('Erreur lors du batch polling du numéro OR:', error);
-					}
-				}, 10000); // Toutes les 10 secondes
-			};
-
-			if (document.querySelectorAll('.or-polling-container[data-has-or="false"]').length > 0) {
-				startPolling();
-			}
-		});
-	</script>
 {% endblock %}
