@@ -86,11 +86,12 @@ class ListeController extends AbstractController
         if ($soumissionForm->isSubmitted() && $soumissionForm->isValid()) {
             $soumissionDoc = $soumissionForm->getData();
             $numeroDit = $soumissionDoc['numeroDit'];
+            $numeroOr = $soumissionDoc['numeroOr'];
             $docDansDW = $soumissionDoc['docDansDW'];
 
             switch ($docDansDW) {
                 case 'OR':
-                    return $this->redirectToRoute("hf_atelier_dit_soumission_ors_index", ['numDit' => $numeroDit]);
+                    return $this->redirectToRoute("hf_atelier_dit_soumission_ors_index", ['numDit' => $numeroDit, 'numOr' => $numeroOr]);
 
                 case 'FACTURE':
                     return $this->redirectToRoute("hf_atelier_dit_soumission_facture_index", ['numDit' => $numeroDit]);

@@ -11,9 +11,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class SoumissionOrsController extends AbstractController
 {
     /**
-     * @Route("/{numDit}", name="index")
+     * @Route("/{numDit}/{numOr}", name="index")
      */
-    public function index(string $numDit)
+    public function index(string $numDit, string $numOr)
     {
         // 1. gerer l'accés 
         $this->denyAccessUnlessGranted('ATELIER_DIT_SOUMISSION_ORS');

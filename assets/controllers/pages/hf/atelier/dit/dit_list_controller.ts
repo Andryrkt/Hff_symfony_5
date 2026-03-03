@@ -2,12 +2,14 @@ import { Controller } from "@hotwired/stimulus";
 import { FetchManager } from "../../../../../js/utils/FetchManager";
 
 export default class extends Controller {
-    static targets = ["modalNumDit", "hiddenNumDit", "pollingContainer", "headerTitre"];
+    static targets = ["modalNumDit", "hiddenNumDit", "hiddenNumOr", "pollingContainer", "headerTitre"];
 
     declare readonly modalNumDitTarget: HTMLElement;
     declare readonly hasModalNumDitTarget: boolean;
     declare readonly hiddenNumDitTarget: HTMLInputElement;
     declare readonly hasHiddenNumDitTarget: boolean;
+    declare readonly hiddenNumOrTarget: HTMLInputElement;
+    declare readonly hasHiddenNumOrTarget: boolean;
     declare readonly pollingContainerTargets: HTMLElement[];
     declare readonly headerTitreTarget: HTMLElement;
     declare readonly hasHeaderTitreTarget: boolean;
@@ -86,6 +88,13 @@ export default class extends Controller {
 
         if (this.hasHiddenNumDitTarget) {
             this.hiddenNumDitTarget.value = numDit;
+        }
+
+        const numOr = button.getAttribute('data-numor');
+        console.log('NumOr found:', numOr);
+
+        if (this.hasHiddenNumOrTarget) {
+            this.hiddenNumOrTarget.value = numOr;
         }
     }
 
