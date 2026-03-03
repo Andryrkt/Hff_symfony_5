@@ -5,7 +5,7 @@ export function initPagination() {
             limitSelector.addEventListener('change', function (this: HTMLSelectElement) {
                 const currentUrl = new URL(window.location.href);
                 currentUrl.searchParams.set('limit', this.value);
-                currentUrl.searchParams.set('page', '1'); // Reset to page 1 when changing limit
+                // On conserve la page actuelle au lieu de forcer le retour à la page 1
 
                 this.disabled = true;
                 const loadingIndicator = document.getElementById('limit-loading');
