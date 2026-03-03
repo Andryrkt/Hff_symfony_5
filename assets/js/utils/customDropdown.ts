@@ -101,6 +101,7 @@ export class CustomDropdown {
     }
 
     private openDropdown(dropdown: Element, toggle: Element, menu: Element): void {
+        dropdown.classList.add('show');
         menu.classList.add('show');
         toggle.classList.add('active');
         this.activeDropdown = dropdown;
@@ -110,6 +111,10 @@ export class CustomDropdown {
     }
 
     private closeAllDropdowns(): void {
+        document.querySelectorAll('.custom-dropdown.show').forEach(dropdown => {
+            dropdown.classList.remove('show');
+        });
+
         document.querySelectorAll('.custom-dropdown-menu.show').forEach(menu => {
             menu.classList.remove('show');
         });

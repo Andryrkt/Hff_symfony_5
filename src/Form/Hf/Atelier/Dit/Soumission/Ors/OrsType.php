@@ -20,14 +20,13 @@ class OrsType extends AbstractType
                 TextType::class,
                 [
                     'label' => 'Numéro DIT',
-                    'data' => $options['data']->getNumeroDit(),
                     'attr' => [
                         'disabled' => true
                     ]
                 ]
             )
             ->add(
-                'numeroOR',
+                'numeroOr',
                 TextType::class,
                 [
                     'label' => 'Numéro OR *',
@@ -35,7 +34,6 @@ class OrsType extends AbstractType
                     'attr' => [
                         'disabled' => true
                     ],
-                    'data' => $options['data']->getNumeroOR()
                 ]
             )
             ->add(

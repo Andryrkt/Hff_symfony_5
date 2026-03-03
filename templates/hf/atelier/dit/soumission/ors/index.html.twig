@@ -15,7 +15,60 @@
 		<div class="card">
 			<div class="card-body">
 				<div class="container">
-					BONJOUR
+					{{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+					{{ form_errors(form)}}
+					<div class="row">
+						<div class="col-12 col-md-6">
+							<div class="row">
+								<div class="col-12 col-md-6">
+									{{ form_row(form.numeroDit)}}
+									{{ form_errors(form.numeroDit)}}
+								</div>
+								<div class="col-12 col-md-6">
+									{{ form_row(form.numeroOr)}}
+									{{ form_errors(form.numeroOr)}}
+								</div>
+							</div>
+						</div>
+					</div>
+					<hr>
+					<div class="row">
+						<div class="col-12 col-md-3">
+							<p>Veuillez insérer<strong>l'OR à valider *</strong>.</p>
+							{% include "partials/_dropZoneFile.html.twig" with {'id': '1', 'form': form,  'fieldName': 'pieceJoint01', 'fileType': 'PDF'} %}
+						</div>
+						<div class="col-12 col-md-3">
+							<p>Veuillez insérer<strong>le devis à fusionner</strong>avec l'OR</p>
+							{% include "partials/_dropZoneFile.html.twig" with {'id': '2', 'form': form,  'fieldName': 'pieceJoint02', 'fileType': 'PDF'} %}
+						</div>
+						<div class="col-12 col-md-3">
+							<p>Veuillez insérer<strong>le BC ou autre document à fusionner</strong>avec l'OR (si existant)</p>
+							{% include "partials/_dropZoneFile.html.twig" with {'id': '3', 'form': form,  'fieldName': 'pieceJoint03', 'fileType': 'PDF'} %}
+						</div>
+						<div class="col-12 col-md-3">
+							<p>Veuillez insérer<strong>le document à fusionner</strong>avec l'OR (si existant)</p>
+							{% include "partials/_dropZoneFile.html.twig" with {'id': '4', 'form': form,  'fieldName': 'pieceJoint04', 'fileType': 'PDF'} %}
+						</div>
+					</div>
+					<div class="row">
+						{{ form_row(form.observation)}}
+						{{ form_errors(form.observation)}}
+					</div>
+					<div class="row">
+						<div class="d-flex justify-content-end mt-2">
+							{% import "macros/actions.html.twig" as actions %}
+							{{ actions.submit_button(
+								'Enregistrer',
+								'fa fa-print',
+								'btn-warning',
+								true,
+								'Confirmez-vous la soumission de l\'OR à validation dans DOCUWARE ?',
+								'Veuillez ne pas quitter la page pendant la création de la demande.',
+								'Soumission de la demande d\'ordre de mission'
+							) }}
+						</div>
+					</div>
+					{{ form_end(form) }}
 				</div>
 			</div>
 		</div>

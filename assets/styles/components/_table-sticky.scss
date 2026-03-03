@@ -16,6 +16,10 @@
 .table-sticky {
     border-collapse: separate !important;
 
+    td {
+        overflow: visible !important;
+    }
+
     thead {
         th {
             position: sticky;

@@ -31,7 +31,7 @@ class ButtonsFactory
                 'label' => 'Soumission document à valider',
                 'url' => '#',
                 'class' => 'soumissionDoc fw-bold',
-                'attributes' => 'data-bs-toggle="modal" data-bs-target="#soumissionDocModal" data-numdit="' . $dto->numeroDit . '" data-numor="' . $dto->numeroOr . '"',
+                'attributes' => 'data-bs-toggle="modal" data-bs-target="#soumissionDocModal" data-numdit="' . $dto->numeroDit . '" data-numor="' . (int)$dto->numeroOr . '"',
             ];
         }
 

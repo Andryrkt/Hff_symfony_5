@@ -10,7 +10,7 @@
 			</div>
 			<div class="modal-body mb-2">
 				<div class="container">
-					{{ form_start(soumissionForm) }}
+					{{ form_start(soumissionForm, {'attr': {'data-turbo-frame': '_top'}}) }}
 					{{ form_row(soumissionForm.docDansDW) }}
 					{{ form_widget(soumissionForm.numeroDit, {'id': 'hiddenNumDit', 'attr': {'data-pages--hf--atelier--dit--dit-list-target': 'hiddenNumDit'}}) }}
 					{{ form_widget(soumissionForm.numeroOr, {'id': 'hiddenNumOr', 'attr': {'data-pages--hf--atelier--dit--dit-list-target': 'hiddenNumOr'}}) }}

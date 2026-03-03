@@ -36,7 +36,7 @@
 	<table class="table table-sticky">
 		<thead class="table-dark align-middle">
 			<tr>
-				<th>
+				<th class="text-center" style="width: 35px;">
 					<i class="fas fa-ellipsis-vertical"></i>
 				</th>
 				<th>Statut</th>
@@ -70,7 +70,7 @@
 			{% for item in data %}
 				<tr>
 					{# Début Action #}
-					<td class="align-middle" style="padding: 0px">
+					<td class="align-middle text-center" style="padding: 0px; width: 35px;">
 						{{ include('partials/_ellipsis_dropdown.html.twig', {
 							id: 'dit-actions-' ~ item.numeroDit,
 							icon: 'fas fa-ellipsis-vertical',

@@ -92,22 +92,26 @@ class ListeController extends AbstractController
 
             switch ($docDansDW) {
                 case 'OR':
-                    return $this->redirectToRoute("hf_atelier_dit_soumission_ors_index", ['numDit' => $numeroDit, 'numOr' => $numeroOr]);
+                    if (empty($numeroOr)) {
+                        $this->addFlash('danger', "Le numéro OR est manquant pour cette DIT. Impossible de soumettre l'OR.");
+                        return $this->redirectToRoute('hf_atelier_dit_liste_index', [], 303);
+                    }
+                    return $this->redirectToRoute("hf_atelier_dit_soumission_ors_index", ['numDit' => $numeroDit, 'numOr' => $numeroOr], 303);
 
                 case 'FACTURE':
-                    return $this->redirectToRoute("hf_atelier_dit_soumission_facture_index", ['numDit' => $numeroDit]);
+                    return $this->redirectToRoute("hf_atelier_dit_soumission_facture_index", ['numDit' => $numeroDit], 303);
 
                 case 'RI':
-                    return $this->redirectToRoute("hf_atelier_dit_soumission_ri_index", ['numDit' => $numeroDit]);
+                    return $this->redirectToRoute("hf_atelier_dit_soumission_ri_index", ['numDit' => $numeroDit], 303);
 
                 case 'DEVIS-VP':
-                    return $this->redirectToRoute("hf_atelier_dit_soumission_devis_index", ['numDit' => $numeroDit, 'type' => 'VP']);
+                    return $this->redirectToRoute("hf_atelier_dit_soumission_devis_index", ['numDit' => $numeroDit, 'type' => 'VP'], 303);
 
                 case 'DEVIS-VA':
-                    return $this->redirectToRoute("hf_atelier_dit_soumission_devis_index", ['numDit' => $numeroDit, 'type' => 'VA']);
+                    return $this->redirectToRoute("hf_atelier_dit_soumission_devis_index", ['numDit' => $numeroDit, 'type' => 'VA'], 303);
 
                 case 'BC':
-                    return $this->redirectToRoute("hf_atelier_dit_soumission_bc_index", ['numDit' => $numeroDit]);
+                    return $this->redirectToRoute("hf_atelier_dit_soumission_bc_index", ['numDit' => $numeroDit], 303);
 
                 default:
                     return null; // ou gérer le cas par défaut
