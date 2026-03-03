@@ -6,12 +6,12 @@ use App\Dto\Hf\Atelier\Dit\Soumission\Ors\OrsDto;
 
 class OrsFactory
 {
-    public function create(string $numeroDit): OrsDto
+    public function create(string $numeroDit, string $numeroOr): OrsDto
     {
         $dto = new OrsDto();
 
         $dto->numeroDit = $numeroDit;
-        $dto->numeroOr = '';
+        $dto->numeroOr = $numeroOr;
 
 
         return $dto;

@@ -16,12 +16,20 @@ export default class extends Controller {
 
     private fetchManager: FetchManager;
     private pollingInterval: number | null = null;
+    private abortController: AbortController | null = null;
     private readonly POLLING_DELAY = 10000; // 10 secondes
 
     connect() {
         console.log('DitListController connected');
         this.fetchManager = new FetchManager();
-        this.startPolling();
+        this.abortController = new AbortController();
+
+        // Retarder un peu le premier polling pour laisser la page (et la toolbar Symfony) se charger
+        setTimeout(() => {
+            if (this.abortController) {
+                this.startPolling();
+            }
+        }, 1000);
 
         // Initialiser le sticky header
         this.updateStickyOffset();
@@ -34,6 +42,10 @@ export default class extends Controller {
 
     disconnect() {
         this.stopPolling();
+        if (this.abortController) {
+            this.abortController.abort();
+            this.abortController = null;
+        }
         window.removeEventListener('resize', this.updateStickyOffset.bind(this));
         if (this.observer) {
             this.observer.disconnect();
@@ -59,7 +71,7 @@ export default class extends Controller {
                 const titleHeight = this.headerTitreTarget.offsetHeight;
                 const totalOffset = globalHeaderHeight + titleHeight;
                 (this.element as HTMLElement).style.setProperty('--table-header-offset', `${totalOffset}px`);
-                console.log('Sticky offsets updated:', { globalHeaderHeight, totalOffset });
+                // console.log('Sticky offsets updated:', { globalHeaderHeight, totalOffset });
             }
         }, 100);
     }
@@ -69,10 +81,10 @@ export default class extends Controller {
      * @param event 
      */
     showSoumissionModal(event: any) {
-        console.log('showSoumissionModal triggered', event);
+        // console.log('showSoumissionModal triggered', event);
         // En mode événement show.bs.modal, relatedTarget est le bouton qui a ouvert la modal
         const button = event.relatedTarget;
-        console.log('Related Target:', button);
+        // console.log('Related Target:', button);
 
         if (!button) {
             console.warn('No relatedTarget found for modal');
@@ -80,7 +92,7 @@ export default class extends Controller {
         }
 
         const numDit = button.getAttribute('data-numdit');
-        console.log('NumDit found:', numDit);
+        //  console.log('NumDit found:', numDit);
 
         if (this.hasModalNumDitTarget) {
             this.modalNumDitTarget.textContent = numDit;
@@ -91,7 +103,7 @@ export default class extends Controller {
         }
 
         const numOr = button.getAttribute('data-numor');
-        console.log('NumOr found:', numOr);
+        // console.log('NumOr found:', numOr);
 
         if (this.hasHiddenNumOrTarget) {
             this.hiddenNumOrTarget.value = numOr;
@@ -119,12 +131,16 @@ export default class extends Controller {
             try {
                 const data = await this.fetchManager.post('hf/atelier/dit/async/check-numero-or-batch', {
                     numeroDits: numeroDits
-                });
+                }, this.abortController?.signal);
 
                 if (data.results && Object.keys(data.results).length > 0) {
                     this.updateContainers(data.results);
                 }
-            } catch (error) {
+            } catch (error: any) {
+                if (error.name === 'AbortError') {
+                    console.log('Polling fetch aborted');
+                    return;
+                }
                 console.error('Erreur lors du batch polling du numéro OR:', error);
             }
         }, this.POLLING_DELAY);

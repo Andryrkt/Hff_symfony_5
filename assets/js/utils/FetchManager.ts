@@ -62,11 +62,12 @@ export class FetchManager {
   /**
    * Méthode de fetch privée pour centraliser la logique de requête.
    */
-  private async _fetch(endpoint: string, options: RequestInit = {}, responseType: string = "json"): Promise<any> {
+  private async _fetch(endpoint: string, options: RequestInit = {}, responseType: string = "json", signal?: AbortSignal): Promise<any> {
     // Ensure leading slash consistency or use URL constructor if needed, but simple concat as per user code
     const url = `${this.baseUrl}/${endpoint}`.replace(/([^:]\/)\/+/g, "$1"); // remove double slashes except http://
 
-    const response = await fetch(url, options);
+    const fetchOptions: RequestInit = { ...options, signal };
+    const response = await fetch(url, fetchOptions);
     if (!response.ok) {
       const errorText = await response
         .text()
@@ -90,23 +91,27 @@ export class FetchManager {
     return response.text();
   }
 
-  async get(endpoint: string, responseType: string = "json"): Promise<any> {
-    return this._fetch(endpoint, { method: "GET" }, responseType);
+  async get(endpoint: string, responseType: string = "json", signal?: AbortSignal): Promise<any> {
+    return this._fetch(endpoint, { method: "GET" }, responseType, signal);
   }
 
-  async post(endpoint: string, data: any): Promise<any> {
+  async post(endpoint: string, data: any, signal?: AbortSignal): Promise<any> {
     return this._fetch(
       endpoint,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "X-Requested-With": "XMLHttpRequest"
+        },
         body: JSON.stringify(data),
       },
       "json",
+      signal
     );
   }
 
-  async put(endpoint: string, data: any): Promise<any> {
+  async put(endpoint: string, data: any, signal?: AbortSignal): Promise<any> {
     return this._fetch(
       endpoint,
       {
@@ -115,10 +120,11 @@ export class FetchManager {
         body: JSON.stringify(data),
       },
       "json",
+      signal
     );
   }
 
-  async delete(endpoint: string): Promise<any> {
-    return this._fetch(endpoint, { method: "DELETE" }, "json");
+  async delete(endpoint: string, signal?: AbortSignal): Promise<any> {
+    return this._fetch(endpoint, { method: "DELETE" }, "json", signal);
   }
 }

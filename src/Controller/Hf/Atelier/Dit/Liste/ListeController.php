@@ -2,18 +2,19 @@
 
 namespace App\Controller\Hf\Atelier\Dit\Liste;
 
-use App\Dto\Hf\Atelier\Dit\SearchDto;
-use App\Mapper\Hf\Atelier\Dit\Mapper;
-use App\Form\Hf\Atelier\Dit\SearchType;
-use Symfony\Component\HttpFoundation\Request;
-use App\Repository\Hf\Atelier\Dit\DitRepository;
 use App\Constants\Hf\Atelier\Dit\ButtonsConstants;
 use App\Constants\Hf\Atelier\Dit\LegendeConstant;
 use App\Controller\Traits\PaginationAndSortingTrait;
-use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
+use App\Dto\Hf\Atelier\Dit\SearchDto;
+use App\Form\Hf\Atelier\Dit\SearchType;
 use App\Form\Hf\Atelier\Dit\SoumissionDocumentAValidationType;
+use App\Mapper\Hf\Atelier\Dit\Mapper;
+use App\Repository\Hf\Atelier\Dit\DitRepository;
+use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/hf/atelier/dit")

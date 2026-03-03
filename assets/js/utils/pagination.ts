@@ -7,6 +7,17 @@ export function initPagination() {
                 currentUrl.searchParams.set('limit', this.value);
                 currentUrl.searchParams.set('page', '1'); // Reset to page 1 when changing limit
 
+                this.disabled = true;
+                const loadingIndicator = document.getElementById('limit-loading');
+                if (loadingIndicator) {
+                    loadingIndicator.classList.remove('d-none');
+                }
+
+                const ditFrame = document.getElementById('dit-list-frame');
+                if (ditFrame) {
+                    ditFrame.setAttribute('busy', '');
+                }
+
                 // Si Turbo est présent, on l'utilise pour une navigation fluide
                 // @ts-ignore
                 if (window.Turbo) {
