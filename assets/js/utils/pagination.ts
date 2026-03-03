@@ -1,13 +1,25 @@
 export function initPagination() {
-    document.addEventListener('DOMContentLoaded', () => {
-        const limitSelector = document.getElementById('limit-selector');
+    const attachListener = () => {
+        const limitSelector = document.getElementById('limit-selector') as HTMLSelectElement;
         if (limitSelector) {
             limitSelector.addEventListener('change', function (this: HTMLSelectElement) {
                 const currentUrl = new URL(window.location.href);
                 currentUrl.searchParams.set('limit', this.value);
                 currentUrl.searchParams.set('page', '1'); // Reset to page 1 when changing limit
-                window.location.href = currentUrl.toString();
+
+                // Si Turbo est présent, on l'utilise pour une navigation fluide
+                // @ts-ignore
+                if (window.Turbo) {
+                    // @ts-ignore
+                    window.Turbo.visit(currentUrl.toString(), { action: "advance" });
+                } else {
+                    window.location.href = currentUrl.toString();
+                }
             });
         }
-    });
+    };
+
+    // Initialisation au chargement classique et au chargement Turbo
+    document.addEventListener('DOMContentLoaded', attachListener);
+    document.addEventListener('turbo:load', attachListener);
 }

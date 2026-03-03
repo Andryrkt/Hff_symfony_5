@@ -9,6 +9,7 @@ trait PaginationDtoTrait
     public int $limit = 50;
     public string $sortBy = 'id';
     public string $sortOrder = 'DESC';
+    public int $page = 1;
 
     public function setLimit(int $limit): self
     {
@@ -26,5 +27,16 @@ trait PaginationDtoTrait
     {
         $this->sortOrder = $sortOrder;
         return $this;
+    }
+
+    public function setPage(int $page): self
+    {
+        $this->page = $page;
+        return $this;
+    }
+
+    public function getPage(): int
+    {
+        return $this->page;
     }
 }

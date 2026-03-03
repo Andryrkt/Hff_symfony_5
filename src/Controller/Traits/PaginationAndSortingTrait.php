@@ -13,7 +13,7 @@ trait PaginationAndSortingTrait
 {
     /**
      * Handles pagination and sorting parameters from the request.
-     * Updates the DTO with limit, sortBy, and sortOrder if present.
+     * Updates the DTO with limit, sortBy, sortOrder and page if present.
      * Returns the current page number.
      *
      * @param Request $request
@@ -41,7 +41,12 @@ trait PaginationAndSortingTrait
         }
 
         // Page
-        return $request->query->getInt('page', 1);
+        $pageFromUrl = $request->query->getInt('page', 0);
+        if ($pageFromUrl > 0) {
+            $dto->setPage($pageFromUrl);
+        }
+
+        return $dto->getPage();
     }
 
     /**
