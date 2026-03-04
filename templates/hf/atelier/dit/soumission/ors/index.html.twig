@@ -6,74 +6,116 @@
 
 {% block stylesheets %}
 	{{ parent() }}
-
+	<style>
+		.preview-container {
+			max-height: 800px;
+			overflow-y: auto;
+		}
+		embed {
+			width: 100%;
+			height: 750px;
+			border: 1px solid #dee2e6;
+			border-radius: 4px;
+		}
+	</style>
 {% endblock %}
 
 
 {% block content %}
-	<div class=" container mt-6 mb-4" data-controller="pages--hf--atelier--dit--dit-form">
-		<div class="card">
-			<div class="card-body">
-				<div class="container">
-					{{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
-					{{ form_errors(form)}}
-					<div class="row">
-						<div class="col-12 col-md-6">
-							<div class="row">
-								<div class="col-12 col-md-6">
-									{{ form_row(form.numeroDit)}}
-									{{ form_errors(form.numeroDit)}}
-								</div>
-								<div class="col-12 col-md-6">
-									{{ form_row(form.numeroOr)}}
-									{{ form_errors(form.numeroOr)}}
-								</div>
+	<div class="container-fluid mt-4 mb-4" {{ stimulus_controller('pages--hf--atelier--dit--soumission-ors') }}>
+		<div class="row">
+			<div class="col-12 col-lg-5">
+				<div class="card shadow-sm">
+					<div class="card-header bg-dark text-white">
+						<h5 class="card-title mb-0">
+							<i class="fas fa-file-upload me-2"></i>Soumission de l'OR
+						</h5>
+					</div>
+					<div class="card-body">
+						{{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+						{{ form_errors(form)}}
+
+						<div class="row">
+							<div class="col-6">
+								{{ form_row(form.numeroDit)}}
+							</div>
+							<div class="col-6">
+								{{ form_row(form.numeroOr)}}
 							</div>
 						</div>
-					</div>
-					<hr>
-					<div class="row">
-						<div class="col-12 col-md-3">
-							<p>Veuillez insérer<strong>l'OR à valider *</strong>.</p>
-							{% include "partials/_dropZoneFile.html.twig" with {'id': '1', 'form': form,  'fieldName': 'pieceJoint01', 'fileType': 'PDF'} %}
+
+						<hr>
+
+
+						<div class="row">
+							<div class="col-6 mb-3">
+								<label class="form-label fw-bold">1. Document OR (Obligatoire) *</label>
+								{% include "partials/_dropZoneFile.html.twig" with {'id': '1', 'form': form, 'fieldName': 'pieceJoint01', 'fileType': 'PDF'} %}
+							</div>
+							<div class="col-6 mb-3">
+								<label class="form-label small fw-bold">2. Devis à fusionner</label>
+								{% include "partials/_dropZoneFile.html.twig" with {'id': '2', 'form': form, 'fieldName': 'pieceJoint02', 'fileType': 'PDF'} %}
+							</div>
+
 						</div>
-						<div class="col-12 col-md-3">
-							<p>Veuillez insérer<strong>le devis à fusionner</strong>avec l'OR</p>
-							{% include "partials/_dropZoneFile.html.twig" with {'id': '2', 'form': form,  'fieldName': 'pieceJoint02', 'fileType': 'PDF'} %}
+						<div class="row">
+							<div class="col-6 mb-3">
+								<label class="form-label small fw-bold">3. BC ou autre</label>
+								{% include "partials/_dropZoneFile.html.twig" with {'id': '3', 'form': form, 'fieldName': 'pieceJoint03', 'fileType': 'PDF'} %}
+							</div>
+							<div class="col-6 mb-3">
+								<label class="form-label small fw-bold">4. Autre document</label>
+								{% include "partials/_dropZoneFile.html.twig" with {'id': '4', 'form': form, 'fieldName': 'pieceJoint04', 'fileType': 'PDF'} %}
+							</div>
 						</div>
-						<div class="col-12 col-md-3">
-							<p>Veuillez insérer<strong>le BC ou autre document à fusionner</strong>avec l'OR (si existant)</p>
-							{% include "partials/_dropZoneFile.html.twig" with {'id': '3', 'form': form,  'fieldName': 'pieceJoint03', 'fileType': 'PDF'} %}
+
+
+						<div class="mb-3">
+							{{ form_row(form.observation)}}
 						</div>
-						<div class="col-12 col-md-3">
-							<p>Veuillez insérer<strong>le document à fusionner</strong>avec l'OR (si existant)</p>
-							{% include "partials/_dropZoneFile.html.twig" with {'id': '4', 'form': form,  'fieldName': 'pieceJoint04', 'fileType': 'PDF'} %}
-						</div>
-					</div>
-					<div class="row">
-						{{ form_row(form.observation)}}
-						{{ form_errors(form.observation)}}
-					</div>
-					<div class="row">
-						<div class="d-flex justify-content-end mt-2">
+
+						<div class="d-grid gap-2">
 							{% import "macros/actions.html.twig" as actions %}
 							{{ actions.submit_button(
-								'Enregistrer',
-								'fa fa-print',
+								'Enregistrer et Envoyer dans Docuware',
+								'fas fa-paper-plane',
 								'btn-warning',
 								true,
-								'Confirmez-vous la soumission de l\'OR à validation dans DOCUWARE ?',
-								'Veuillez ne pas quitter la page pendant la création de la demande.',
-								'Soumission de la demande d\'ordre de mission'
+								'Confirmez-vous la soumission ?',
+								'Le processus peut prendre quelques instants.',
+								'Soumission OR'
 							) }}
+							<a href="{{ path('hf_atelier_dit_liste_index') }}" class="btn btn-outline-secondary">
+								<i class="fas fa-arrow-left me-1"></i>Retour à la liste
+							</a>
 						</div>
+						{{ form_end(form) }}
 					</div>
-					{{ form_end(form) }}
+				</div>
+			</div>
+
+			<div class="col-12 col-lg-7">
+				<div class="card shadow-sm h-100 d-none" data-pages--hf--atelier--dit--soumission-ors-target="pdfPreview">
+					<div class="card-header bg-info text-white pb-0 border-bottom-0">
+						<div class="d-flex align-items-center mb-2 mt-1">
+							<i class="fas fa-eye me-2"></i>
+							<h5 class="card-title mb-0">Aperçu des documents</h5>
+						</div>
+						<ul
+							class="nav nav-tabs card-header-tabs m-0 border-0" data-pages--hf--atelier--dit--soumission-ors-target="navTabs"><!-- Onglets injectés via JS -->
+						</ul>
+					</div>
+					<div
+						class="card-body p-0 tab-content bg-white border-top border-info border-3" data-pages--hf--atelier--dit--soumission-ors-target="tabContent"><!-- Contenu des onglets injecté via JS -->
+					</div>
+				</div>
+				<div class="h-100 d-flex align-items-center justify-content-center bg-light border rounded" data-pages--hf--atelier--dit--soumission-ors-target="placeholder">
+					<div class="text-center text-muted p-5">
+						<i class="fas fa-file-pdf fa-4x mb-3"></i>
+						<p>Sélectionnez au moins un fichier pour afficher l'aperçu.</p>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-{% endblock %}
-{% block javascripts %}
-	{{ parent() }}
 {% endblock %}

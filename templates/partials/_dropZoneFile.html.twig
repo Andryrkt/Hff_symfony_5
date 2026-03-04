@@ -16,5 +16,12 @@
 {{ form_errors(form[fieldName]) }}
 
 <!-- Conteneur pour afficher le nom du fichier -->
-<div class="file-name" id="file-name-{{ id }}" style="margin-top: 10px;"></div>
-<div class="file-size" id="file-size-{{ id }}"></div>
+<div class="d-flex align-items-center justify-content-between mt-2">
+	<div>
+		<div class="file-name" id="file-name-{{ id }}"></div>
+		<div class="file-size text-muted small" id="file-size-{{ id }}"></div>
+	</div>
+	<button type="button" id="remove-btn-{{ id }}" class="btn btn-sm btn-outline-danger d-none" title="Supprimer le fichier">
+		<i class="fas fa-trash"></i>
+	</button>
+</div>

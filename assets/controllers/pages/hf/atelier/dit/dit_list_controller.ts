@@ -77,6 +77,30 @@ export default class extends Controller {
     }
 
     /**
+     * Appelé lors du click sur le bouton ellipsis "Soumission document à valider" (plus fiable que Bootstrap show.bs.modal sous Turbo)
+     */
+    prepareSoumissionModal(event: any) {
+        const button = event.currentTarget || event.target;
+        if (!button) return;
+
+        // remonte vers le a ou button original au cas où event.target soit l'icone
+        const targetBtn = button.closest('[data-numdit]') || button;
+
+        const numDit = targetBtn.getAttribute('data-numdit');
+        if (this.hasModalNumDitTarget) {
+            this.modalNumDitTarget.textContent = numDit;
+        }
+        if (this.hasHiddenNumDitTarget) {
+            this.hiddenNumDitTarget.value = numDit;
+        }
+
+        const numOr = targetBtn.getAttribute('data-numor');
+        if (this.hasHiddenNumOrTarget) {
+            this.hiddenNumOrTarget.value = numOr;
+        }
+    }
+
+    /**
      * Gère l'ouverture de la modal de soumission de document (via l'événement Bootstrap)
      * @param event 
      */
