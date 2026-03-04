@@ -13,7 +13,6 @@ export default class extends Controller {
     declare readonly tabContentTarget: HTMLElement;
     declare readonly hasTabContentTarget: boolean;
 
-    private managers: FileUploadManager[] = [];
     private uploadedFiles: Record<string, { title: string, dataUrl: string }> = {};
 
     private fileTitles: Record<string, string> = {
@@ -23,17 +22,23 @@ export default class extends Controller {
         '4': 'Autre document'
     };
 
+    private managers: FileUploadManager[] = [];
+
     connect() {
         console.log("SoumissionOrsController connected");
         this.initDropzones();
     }
 
     private initDropzones() {
-        // Initialiser les 4 dropzones (id 1 à 4 dans le template)
         const ids = ['1', '2', '3', '4'];
 
         ids.forEach(id => {
-            const input = document.querySelector(`input[id$="_pieceJoint0${id}"]`) as HTMLInputElement;
+            // Chercher l'input dans le contexte du controller (this.element) en priorité,
+            // puis dans le document entier si pas trouvé
+            const input = (
+                this.element.querySelector(`input[id$="_pieceJoint0${id}"]`) ||
+                document.querySelector(`input[id$="_pieceJoint0${id}"]`)
+            ) as HTMLInputElement;
 
             if (input) {
                 const manager = new FileUploadManager({
@@ -224,18 +229,33 @@ export default class extends Controller {
 
         if (!targetId) return;
 
+        // Trouver le contrôleur dropzone correspondant dans le DOM et appeler sa méthode pour virer le fichier
+        let managerBaseId = targetId;
+        let indexStr = null;
+
         if (targetId.includes('_')) {
             // Fichier issu d'une sélection multiple (ex: "4_0", "4_1")
-            const [baseId, indexStr] = targetId.split('_');
-            const manager = this.managers.find(m => m.getIdSuffix() === baseId);
-            if (manager) {
-                manager.removeFileByIndex(parseInt(indexStr, 10));
-            }
-        } else {
-            // Fichier unique ("1", "2"...)
-            const manager = this.managers.find(m => m.getIdSuffix() === targetId);
-            if (manager) {
-                manager.clear(true);
+            const parts = targetId.split('_');
+            managerBaseId = parts[0];
+            indexStr = parts[1];
+        }
+
+        const dropzoneControllerElement = document.getElementById(`dropzone-${managerBaseId}`);
+
+        if (dropzoneControllerElement) {
+            // Hotwire permet de récupérer une action du contrôleur si on connaît son nom
+            // via application.getControllerForElementAndIdentifier mais en typescript c'est bloquant 
+            // On peut aussi déclencher un custom event vers le module mais c'est lourd.
+            // On va directement attraper l'instance via une solution de contournement (ou demander au comp de re-clear).
+            // La solution la plus propre Stimulus est d'avoir un Outlets, mais on va plutôt utiliser un dispatch inverse :
+            const dropzoneController = this.application.getControllerForElementAndIdentifier(dropzoneControllerElement, 'common--dropzone');
+
+            if (dropzoneController) {
+                if (indexStr !== null) {
+                    (dropzoneController as any).removeFileByIndex(parseInt(indexStr, 10));
+                } else {
+                    (dropzoneController as any).clearFiles(true);
+                }
             }
         }
     }
@@ -266,5 +286,6 @@ export default class extends Controller {
 
     disconnect() {
         this.managers = [];
+        this.uploadedFiles = {};
     }
 }

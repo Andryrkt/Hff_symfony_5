@@ -66,7 +66,19 @@ export class FetchManager {
     // Ensure leading slash consistency or use URL constructor if needed, but simple concat as per user code
     const url = `${this.baseUrl}/${endpoint}`.replace(/([^:]\/)\/+/g, "$1"); // remove double slashes except http://
 
-    const fetchOptions: RequestInit = { ...options, signal };
+    // Add default headers for AJAX detection by Symfony
+    const defaultHeaders: Record<string, string> = {
+      "X-Requested-With": "XMLHttpRequest",
+    };
+    if (responseType === "json") {
+      defaultHeaders["Accept"] = "application/json";
+    }
+
+    const fetchOptions: RequestInit = {
+      ...options,
+      headers: { ...defaultHeaders, ...options.headers },
+      signal
+    };
     const response = await fetch(url, fetchOptions);
     if (!response.ok) {
       const errorText = await response
@@ -101,8 +113,7 @@ export class FetchManager {
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
-          "X-Requested-With": "XMLHttpRequest"
+          "Content-Type": "application/json"
         },
         body: JSON.stringify(data),
       },

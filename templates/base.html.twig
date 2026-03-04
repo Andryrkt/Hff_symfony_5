@@ -6,6 +6,10 @@
 			{% block stylesheets %}
 				{{ encore_entry_link_tags('app') }}
 			{% endblock %}
+
+			{% block javascripts %}
+				{{ encore_entry_script_tags('app') }}
+			{% endblock %}
 			<link href="{{ asset('build/images/favicon.jpg') }}" type="image/x-icon" rel="shortcut icon">
 			<title>HFF Intranet |
 				{% block title %}{% endblock %}
@@ -13,7 +17,7 @@
 		{% endblock %}
 	</head>
 
-	<body data-turbo-suppress-warning>
+	<body>
 		<div class="main-content">
 			<div class="sticky-top main-header-sticky" id="app-main-header">
 				{% block nav %}
@@ -32,8 +36,5 @@
 
 			{% include "partials/_loading_overlay.html.twig" %}
 
-			{% block javascripts %}
-				{{ encore_entry_script_tags('app') }}
-			{% endblock %}
 		</body>
 	</html>
