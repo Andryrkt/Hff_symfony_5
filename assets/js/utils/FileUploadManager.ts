@@ -8,7 +8,9 @@ export interface FileHandlerOptions {
     fileInput: HTMLInputElement;
     allowedTypes?: string[];
     maxSizeMB?: number;
+    multiple?: boolean;
     onFileSelect?: (file: File) => void;
+    onFilesSelect?: (files: File[]) => void;
     onFileRemove?: () => void;
 }
 
@@ -16,10 +18,12 @@ export class FileUploadManager {
     private fileInput: HTMLInputElement;
     private fileNameElement: HTMLElement | null;
     private fileSizeElement: HTMLElement | null;
+    private fileSummaryElement: HTMLElement | null;
     private uploadBtn: HTMLElement | null;
     private removeBtn: HTMLElement | null;
     private dropzone: HTMLElement | null;
     private options: FileHandlerOptions;
+    private accumulatedFiles: File[] = [];
 
     constructor(options: FileHandlerOptions) {
         this.options = {
@@ -32,6 +36,7 @@ export class FileUploadManager {
         this.fileInput = options.fileInput;
         this.fileNameElement = document.getElementById(`file-name-${idSuffix}`);
         this.fileSizeElement = document.getElementById(`file-size-${idSuffix}`);
+        this.fileSummaryElement = document.getElementById(`file-summary-${idSuffix}`);
         this.uploadBtn = document.getElementById(`upload-btn-${idSuffix}`);
         this.removeBtn = document.getElementById(`remove-btn-${idSuffix}`);
         this.dropzone = document.getElementById(`dropzone-${idSuffix}`);
@@ -80,46 +85,95 @@ export class FileUploadManager {
 
         const files = e.dataTransfer?.files;
         if (files && files.length > 0) {
-            this.fileInput.files = files;
             this.processFiles(files);
         }
     }
 
     private processFiles(files: FileList): void {
-        const file = files[0];
-        if (!file) return;
-
-        // Validation du type
-        if (this.options.allowedTypes && !this.options.allowedTypes.includes(file.type)) {
-            const ext = file.name.split('.').pop()?.toUpperCase();
-            alert(`Type de fichier non autorisé (${ext}). Veuillez utiliser : ${this.options.allowedTypes.join(', ')}`);
-            this.clear();
-            return;
-        }
-
-        // Validation de la taille
+        const validFiles: File[] = [];
         const maxSizeBytes = (this.options.maxSizeMB || 5) * 1024 * 1024;
-        if (file.size > maxSizeBytes) {
-            alert(`Le fichier est trop volumineux (max ${this.options.maxSizeMB} Mo).`);
-            this.clear();
+        let hasError = false;
+
+        const filesToProcess = this.options.multiple ? Array.from(files) : [files[0]];
+
+        for (const file of filesToProcess) {
+            if (!file) continue;
+
+            // Validation du type
+            if (this.options.allowedTypes && !this.options.allowedTypes.includes(file.type)) {
+                const ext = file.name.split('.').pop()?.toUpperCase();
+                alert(`Type de fichier non autorisé (${ext}). Veuillez utiliser : ${this.options.allowedTypes.join(', ')}`);
+                hasError = true;
+                break;
+            }
+
+            // Validation de la taille
+            if (file.size > maxSizeBytes) {
+                alert(`Le fichier ${file.name} est trop volumineux (max ${this.options.maxSizeMB} Mo).`);
+                hasError = true;
+                break;
+            }
+
+            validFiles.push(file);
+        }
+
+        if (hasError) {
+            // Restore previous files in input if there's an error, don't clear everything unless it's single
+            if (!this.options.multiple) {
+                this.clear();
+            } else {
+                const dt = new DataTransfer();
+                for (const f of this.accumulatedFiles) {
+                    dt.items.add(f);
+                }
+                this.fileInput.files = dt.files;
+            }
             return;
         }
 
-        this.updateUI(file);
-        if (this.options.onFileSelect) {
-            this.options.onFileSelect(file);
+        if (validFiles.length > 0) {
+            if (this.options.multiple) {
+                this.accumulatedFiles.push(...validFiles);
+            } else {
+                this.accumulatedFiles = [validFiles[0]];
+            }
+
+            const dt = new DataTransfer();
+            for (const f of this.accumulatedFiles) {
+                dt.items.add(f);
+            }
+            this.fileInput.files = dt.files;
+
+            this.updateUI(this.accumulatedFiles);
+            if (this.options.multiple) {
+                if (this.options.onFilesSelect) {
+                    this.options.onFilesSelect(this.accumulatedFiles);
+                }
+            } else {
+                if (this.options.onFileSelect) {
+                    this.options.onFileSelect(this.accumulatedFiles[0]);
+                }
+            }
         }
     }
 
-    private updateUI(file: File): void {
-        if (this.fileNameElement) {
-            this.fileNameElement.innerHTML = `<strong>Fichier :</strong> ${file.name}`;
-        }
-        if (this.fileSizeElement) {
-            this.fileSizeElement.innerHTML = `<strong>Taille :</strong> ${this.formatFileSize(file.size)}`;
+
+    private updateUI(files: File[]): void {
+        if (this.options.multiple) {
+            if (this.fileSummaryElement) {
+                this.fileSummaryElement.innerHTML = `<strong>${files.length} fichier(s) sélectionné(s)</strong>`;
+            }
+        } else {
+            const file = files[0];
+            if (this.fileNameElement) {
+                this.fileNameElement.innerHTML = `<strong>Fichier :</strong> ${file.name}`;
+            }
+            if (this.fileSizeElement) {
+                this.fileSizeElement.innerHTML = `<strong>Taille :</strong> ${this.formatFileSize(file.size)}`;
+            }
         }
         if (this.dropzone) {
-            this.dropzone.style.borderColor = "#28a745";
+            this.dropzone.style.borderColor = "#e0cc12ff";
             this.dropzone.style.backgroundColor = "rgba(40, 167, 69, 0.05)";
         }
 
@@ -129,9 +183,11 @@ export class FileUploadManager {
     }
 
     public clear(triggerCallback: boolean = false): void {
+        this.accumulatedFiles = [];
         this.fileInput.value = '';
         if (this.fileNameElement) this.fileNameElement.innerHTML = '';
         if (this.fileSizeElement) this.fileSizeElement.innerHTML = '';
+        if (this.fileSummaryElement) this.fileSummaryElement.innerHTML = '';
 
         if (this.dropzone) {
             this.dropzone.style.borderColor = "#ccc";
@@ -144,6 +200,37 @@ export class FileUploadManager {
 
         if (triggerCallback && this.options.onFileRemove) {
             this.options.onFileRemove();
+        }
+    }
+
+    public getIdSuffix(): string {
+        return this.options.idSuffix;
+    }
+
+    public removeFileByIndex(index: number, triggerCallback: boolean = false): void {
+        if (index < 0 || index >= this.accumulatedFiles.length) return;
+
+        this.accumulatedFiles.splice(index, 1);
+
+        const dt = new DataTransfer();
+        for (const f of this.accumulatedFiles) {
+            dt.items.add(f);
+        }
+
+        this.fileInput.files = dt.files;
+
+        if (this.accumulatedFiles.length === 0) {
+            this.clear(triggerCallback);
+        } else {
+            // Reprocess the remaining files to trigger callbacks
+            if (this.options.multiple) {
+                if (this.options.onFilesSelect) {
+                    this.options.onFilesSelect(this.accumulatedFiles);
+                }
+                if (this.fileSummaryElement) {
+                    this.fileSummaryElement.innerHTML = `<strong>${this.accumulatedFiles.length} fichier(s) sélectionné(s)</strong>`;
+                }
+            }
         }
     }
 

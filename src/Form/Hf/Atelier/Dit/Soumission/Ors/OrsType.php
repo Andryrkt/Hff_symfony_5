@@ -86,6 +86,7 @@ class OrsType extends AbstractType
                 [
                     'label' => 'Veuillez insérer le document à fusionner avec l\'OR (si existant) ',
                     'required' => false,
+                    'multiple' => true,
                     'allowed_mime_types' => ['application/pdf'],
                     'accept' => '.pdf',
                     'max_size' => '5M'

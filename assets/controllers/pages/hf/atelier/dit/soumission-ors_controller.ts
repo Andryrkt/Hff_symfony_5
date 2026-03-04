@@ -41,8 +41,12 @@ export default class extends Controller {
                     fileInput: input,
                     allowedTypes: ['application/pdf'],
                     maxSizeMB: 10,
+                    multiple: id === '4',
                     onFileSelect: (file) => {
                         this.handleFileSelect(id, file);
+                    },
+                    onFilesSelect: (files) => {
+                        this.handleFilesSelect(id, files);
                     },
                     onFileRemove: () => {
                         this.handleFileRemove(id);
@@ -67,8 +71,44 @@ export default class extends Controller {
         reader.readAsDataURL(file);
     }
 
+    private handleFilesSelect(id: string, files: File[]) {
+        // Nettoyer les anciens fichiers pour cet id s'il y en avait
+        Object.keys(this.uploadedFiles).forEach(key => {
+            if (key.startsWith(`${id}_`)) {
+                delete this.uploadedFiles[key];
+            }
+        });
+
+        files.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                if (e.target?.result) {
+                    const fileKey = `${id}_${index}`;
+                    this.uploadedFiles[fileKey] = {
+                        title: `${this.fileTitles[id] || 'Fichier'} ${index + 1} (${file.name})`,
+                        dataUrl: e.target.result as string
+                    };
+
+                    // On rend les onglets uniquement quand le dernier fichier a été lu
+                    if (index === files.length - 1) {
+                        this.renderTabs();
+                    }
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
     private handleFileRemove(id: string) {
-        delete this.uploadedFiles[id];
+        if (id === '4') {
+            Object.keys(this.uploadedFiles).forEach(key => {
+                if (key.startsWith(`${id}_`)) {
+                    delete this.uploadedFiles[key];
+                }
+            });
+        } else {
+            delete this.uploadedFiles[id];
+        }
         this.renderTabs();
     }
 
@@ -103,16 +143,29 @@ export default class extends Controller {
 
             // Tab button
             const li = document.createElement('li');
-            li.className = 'nav-item';
+            li.className = 'nav-item position-relative d-flex align-items-center';
 
             const a = document.createElement('a');
-            a.className = `nav-link text-black border-0 rounded-top ${isActive ? 'active text-primary fw-bold bg-white' : ''}`;
+            a.className = `nav-link text-black border-0 rounded-top pe-4 ${isActive ? 'active text-primary fw-bold bg-white' : ''}`;
             a.style.cursor = 'pointer';
             a.textContent = data.title;
             a.setAttribute('data-id', id);
             a.setAttribute('data-action', 'click->pages--hf--atelier--dit--soumission-ors#switchTab');
 
             li.appendChild(a);
+
+            // Close button
+            const closeBtn = document.createElement('span');
+            closeBtn.className = 'position-absolute top-50 end-0 translate-middle-y me-2 text-danger';
+            closeBtn.style.cursor = 'pointer';
+            closeBtn.style.fontSize = '1.1rem';
+            closeBtn.style.zIndex = '10';
+            closeBtn.innerHTML = '<i class="fas fa-trash"></i>';
+            closeBtn.setAttribute('data-id', id);
+            closeBtn.setAttribute('data-action', 'click->pages--hf--atelier--dit--soumission-ors#removePreviewTab');
+
+            li.appendChild(closeBtn);
+
             this.navTabsTarget.appendChild(li);
 
             // Tab content
@@ -159,6 +212,31 @@ export default class extends Controller {
         if (targetPane) {
             targetPane.classList.remove('d-none');
             targetPane.classList.add('active', 'show');
+        }
+    }
+
+    removePreviewTab(event: Event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const closeBtn = event.currentTarget as HTMLElement;
+        const targetId = closeBtn.getAttribute('data-id');
+
+        if (!targetId) return;
+
+        if (targetId.includes('_')) {
+            // Fichier issu d'une sélection multiple (ex: "4_0", "4_1")
+            const [baseId, indexStr] = targetId.split('_');
+            const manager = this.managers.find(m => m.getIdSuffix() === baseId);
+            if (manager) {
+                manager.removeFileByIndex(parseInt(indexStr, 10));
+            }
+        } else {
+            // Fichier unique ("1", "2"...)
+            const manager = this.managers.find(m => m.getIdSuffix() === targetId);
+            if (manager) {
+                manager.clear(true);
+            }
         }
     }
 
