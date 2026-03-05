@@ -26,7 +26,8 @@ class DitBreadcrumbBuilder extends BaseBreadcrumbBuilder implements BreadcrumbBu
         return in_array($context, [
             'hf_atelier_dit_liste_index',
             'hf_atelier_dit_form_index',
-            'hf_atelier_dit_creation_duplication'
+            'hf_atelier_dit_creation_duplication',
+            'hf_atelier_dit_soumission_ors_index'
         ]);
     }
 
@@ -46,6 +47,9 @@ class DitBreadcrumbBuilder extends BaseBreadcrumbBuilder implements BreadcrumbBu
                 break;
             case 'hf_atelier_dit_creation_duplication':
                 $items = $this->buildDuplicationBreadcrumb();
+                break;
+            case 'hf_atelier_dit_soumission_ors_index':
+                $items = $this->buildSoumissionOrsBreadcrumb();
                 break;
             default:
                 throw new \InvalidArgumentException("Unsupported product context: {$context}");
@@ -91,6 +95,14 @@ class DitBreadcrumbBuilder extends BaseBreadcrumbBuilder implements BreadcrumbBu
         return $this->buildBaseBreadcrumb()
             ->add("Liste de consultation du dit")
             ->setBackRoute('home_index')
+            ->get();
+    }
+
+    private function buildSoumissionOrsBreadcrumb(): array
+    {
+        return $this->buildBaseBreadcrumb()
+            ->add("Soumission ors")
+            ->setBackRoute('hf_atelier_dit_liste_index')
             ->get();
     }
 }
