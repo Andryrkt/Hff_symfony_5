@@ -1,7 +1,7 @@
 {% set fileType = fileType ?? 'PDF' %}
 {% set class = fileType == 'EXCEL' ? 'text-success' : 'text-warning' %}
 {% set bgColor = fileType == 'EXCEL' ? 'bg-success' : 'bg-warning' %}
-<div id="dropzone-{{ id }}" class="mt-3" style="border: 2px dashed #ccc; padding: 50px; text-align: center;">
+<div id="dropzone-{{ id }}" class="dropzone-container mt-3">
 	<i class="fa fa-cloud-upload {{ class }} fs-1 mb-3"></i>
 	<br>
 	Glissez et déposez votre fichier
@@ -9,7 +9,7 @@
 	ici, ou cliquez pour sélectionner un fichier
 	<b>{{ fileType }}</b>.
 	<br>
-	<button type="button" id="upload-btn-{{ id }}" class="btn border border-none mt-3 fw-bold {{ bgColor }}">Sélectionner un fichier</button>
+	<button type="button" id="upload-btn-{{ id }}" class="btn btn-dropzone border border-none mt-3 fw-bold {{ bgColor }}">Sélectionner un fichier</button>
 </div>
 
 {{ form_widget(form[fieldName], {'attr': {'style': 'position: absolute; left: -9999px; opacity: 0;'}}) }}
