@@ -10,7 +10,7 @@ class OrsParInterventionDto
     public float $montantPiece;
     public float $montantMo;
     public float $montantAchatLocaux;
-    public float $montantFraisDivers;
+    public float $montantFraisDivers; // montant autres
     public float $montantLubrifiants;
     public string $libellelItv;
 }

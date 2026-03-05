@@ -16,4 +16,5 @@ class OrsDto
     public $pieceJoint03;
     public array $pieceJoint04 = [];
     public array $orsParInterventionDtos = [];
+    public array $pieceFaibleAchatDtos = [];
 }
