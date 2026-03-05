@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Constants\Hf\Atelier\Dit\Ors;
+namespace App\Constants\Hf\Atelier\Dit\Soumission\Ors;
 
 class StatutOrConstant
 {
+    public const SOUMIS_A_VALIDATION = 'Soumis à validation';
     public const TOUT_LIVRE = 'Tout livré';
     public const PARTIELLEMENT_LIVRE = 'Partiellement livré';
     public const PARTIELLEMENT_DISPO = 'Partiellement dispo';

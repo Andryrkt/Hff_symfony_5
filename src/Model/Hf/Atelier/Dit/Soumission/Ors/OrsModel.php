@@ -20,7 +20,7 @@ class OrsModel
     }
 
 
-    public function getInfoOrs(string $numeroDit): array
+    public function getInfoOrs(string $numeroDit, int $numeroOr): array
     {
         $this->databaseInformix->connect();
 
@@ -109,6 +109,7 @@ class OrsModel
                     AND sitv_interv = slor_nogrp / 100
 
                 AND trim(seor_refdem) = '$numeroDit'
+                AND slor_numor = $numeroOr
                 GROUP BY 1, 2, 3, 4, 5
                 ORDER BY slor_numor, sitv_interv
             ";

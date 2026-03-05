@@ -2,10 +2,11 @@
 
 namespace App\Repository\Hf\Atelier\Dit\Ors;
 
-use App\Entity\Hf\Atelier\Dit\Ors\Ors;
+
+use App\Entity\Hf\Atelier\Dit\Soumission\Ors\Ors;
 use App\Service\Traits\ArrayHelperTrait;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<Ors>
@@ -24,9 +25,11 @@ class OrsRepository extends ServiceEntityRepository
         parent::__construct($registry, Ors::class);
     }
 
-    public function add(Ors $entity, bool $flush = false): void
+    public function add(array $entities, bool $flush = false): void
     {
-        $this->getEntityManager()->persist($entity);
+        foreach ($entities as $entity) {
+            $this->getEntityManager()->persist($entity);
+        }
 
         if ($flush) {
             $this->getEntityManager()->flush();
@@ -40,6 +43,16 @@ class OrsRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function getNumeroVersion(string $numeroOr): ?int
+    {
+        $qb = $this->createQueryBuilder('o');
+        $qb->select('MAX(o.numeroVersion)')
+            ->where('o.numeroOr = :numeroOr')
+            ->setParameter('numeroOr', $numeroOr);
+
+        return $qb->getQuery()->getSingleScalarResult();
     }
 
     public function findAllOrsValide()
@@ -80,29 +93,4 @@ class OrsRepository extends ServiceEntityRepository
 
         return $this->TableauEnString($result);
     }
-
-    //    /**
-    //     * @return Ors[] Returns an array of Ors objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('o')
-    //            ->andWhere('o.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('o.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Ors
-    //    {
-    //        return $this->createQueryBuilder('o')
-    //            ->andWhere('o.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }

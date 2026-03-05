@@ -2,15 +2,15 @@
 
 namespace App\Dto\Hf\Atelier\Dit;
 
+use App\Constants\Admin\Historisation\TypeDocumentConstants;
+use App\Constants\Hf\Atelier\Dit\Soumission\Ors\StatutOrConstant;
+use App\Constants\Hf\Atelier\Dit\StatutDitConstants;
 use App\Entity\Admin\PersonnelUser\User;
 use App\Entity\Admin\Statut\StatutDemande;
 use App\Entity\Hf\Atelier\Dit\CategorieAteApp;
-use App\Entity\Hf\Atelier\Dit\WorTypeDocument;
 use App\Entity\Hf\Atelier\Dit\WorNiveauUrgence;
-use App\Constants\Hf\Atelier\Dit\StatutDitConstants;
-use App\Constants\Hf\Atelier\Dit\Ors\StatutOrConstant;
+use App\Entity\Hf\Atelier\Dit\WorTypeDocument;
 use Symfony\Component\Validator\Constraints as Assert;
-use App\Constants\Admin\Historisation\TypeDocumentConstants;
 
 class FormDto
 {
