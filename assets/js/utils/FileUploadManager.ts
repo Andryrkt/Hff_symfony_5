@@ -1,3 +1,5 @@
+import Swal from 'sweetalert2';
+
 /**
  * FileUploadManager.ts
  * Utilitaire TypeScript pour la gestion des dropzones et prévisualisations de fichiers.
@@ -9,6 +11,8 @@ export interface FileHandlerOptions {
     allowedTypes?: string[];
     maxSizeMB?: number;
     multiple?: boolean;
+    expectedFileNamePrefix?: string;
+    expectedKeywords?: string[];
     onFileSelect?: (file: File) => void;
     onFilesSelect?: (files: File[]) => void;
     onFileRemove?: () => void;
@@ -89,46 +93,45 @@ export class FileUploadManager {
         }
     }
 
-    private processFiles(files: FileList): void {
+    private async processFiles(files: FileList): Promise<void> {
         const validFiles: File[] = [];
         const maxSizeBytes = (this.options.maxSizeMB || 5) * 1024 * 1024;
-        let hasError = false;
 
         const filesToProcess = this.options.multiple ? Array.from(files) : [files[0]];
 
         for (const file of filesToProcess) {
             if (!file) continue;
 
-            // Validation du type
+            // 1. Validation du type
             if (this.options.allowedTypes && !this.options.allowedTypes.includes(file.type)) {
                 const ext = file.name.split('.').pop()?.toUpperCase();
-                alert(`Type de fichier non autorisé (${ext}). Veuillez utiliser : ${this.options.allowedTypes.join(', ')}`);
-                hasError = true;
-                break;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Type de fichier non autorisé',
+                    text: `L'extension (${ext}) n'est pas acceptée. Veuillez utiliser : ${this.options.allowedTypes.join(', ')}`,
+                    confirmButtonColor: '#ffc107',
+                });
+                return;
             }
 
-            // Validation de la taille
+            // 2. Validation de la taille
             if (file.size > maxSizeBytes) {
-                alert(`Le fichier ${file.name} est trop volumineux (max ${this.options.maxSizeMB} Mo).`);
-                hasError = true;
-                break;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Fichier trop volumineux',
+                    text: `Le fichier ${file.name} dépasse la limite autorisée de ${this.options.maxSizeMB} Mo.`,
+                    confirmButtonColor: '#ffc107',
+                });
+                return;
+            }
+
+            // 3. Validation du format du NOM et du CONTENU (Si attendu)
+            if (this.options.expectedFileNamePrefix || (this.options.expectedKeywords && this.options.expectedKeywords.length > 0)) {
+                const isValid = await this.validateFileContent(file);
+                if (!isValid) return;
             }
 
             validFiles.push(file);
-        }
-
-        if (hasError) {
-            // Restore previous files in input if there's an error, don't clear everything unless it's single
-            if (!this.options.multiple) {
-                this.clear();
-            } else {
-                const dt = new DataTransfer();
-                for (const f of this.accumulatedFiles) {
-                    dt.items.add(f);
-                }
-                this.fileInput.files = dt.files;
-            }
-            return;
         }
 
         if (validFiles.length > 0) {
@@ -155,6 +158,63 @@ export class FileUploadManager {
                 }
             }
         }
+    }
+
+    /**
+     * Valide si le nom du fichier et son contenu correspond aux attentes de manière générique
+     */
+    private async validateFileContent(file: File): Promise<boolean> {
+        const fileName = file.name.toUpperCase();
+
+        // 1. Validation du PRÉFIXE du nom de fichier
+        if (this.options.expectedFileNamePrefix) {
+            const prefix = this.options.expectedFileNamePrefix.toUpperCase();
+            if (!fileName.startsWith(prefix)) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Format du nom de fichier invalide',
+                    text: `Le nom du fichier a été renommé ou ne correspond pas à un fichier attendu.\nFichier actuel : ${file.name}`,
+                    confirmButtonColor: '#ffc107',
+                });
+                return false;
+            }
+        }
+
+        // 2. Validation des MOTS-CLÉS dans le contenu (PDF)
+        // if (file.type === 'application/pdf' && this.options.expectedKeywords && this.options.expectedKeywords.length > 0) {
+        //     try {
+        //         const content = await this.readPdfAsText(file);
+        //         const missingInContent = this.options.expectedKeywords.filter(
+        //             word => word && !content.includes(word.toUpperCase())
+        //         );
+
+        //         if (missingInContent.length > 0) {
+        //             Swal.fire({
+        //                 icon: 'warning',
+        //                 title: 'Vérification de contenu échouée',
+        //                 text: `Les informations suivantes n'ont pas été trouvées dans le document : ${missingInContent.join(', ')}.\nVeuillez vérifier le fichier choisi.`,
+        //                 confirmButtonColor: '#ffc107',
+        //             });
+        //             return false;
+        //         }
+        //     } catch (e) {
+        //         console.error("Erreur lecture PDF", e);
+        //     }
+        // }
+
+        return true;
+    }
+
+    /**
+     * Lit un PDF comme du texte brut pour une recherche rapide de chaînes
+     */
+    private readPdfAsText(file: File): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve((reader.result as string).toUpperCase());
+            reader.onerror = reject;
+            reader.readAsText(file); // Lecture textuelle pour trouver les IDs non compressés
+        });
     }
 
 

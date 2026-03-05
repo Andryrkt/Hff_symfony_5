@@ -41,12 +41,19 @@ export default class extends Controller {
             ) as HTMLInputElement;
 
             if (input) {
+                // Récupération des valeurs attendues depuis le formulaire pour la validation
+                const numeroDitInput = document.querySelector('input[id$="_numeroDit"]') as HTMLInputElement;
+                const numeroOrInput = document.querySelector('input[id$="_numeroOr"]') as HTMLInputElement;
+
                 const manager = new FileUploadManager({
                     idSuffix: id,
                     fileInput: input,
                     allowedTypes: ['application/pdf'],
                     maxSizeMB: 10,
                     multiple: id === '4',
+                    // Règle spécifique pour le document OR (id=1)
+                    expectedFileNamePrefix: id === '1' ? `Ordre de réparation_${numeroOrInput?.value}` : undefined,
+                    expectedKeywords: id === '1' ? [numeroDitInput?.value, numeroOrInput?.value] : [],
                     onFileSelect: (file) => {
                         this.handleFileSelect(id, file);
                     },
