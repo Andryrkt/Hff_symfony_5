@@ -4,10 +4,14 @@ namespace App\Controller\Hf\Atelier\Dit\Soumission\Ors;
 
 use App\Factory\Hf\Atelier\Dit\Soumission\Ors\OrsFactory;
 use App\Form\Hf\Atelier\Dit\Soumission\Ors\OrsType;
+use App\Service\Hf\Atelier\Dit\CreationHandler;
+use App\Service\Hf\Atelier\Dit\PdfService;
 use App\Service\Historique_operation\HistoriqueOperationService;
 use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -49,5 +53,23 @@ class SoumissionOrsController extends AbstractController
             'form' => $form->createView(),
             'breadcrumbs' => $this->breadcrumbBuilder->build('hf_atelier_dit_soumission_ors_index'),
         ]);
+    }
+
+    private function handleFormSubmission(
+        Request $request,
+        FormInterface $form,
+        PdfService $pdfService,
+        CreationHandler $creationHandler
+    ) {
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->logger->info('formulaire soumis et valide.');
+            $this->logger->debug('Données du formulaire', ['data' => $form->getData()]);
+            // $redirectResponse = $this->processValidForm($form, $pdfService, $creationHandler);
+            // if ($redirectResponse) {
+            //     return $redirectResponse;
+            // }
+        }
     }
 }

@@ -16,4 +16,6 @@ class OrsFactory
 
         return $dto;
     }
+
+    public function enrichissementDto(OrsDto $dto) {}
 }
