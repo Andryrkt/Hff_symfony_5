@@ -131,9 +131,10 @@ class OrsModel
     public function getInfoOrsPourConstructeurMagasin(string $numeroDit, int $numeroOr): array
     {
         $this->databaseInformix->connect();
-        $piecesMagasin = $this->parameters->get('app.constructeurs.pieces_magasin');
 
         try {
+            $piecesMagasin = $this->parameters->get('app.constructeurs.pieces_magasin');
+
             $statement = " SELECT
                 slor_numor as numero_or,
                 sitv_datdeb,
@@ -173,9 +174,10 @@ class OrsModel
     {
 
         $this->databaseInformix->connect();
-        $piecesMagasin = $this->parameters->get('app.constructeurs.pieces_magasin');
 
         try {
+            $piecesMagasin = $this->parameters->get('app.constructeurs.pieces_magasin');
+
             $statement = "SELECT
                 TRIM(case when 
                     A.nombre_jour >= 365 then 'a afficher'
@@ -207,6 +209,96 @@ class OrsModel
             $rows = $this->databaseInformix->fetchResults($result);
 
             return $rows;
+        } finally {
+            $this->databaseInformix->close();
+        }
+    }
+
+    public function getNumeroDevis(int $numeroOr): ?int
+    {
+        $this->databaseInformix->connect();
+
+        try {
+            $statement = "SELECT  seor_numdev  as numero_devis
+                from sav_eor
+                where seor_numor = $numeroOr
+            ";
+
+            $result = $this->databaseInformix->executeQuery($statement);
+            $rows = $this->databaseInformix->fetchResults($result);
+
+            return (int)$rows[0]['numero_devis'] ?? null;
+        } finally {
+            $this->databaseInformix->close();
+        }
+    }
+
+    public function getPieceSortieMagasin(int $numeroOr): string
+    {
+        $this->databaseInformix->connect();
+
+        try {
+            $piecesMagasin = $this->parameters->get('app.constructeurs.pieces_magasin');
+
+            $statement = " SELECT
+                CASE WHEN count(slor_constp) > 0 THEN 'OUI' ELSE 'NON' END as nbr_sortie_magasin 
+                from sav_lor 
+                where slor_constp in ($piecesMagasin)
+                AND (slor_refp not like '%-L' and slor_refp not like '%-CTRL')
+                and slor_typlig = 'P' 
+                and slor_numor = '$numeroOr'
+            ";
+
+            $result = $this->databaseInformix->executeQuery($statement);
+            $rows = $this->databaseInformix->fetchResults($result);
+
+            return $rows[0]['nbr_sortie_magasin'] ?? 'NON';
+        } finally {
+            $this->databaseInformix->close();
+        }
+    }
+
+    public function getPieceAchatLocaux(int $numeroOr): string
+    {
+        $this->databaseInformix->connect();
+
+        try {
+            $piecesAchatLocaux = $this->parameters->get('app.constructeurs.achat_locaux');
+
+            $statement = " SELECT
+                CASE WHEN count(slor_constp) > 0 THEN 'OUI' ELSE 'NON' END as nbr_achat_locaux 
+            from sav_lor 
+            where slor_constp in ($piecesAchatLocaux)
+            and slor_numor = '$numeroOr'
+            ";
+
+            $result = $this->databaseInformix->executeQuery($statement);
+            $rows = $this->databaseInformix->fetchResults($result);
+
+            return $rows[0]['nbr_achat_locaux'] ?? 'NON';
+        } finally {
+            $this->databaseInformix->close();
+        }
+    }
+
+    public function getPiecePol(int $numeroOr): string
+    {
+        $this->databaseInformix->connect();
+
+        try {
+            $piecesPol = $this->parameters->get('app.constructeurs.lub');
+
+            $statement = " SELECT
+                CASE WHEN count(slor_constp) > 0 THEN 'OUI' ELSE 'NON' END as nbr_pol 
+            from sav_lor 
+            where slor_constp in ($piecesPol)
+            and slor_numor = '$numeroOr'
+            ";
+
+            $result = $this->databaseInformix->executeQuery($statement);
+            $rows = $this->databaseInformix->fetchResults($result);
+
+            return $rows[0]['nbr_pol'] ?? 'NON';
         } finally {
             $this->databaseInformix->close();
         }

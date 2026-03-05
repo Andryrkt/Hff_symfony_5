@@ -46,6 +46,12 @@ class OrsFactory
     {
         $dto->numeroVersion = $this->getNumeroVersion($dto);
         $dto->statut = StatutOrConstant::SOUMIS_A_VALIDATION;
+        $dto->dateDemande = new \DateTime();
+
+        $dto->numeroDevis = $this->getNumeroDevis($dto);
+        $dto->estPieceSortieMagasin = $this->getPieceSortieMagasin($dto);
+        $dto->estPieceAchatLocaux = $this->getPieceAchatLocaux($dto);
+        $dto->estPiecePol = $this->getPiecePol($dto);
 
         // Récupération automatique par ligne d'interventions de l'OR (Récapitulation de l'OR)
         $dto->orsParInterventionDtos = $this->orsParInterventionMapper->mapToDtos($dto);
@@ -57,5 +63,25 @@ class OrsFactory
     {
         $numeroVersion = $this->orsRepository->getNumeroVersion($dto->numeroOr);
         return $this->numeroGeneratorService->simpleIncrement($numeroVersion);
+    }
+
+    private function getNumeroDevis(OrsDto $dto)
+    {
+        return $this->orsModel->getNumeroDevis($dto->numeroOr);
+    }
+
+    private function getPieceSortieMagasin(OrsDto $dto)
+    {
+        return $this->orsModel->getPieceSortieMagasin($dto->numeroOr);
+    }
+
+    private function getPieceAchatLocaux(OrsDto $dto)
+    {
+        return $this->orsModel->getPieceAchatLocaux($dto->numeroOr);
+    }
+
+    private function getPiecePol(OrsDto $dto)
+    {
+        return $this->orsModel->getPiecePol($dto->numeroOr);
     }
 }

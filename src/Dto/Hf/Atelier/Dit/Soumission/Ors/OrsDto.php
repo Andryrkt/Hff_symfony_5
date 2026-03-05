@@ -5,8 +5,8 @@ namespace App\Dto\Hf\Atelier\Dit\Soumission\Ors;
 
 class OrsDto
 {
-    public ?string $numeroDit = null;
-    public ?int $numeroOr = null;
+    public string $numeroDit;
+    public int $numeroOr;
     public ?string $observation = null;
     public ?int $numeroVersion = null;
     public ?string $statut = null;
@@ -17,4 +17,9 @@ class OrsDto
     public array $pieceJoint04 = [];
     public array $orsParInterventionDtos = [];
     public array $pieceFaibleAchatDtos = [];
+    public ?int $numeroDevis = null;
+    public string $estPieceSortieMagasin = 'NON';
+    public string $estPieceAchatLocaux = 'NON';
+    public string $estPiecePol = 'NON';
+    public $dateDemande;
 }
