@@ -27,6 +27,7 @@ export class StimulusAutoloader {
             { name: 'form-confirmation', import: () => import('@controllers/components/form_confirmation_controller') },
             { name: 'components--uppercase', import: () => import('@controllers/components/uppercase_controller') },
             { name: 'file-validation', import: () => import('@controllers/components/file_validation_controller') },
+            { name: 'pages--hf--atelier--dit--dit-list', import: () => import('@controllers/pages/hf/atelier/dit/dit_list_controller') },
         ];
 
         // Contrôleurs de page - chargés à la demande (lazy loading)
@@ -54,7 +55,6 @@ export class StimulusAutoloader {
 
             // DIT
             { name: 'pages--hf--atelier--dit--dit-form', import: () => import('@controllers/pages/hf/atelier/dit/dit_form_controller') },
-            { name: 'pages--hf--atelier--dit--dit-list', import: () => import('@controllers/pages/hf/atelier/dit/dit_list_controller') },
             { name: 'pages--hf--atelier--dit--soumission-ors', import: () => import('@controllers/pages/hf/atelier/dit/soumission-ors_controller') },
         ];
 

@@ -5,6 +5,10 @@
 {% block title %}Liste des DIT
 {% endblock %}
 
+{% block meta %}
+	<meta name="turbo-cache-control" content="no-cache">
+{% endblock %}
+
 {% block content %}
 {% set mots_a_supprimer = ['Chef section', 'Chef de section', 'Responsable section', 'Chef d\'équipe'] %}
 <turbo-frame id="dit-list-frame" data-turbo-action="advance" {{ stimulus_controller('pages--hf--atelier--dit--dit-list') }}>

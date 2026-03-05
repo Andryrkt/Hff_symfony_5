@@ -77,62 +77,45 @@ export default class extends Controller {
     }
 
     /**
-     * Appelé lors du click sur le bouton ellipsis "Soumission document à valider" (plus fiable que Bootstrap show.bs.modal sous Turbo)
+     * Appelé lors du click sur le bouton ellipsis "Soumission document à valider"
      */
-    prepareSoumissionModal(event: any) {
-        const button = event.currentTarget || event.target;
-        if (!button) return;
+    prepareSoumissionModal(event: Event) {
+        console.log('--- prepareSoumissionModal trigger ---');
 
-        // remonte vers le a ou button original au cas où event.target soit l'icone
-        const targetBtn = button.closest('[data-numdit]') || button;
-
-        const numDit = targetBtn.getAttribute('data-numdit');
-        if (this.hasModalNumDitTarget) {
-            this.modalNumDitTarget.textContent = numDit;
-        }
-        if (this.hasHiddenNumDitTarget) {
-            this.hiddenNumDitTarget.value = numDit;
-        }
-
-        const numOr = targetBtn.getAttribute('data-numor');
-        if (this.hasHiddenNumOrTarget) {
-            this.hiddenNumOrTarget.value = numOr;
-        }
-    }
-
-    /**
-     * Gère l'ouverture de la modal de soumission de document (via l'événement Bootstrap)
-     * @param event 
-     */
-    showSoumissionModal(event: any) {
-        // console.log('showSoumissionModal triggered', event);
-        // En mode événement show.bs.modal, relatedTarget est le bouton qui a ouvert la modal
-        const button = event.relatedTarget;
-        // console.log('Related Target:', button);
-
+        // 1. Récupérer l'élément porteur de données
+        const button = (event.target as HTMLElement).closest('[data-numdit]') as HTMLElement;
         if (!button) {
-            console.warn('No relatedTarget found for modal');
+            console.error("Bouton non trouvé");
             return;
         }
 
         const numDit = button.getAttribute('data-numdit');
-        //  console.log('NumDit found:', numDit);
-
-        if (this.hasModalNumDitTarget) {
-            this.modalNumDitTarget.textContent = numDit;
-        }
-
-        if (this.hasHiddenNumDitTarget) {
-            this.hiddenNumDitTarget.value = numDit;
-        }
-
         const numOr = button.getAttribute('data-numor');
-        // console.log('NumOr found:', numOr);
 
-        if (this.hasHiddenNumOrTarget) {
-            this.hiddenNumOrTarget.value = numOr;
+        console.log('Données détectées:', { numDit, numOr });
+
+        if (!numDit) return;
+
+        // 2. Remplissage des champs (avec fallback si Stimulus perd les targets)
+        // Note: Bootstrap peut déplacer le modal dans le body, ce qui le sort du scope de Stimulus
+
+        // Remplissage Numéro DIT (Affichage)
+        const displayDit = this.hasModalNumDitTarget ? this.modalNumDitTarget : document.getElementById('modalNumDit');
+        if (displayDit) displayDit.textContent = numDit;
+
+        // Remplissage Champs cachés (Formulaire)
+        const inputDit = this.hasHiddenNumDitTarget ? this.hiddenNumDitTarget : document.getElementById('hiddenNumDit');
+        if (inputDit) (inputDit as HTMLInputElement).value = numDit;
+
+        const inputOr = this.hasHiddenNumOrTarget ? this.hiddenNumOrTarget : document.getElementById('hiddenNumOr');
+        if (inputOr) {
+            (inputOr as HTMLInputElement).value = (numOr && numOr !== '0') ? numOr : "";
         }
+
+        console.log('Modal mis à jour avec:', numDit);
     }
+
+
 
     /**
      * Démarre le polling global pour les numéros OR manquants
@@ -201,6 +184,7 @@ export default class extends Controller {
      */
     private updateContainers(results: Record<string, string>) {
         for (const [numDit, numeroOr] of Object.entries(results)) {
+            // 1. Mettre à jour la cellule OR dans le tableau
             const container = this.pollingContainerTargets.find(
                 c => c.getAttribute('data-num-dit') === numDit
             );
@@ -219,6 +203,16 @@ export default class extends Controller {
                     showToast('Succès', `Le numéro OR pour la DIT ${numDit} a été récupéré : ${numeroOr}`, 'success');
                 }
             }
+
+            // 2. Mettre à jour l'attribut data-numor de TOUS les éléments liés à cette DIT
+            //    (principalement le bouton "Soumission document à valider" dans le dropdown)
+            const elementsToUpdate = this.element.querySelectorAll<HTMLElement>(`[data-numdit="${numDit}"]`);
+            elementsToUpdate.forEach(el => {
+                // Si l'élément a déjà un attribut data-numor (même vide), on le met à jour
+                if (el.hasAttribute('data-numor')) {
+                    el.setAttribute('data-numor', numeroOr);
+                }
+            });
         }
     }
 }

@@ -53,7 +53,7 @@ class ListeController extends AbstractController
             return $response;
         }
 
-        return $this->render('hf/atelier/dit/liste/liste.html.twig', [
+        $response = $this->render('hf/atelier/dit/liste/liste.html.twig', [
             'data' => $paginationDatas['data'],
             'paginationData' => $paginationDatas,
             'queryParams' => $request->query->all(),
@@ -66,6 +66,13 @@ class ListeController extends AbstractController
             'form' => $form->createView(),
             'soumissionForm' => $soumissionForm->createView(),
         ]);
+
+        // Forcer l'absence de cache pour éviter les snapshots HTML obsolètes
+        $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
+        $response->headers->set('Pragma', 'no-cache');
+        $response->headers->set('Expires', '0');
+
+        return $response;
     }
 
     private function traitementFormulaireDeRecherche(Request $request, FormInterface $form): void
