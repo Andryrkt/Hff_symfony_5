@@ -6,6 +6,7 @@ use App\Constants\Hf\Atelier\Dit\Soumission\Ors\StatutOrConstant;
 use App\Dto\Hf\Atelier\Dit\Soumission\Ors\OrsDto;
 use App\Mapper\Hf\Atelier\Dit\Soumission\Ors\OrsParInterventionMapper;
 use App\Mapper\Hf\Atelier\Dit\Soumission\Ors\PieceFaibleAchatMapper;
+use App\Mapper\Hf\Atelier\Dit\Soumission\Ors\TotalOrsParInterventionMapper;
 use App\Model\Hf\Atelier\Dit\Soumission\Ors\OrsModel;
 use App\Repository\Hf\Atelier\Dit\Ors\OrsRepository;
 use App\Service\Utils\NumeroGeneratorService;
@@ -15,6 +16,7 @@ class OrsFactory
     private OrsRepository $orsRepository;
     private NumeroGeneratorService $numeroGeneratorService;
     private OrsParInterventionMapper $orsParInterventionMapper;
+    private TotalOrsParInterventionMapper $totalOrsParInterventionMapper;
     private PieceFaibleAchatMapper $pieceFaibleAchatMapper;
     private OrsModel $orsModel;
 
@@ -22,12 +24,14 @@ class OrsFactory
         OrsRepository $orsRepository,
         NumeroGeneratorService $numeroGeneratorService,
         OrsParInterventionMapper $orsParInterventionMapper,
+        TotalOrsParInterventionMapper $totalOrsParInterventionMapper,
         PieceFaibleAchatMapper $pieceFaibleAchatMapper,
         OrsModel $orsModel
     ) {
         $this->orsRepository = $orsRepository;
         $this->numeroGeneratorService = $numeroGeneratorService;
         $this->orsParInterventionMapper = $orsParInterventionMapper;
+        $this->totalOrsParInterventionMapper = $totalOrsParInterventionMapper;
         $this->pieceFaibleAchatMapper = $pieceFaibleAchatMapper;
         $this->orsModel = $orsModel;
     }
@@ -55,6 +59,8 @@ class OrsFactory
 
         // Récupération automatique par ligne d'interventions de l'OR (Récapitulation de l'OR)
         $dto->orsParInterventionDtos = $this->orsParInterventionMapper->mapToDtos($dto);
+        // Récupération du total des OR par intervention
+        $dto->totalOrsParIntervention = [$this->totalOrsParInterventionMapper->calculateTotals($dto)];
         // Récupération automatique des pièces faible achat
         $dto->pieceFaibleAchatDtos = $this->pieceFaibleAchatMapper->mapToDtos($dto);
     }
