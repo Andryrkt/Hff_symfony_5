@@ -2,238 +2,259 @@
 
 namespace App\Service\Utils\Fichier;
 
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+
 /**
- * Génère un tableau HTML pour l'export PDF.
- *
- * Ce service peut être configuré pour être plus flexible en appelant la méthode `setOptions()`
- * avant `generateTable()`.
- *
- * Des options peuvent être fournies pour les paramètres globaux du tableau :
- * - `header_row_style`: CSS pour la ligne d'en-tête (ex: 'background-color: #F0F0F0;')
- * - `footer_row_style`: CSS pour la ligne de pied de page.
- * - `empty_message`: Message personnalisé pour les tableaux vides.
- * - `default_number_value`: Valeur à afficher pour les nombres non valides (défaut: '0,00').
- * - `default_date_value`: Valeur à afficher pour les dates non valides (défaut: '-').
- * - `default_empty_value`: Valeur à afficher pour les autres champs vides (défaut: '').
- *
- * Le tableau `$headerConfig` pour `generateTable()` a également été amélioré. Le tableau de
- * configuration de chaque colonne peut maintenant inclure :
- * - `type`: ('number', 'date') pour activer le formatage automatique.
- * - `formatter`: Une fonction callable `function($value, $row)` pour un formatage de valeur personnalisé.
- * - `header_style`: CSS spécifique pour la cellule d'en-tête.
- * - `cell_style`: CSS spécifique pour les cellules du corps.
- * - `styler`: Une fonction callable `function($value, $row)` pour appliquer des styles dynamiques à une cellule (ex: basé sur la valeur).
- * - `footer_style`: CSS spécifique pour la cellule de pied de page.
- * - `default_value`: Valeur par défaut pour la colonne si la donnée est vide ou invalide. Surcharge les options globales.
+ * Générateur de tableaux HTML ultra-flexible pour TCPDF.
+ * 
+ * Ce service permet de générer des structures de tableaux complexes avec support
+ * des propriétés imbriquées, formatage automatique et styles dynamiques.
+ * 
+ * Les options globales (via setOptions()) incluent :
+ * - `table_attributes`: Attributs HTML de la balise <table>
+ * - `header_row_style`: Style CSS de la ligne d'en-tête
+ * - `footer_row_style`: Style CSS de la ligne de pied de page
+ * - `row_styler`: Callable function($row) retournant un style CSS pour le <tr>
+ * - `empty_message`: Message à afficher si aucune donnée
+ * - `default_number_format`: array ['decimals', 'dec_point', 'thousands_sep']
+ * - `default_date_format`: format de date PHP (ex: 'd/m/Y')
+ * - `default_empty_value`: Valeur par défaut pour les champs vides
+ * 
+ * La configuration des colonnes ($headerConfig) accepte :
+ * - `key`: Chemin de la propriété (ex: 'id', 'client.nom', '[piece][libelle]')
+ * - `label`: Libellé d'en-tête
+ * - `width`: Largeur en pixels
+ * - `type`: 'number', 'date', 'datetime', 'boolean', 'percent', 'text'
+ * - `style`: Style CSS de base (appliqué à th et td)
+ * - `header_style`: Surchage de style pour th
+ * - `cell_style`: Surchage de style pour td
+ * - `footer_style`: Surchage de style pour le pied de page
+ * - `formatter`: Callable function($value, $row) pour transformer la valeur
+ * - `styler`: Callable function($value, $row) pour un style de cellule dynamique
  */
 class PdfTableGeneratorFlexible
 {
     private array $options = [];
+    private PropertyAccessorInterface $accessor;
+
+    public function __construct(?PropertyAccessorInterface $accessor = null)
+    {
+        $this->accessor = $accessor ?? PropertyAccess::createPropertyAccessor();
+    }
 
     /**
-     * Définit les options pour la génération du tableau.
-     *
-     * @param array $options
-     * @return $this
+     * Définit les options pour la génération. Les options sont fusionnées avec les valeurs par défaut.
      */
     public function setOptions(array $options): self
     {
-        $this->options = $options;
+        $this->options = array_merge([
+            'table_attributes'      => 'border="0" cellpadding="0" cellspacing="0" align="center" style="font-size: 8px;"',
+            'header_row_style'      => 'background-color: #D3D3D3;',
+            'footer_row_style'      => 'background-color: #D3D3D3;',
+            'empty_message'         => 'Aucune donnée disponible',
+            'default_number_format' => ['decimals' => 2, 'dec_point' => ',', 'thousands_sep' => '.'],
+            'default_date_format'   => 'd/m/Y',
+            'default_empty_value'   => '',
+        ], $options);
+
         return $this;
     }
 
-    public function generateTable(array $headerConfig, array $rows, array $totals, bool $expre = false)
+    /**
+     * Génère le HTML du tableau.
+     * 
+     * @param array $headerConfig Configuration des colonnes
+     * @param array $rows Données du corps
+     * @param array $totals Données du pied de page (optionnel)
+     * @param bool $hideEmptyMessage Si vrai, n'affiche rien si $rows est vide
+     */
+    public function generateTable(array $headerConfig, array $rows, array $totals = [], bool $hideEmptyMessage = false): string
     {
-        $tableAttributes = $this->options['table_attributes'] ?? 'border="0" cellpadding="0" cellspacing="0" align="center" style="font-size: 8px;"';
-        $html = '<table ' . $tableAttributes . '>';
+        if (empty($this->options)) {
+            $this->setOptions([]);
+        }
+
+        $html = '<table ' . $this->options['table_attributes'] . '>';
         $html .= $this->generateHeader($headerConfig);
-        $html .= $this->generateBody($headerConfig, $rows, $expre);
-        $html .= $this->generateFooter($headerConfig, $totals);
+        $html .= $this->generateBody($headerConfig, $rows, $hideEmptyMessage);
+
+        if (!empty($totals)) {
+            $html .= $this->generateFooter($headerConfig, $totals);
+        }
+
         $html .= '</table>';
 
-        // Réinitialise les options après la génération pour ne pas affecter les tableaux suivants
+        // Reset des options après génération pour isolation
         $this->options = [];
 
         return $html;
     }
 
-    private function generateHeader(array $headerConfig)
+    private function generateHeader(array $headerConfig): string
     {
-        $headerRowStyle = $this->options['header_row_style'] ?? 'background-color: #D3D3D3;';
-        $html = '<thead><tr style="' . $headerRowStyle . '">';
+        $html = '<thead><tr style="' . $this->options['header_row_style'] . '">';
         foreach ($headerConfig as $config) {
-            $style = $config['header_style'] ?? $config['style'];
-            $html .= '<th style="width: ' . $config['width'] . 'px; ' . $style . '">' . $config['label'] . '</th>';
+            $style = $config['header_style'] ?? $config['style'] ?? '';
+            $width = isset($config['width']) ? 'width: ' . $config['width'] . 'px; ' : '';
+            $html .= sprintf('<th style="%s%s">%s</th>', $width, $style, $config['label'] ?? '');
         }
         $html .= '</tr></thead>';
         return $html;
     }
 
-    /**
-     * Génère le corps du tableau.
-     *
-     * @param array $headerConfig
-     * @param array $rows
-     * @param boolean $expre Si vrai, n'affiche pas de message pour un tableau vide.
-     * @return string
-     */
-    private function generateBody(array $headerConfig, array $rows, bool $expre = false)
+    private function generateBody(array $headerConfig, array $rows, bool $hideEmptyMessage): string
     {
         $html = '<tbody>';
-        $emptyMessage = $this->options['empty_message'] ?? 'N/A';
 
-        if (empty($rows) && !$expre) {
-            $html .= '<tr><td colspan="' . count($headerConfig) . '" style="text-align: center; font-weight: bold;">' . $emptyMessage . '</td></tr>';
-            $html .= '</tbody>';
-            return $html;
+        if (empty($rows)) {
+            if (!$hideEmptyMessage) {
+                $html .= sprintf(
+                    '<tr><td colspan="%d" style="text-align: center; font-weight: bold; padding: 5px;">%s</td></tr>',
+                    count($headerConfig),
+                    $this->options['empty_message']
+                );
+            }
+            return $html . '</tbody>';
         }
 
         foreach ($rows as $row) {
-            // L'implémentation précédente avait une vérification boguée et inefficace pour les lignes avec des montants à zéro.
-            // Elle a été supprimée pour nettoyer le code. Une fonctionnalité similaire peut être implémentée
-            // en filtrant les données `$rows` avant d'appeler cette méthode, ou réintroduite via une option.
+            $rowStyle = '';
+            if (isset($this->options['row_styler']) && is_callable($this->options['row_styler'])) {
+                $rowStyle = $this->options['row_styler']($row);
+            }
 
-            $html .= '<tr>';
+            $html .= sprintf('<tr style="%s">', $rowStyle);
+
             foreach ($headerConfig as $config) {
-                $key = $config['key'];
-                $value = '';
+                $value = $this->getValueFromData($row, $config['key'] ?? '');
 
-                if (is_array($row) || $row instanceof \ArrayAccess) {
-                    $value = $row[$key] ?? '';
-                } elseif (is_object($row)) {
-                    // Tenter de lire la propriété publique
-                    if (isset($row->{$key})) {
-                        $value = $row->{$key};
-                    } else {
-                        // Sinon, tenter d'appeler un getter
-                        $getter = 'get' . ucfirst($key);
-                        if (method_exists($row, $getter)) {
-                            $value = $row->{$getter}();
-                        }
-                    }
-                }
+                $baseStyle = $config['cell_style'] ?? str_replace('font-weight: bold;', '', $config['style'] ?? '');
+                $dynamicStyle = (isset($config['styler']) && is_callable($config['styler']))
+                    ? $config['styler']($value, $row)
+                    : '';
 
-                $baseStyle = $config['cell_style'] ?? str_replace('font-weight: bold;', '', $config['style']);
-
-                $dynamicStyle = '';
-                if (isset($config['styler']) && is_callable($config['styler'])) {
-                    $dynamicStyle = $config['styler']($value, $row);
-                } else {
-                    $dynamicStyle = $this->getDynamicStyle($key, $value);
-                }
                 $style = $baseStyle . $dynamicStyle;
+                $width = isset($config['width']) ? 'width: ' . $config['width'] . 'px; ' : '';
 
-                if (isset($config['formatter']) && is_callable($config['formatter'])) {
-                    $value = $config['formatter']($value, $row);
-                } else {
-                    $value = $this->formatValue($key, $value, $config);
-                }
+                $formattedValue = (isset($config['formatter']) && is_callable($config['formatter']))
+                    ? $config['formatter']($value, $row)
+                    : $this->formatValue($value, $config);
 
-                $html .= '<td style="width: ' . $config['width'] . 'px; ' . $style . '">' . $value . '</td>';
+                $html .= sprintf('<td style="%s%s">%s</td>', $width, $style, $formattedValue);
             }
             $html .= '</tr>';
         }
-        $html .= '</tbody>';
-        return $html;
+
+        return $html . '</tbody>';
     }
 
-    private function generateFooter(array $headerConfig, array $totals)
+    private function generateFooter(array $headerConfig, array $totals): string
     {
-        $footerRowStyle = $this->options['footer_row_style'] ?? 'background-color: #D3D3D3;';
-        $html = '<tfoot><tr style="' . $footerRowStyle . '">';
-        foreach ($headerConfig as $config) {
-            $key = $config['key'];
-            $style = $config['footer_style'] ?? $config['style'];
-            $value = $totals[$key] ?? '';
+        $html = '<tfoot><tr style="' . $this->options['footer_row_style'] . '">';
+        $skipCount = 0;
 
-            if (!empty($value)) {
-                if (isset($config['formatter']) && is_callable($config['formatter'])) {
-                    $value = $config['formatter']($value, $totals);
-                } else {
-                    $value = $this->formatValue($key, $value, $config);
-                }
+        foreach ($headerConfig as $index => $config) {
+            if ($skipCount > 0) {
+                $skipCount--;
+                continue;
             }
 
-            $html .= '<th style="width: ' . $config['width'] . 'px; ' . $style . '">' . $value . '</th>';
+            $colspan = $config['footer_colspan'] ?? 1;
+            $value = $this->getValueFromData($totals, $config['key'] ?? '');
+            $style = $config['footer_style'] ?? $config['style'] ?? '';
+
+            // Calculer la largeur cumulée si colspan > 1
+            $totalWidth = $config['width'] ?? 0;
+            if ($colspan > 1) {
+                for ($i = 1; $i < $colspan; $i++) {
+                    if (isset($headerConfig[$index + $i])) {
+                        $totalWidth += $headerConfig[$index + $i]['width'] ?? 0;
+                    }
+                }
+                $skipCount = $colspan - 1;
+            }
+
+            $widthAttr = $totalWidth > 0 ? sprintf('width: %dpx; ', $totalWidth) : '';
+            $colspanAttr = $colspan > 1 ? sprintf(' colspan="%d"', $colspan) : '';
+
+            $formattedValue = (isset($config['formatter']) && is_callable($config['formatter']))
+                ? $config['formatter']($value, $totals)
+                : $this->formatValue($value, $config);
+
+            $html .= sprintf('<th%s style="%s%s">%s</th>', $colspanAttr, $widthAttr, $style, $formattedValue);
         }
         $html .= '</tr></tfoot>';
         return $html;
     }
 
-
-    private function getDynamicStyle($key, $value)
+    /**
+     * Récupère de manière sécurisée une valeur depuis un tableau ou un objet.
+     */
+    private function getValueFromData($row, string $key)
     {
-        $styles = '';
-        if ($key === 'statut') {
-            switch ($value) {
-                case 'Supp':
-                    $styles .= 'background-color: #FF0000;';
-                    break;
-                case 'Modif':
-                    $styles .= 'background-color: #FFFF00;';
-                    break;
-                case 'Nouv':
-                    $styles .= 'background-color: #00FF00;';
-                    break;
-            }
+        if ($key === '') {
+            return null;
         }
-        return $styles;
+
+        try {
+            // Normalisation pour PropertyAccessor si c'est un tableau simple et une clé simple
+            $propertyPath = (is_array($row) && strpos($key, '.') === false && strpos($key, '[') === false)
+                ? '[' . $key . ']'
+                : $key;
+
+            return $this->accessor->getValue($row, $propertyPath);
+        } catch (\Exception $e) {
+            // En cas d'échec de l'accessor, on tente un fallback basique si c'est un objet
+            if (is_object($row) && isset($row->{$key})) {
+                return $row->{$key};
+            }
+            return null;
+        }
     }
 
     /**
-     * Formate une valeur en fonction de son type, défini dans la configuration de la colonne ou déduit de la clé.
-     * Le format de nombre peut être spécifié via `type`='number' dans la configuration de la colonne.
-     * Le format de date peut être spécifié via `type`='date' dans la configuration de la colonne.
-     *
-     * @param string $key La clé de la ligne de données.
-     * @param mixed $value La valeur à formater.
-     * @param array $config La configuration pour la colonne.
-     * @return string La valeur formatée.
+     * Formate la valeur selon la configuration.
      */
-    private function formatValue(string $key, $value, array $config = []): string
+    private function formatValue($value, array $config): string
     {
-        $type = $config['type'] ?? null;
-
-        // Formatage des nombres
-        $isNumeric = $type === 'number';
-        if ($type === null && (in_array($key, ['mttTotal', 'mttPieces', 'mttMo', 'mttSt', 'mttLub', 'mttAutres', 'mttTotalAv', 'mttTotalAp', 'pu1', 'pu2', 'pu3', 'prixHt', 'montantNet', 'remise1', 'remise2']) || stripos($key, 'mtt') !== false)) {
-            $isNumeric = true;
+        if ($value === null || $value === '') {
+            return $config['default_value'] ?? $this->options['default_empty_value'];
         }
 
-        if ($isNumeric) {
-            if (is_numeric($value)) {
-                return number_format((float) $value, 2, ',', '.');
-            }
-            return $config['default_value'] ?? $this->options['default_number_value'] ?? '0,00';
-        }
+        $type = $config['type'] ?? 'text';
 
-        // Formatage des dates
-        $isDate = $type === 'date';
-        if ($type === null && stripos($key, 'date') !== false) {
-            $isDate = true;
-        }
-
-        if ($isDate) {
-            $defaultDateValue = $config['default_value'] ?? $this->options['default_date_value'] ?? '-';
-            // Vérifier si la valeur est une chaîne et non égale à la valeur par défaut pour éviter une mauvaise interprétation
-            if (is_string($value) && !empty($value) && $value !== $defaultDateValue) {
-                try {
-                    $date = new \DateTime($value);
-                    return $date->format('d/m/Y');
-                } catch (\Exception $e) {
-                    // Si la date est invalide, retourne une valeur par défaut
-                    return $defaultDateValue;
+        switch ($type) {
+            case 'number':
+                $fmt = $this->options['default_number_format'];
+                if (is_numeric($value)) {
+                    return number_format((float)$value, $fmt['decimals'], $fmt['dec_point'], $fmt['thousands_sep']);
                 }
-            }
-            return $defaultDateValue; // Si la valeur n'est pas valide, retourne un séparateur par défaut
-        }
+                return $value;
 
-        // Pour les autres types, si la valeur est vide, utiliser une valeur par défaut si elle est définie
-        if ($value === '' || $value === null) {
-            return $config['default_value'] ?? $this->options['default_empty_value'] ?? (string) $value;
-        }
+            case 'date':
+            case 'datetime':
+                if ($value instanceof \DateTimeInterface) {
+                    return $value->format($config['format'] ?? $this->options['default_date_format']);
+                }
+                try {
+                    // Tente de parser si c'est une string
+                    if (is_string($value) && !empty($value)) {
+                        return (new \DateTime($value))->format($config['format'] ?? $this->options['default_date_format']);
+                    }
+                } catch (\Exception $e) {
+                    return $value;
+                }
+                return $value;
 
-        // Retourne la valeur non modifiée si aucune condition ne s'applique
-        return (string) $value;
+            case 'boolean':
+                return $value ? ($config['true_label'] ?? 'Oui') : ($config['false_label'] ?? 'Non');
+
+            case 'percent':
+                return number_format((float)$value, 2, ',', '.') . ' %';
+
+            default:
+                return (string)$value;
+        }
     }
 }

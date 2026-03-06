@@ -16,6 +16,7 @@ class OrsDto
     public $pieceJoint03;
     public array $pieceJoint04 = [];
     public array $orsParInterventionDtos = [];
+    public array $totalOrsParIntervention = []; // TODO: à revoir
     public array $pieceFaibleAchatDtos = [];
     public ?int $numeroDevis = null;
     public string $estPieceSortieMagasin = 'NON';
