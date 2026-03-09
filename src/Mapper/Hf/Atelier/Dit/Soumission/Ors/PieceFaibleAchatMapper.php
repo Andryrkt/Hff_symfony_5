@@ -9,17 +9,28 @@ use App\Model\Hf\Atelier\Dit\Soumission\Ors\OrsModel;
 class PieceFaibleAchatMapper
 {
     private OrsModel $orsModel;
+    private $parameters;
 
-    public function __construct(OrsModel $orsModel)
+    public function __construct(OrsModel $orsModel, \Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface $parameters)
     {
         $this->orsModel = $orsModel;
+        $this->parameters = $parameters;
     }
 
-    public function mapToDtos(OrsDto $orsDto): array
+    public function mapToDtos(OrsDto $orsDto, array $infoSurLesOrs = []): array
     {
         $pieceFaibleAchatDtos = [];
 
-        $infoOrs = $this->orsModel->getInfoOrsPourConstructeurMagasin($orsDto->numeroDit, $orsDto->numeroOr);
+        // Si les données ne sont pas fournies, on les récupère (comportement d'origine)
+        // Sinon on les filtre en mémoire pour économiser une requête
+        if (empty($infoSurLesOrs)) {
+            $infoOrs = $this->orsModel->getInfoOrsPourConstructeurMagasin($orsDto->numeroDit, $orsDto->numeroOr);
+        } else {
+            $piecesMagasin = explode(',', str_replace("'", "", $this->parameters->get('app.constructeurs.pieces_magasin')));
+            $infoOrs = array_filter($infoSurLesOrs, function ($info) use ($piecesMagasin) {
+                return in_array($info['constructeur'] ?? '', $piecesMagasin);
+            });
+        }
 
         foreach ($infoOrs as $infoOr) {
             $pieceFaibleAchatDto = new PieceFaibleAchatDto();
@@ -27,12 +38,12 @@ class PieceFaibleAchatMapper
             $afficher = $this->orsModel->getPieceFaibleActiviteAchat($infoOr['constructeur'], $infoOr['reference'], $orsDto->numeroOr);
 
             if (isset($afficher[0]) && $afficher[0]['retour'] === 'a afficher') {
-                $pieceFaibleAchatDto->numeroItv = $infoOr['numero_itv'];
-                $pieceFaibleAchatDto->libelleItv = $infoOr['libelle_itv'];
-                $pieceFaibleAchatDto->constructeur = $infoOr['constructeur'];
-                $pieceFaibleAchatDto->reference = $infoOr['reference'];
-                $pieceFaibleAchatDto->designation = $infoOr['designation'];
-                $pieceFaibleAchatDto->pmp = $afficher[0]['pmp'];
+                $pieceFaibleAchatDto->numeroItv = (int) ($infoOr['numero_itv'] ?? 0);
+                $pieceFaibleAchatDto->libelleItv = (string) ($infoOr['libelle_itv'] ?? '');
+                $pieceFaibleAchatDto->constructeur = (string) ($infoOr['constructeur'] ?? '');
+                $pieceFaibleAchatDto->reference = (string) ($infoOr['reference'] ?? '');
+                $pieceFaibleAchatDto->designation = (string) ($infoOr['designation'] ?? '');
+                $pieceFaibleAchatDto->pmp = (float) ($afficher[0]['pmp'] ?? 0);
                 $pieceFaibleAchatDto->dateDerniereCde = $afficher[0]['date_derniere_cde'];
 
                 $pieceFaibleAchatDtos[] = $pieceFaibleAchatDto;

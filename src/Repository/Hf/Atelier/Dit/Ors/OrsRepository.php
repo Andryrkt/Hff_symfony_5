@@ -93,4 +93,15 @@ class OrsRepository extends ServiceEntityRepository
 
         return $this->TableauEnString($result);
     }
+
+    /**
+     * @return Ors[]
+     */
+    public function findByOrAndVersion(string $numeroOr, int $numeroVersion): array
+    {
+        return $this->findBy([
+            'numeroOr' => $numeroOr,
+            'numeroVersion' => $numeroVersion
+        ]);
+    }
 }

@@ -8,6 +8,7 @@ use App\Factory\Hf\Atelier\Dit\Soumission\Ors\OrsFactory;
 use App\Form\Hf\Atelier\Dit\Soumission\Ors\OrsType;
 use App\Service\Hf\Atelier\Dit\PdfService;
 use App\Service\Hf\Atelier\Dit\Soumission\Ors\CreationHandler;
+use App\Service\Hf\Atelier\Dit\Soumission\Ors\OrsPdfService;
 use App\Service\Historique_operation\HistoriqueOperationService;
 use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use Psr\Log\LoggerInterface;
@@ -44,7 +45,7 @@ class SoumissionOrsController extends AbstractController
         string $numOr,
         OrsFactory $orsFactory,
         Request $request,
-        PdfService $pdfService,
+        OrsPdfService $orsPdfService,
         CreationHandler $creationHandler
     ) {
         // 1. gerer l'accés 
@@ -52,25 +53,35 @@ class SoumissionOrsController extends AbstractController
 
         // 2. creation et initialisation du formulaire
         $dto = $orsFactory->create($numDit, $numOr);
+        $orsFactory->enrichissementDto($dto);
+
         $form = $this->createForm(OrsType::class, $dto);
 
         //3. Traitement du Formulaire
-        $response = $this->handleFormSubmission($request, $form, $pdfService, $creationHandler);
+        $response = $this->handleFormSubmission($request, $form, $orsPdfService, $creationHandler);
         if ($response) {
             return $response;
         }
 
-        return $this->render('hf/atelier/dit/soumission/ors/index.html.twig', [
+        $renderResponse = $this->render('hf/atelier/dit/soumission/ors/index.html.twig', [
             'numDit' => $numDit,
             'form' => $form->createView(),
             'breadcrumbs' => $this->breadcrumbBuilder->build('hf_atelier_dit_soumission_ors_index'),
         ]);
+
+        // Si le formulaire a été soumis mais qu'on arrive ici (erreur de validation ou exception), 
+        // on renvoie un code 422 pour Turbo (Hotwire).
+        if ($form->isSubmitted()) {
+            $renderResponse->setStatusCode(422);
+        }
+
+        return $renderResponse;
     }
 
     private function handleFormSubmission(
         Request $request,
         FormInterface $form,
-        PdfService $pdfService,
+        OrsPdfService $orsPdfService,
         CreationHandler $creationHandler
     ) {
         $form->handleRequest($request);
@@ -78,7 +89,7 @@ class SoumissionOrsController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->logger->info('formulaire soumis et valide.');
             $this->logger->debug('Données du formulaire', ['data' => $form->getData()]);
-            $redirectResponse = $this->processValidForm($form, $pdfService, $creationHandler);
+            $redirectResponse = $this->processValidForm($form, $orsPdfService, $creationHandler);
             if ($redirectResponse) {
                 return $redirectResponse;
             }
@@ -87,7 +98,7 @@ class SoumissionOrsController extends AbstractController
 
     protected function processValidForm(
         FormInterface $form,
-        PdfService $pdfService,
+        OrsPdfService $orsPdfService,
         CreationHandler $creationHandler
     ): ?RedirectResponse {
         $numero = 'non-défini';
@@ -95,7 +106,12 @@ class SoumissionOrsController extends AbstractController
         $success = false;
 
         try {
-            $ors = $creationHandler->handel($form, $pdfService);
+            $ors = $creationHandler->handel($form, $orsPdfService);
+
+            if (empty($ors)) {
+                throw new \RuntimeException("Aucune donnée (intervention) n'a été trouvée pour cet OR. Veuillez vérifier que l'OR est bien complété sur Informix.");
+            }
+
             $numero = $ors[0]->getNumeroOr();
             $success = true;
             $message = 'L\'OR a été soumis avec succès.';

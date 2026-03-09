@@ -6,7 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Traits\CreatedByTrait;
 use App\Entity\Traits\TimestampableTrait;
 use App\Contract\Entity\CreatedByInterface;
-use App\Repository\Hf\Atelier\Dit\Ors\OrsRepository;
 
 /**
  * @ORM\Entity(repositoryClass=OrsRepository::class)
@@ -299,5 +298,10 @@ class Ors implements CreatedByInterface
         $this->pieceFaibleActiviteAchat = $pieceFaibleActiviteAchat;
 
         return $this;
+    }
+
+    public function estEgalParNumero(self $other): bool
+    {
+        return $this->getNumeroItv() === $other->getNumeroItv();
     }
 }

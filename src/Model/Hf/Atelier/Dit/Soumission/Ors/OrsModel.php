@@ -25,98 +25,30 @@ class OrsModel
         $this->databaseInformix->connect();
 
         try {
-            $statement = " SELECT
-                slor_numor as numero_or,
+            $statement = "
+                SELECT
+                sitv_numor as numero_or,
                 sitv_datdeb,
                 trim(seor_refdem) as numero_dit,
                 sitv_interv as numero_itv,
                 trim(sitv_comment) as libelle_itv,
-                count(slor_constp) as nombre_ligne,
+                seor_numdev as numero_devis,
                 slor_constp as constructeur,
                 trim(slor_refp) as reference,
                 trim(slor_desi) as designation,
-                slor_succ as code_agence,
-                slor_servcrt as code_service,
-                -- montant intervention
-                Sum(
-                    CASE
-                        WHEN slor_typlig = 'P' THEN (
-                            slor_qterel + slor_qterea + slor_qteres + slor_qtewait - slor_qrec
-                        )
-                        WHEN slor_typlig IN ('F', 'M', 'U', 'C') THEN slor_qterea
-                    END * CASE
-                        WHEN slor_typlig = 'P' THEN slor_pxnreel
-                        WHEN slor_typlig IN ('F', 'M', 'U', 'C') THEN slor_pxnreel
-                    END
-                ) as montant_itv,
-                -- montant pièce
-                Sum(
-                    CASE
-                        WHEN slor_typlig = 'P'
-                        AND slor_constp NOT like 'Z%'
-                        AND slor_constp <> 'LUB' THEN (
-                            nvl (slor_qterel, 0) + nvl (slor_qterea, 0) + nvl (slor_qteres, 0) + nvl (slor_qtewait, 0) - nvl (slor_qrec, 0)
-                        )
-                    END * CASE
-                        WHEN slor_typlig = 'P' THEN slor_pxnreel
-                        WHEN slor_typlig IN ('F', 'M', 'U', 'C') THEN slor_pxnreel
-                    END
-                ) AS montant_piece,
-                -- montant main d'oeuvre
-                Sum(
-                    CASE
-                        WHEN slor_typlig = 'M' THEN slor_qterea
-                    END * CASE
-                        WHEN slor_typlig = 'P' THEN slor_pxnreel
-                        WHEN slor_typlig IN ('F', 'M', 'U', 'C') THEN slor_pxnreel
-                    END
-                ) AS montant_mo,
-                -- montant achats locaux
-                Sum(
-                    CASE
-                        WHEN slor_constp = 'ZST' THEN (
-                            slor_qterel + slor_qterea + slor_qteres + slor_qtewait - slor_qrec
-                        )
-                    END * CASE
-                        WHEN slor_typlig = 'P' THEN slor_pxnreel
-                        WHEN slor_typlig IN ('F', 'M', 'U', 'C') THEN slor_pxnreel
-                    END
-                ) AS montant_achats_locaux,
-                -- montant divers
-                Sum(
-                    CASE
-                        WHEN slor_constp <> 'ZST'
-                        AND slor_constp like 'Z%' THEN slor_qterea
-                    END * CASE
-                        WHEN slor_typlig = 'P' THEN slor_pxnreel
-                        WHEN slor_typlig IN ('F', 'M', 'U', 'C') THEN slor_pxnreel
-                    END
-                ) AS montant_divers,
-                -- montant lubrifiants
-                Sum(
-                    CASE
-                        WHEN slor_typlig = 'P'
-                        AND slor_constp NOT like 'Z%'
-                        AND slor_constp = 'LUB' THEN (
-                            nvl (slor_qterel, 0) + nvl (slor_qterea, 0) + nvl (slor_qteres, 0) + nvl (slor_qtewait, 0) - nvl (slor_qrec, 0)
-                        )
-                    END * CASE
-                        WHEN slor_typlig = 'P' THEN slor_pxnreel
-                        WHEN slor_typlig IN ('F', 'M', 'U', 'C') THEN slor_pxnreel
-                    END
-                ) AS montant_lubrifiants
+                slor_typlig as type_ligne,
+                nvl (slor_qterel, 0) + nvl (slor_qterea, 0) + nvl (slor_qteres, 0) + nvl (slor_qtewait, 0) - nvl (slor_qrec, 0) as qte_piece,
+                slor_qterea - nvl (slor_qrec, 0) as qte_autre,
+                slor_pxnreel as prix_net
 
-                FROM informix.sav_eor, informix.sav_lor, informix.sav_itv
+                FROM informix.sav_eor
+                INNER JOIN informix.sav_itv ON seor_numor = sitv_numor
+                LEFT JOIN informix.sav_lor ON sitv_numor = slor_numor AND sitv_interv = slor_nogrp / 100
                 WHERE
-                    seor_numor = slor_numor
-                    AND seor_serv <> 'DEV'
-                    AND sitv_numor = slor_numor
-                    AND sitv_interv = slor_nogrp / 100
-
-                AND trim(seor_refdem) = '$numeroDit'
-                AND slor_numor = $numeroOr
-                GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-                ORDER BY slor_numor, sitv_interv
+                    seor_serv <> 'DEV'
+                    AND trim(seor_refdem) = '$numeroDit'
+                    AND sitv_numor = $numeroOr
+                ORDER BY sitv_numor, sitv_interv
             ";
 
             $result = $this->databaseInformix->executeQuery($statement);
@@ -299,6 +231,29 @@ class OrsModel
             $rows = $this->databaseInformix->fetchResults($result);
 
             return $rows[0]['nbr_pol'] ?? 'NON';
+        } finally {
+            $this->databaseInformix->close();
+        }
+    }
+
+    public function getDatePlanning(int $numeroOr, int $numeroItv): ?\DateTime
+    {
+        $this->databaseInformix->connect();
+
+        try {
+            $statement = "SELECT sitv_datdeb as date_planning
+                from sav_itv
+                where sitv_numor = $numeroOr
+                and sitv_interv = $numeroItv
+            ";
+
+            $result = $this->databaseInformix->executeQuery($statement);
+            $rows = $this->databaseInformix->fetchResults($result);
+
+            if (isset($rows[0]['date_planning']) && !empty($rows[0]['date_planning'])) {
+                return new \DateTime($rows[0]['date_planning']);
+            }
+            return null;
         } finally {
             $this->databaseInformix->close();
         }

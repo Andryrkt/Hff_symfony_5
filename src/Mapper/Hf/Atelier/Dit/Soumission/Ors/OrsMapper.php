@@ -28,7 +28,8 @@ class OrsMapper
                 ->setMontantAchatLocaux($orsParInterventionDto->montantAchatLocaux)
                 ->setMontantFraisDivers($orsParInterventionDto->montantFraisDivers)
                 ->setMontantLubrifiants($orsParInterventionDto->montantLubrifiants)
-                ->setLibellelItv($orsParInterventionDto->libellelItv);
+                ->setLibellelItv($orsParInterventionDto->libellelItv)
+                ->setObservation($orsDto->observation);
 
             $ors[] = $or;
         }

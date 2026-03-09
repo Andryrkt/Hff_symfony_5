@@ -23,24 +23,70 @@ class OrsParInterventionMapper
      */
     public function mapToDtos(OrsDto $orsDto): array
     {
-        $dtos = [];
         $infoSurLesOrs = $this->orsModel->getInfoOrs($orsDto->numeroDit, $orsDto->numeroOr);
 
-        foreach ($infoSurLesOrs as $info) {
-            $dto = new OrsParInterventionDto();
-            $dto->numeroItv = (int) ($info['numeroItv'] ?? 0);
-            $dto->nombreLigneItv = (int) ($info['nombreLigneItv'] ?? 0);
-            $dto->montantItv = (float) ($info['montantItv'] ?? 0);
-            $dto->montantPiece = (float) ($info['montantPiece'] ?? 0);
-            $dto->montantMo = (float) ($info['montantMo'] ?? 0);
-            $dto->montantAchatLocaux = (float) ($info['montantAchatLocaux'] ?? 0);
-            $dto->montantFraisDivers = (float) ($info['montantFraisDivers'] ?? 0);
-            $dto->montantLubrifiants = (float) ($info['montantLubrifiants'] ?? 0);
-            $dto->libellelItv = (string) ($info['libellelItv'] ?? '');
+        return $this->mapFromRawData($infoSurLesOrs);
+    }
 
-            $dtos[] = $dto;
+    /**
+     * @param array $infoSurLesOrs
+     * @return OrsParInterventionDto[]
+     */
+    public function mapFromRawData(array $infoSurLesOrs): array
+    {
+        $grouped = [];
+
+        foreach ($infoSurLesOrs as $info) {
+            $numItv = (int) ($info['numero_itv'] ?? 0);
+
+            if (!isset($grouped[$numItv])) {
+                $dto = new OrsParInterventionDto();
+                $dto->numeroItv = $numItv;
+                $dto->libellelItv = (string) ($info['libelle_itv'] ?? '');
+                if (isset($info['sitv_datdeb']) && !empty($info['sitv_datdeb'])) {
+                    $dto->datePlanning = new \DateTime($info['sitv_datdeb']);
+                }
+                $dto->nombreLigneItv = 0;
+                $grouped[$numItv] = $dto;
+            }
+
+            /** @var OrsParInterventionDto $dto */
+            $dto = $grouped[$numItv];
+
+            // Si slor_constp est null, c'est une itv sans pièces/MO
+            if (!isset($info['constructeur']) || empty($info['constructeur'])) {
+                continue;
+            }
+
+            $dto->nombreLigneItv++;
+
+            $type = $info['type_ligne'] ?? '';
+            $qtePiece = (float)($info['qte_piece'] ?? 0);
+            $qteAutre = (float)($info['qte_autre'] ?? 0);
+            $prixNet = (float)($info['prix_net'] ?? 0);
+            $constr = $info['constructeur'] ?? '';
+
+            $montant = 0;
+            if ($type === 'P') {
+                $montant = $qtePiece * $prixNet;
+                $dto->montantPiece += $montant;
+
+                // Répartition selon constructeur (Logique historique)
+                if ($constr === 'ZST') {
+                    $dto->montantAchatLocaux += $montant;
+                } elseif (strpos($constr, 'Z') === 0) {
+                    $dto->montantFraisDivers += $montant;
+                } elseif ($constr === 'LUB') {
+                    $dto->montantLubrifiants += $montant;
+                }
+            } elseif (in_array($type, ['F', 'M', 'U', 'C'])) {
+                $montant = $qteAutre * $prixNet;
+                $dto->montantMo += $montant;
+            }
+
+            $dto->montantItv += $montant;
         }
 
-        return $dtos;
+        return array_values($grouped);
     }
 }
