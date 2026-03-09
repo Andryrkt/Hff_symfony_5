@@ -5,14 +5,17 @@ namespace App\Mapper\Hf\Atelier\Dit\Soumission\Ors;
 use App\Dto\Hf\Atelier\Dit\Soumission\Ors\OrsComparaisonItvDto;
 use App\Entity\Hf\Atelier\Dit\Soumission\Ors\Ors;
 use App\Model\Hf\Atelier\Dit\Soumission\Ors\OrsModel;
+use App\Service\Utils\CollectionComparatorService;
 
 class OrsComparaisonMapper
 {
     private OrsModel $orsModel;
+    private CollectionComparatorService $comparator;
 
-    public function __construct(OrsModel $orsModel)
+    public function __construct(OrsModel $orsModel, CollectionComparatorService $comparator)
     {
         $this->orsModel = $orsModel;
+        $this->comparator = $comparator;
     }
 
     /**
@@ -23,87 +26,51 @@ class OrsComparaisonMapper
      */
     public function mapToComparaisonDtos(array $vmsAv, array $vmsAp, array $datePlanningMap = []): array
     {
-        if (!empty($vmsAv)) {
-            $manquantsAp = $this->objetsManquantsParNumero($vmsAv, $vmsAp);
-            $manquantsAv = $this->objetsManquantsParNumero($vmsAp, $vmsAv);
+        // On définit ce qui constitue une "modification"
+        $isModified = fn($av, $ap) =>
+        (float) $av->getMontantItv() != (float) $ap->getMontantItv() ||
+            (int) $av->getNombreLigneItv() != (int) $ap->getNombreLigneItv();
 
-            $vmsAv = array_merge($vmsAv, $manquantsAp);
-            $vmsAp = array_merge($vmsAp, $manquantsAv);
-
-            $this->trierTableauParNumero($vmsAv);
-            $this->trierTableauParNumero($vmsAp);
-        }
+        $comparison = $this->comparator->compare($vmsAv, $vmsAp, fn($o) => $o->getNumeroItv(), $isModified);
 
         $recap = [];
 
-        foreach ($vmsAp as $index => $vmAp) {
-            $vmAv = $vmsAv[$index] ?? null;
+        foreach ($comparison as $id => $data) {
+            $orsAv = $data['before'];
+            $orsAp = $data['after'];
 
             $dto = new OrsComparaisonItvDto();
-            $dto->itv = $vmAp->getNumeroItv();
-            $dto->libelleItv = $vmAp->getLibellelItv() ?? ($vmAv ? $vmAv->getLibellelItv() : '');
+            $dto->itv = (int) $id;
+            $dto->statut = $data['status'];
+
+            // On prend le libellé de la version APRES, sinon AVANT
+            $dto->libelleItv = ($orsAp ? $orsAp->getLibellelItv() : null) ?? ($orsAv ? $orsAv->getLibellelItv() : '');
 
             // Utilisation de la map si disponible, sinon repli sur l'ancienne méthode
             if (isset($datePlanningMap[$dto->itv])) {
                 $dto->datePlanning = $datePlanningMap[$dto->itv];
             } else {
-                $dto->datePlanning = $this->datePlanning($vmAp->getNumeroOr(), $dto->itv);
+                // Si l'objet APRES existe, on prend son numéro OR, sinon celui de AVANT
+                $numeroOr = ($orsAp ? $orsAp->getNumeroOr() : ($orsAv ? $orsAv->getNumeroOr() : 0));
+                $dto->datePlanning = $numeroOr ? $this->datePlanning($numeroOr, $dto->itv) : null;
+            }
+
+            // Données AVANT
+            if ($orsAv) {
+                $dto->nbLigAv = $orsAv->getNombreLigneItv() ?: 0;
+                $dto->mttTotalAv = (float) ($orsAv->getMontantItv() ?: 0);
             }
 
             // Données APRES
-            $dto->nbLigAp = $vmAp->getNombreLigneItv() ?: 0;
-            $dto->mttTotalAp = (float) ($vmAp->getMontantItv() ?: 0);
-
-            // Données AVANT
-            if ($vmAv) {
-                $dto->nbLigAv = $vmAv->getNombreLigneItv() ?: 0;
-                $dto->mttTotalAv = (float) ($vmAv->getMontantItv() ?: 0);
+            if ($orsAp) {
+                $dto->nbLigAp = $orsAp->getNombreLigneItv() ?: 0;
+                $dto->mttTotalAp = (float) ($orsAp->getMontantItv() ?: 0);
             }
-
-            // Calcul du statut
-            $this->calculerStatut($dto);
 
             $recap[] = $dto;
         }
 
         return $recap;
-    }
-
-    private function calculerStatut(OrsComparaisonItvDto $dto): void
-    {
-        if ($dto->mttTotalAv == 0 && $dto->mttTotalAp > 0) {
-            $dto->statut = 'Nouv';
-        } elseif ($dto->mttTotalAp == 0 && $dto->mttTotalAv > 0) {
-            $dto->statut = 'Supp';
-        } elseif ($dto->mttTotalAv != $dto->mttTotalAp || $dto->nbLigAv != $dto->nbLigAp) {
-            $dto->statut = 'Modif';
-        }
-    }
-
-    private function objetsManquantsParNumero(array $cible, array $source): array
-    {
-        $manquants = [];
-        $itvsCible = array_map(fn($o) => $o->getNumeroItv(), $cible);
-
-        foreach ($source as $objetSource) {
-            if (!in_array($objetSource->getNumeroItv(), $itvsCible)) {
-                $fantome = new Ors();
-                $fantome->setNumeroOr($objetSource->getNumeroOr());
-                $fantome->setNumeroItv($objetSource->getNumeroItv());
-                $fantome->setLibellelItv($objetSource->getLibellelItv());
-                $fantome->setNombreLigneItv(0);
-                $fantome->setMontantItv(0);
-
-                $manquants[] = $fantome;
-            }
-        }
-
-        return $manquants;
-    }
-
-    private function trierTableauParNumero(array &$tableau): void
-    {
-        usort($tableau, fn($a, $b) => $a->getNumeroItv() <=> $b->getNumeroItv());
     }
 
     private function datePlanning(int $numeroOr, int $numeroItv): ?\DateTime

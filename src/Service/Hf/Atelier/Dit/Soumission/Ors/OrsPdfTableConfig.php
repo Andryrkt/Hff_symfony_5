@@ -2,6 +2,8 @@
 
 namespace App\Service\Hf\Atelier\Dit\Soumission\Ors;
 
+use App\Constants\Hf\Atelier\Dit\Soumission\Ors\StatutComparaisonConstant;
+
 /**
  * Service gérant la structure (colonnes, styles) des tableaux pour le PDF OR
  */
@@ -77,16 +79,7 @@ class OrsPdfTableConfig
                 'header_style' => 'font-weight: bold; text-align: center;',
                 'cell_style'   => 'text-align: left;',
                 'styler'       => function ($value) {
-                    switch ($value) {
-                        case 'Supp':
-                            return 'background-color: #FF0000;';
-                        case 'Modif':
-                            return 'background-color: #FFFF00;';
-                        case 'Nouv':
-                            return 'background-color: #00FF00;';
-                        default:
-                            return '';
-                    }
+                    return StatutComparaisonConstant::getPdfStyle($value);
                 }
             ]
         ];
