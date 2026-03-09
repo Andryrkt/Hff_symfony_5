@@ -68,18 +68,21 @@ class OrsParInterventionMapper
 
             $montant = 0;
             if ($type === 'P') {
-                $montant = $qtePiece * $prixNet;
-                $dto->montantPiece += $montant;
-
                 // Répartition selon constructeur (Logique historique)
                 if ($constr === 'ZST') {
+                    $montant = $qtePiece * $prixNet;
                     $dto->montantAchatLocaux += $montant;
                 } elseif (strpos($constr, 'Z') === 0) {
+                    $montant = $qteAutre * $prixNet;
                     $dto->montantFraisDivers += $montant;
                 } elseif ($constr === 'LUB') {
+                    $montant = $qtePiece * $prixNet;
                     $dto->montantLubrifiants += $montant;
+                } else {
+                    $montant = $qtePiece * $prixNet;
+                    $dto->montantPiece += $montant;
                 }
-            } elseif (in_array($type, ['F', 'M', 'U', 'C'])) {
+            } elseif ($type === 'M') {
                 $montant = $qteAutre * $prixNet;
                 $dto->montantMo += $montant;
             }

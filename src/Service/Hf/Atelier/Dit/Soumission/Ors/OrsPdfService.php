@@ -173,22 +173,7 @@ class OrsPdfService extends AbstractGeneratePdf
         $pdf->Output($nomAvecCheminFichier, 'F');
     }
 
-    private function calculerStatsControle(OrsDto $dto): array
-    {
-        $stats = ['nbrNouv' => 0, 'nbrSupp' => 0, 'nbrModif' => 0, 'mttModif' => 0.0];
-        foreach ($dto->orsApresDtos as $compDto) {
-            if ($compDto->statut === 'Nouv') {
-                $stats['nbrNouv']++;
-            } elseif ($compDto->statut === 'Supp') {
-                $stats['nbrSupp']++;
-            } elseif ($compDto->statut === 'Modif') {
-                $stats['nbrModif']++;
-            }
-            // On calcule l'écart de montant absolu
-            $stats['mttModif'] += abs($compDto->mttTotalAp - $compDto->mttTotalAv);
-        }
-        return $stats;
-    }
+
 
     /**===============================================================
      * -------- Pour le tableau Situation de l'OR ------------------
@@ -216,6 +201,7 @@ class OrsPdfService extends AbstractGeneratePdf
                 'label'        => 'Date pla',
                 'width'        => 50,
                 'header_style' => 'font-weight: bold;',
+                'footer_style' => 'font-weight: bold; text-align: center;',
                 'cell_style'   => 'text-align: left;',
                 'type'         => 'date'
             ],
@@ -224,6 +210,7 @@ class OrsPdfService extends AbstractGeneratePdf
                 'label'        => 'Nb Lig av',
                 'width'        => 50,
                 'header_style' => 'font-weight: bold;',
+                'footer_style' => 'font-weight: bold; text-align: center;',
                 'cell_style'   => '',
             ],
             [
@@ -231,6 +218,7 @@ class OrsPdfService extends AbstractGeneratePdf
                 'label'        => 'Nb Lig ap',
                 'width'        => 50,
                 'header_style' => 'font-weight: bold;',
+                'footer_style' => 'font-weight: bold; text-align: center;',
                 'cell_style'   => '',
             ],
             [
@@ -238,6 +226,7 @@ class OrsPdfService extends AbstractGeneratePdf
                 'label'        => 'Mtt Total av',
                 'width'        => 80,
                 'header_style' => 'font-weight: bold; text-align: center;',
+                'footer_style' => 'font-weight: bold; text-align: right;',
                 'cell_style'   => 'text-align: right;',
                 'type'         => 'number'
             ],
@@ -246,6 +235,7 @@ class OrsPdfService extends AbstractGeneratePdf
                 'label'        => 'Mtt total ap',
                 'width'        => 80,
                 'header_style' => 'font-weight: bold; text-align: center;',
+                'footer_style' => 'font-weight: bold; text-align: right;',
                 'cell_style'   => 'text-align: right;',
                 'type'         => 'number'
             ],
@@ -297,23 +287,21 @@ class OrsPdfService extends AbstractGeneratePdf
         ];
     }
 
-    private function getDynamicStyle($key, $value)
+    private function calculerStatsControle(OrsDto $dto): array
     {
-        $styles = '';
-        if ($key === 'statut') {
-            switch ($value) {
-                case 'Supp':
-                    $styles .= 'background-color: #FF0000;';
-                    break;
-                case 'Modif':
-                    $styles .= 'background-color: #FFFF00;';
-                    break;
-                case 'Nouv':
-                    $styles .= 'background-color: #00FF00;';
-                    break;
+        $stats = ['nbrNouv' => 0, 'nbrSupp' => 0, 'nbrModif' => 0, 'mttModif' => 0.0];
+        foreach ($dto->orsApresDtos as $compDto) {
+            if ($compDto->statut === 'Nouv') {
+                $stats['nbrNouv']++;
+            } elseif ($compDto->statut === 'Supp') {
+                $stats['nbrSupp']++;
+            } elseif ($compDto->statut === 'Modif') {
+                $stats['nbrModif']++;
+                // On calcule l'écart de montant absolu
+                $stats['mttModif'] += abs($compDto->mttTotalAp - $compDto->mttTotalAv);
             }
         }
-        return $styles;
+        return $stats;
     }
 
     /**===============================================================
@@ -324,7 +312,7 @@ class OrsPdfService extends AbstractGeneratePdf
     {
         return [
             [
-                'key'          => 'itv',
+                'key'          => 'numeroItv',
                 'label'        => 'ITV',
                 'width'        => 40,
                 'style'        => 'font-weight: 900;',
@@ -333,7 +321,7 @@ class OrsPdfService extends AbstractGeneratePdf
                 'footer_style' => 'font-weight: 900;'
             ],
             [
-                'key'          => 'mttTotal',
+                'key'          => 'montantItv',
                 'label'        => 'Mtt Total',
                 'width'        => 70,
                 'style'        => 'font-weight: bold; text-align: center;',
@@ -343,7 +331,7 @@ class OrsPdfService extends AbstractGeneratePdf
                 'type'         => 'number'
             ],
             [
-                'key'          => 'mttPieces',
+                'key'          => 'montantPiece',
                 'label'        => 'Mtt Pièces',
                 'width'        => 60,
                 'style'        => 'font-weight: bold; text-align: center;',
@@ -353,7 +341,7 @@ class OrsPdfService extends AbstractGeneratePdf
                 'type'         => 'number'
             ],
             [
-                'key'          => 'mttMo',
+                'key'          => 'montantMo',
                 'label'        => 'Mtt MO',
                 'width'        => 60,
                 'style'        => 'font-weight: bold; text-align: center;',
@@ -363,7 +351,7 @@ class OrsPdfService extends AbstractGeneratePdf
                 'type'         => 'number'
             ],
             [
-                'key'          => 'mttSt',
+                'key'          => 'montantAchatLocaux',
                 'label'        => 'Mtt ST',
                 'width'        => 80,
                 'style'        => 'font-weight: bold; text-align: center;',
@@ -373,7 +361,7 @@ class OrsPdfService extends AbstractGeneratePdf
                 'type'         => 'number'
             ],
             [
-                'key'          => 'mttLub',
+                'key'          => 'montantLubrifiants',
                 'label'        => 'Mtt LUB',
                 'width'        => 80,
                 'style'        => 'font-weight: bold; text-align: center;',
@@ -383,7 +371,7 @@ class OrsPdfService extends AbstractGeneratePdf
                 'type'         => 'number'
             ],
             [
-                'key'          => 'mttAutres',
+                'key'          => 'montantFraisDivers',
                 'label'        => 'Mtt Autres',
                 'width'        => 80,
                 'style'        => 'font-weight: bold; text-align: center;',
@@ -397,15 +385,32 @@ class OrsPdfService extends AbstractGeneratePdf
 
     private function footerRecapitulationOR(OrsDto $dto): array
     {
-        $total = $dto->totalOrsParIntervention[0] ?? null;
+        // $total = $dto->totalOrsParIntervention[0] ?? null;
+
+        $montantItv = 0;
+        $montantPiece = 0;
+        $montantMo = 0.0;
+        $montantAchatLocaux = 0.0;
+        $montantLubrifiants = 0.0;
+        $montantFraisDivers = 0.0;
+
+        foreach ($dto->orsParInterventionDtos as $itv) {
+            $montantItv += $itv->montantItv;
+            $montantPiece += $itv->montantPiece;
+            $montantMo += $itv->montantMo;
+            $montantAchatLocaux += $itv->montantAchatLocaux;
+            $montantLubrifiants += $itv->montantLubrifiants;
+            $montantFraisDivers += $itv->montantFraisDivers;
+        }
+
         return [
-            'itv'              => 'TOTAL',
-            'mttTotal'         => $total ? $total->montantItv : 0,
-            'mttPieces'        => $total ? $total->montantPiece : 0,
-            'mttMo'            => $total ? $total->montantMo : 0,
-            'mttSt'            => $total ? $total->montantAchatLocaux : 0,
-            'mttLub'           => $total ? $total->montantLubrifiants : 0,
-            'mttAutres'        => $total ? $total->montantFraisDivers : 0
+            'numeroItv'          => 'TOTAL',
+            'montantItv'         => $montantItv,
+            'montantPiece'       => $montantPiece,
+            'montantMo'          => $montantMo,
+            'montantAchatLocaux' => $montantAchatLocaux,
+            'montantLubrifiants' => $montantLubrifiants,
+            'montantFraisDivers' => $montantFraisDivers
         ];
     }
 
@@ -416,7 +421,7 @@ class OrsPdfService extends AbstractGeneratePdf
     {
         return [
             [
-                'key'          => 'numero_itv',
+                'key'          => 'numeroItv',
                 'label'        => 'ITV',
                 'width'        => 40,
                 'style'        => 'font-weight: bold;',
@@ -425,7 +430,7 @@ class OrsPdfService extends AbstractGeneratePdf
                 'footer_style' => 'font-weight: 900;'
             ],
             [
-                'key'          => 'libelle_itv',
+                'key'          => 'libelleItv',
                 'label'        => 'Libellé ITV',
                 'width'        => 150,
                 'style'        => 'font-weight: bold;',
@@ -471,7 +476,7 @@ class OrsPdfService extends AbstractGeneratePdf
                 'type'         => 'number'
             ],
             [
-                'key'          => 'date_derniere_cde',
+                'key'          => 'dateDerniereCde',
                 'label'        => 'Date dern cmd',
                 'width'        => 50,
                 'style'        => 'font-weight: bold; text-align: center;',

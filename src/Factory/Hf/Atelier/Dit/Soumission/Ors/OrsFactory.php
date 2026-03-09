@@ -22,7 +22,6 @@ class OrsFactory
     private OrsRepository $orsRepository;
     private NumeroGeneratorService $numeroGeneratorService;
     private OrsParInterventionMapper $orsParInterventionMapper;
-    private TotalOrsParInterventionMapper $totalOrsParInterventionMapper;
     private PieceFaibleAchatMapper $pieceFaibleAchatMapper;
     private OrsComparaisonMapper $orsComparaisonMapper;
     private OrsMapper $orsMapper;
@@ -34,7 +33,6 @@ class OrsFactory
         OrsRepository $orsRepository,
         NumeroGeneratorService $numeroGeneratorService,
         OrsParInterventionMapper $orsParInterventionMapper,
-        TotalOrsParInterventionMapper $totalOrsParInterventionMapper,
         PieceFaibleAchatMapper $pieceFaibleAchatMapper,
         OrsComparaisonMapper $orsComparaisonMapper,
         OrsMapper $orsMapper,
@@ -45,7 +43,6 @@ class OrsFactory
         $this->orsRepository = $orsRepository;
         $this->numeroGeneratorService = $numeroGeneratorService;
         $this->orsParInterventionMapper = $orsParInterventionMapper;
-        $this->totalOrsParInterventionMapper = $totalOrsParInterventionMapper;
         $this->pieceFaibleAchatMapper = $pieceFaibleAchatMapper;
         $this->orsComparaisonMapper = $orsComparaisonMapper;
         $this->orsMapper = $orsMapper;
@@ -87,13 +84,9 @@ class OrsFactory
 
         // Récupération automatique par ligne d'interventions de l'OR (Récapitulation de l'OR)
         $dto->orsParInterventionDtos = $this->orsParInterventionMapper->mapFromRawData($infoSurLesOrs);
-
-        // Récupération du total des OR par intervention
-        $dto->totalOrsParIntervention = [$this->totalOrsParInterventionMapper->calculateTotals($dto)];
         // Récupération automatique des pièces faible achat
         $dto->pieceFaibleAchatDtos = $this->pieceFaibleAchatMapper->mapToDtos($dto, $infoSurLesOrs);
         $dto->pieceFaibleActiviteAchat = !empty($dto->pieceFaibleAchatDtos);
-
         // Comparaison Avant / Après
         $orsAvant = $lastVersion ? $this->orsRepository->findByOrAndVersion($dto->numeroOr, $lastVersion) : [];
         $orsApres = $this->orsMapper->map($dto);
@@ -151,25 +144,5 @@ class OrsFactory
                 }
             }
         }
-    }
-
-    private function getNumeroDevis(OrsDto $dto)
-    {
-        return $this->orsModel->getNumeroDevis($dto->numeroOr);
-    }
-
-    private function getPieceSortieMagasin(OrsDto $dto)
-    {
-        return $this->orsModel->getPieceSortieMagasin($dto->numeroOr);
-    }
-
-    private function getPieceAchatLocaux(OrsDto $dto)
-    {
-        return $this->orsModel->getPieceAchatLocaux($dto->numeroOr);
-    }
-
-    private function getPiecePol(OrsDto $dto)
-    {
-        return $this->orsModel->getPiecePol($dto->numeroOr);
     }
 }

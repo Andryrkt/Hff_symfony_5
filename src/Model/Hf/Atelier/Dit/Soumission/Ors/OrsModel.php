@@ -25,8 +25,7 @@ class OrsModel
         $this->databaseInformix->connect();
 
         try {
-            $statement = "
-                SELECT
+            $statement = "SELECT
                 sitv_numor as numero_or,
                 sitv_datdeb,
                 trim(seor_refdem) as numero_dit,
@@ -38,7 +37,7 @@ class OrsModel
                 trim(slor_desi) as designation,
                 slor_typlig as type_ligne,
                 nvl (slor_qterel, 0) + nvl (slor_qterea, 0) + nvl (slor_qteres, 0) + nvl (slor_qtewait, 0) - nvl (slor_qrec, 0) as qte_piece,
-                slor_qterea - nvl (slor_qrec, 0) as qte_autre,
+                slor_qterea as qte_autre,
                 slor_pxnreel as prix_net
 
                 FROM informix.sav_eor
