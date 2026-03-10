@@ -14,6 +14,7 @@ parameters:
   documents_directory: '%kernel.project_dir%/public/uploads'
   docuware_directory: 'C:\DOCUWARE'
   app.constructeurs.pieces_magasin: '%env(resolve:APP_CONSTRUCTEURS_PIECES_MAGASIN)%'
+  app.constructeurs.pieces_magasin_sans_cat: '%env(resolve:APP_CONSTRUCTEURS_PIECES_MAGASIN_SANS_CAT)%'
   app.constructeurs.achat_locaux: '%env(resolve:APP_CONSTRUCTEURS_ACHAT_LOCAUX)%'
   app.constructeurs.lub: '%env(resolve:APP_CONSTRUCTEURS_LUB)%'
   app.constructeurs.pneumatique: '%env(resolve:APP_CONSTRUCTEURS_PNEUMATIQUE)%'

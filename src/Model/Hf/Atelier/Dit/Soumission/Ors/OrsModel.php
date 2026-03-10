@@ -164,84 +164,21 @@ class OrsModel
         }
     }
 
-    public function getPieceSortieMagasin(int $numeroOr): string
-    {
-        $this->databaseInformix->connect();
-
-        try {
-            $piecesMagasin = $this->parameters->get('app.constructeurs.pieces_magasin');
-
-            $statement = " SELECT
-                CASE WHEN count(slor_constp) > 0 THEN 'OUI' ELSE 'NON' END as nbr_sortie_magasin 
-                from sav_lor 
-                where slor_constp in ($piecesMagasin)
-                AND (slor_refp not like '%-L' and slor_refp not like '%-CTRL')
-                and slor_typlig = 'P' 
-                and slor_numor = '$numeroOr'
-            ";
-
-            $result = $this->databaseInformix->executeQuery($statement);
-            $rows = $this->databaseInformix->fetchResults($result);
-
-            return $rows[0]['nbr_sortie_magasin'] ?? 'NON';
-        } finally {
-            $this->databaseInformix->close();
-        }
-    }
-
-    public function getPieceAchatLocaux(int $numeroOr): string
-    {
-        $this->databaseInformix->connect();
-
-        try {
-            $piecesAchatLocaux = $this->parameters->get('app.constructeurs.achat_locaux');
-
-            $statement = " SELECT
-                CASE WHEN count(slor_constp) > 0 THEN 'OUI' ELSE 'NON' END as nbr_achat_locaux 
-            from sav_lor 
-            where slor_constp in ($piecesAchatLocaux)
-            and slor_numor = '$numeroOr'
-            ";
-
-            $result = $this->databaseInformix->executeQuery($statement);
-            $rows = $this->databaseInformix->fetchResults($result);
-
-            return $rows[0]['nbr_achat_locaux'] ?? 'NON';
-        } finally {
-            $this->databaseInformix->close();
-        }
-    }
-
-    public function getPiecePol(int $numeroOr): string
-    {
-        $this->databaseInformix->connect();
-
-        try {
-            $piecesPol = $this->parameters->get('app.constructeurs.lub');
-
-            $statement = " SELECT
-                CASE WHEN count(slor_constp) > 0 THEN 'OUI' ELSE 'NON' END as nbr_pol 
-            from sav_lor 
-            where slor_constp in ($piecesPol)
-            and slor_numor = '$numeroOr'
-            ";
-
-            $result = $this->databaseInformix->executeQuery($statement);
-            $rows = $this->databaseInformix->fetchResults($result);
-
-            return $rows[0]['nbr_pol'] ?? 'NON';
-        } finally {
-            $this->databaseInformix->close();
-        }
-    }
 
     public function getDatePlanning(int $numeroOr, int $numeroItv): ?\DateTime
     {
         $this->databaseInformix->connect();
 
         try {
-            $statement = "SELECT sitv_datdeb as date_planning
-                from sav_itv
+            $statement = "SELECT 
+                    CASE 
+                            WHEN 
+                                (SELECT DATE(Min(ska_d_start)) FROM informix.ska, informix.skw WHERE ofh_id = sitv_numor AND ofs_id=sitv_interv AND skw.skw_id = ska.skw_id )  is Null 
+                            THEN DATE(sitv_datepla)  
+                            ELSE
+                                (SELECT DATE(Min(ska_d_start)) FROM informix.ska, informix.skw WHERE ofh_id = sitv_numor AND ofs_id=sitv_interv AND skw.skw_id = ska.skw_id ) 
+                    END as date_planning
+                    FROM informix.sav_itv 
                 where sitv_numor = $numeroOr
                 and sitv_interv = $numeroItv
             ";
@@ -253,6 +190,72 @@ class OrsModel
                 return new \DateTime($rows[0]['date_planning']);
             }
             return null;
+        } finally {
+            $this->databaseInformix->close();
+        }
+    }
+
+    // public function getPieceSortieMagasin(int $numeroOr): string
+    // {
+    //     $this->databaseInformix->connect();
+
+    //     try {
+    //         $piecesMagasin = $this->parameters->get('app.constructeurs.pieces_magasin');
+
+    //         $statement = " SELECT
+    //             CASE WHEN count(slor_constp) > 0 THEN 'OUI' ELSE 'NON' END as nbr_sortie_magasin 
+    //             from sav_lor 
+    //             where slor_constp in ($piecesMagasin)
+    //             AND (slor_refp not like '%-L' and slor_refp not like '%-CTRL')
+    //             and slor_typlig = 'P' 
+    //             and slor_numor = '$numeroOr'
+    //         ";
+
+    //         $result = $this->databaseInformix->executeQuery($statement);
+    //         $rows = $this->databaseInformix->fetchResults($result);
+
+    //         return $rows[0]['nbr_sortie_magasin'] ?? 'NON';
+    //     } finally {
+    //         $this->databaseInformix->close();
+    //     }
+    // }
+
+    public function getSuffixSelonConstructeurPieceMagasin(int $numeroOr): string
+    {
+        $this->databaseInformix->connect();
+
+        try {
+            $piecesMagasinSansCat = $this->parameters->get('app.constructeurs.pieces_magasin_sans_cat');
+
+            $statement = " SELECT
+            CASE
+                -- si CAT et autre constructeur magasin
+                WHEN COUNT(CASE WHEN slor_constp = 'CAT' THEN 1 END) > 0
+                AND COUNT(CASE WHEN slor_constp IN ($piecesMagasinSansCat) THEN 1 END) > 0
+                THEN TRIM('CP')
+                -- si  CAT
+                WHEN COUNT(CASE WHEN slor_constp = 'CAT' THEN 1 END) > 0
+                AND COUNT(CASE WHEN slor_constp IN ($piecesMagasinSansCat) THEN 1 END) = 0
+                THEN TRIM('C')
+                -- si ni CAT ni autre constructeur magasin
+                WHEN COUNT(CASE WHEN slor_constp = 'CAT' THEN 1 END) = 0
+                AND COUNT(CASE WHEN slor_constp IN ($piecesMagasinSansCat) THEN 1 END) = 0
+                THEN TRIM('N')
+                -- si autre constructeur magasin
+                WHEN COUNT(CASE WHEN slor_constp = 'CAT' THEN 1 END) = 0
+                AND COUNT(CASE WHEN slor_constp IN ($piecesMagasinSansCat) THEN 1 END) > 0
+                THEN TRIM('P')
+                -- sinon
+                ELSE ''
+            END AS retour
+        FROM sav_lor
+        WHERE slor_numor = '" . $numeroOr . "'
+            ";
+
+            $result = $this->databaseInformix->executeQuery($statement);
+            $rows = $this->databaseInformix->fetchResults($result);
+
+            return $rows[0]['retour'] ?? '';
         } finally {
             $this->databaseInformix->close();
         }

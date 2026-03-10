@@ -58,6 +58,7 @@ class OrsDocumentManager
         $numero = $orsDto->numeroDit;
         $numeroOr = $orsDto->numeroOr;
         $numeroVersion = $orsDto->numeroVersion;
+        $suffix = $orsDto->suffix;
 
         $nameGenerator = new OrsGenerateFileNameService();
         $mainPath = $this->params->get('documents_directory') . '/dit';
@@ -75,20 +76,20 @@ class OrsDocumentManager
         try {
             [$uploadedFilesPaths, $uploadedFileNames] = $uploader->getFichiers($form, [
                 'repertoire' => $path,
-                'generer_nom_callback' => function (UploadedFile $file, int $index) use ($nameGenerator, $numero, $numeroOr, $numeroVersion) {
-                    return $nameGenerator->generateFileUplodeName($file, $numero, $numeroOr, $numeroVersion, $index);
+                'generer_nom_callback' => function (UploadedFile $file, int $index) use ($nameGenerator, $numeroOr, $numeroVersion) {
+                    return $nameGenerator->generateFileUplodeName($file, $numeroOr, $numeroVersion, $index);
                 }
             ]);
             $success = true;
             $message = 'Upload des fichiers réussi : ' . (empty($uploadedFileNames) ? 'aucun fichier' : implode(', ', $uploadedFileNames));
-            $this->logger->info($message, ['numero' => $numero]);
+            $this->logger->info($message, ['numero_or' => $numeroOr]);
         } catch (\Throwable $e) {
             $message = 'Erreur lors de l\'upload des fichiers : ' . $e->getMessage();
-            $this->logger->error($message, ['numero' => $numero, 'exception' => $e]);
+            $this->logger->error($message, ['numero_or' => $numeroOr, 'exception' => $e]);
             throw $e;
         } finally {
             $this->historiqueOperationService->enregistrer(
-                $numero,
+                $numeroOr,
                 TypeOperationConstants::TYPE_OPERATION_FILE_UPLOAD_NAME,
                 TypeDocumentConstants::TYPE_DOCUMENT_OR_CODE,
                 $success,
@@ -96,7 +97,7 @@ class OrsDocumentManager
             );
         }
 
-        $finalPdfName = $nameGenerator->generateMainName($numeroOr, $numeroVersion);
+        $finalPdfName = $nameGenerator->generateMainName($numeroOr, $numeroVersion, $suffix);
         $finalPdfPath = $path . $finalPdfName;
 
         return [$uploadedFilesPaths, $uploadedFileNames, $finalPdfPath, $finalPdfName];
@@ -106,6 +107,7 @@ class OrsDocumentManager
     {
         $success = false;
         $message = 'Fusion des fichiers.';
+        $numeroOr = $orsDto->numeroOr;
         try {
             $fileProcessor = new TraitementDeFichier();
             $filesToMerge = $fileProcessor->insertFileAtPosition($uploadedFilesPaths, $finalPdfPath, 0);
@@ -113,14 +115,14 @@ class OrsDocumentManager
             $fileProcessor->fusionFichers($filesToMerge, $finalPdfPath);
             $success = true;
             $message = 'Fusion des fichiers réussie.';
-            $this->logger->info($message, ['numero_or' => $orsDto->numeroOr]);
+            $this->logger->info($message, ['numero_or' => $numeroOr]);
         } catch (\Exception $e) {
             $message = 'Erreur lors de la fusion des fichiers : ' . $e->getMessage();
-            $this->logger->error($message, ['numero_or' => $orsDto->numeroOr, 'exception' => $e]);
+            $this->logger->error($message, ['numero_or' => $numeroOr, 'exception' => $e]);
             throw $e;
         } finally {
             $this->historiqueOperationService->enregistrer(
-                $orsDto->numeroOr,
+                $numeroOr,
                 TypeOperationConstants::TYPE_OPERATION_FILE_MERGE_NAME,
                 TypeDocumentConstants::TYPE_DOCUMENT_OR_CODE,
                 $success,

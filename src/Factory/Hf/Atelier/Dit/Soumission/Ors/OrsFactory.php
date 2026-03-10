@@ -75,6 +75,7 @@ class OrsFactory
         $dto->numeroVersion = $this->numeroGeneratorService->simpleIncrement($lastVersion);
         $dto->statut = StatutOrConstant::SOUMIS_A_VALIDATION;
         $dto->dateDemande = new \DateTime();
+        $dto->suffix = $this->orsModel->getSuffixSelonConstructeurPieceMagasin($dto->numeroOr);
 
         // Récupération unique des données Informix pour éviter les requêtes multiples
         $infoSurLesOrs = $this->orsModel->getInfoOrs($dto->numeroDit, $dto->numeroOr);

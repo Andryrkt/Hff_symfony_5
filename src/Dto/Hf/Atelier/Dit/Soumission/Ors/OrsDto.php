@@ -15,6 +15,7 @@ class OrsDto
     public string $estPieceSortieMagasin = 'NON';
     public string $estPieceAchatLocaux = 'NON';
     public string $estPiecePol = 'NON';
+    public string $suffix = '';
     public $dateDemande;
     public $emailDemandeur;
     public $pieceJoint01;
