@@ -17,7 +17,7 @@ class OrsGenerateFileNameService extends AbstractFileNameGeneratorService
         int $index = 1
     ): string {
         return $this->generateFileName($file, [
-            'format' => '{numero}_{numeroOr}_{numeroVersion}_PJ.{extension}',
+            'format' => 'oRValidation_{numeroOr}-{numeroVersion}_PJ.{extension}',
             'variables' => [
                 'numero' => $numero,
                 'numeroOr' => $numeroOr,
@@ -27,8 +27,8 @@ class OrsGenerateFileNameService extends AbstractFileNameGeneratorService
         ], $index);
     }
 
-    public function generateMainName(string $numero, string $numeroOr, string $numeroVersion): string
+    public function generateMainName(string $numeroOr, string $numeroVersion): string
     {
-        return $numero . '_' . $numeroOr . '_' . $numeroVersion . '.pdf';
+        return 'oRValidation_' . $numeroOr . '-' . $numeroVersion . '.pdf';
     }
 }

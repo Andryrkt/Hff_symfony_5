@@ -92,7 +92,7 @@ class OrsDocumentManager
             );
         }
 
-        $finalPdfName = $nameGenerator->generateMainName($numero, $numeroOr, $numeroVersion);
+        $finalPdfName = $nameGenerator->generateMainName($numeroOr, $numeroVersion);
         $finalPdfPath = $path . $finalPdfName;
 
         return [$uploadedFilesPaths, $uploadedFileNames, $finalPdfPath, $finalPdfName];
