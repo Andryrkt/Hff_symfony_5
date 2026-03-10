@@ -35,6 +35,8 @@ class OrsPdfService extends AbstractGeneratePdf
         // 2. Bloc d'informations générales
         $this->renderHeaderInfos($pdf, $dto);
 
+        $pdf->Ln(5);
+
         // 3. Situation de l'OR (Tableau)
         $this->addTable(
             $pdf,
@@ -102,6 +104,7 @@ class OrsPdfService extends AbstractGeneratePdf
             $pdf->setFont('helvetica', '', 10);
             $pdf->Cell(50, 6, $value, 0, 1, 'L');
         }
+        $maxY = $pdf->GetY();
 
         // Rendu Colonne 2
         $pdf->SetY($startY);
@@ -113,6 +116,8 @@ class OrsPdfService extends AbstractGeneratePdf
             $pdf->Cell(0, 6, $value, 0, 1, 'L');
         }
 
+        // On prend le Y le plus bas des deux colonnes pour la suite
+        $pdf->SetY(max($maxY, $pdf->GetY()));
         $pdf->Ln(5);
     }
 
