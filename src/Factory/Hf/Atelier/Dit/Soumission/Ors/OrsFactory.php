@@ -9,7 +9,6 @@ use App\Mapper\Hf\Atelier\Dit\Soumission\Ors\OrsComparaisonMapper;
 use App\Mapper\Hf\Atelier\Dit\Soumission\Ors\OrsMapper;
 use App\Mapper\Hf\Atelier\Dit\Soumission\Ors\OrsParInterventionMapper;
 use App\Mapper\Hf\Atelier\Dit\Soumission\Ors\PieceFaibleAchatMapper;
-use App\Mapper\Hf\Atelier\Dit\Soumission\Ors\TotalOrsParInterventionMapper;
 use App\Model\Hf\Atelier\Dit\Soumission\Ors\OrsModel;
 use App\Repository\Hf\Atelier\Dit\Ors\OrsRepository;
 use App\Service\Utils\NumeroGeneratorService;

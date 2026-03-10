@@ -7,11 +7,10 @@ class OrsDto
 {
     public string $numeroDit;
     public int $numeroOr;
-    public ?string $observation = null;
+    public ?int $numeroDevis = null;
     public ?int $numeroVersion = null;
     public ?string $statut = null;
-    public bool $pieceFaibleActiviteAchat = false;
-    public ?int $numeroDevis = null;
+    public ?string $observation = null;
     public string $estPieceSortieMagasin = 'NON';
     public string $estPieceAchatLocaux = 'NON';
     public string $estPiecePol = 'NON';
@@ -23,11 +22,12 @@ class OrsDto
     public $pieceJoint03;
     public array $pieceJoint04 = [];
     // comparaison de l'OR avant par l'OR qu'on va soumettre
-    public array $orsAvantDtos = [];
     public array $orsApresDtos = [];
     // récapitulation de l'OR
     public array $orsParInterventionDtos = [];
     public array $totalOrsParIntervention = [];
     // pièces faibles achat
+    public bool $pieceFaibleActiviteAchat = false;
     public array $pieceFaibleAchatDtos = [];
+    // TODO: Demande appro
 }
