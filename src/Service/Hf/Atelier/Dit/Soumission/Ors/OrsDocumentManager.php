@@ -7,6 +7,7 @@ use App\Constants\Admin\Historisation\TypeOperationConstants;
 use App\Dto\Hf\Atelier\Dit\Soumission\Ors\OrsDto;
 use App\Service\Hf\Atelier\Dit\Soumission\Ors\OrsGenerateFileNameService;
 use App\Service\Historique_operation\HistoriqueOperationService;
+use App\Service\Utils\Fichier\TraitementDeFichier;
 use App\Service\Utils\Fichier\UploderFileService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -42,6 +43,9 @@ class OrsDocumentManager
 
         // 2. Génération du PDF principal (page de garde)
         $pdfService->genererPDF($dto, $finalPdfPath);
+
+        // 3. Fusion des fichiers (PDF principal + pièces jointes)
+        $this->mergeFiles($dto, $uploadedFilesPaths, $finalPdfPath);
 
         return [
             'path' => $finalPdfPath,
@@ -96,5 +100,32 @@ class OrsDocumentManager
         $finalPdfPath = $path . $finalPdfName;
 
         return [$uploadedFilesPaths, $uploadedFileNames, $finalPdfPath, $finalPdfName];
+    }
+
+    private function mergeFiles(OrsDto $orsDto, array $uploadedFilesPaths, string $finalPdfPath): void
+    {
+        $success = false;
+        $message = 'Fusion des fichiers.';
+        try {
+            $fileProcessor = new TraitementDeFichier();
+            $filesToMerge = $fileProcessor->insertFileAtPosition($uploadedFilesPaths, $finalPdfPath, 0);
+
+            $fileProcessor->fusionFichers($filesToMerge, $finalPdfPath);
+            $success = true;
+            $message = 'Fusion des fichiers réussie.';
+            $this->logger->info($message, ['numero_or' => $orsDto->numeroOr]);
+        } catch (\Exception $e) {
+            $message = 'Erreur lors de la fusion des fichiers : ' . $e->getMessage();
+            $this->logger->error($message, ['numero_or' => $orsDto->numeroOr, 'exception' => $e]);
+            throw $e;
+        } finally {
+            $this->historiqueOperationService->enregistrer(
+                $orsDto->numeroOr,
+                TypeOperationConstants::TYPE_OPERATION_FILE_MERGE_NAME,
+                TypeDocumentConstants::TYPE_DOCUMENT_OR_CODE,
+                $success,
+                $message
+            );
+        }
     }
 }
