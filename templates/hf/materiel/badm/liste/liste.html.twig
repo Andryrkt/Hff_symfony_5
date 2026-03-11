@@ -9,7 +9,7 @@
 	<div class="container-fluid" id="agence-service-data" data-agences="{{ agencesJson|e('html_attr') }}" data-controller="dom-liste components--list-sticky">
 		<div class="sticky-header-titre" data-components--list-sticky-target="headerTitre">
 			<div class="container">
-				{% include 'partials/flash_messages.html.twig' %}
+
 
 				{% include "hf/materiel/badm/liste/_formulaireRecherche.html.twig" with{
 					form : form

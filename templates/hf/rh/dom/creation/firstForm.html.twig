@@ -9,9 +9,7 @@
 	<div class="container mt-6 mb-4">
 		<div class="card p-3">
 			<div class="card-body">
-				<div class="container-fluid">
-					{% include 'partials/flash_messages.html.twig' %}
-				</div>
+				<div class="container-fluid"></div>
 
 				{{ form_start(form, {'attr': {'data-controller': 'first-form', 'data-action': 'submit->first-form#validate'}})}}
 				<div class="row">

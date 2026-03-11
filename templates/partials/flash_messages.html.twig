@@ -1,9 +1,11 @@
 {# templates/partials/flash_messages.html.twig #}
+{% set flashMessages = [] %}
 {% for label, messages in app.flashes %}
-    {% for message in messages %}
-        <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    {% endfor %}
+	{% for message in messages %}
+		{% set flashMessages = flashMessages|merge([{type: label, message: message}]) %}
+	{% endfor %}
 {% endfor %}
+
+{% if flashMessages|length > 0 %}
+	<div data-controller="common--flash" data-common--flash-messages-value="{{ flashMessages|json_encode }}"></div>
+{% endif %}
