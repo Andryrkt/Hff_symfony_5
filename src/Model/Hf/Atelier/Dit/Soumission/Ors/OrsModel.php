@@ -38,7 +38,11 @@ class OrsModel
                 slor_typlig as type_ligne,
                 nvl (slor_qterel, 0) + nvl (slor_qterea, 0) + nvl (slor_qteres, 0) + nvl (slor_qtewait, 0) - nvl (slor_qrec, 0) as qte_piece,
                 slor_qterea as qte_autre,
-                slor_pxnreel as prix_net
+                slor_pxnreel as prix_net,
+                seor_pos as position,
+                slor_succdeb as code_agence_debiteur,
+                slor_servdeb as code_service_debiteur
+
 
                 FROM informix.sav_eor
                 INNER JOIN informix.sav_itv ON seor_numor = sitv_numor
@@ -101,6 +105,14 @@ class OrsModel
         }
     }
 
+    /**
+     * Récupère les pièces faibles en activité d'achat
+     * 
+     * @param string $constructeur
+     * @param string|null $reference
+     * @param string $numOr
+     * @return array
+     */
     public function getPieceFaibleActiviteAchat(string $constructeur, ?string $reference, string $numOr): array
     {
 
@@ -145,26 +157,33 @@ class OrsModel
         }
     }
 
-    public function getNumeroDevis(int $numeroOr): ?int
-    {
-        $this->databaseInformix->connect();
+    // public function getNumeroDevis(int $numeroOr): ?int
+    // {
+    //     $this->databaseInformix->connect();
 
-        try {
-            $statement = "SELECT  seor_numdev  as numero_devis
-                from sav_eor
-                where seor_numor = $numeroOr
-            ";
+    //     try {
+    //         $statement = "SELECT  seor_numdev  as numero_devis
+    //             from sav_eor
+    //             where seor_numor = $numeroOr
+    //         ";
 
-            $result = $this->databaseInformix->executeQuery($statement);
-            $rows = $this->databaseInformix->fetchResults($result);
+    //         $result = $this->databaseInformix->executeQuery($statement);
+    //         $rows = $this->databaseInformix->fetchResults($result);
 
-            return (int)$rows[0]['numero_devis'] ?? null;
-        } finally {
-            $this->databaseInformix->close();
-        }
-    }
+    //         return (int)$rows[0]['numero_devis'] ?? null;
+    //     } finally {
+    //         $this->databaseInformix->close();
+    //     }
+    // }
 
 
+    /**
+     * Récupère la date de planning par intervention
+     * 
+     * @param int $numeroOr
+     * @param int $numeroItv
+     * @return \DateTime|null
+     */
     public function getDatePlanning(int $numeroOr, int $numeroItv): ?\DateTime
     {
         $this->databaseInformix->connect();
@@ -195,6 +214,46 @@ class OrsModel
         }
     }
 
+    /**
+     * Vérifie si la date de planning existe
+     * 
+     * @param int $numeroOr
+     * @return int 1 si la date de planning existe, 0 sinon
+     */
+    public function getEstDatePlanningExiste(int $numeroOr): int
+    {
+        $this->databaseInformix->connect();
+
+        try {
+            $statement = "SELECT FIRST 1
+                    --(SELECT DATE(Min(ska_d_start)) FROM informix.ska, informix.skw WHERE ofh_id = sitv_numor AND ofs_id=sitv_interv AND skw.skw_id = ska.skw_id ) as date_planning_1,
+                    --sitv_datepla as date_planning_2,
+                    CASE 
+                        WHEN NOT EXISTS (
+                            SELECT 1 
+                            FROM informix.ska
+                            JOIN informix.skw ON skw.skw_id = ska.skw_id
+                            WHERE skw.ofh_id = sav_itv.sitv_numor 
+                            AND skw.ofs_id = sav_itv.sitv_interv 
+                            AND ska.ska_d_start IS NOT NULL
+                        )
+                        OR sav_itv.sitv_datepla IS NOT NULL
+                        THEN 1
+                        ELSE 0
+                    END as date_planning
+                FROM informix.sav_itv 
+                WHERE sav_itv.sitv_numor = $numeroOr
+            ";
+
+            $result = $this->databaseInformix->executeQuery($statement);
+            $rows = $this->databaseInformix->fetchResults($result);
+
+            return $rows[0]['date_planning'] ?? 0;
+        } finally {
+            $this->databaseInformix->close();
+        }
+    }
+
     // public function getPieceSortieMagasin(int $numeroOr): string
     // {
     //     $this->databaseInformix->connect();
@@ -220,6 +279,12 @@ class OrsModel
     //     }
     // }
 
+    /**
+     * Récupère le suffixe selon le constructeur de la pièce magasin
+     * 
+     * @param int $numeroOr
+     * @return string
+     */
     public function getSuffixSelonConstructeurPieceMagasin(int $numeroOr): string
     {
         $this->databaseInformix->connect();
