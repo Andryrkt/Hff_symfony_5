@@ -53,6 +53,7 @@ export default class extends Controller {
             : [];
 
         this.manager = new FileUploadManager({
+            container:               this.element as HTMLElement,
             idSuffix:                this.idSuffixValue,
             fileInput:               input,
             allowedTypes:            [this.fileTypeValue],
@@ -67,6 +68,7 @@ export default class extends Controller {
                 this.dispatch('filesSelected', { detail: { id: this.idSuffixValue, files } });
             },
             onFileRemove: () => {
+                console.log(`[Dropzone Controller] Fichier supprimé pour ${this.idSuffixValue}`);
                 this.dispatch('fileRemoved', { detail: { id: this.idSuffixValue } });
             },
         });

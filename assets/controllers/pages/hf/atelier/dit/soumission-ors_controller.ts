@@ -13,11 +13,8 @@ import type PdfPreviewController from "../../../../common/pdf-preview_controller
  * C'est le rôle du `common--dropzone_controller` dans chaque dropzone.
  */
 export default class extends Controller {
-    static targets = ["pdfPreview"];
     static outlets = ["common--pdf-preview"];
 
-    declare readonly pdfPreviewTarget: HTMLElement;
-    declare readonly hasPdfPreviewTarget: boolean;
     declare readonly "commonPdfPreviewOutlet": PdfPreviewController;
     declare readonly "hasCommonPdfPreviewOutlet": boolean;
 
@@ -34,7 +31,8 @@ export default class extends Controller {
     };
 
     connect() {
-        console.log("SoumissionOrsController connected");
+        console.log("✅ SoumissionOrsController connecté");
+        console.log("🔗 Outlet PDF Preview présent ?", this.hasCommonPdfPreviewOutlet);
     }
 
     // ─── Handlers des events émis par common--dropzone ───────────────────────
@@ -45,10 +43,13 @@ export default class extends Controller {
      */
     onDropzoneFileSelected(event: CustomEvent<{ id: string; file: File }>) {
         const { id, file } = event.detail;
+        console.log(`📩 Fichier reçu du dropzone ${id}:`, file.name);
         const title = this.fileTitles[id] ?? `Fichier ${id}`;
 
         if (this.hasCommonPdfPreviewOutlet) {
             this.commonPdfPreviewOutlet.addFile(id, title, file);
+        } else {
+            console.error("❌ Outlet 'common--pdf-preview' non trouvé !");
         }
     }
 

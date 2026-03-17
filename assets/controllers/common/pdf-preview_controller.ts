@@ -25,40 +25,45 @@ export default class extends Controller {
     /** Map : fileKey → { title, dataUrl } */
     private uploadedFiles: Record<string, { title: string; dataUrl: string }> = {};
 
+    connect() {
+        console.log("✅ PdfPreviewController connecté");
+    }
+
     /** Ajoute ou remplace un fichier single dans la map et re-render */
     addFile(id: string, title: string, file: File) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            if (e.target?.result) {
-                this.uploadedFiles[id] = { title, dataUrl: e.target.result as string };
-                this.renderTabs();
-            }
-        };
-        reader.readAsDataURL(file);
+        console.log(`[PDF Preview] addFile: ${title} (${id})`);
+        
+        // Nettoyer l'ancien URL si existant pour libérer la mémoire
+        if (this.uploadedFiles[id]?.dataUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(this.uploadedFiles[id].dataUrl);
+        }
+
+        const blobUrl = URL.createObjectURL(file);
+        this.uploadedFiles[id] = { title, dataUrl: blobUrl };
+        this.renderTabs();
     }
 
     /** Ajoute plusieurs fichiers (mode multiple) et re-render */
     addFiles(id: string, titlePrefix: string, files: File[]) {
+        console.log(`[PDF Preview] addFiles: ${files.length} fichiers pour ${id}`);
         // Supprime les anciens fichiers de cet id
         Object.keys(this.uploadedFiles).forEach(key => {
-            if (key.startsWith(`${id}_`)) delete this.uploadedFiles[key];
+            if (key.startsWith(`${id}_`)) {
+                if (this.uploadedFiles[key].dataUrl.startsWith('blob:')) {
+                    URL.revokeObjectURL(this.uploadedFiles[key].dataUrl);
+                }
+                delete this.uploadedFiles[key];
+            }
         });
 
-        let loaded = 0;
         files.forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                if (e.target?.result) {
-                    this.uploadedFiles[`${id}_${index}`] = {
-                        title: `${titlePrefix} ${index + 1} (${file.name})`,
-                        dataUrl: e.target.result as string,
-                    };
-                }
-                loaded++;
-                if (loaded === files.length) this.renderTabs();
+            const blobUrl = URL.createObjectURL(file);
+            this.uploadedFiles[`${id}_${index}`] = {
+                title: `${titlePrefix} ${index + 1} (${file.name})`,
+                dataUrl: blobUrl,
             };
-            reader.readAsDataURL(file);
         });
+        this.renderTabs();
     }
 
     /** Supprime un fichier (ou plusieurs si multiple) et re-render */
@@ -116,6 +121,8 @@ export default class extends Controller {
         const targetId = closeBtn.getAttribute('data-id');
         if (!targetId) return;
 
+        console.log(`[PDF Preview] Tentative de suppression de l'onglet: ${targetId}`);
+
         let managerBaseId = targetId;
         let indexStr: string | null = null;
 
@@ -125,16 +132,24 @@ export default class extends Controller {
             indexStr = parts[1];
         }
 
-        const dropzoneEl = document.getElementById(`dropzone-${managerBaseId}`);
+        const dropzoneId = `dropzone-${managerBaseId}`;
+        const dropzoneEl = document.getElementById(dropzoneId);
+        
         if (dropzoneEl) {
+            console.log(`[PDF Preview] Dropzone trouvée: ${dropzoneId}`);
             const dropzoneController = this.application.getControllerForElementAndIdentifier(dropzoneEl, 'common--dropzone');
             if (dropzoneController) {
+                console.log(`[PDF Preview] Contrôleur dropzone trouvé, appel de la suppression`);
                 if (indexStr !== null) {
                     (dropzoneController as any).removeFileByIndex(parseInt(indexStr, 10));
                 } else {
                     (dropzoneController as any).clearFiles(true);
                 }
+            } else {
+                console.error(`[PDF Preview] Contrôleur 'common--dropzone' non trouvé sur l'élément #${dropzoneId}`);
             }
+        } else {
+            console.error(`[PDF Preview] Élément #${dropzoneId} non trouvé dans le DOM`);
         }
     }
 
@@ -172,7 +187,7 @@ export default class extends Controller {
             li.className = 'nav-item position-relative d-flex align-items-center';
 
             const a = document.createElement('a');
-            a.className = `nav-link text-black border-0 rounded-top pe-4 ${isActive ? 'active text-primary fw-bold bg-white' : ''}`;
+            a.className = `nav-link border-0 rounded-top pe-4 ${isActive ? 'active text-primary fw-bold bg-white' : 'text-white'}`;
             a.style.cursor = 'pointer';
             a.textContent = data.title;
             a.setAttribute('data-id', id);
@@ -195,27 +210,37 @@ export default class extends Controller {
             // Pane
             const div = document.createElement('div');
             div.className = `tab-pane h-100 ${isActive ? 'active show' : 'd-none'}`;
+            div.style.minHeight = '750px';
             div.setAttribute('data-pane-id', id);
 
-            const embed = document.createElement('embed');
-            embed.src = data.dataUrl;
-            embed.type = 'application/pdf';
-            embed.style.width = '100%';
-            embed.style.height = '100%';
+            // Balise <object> avec fallback <embed> : la méthode la plus robuste
+            const object = document.createElement('object');
+            object.data = data.dataUrl;
+            object.type = 'application/pdf';
+            object.style.width = '100%';
+            object.style.height = '750px';
+            
+            const embedFallback = document.createElement('embed');
+            embedFallback.src = data.dataUrl;
+            embedFallback.type = 'application/pdf';
+            object.appendChild(embedFallback);
 
-            div.appendChild(embed);
+            div.appendChild(object);
             this.tabContentTarget.appendChild(div);
         });
+        console.log(`[PDF Preview] Rendu terminé. Onglets : ${ids.length}`);
     }
 
     private showPreview() {
-        this.pdfPreviewTarget?.classList.remove('d-none');
-        this.placeholderTarget?.classList.add('d-none');
+        console.log("[PDF Preview] Affichage de la zone de prévisualisation");
+        if (this.hasPdfPreviewTarget) this.pdfPreviewTarget.classList.remove('d-none');
+        if (this.hasPlaceholderTarget) this.placeholderTarget.classList.add('d-none');
     }
 
     private hidePreview() {
-        this.pdfPreviewTarget?.classList.add('d-none');
-        this.placeholderTarget?.classList.remove('d-none');
+        console.log("[PDF Preview] Masquage de la zone de prévisualisation");
+        if (this.hasPdfPreviewTarget) this.pdfPreviewTarget.classList.add('d-none');
+        if (this.hasPlaceholderTarget) this.placeholderTarget.classList.remove('d-none');
         if (this.hasNavTabsTarget) this.navTabsTarget.innerHTML = '';
         if (this.hasTabContentTarget) this.tabContentTarget.innerHTML = '';
     }

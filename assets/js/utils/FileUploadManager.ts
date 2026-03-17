@@ -16,6 +16,7 @@ export interface FileHandlerOptions {
     onFileSelect?: (file: File) => void;
     onFilesSelect?: (files: File[]) => void;
     onFileRemove?: () => void;
+    container?: HTMLElement;
 }
 
 export class FileUploadManager {
@@ -37,13 +38,22 @@ export class FileUploadManager {
         };
 
         const { idSuffix } = this.options;
+        const root = options.container || document;
+        
         this.fileInput = options.fileInput;
-        this.fileNameElement = document.getElementById(`file-name-${idSuffix}`);
-        this.fileSizeElement = document.getElementById(`file-size-${idSuffix}`);
-        this.fileSummaryElement = document.getElementById(`file-summary-${idSuffix}`);
-        this.uploadBtn = document.getElementById(`upload-btn-${idSuffix}`);
-        this.removeBtn = document.getElementById(`remove-btn-${idSuffix}`);
-        this.dropzone = document.getElementById(`dropzone-${idSuffix}`);
+        this.fileNameElement = root.querySelector(`#file-name-${idSuffix}`) || document.getElementById(`file-name-${idSuffix}`);
+        this.fileSizeElement = root.querySelector(`#file-size-${idSuffix}`) || document.getElementById(`file-size-${idSuffix}`);
+        this.fileSummaryElement = root.querySelector(`#file-summary-${idSuffix}`) || document.getElementById(`file-summary-${idSuffix}`);
+        this.uploadBtn = root.querySelector(`#upload-btn-${idSuffix}`) || document.getElementById(`upload-btn-${idSuffix}`);
+        this.removeBtn = root.querySelector(`#remove-btn-${idSuffix}`) || document.getElementById(`remove-btn-${idSuffix}`);
+        this.dropzone = root.querySelector(`#dropzone-${idSuffix}`) || document.getElementById(`dropzone-${idSuffix}`);
+
+        console.log(`[FileUploadManager] Initialisé pour ${idSuffix}`, {
+            input: !!this.fileInput,
+            removeBtn: !!this.removeBtn,
+            dropzone: !!this.dropzone,
+            root: options.container ? 'local' : 'global'
+        });
 
         this.init();
     }
@@ -54,7 +64,12 @@ export class FileUploadManager {
         }
 
         if (this.removeBtn) {
-            this.removeBtn.addEventListener('click', () => this.clear(true));
+            this.removeBtn.addEventListener('click', (e) => {
+                console.log(`[FileUploadManager] Clic sur bouton supprimer ${this.options.idSuffix}`);
+                e.preventDefault();
+                e.stopPropagation();
+                this.clear(true);
+            });
         }
 
         if (this.dropzone) {
@@ -243,6 +258,7 @@ export class FileUploadManager {
     }
 
     public clear(triggerCallback: boolean = false): void {
+        console.log(`[FileUploadManager] Suppression du fichier (callback: ${triggerCallback})`);
         this.accumulatedFiles = [];
         this.fileInput.value = '';
         if (this.fileNameElement) this.fileNameElement.innerHTML = '';

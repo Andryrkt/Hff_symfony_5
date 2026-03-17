@@ -1,7 +1,7 @@
 {% set fileType = fileType ?? 'PDF' %}
 {% set class = fileType == 'EXCEL' ? 'text-success' : 'text-warning' %}
 {% set bgColor = fileType == 'EXCEL' ? 'bg-success' : 'bg-warning' %}
-<div id="dropzone-{{ id }}" class="dropzone-container mt-3">
+<div class="dropzone-container mt-3">
 	<i class="fa fa-cloud-upload {{ class }} fs-1 mb-3"></i>
 	<br>
 	Glissez et déposez votre fichier
