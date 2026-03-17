@@ -35,20 +35,38 @@ export default class extends Controller {
                     icon = 'info';
                 }
 
-                Swal.fire({
-                    icon: icon as any,
+                const isCritical = icon === 'error' || icon === 'warning';
+
+                const config: any = {
+                    icon: icon,
                     title: flash.message,
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 5000,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
+                    confirmButtonColor: '#ffc107',
+                };
+
+                if (isCritical) {
+                    // Critical messages: show as modal, require user action
+                    config.toast = false;
+                    config.position = 'center';
+                    config.showConfirmButton = true;
+                    config.confirmButtonText = 'OK';
+                    config.timer = undefined;
+                    config.timerProgressBar = false;
+                } else {
+                    // Non-critical: show as ephemeral toast
+                    config.toast = true;
+                    config.position = 'top-end';
+                    config.showConfirmButton = false;
+                    config.timer = 5000;
+                    config.timerProgressBar = true;
+                    config.didOpen = (toast: HTMLElement) => {
                         toast.addEventListener('mouseenter', Swal.stopTimer);
                         toast.addEventListener('mouseleave', Swal.resumeTimer);
-                    }
-                });
+                    };
+                }
+
+                Swal.fire(config);
             }, index * 500); // 500ms delay between multiple toasts
         });
+
     }
 }

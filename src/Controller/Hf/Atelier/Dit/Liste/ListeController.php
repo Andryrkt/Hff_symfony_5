@@ -109,7 +109,7 @@ class ListeController extends AbstractController
                     $blockingError = $orsBlockingConditionService->checkBlockingConditionsDepuisListe($numeroDit, $numeroOr);
 
                     if ($blockingError !== null) {
-                        $this->addFlash('danger', $blockingError);
+                        $this->addFlash('warning', $blockingError);
                         return $this->redirectToRoute('hf_atelier_dit_liste_index', [], 303);
                     }
 

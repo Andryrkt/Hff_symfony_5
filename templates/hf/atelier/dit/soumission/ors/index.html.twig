@@ -22,7 +22,10 @@
 
 
 {% block content %}
-	<div class="container-fluid mt-4 mb-4" {{ stimulus_controller('pages--hf--atelier--dit--soumission-ors') }}>
+	<div class="container-fluid mt-4 mb-4" 
+		{{ stimulus_controller('pages--hf--atelier--dit--soumission-ors', {
+			'common--pdf-preview-outlet': '#pdf-preview-zone'
+		}) }}>
 		<div class="row">
 			<div class="col-12 col-lg-5">
 				<div class="card shadow-sm">
@@ -46,29 +49,54 @@
 
 						<hr>
 
-
 						<div class="row">
 							<div class="col-6 mb-3">
 								<label class="form-label fw-bold">1. Document OR (Obligatoire) *</label>
-								{% include "partials/_dropZoneFile.html.twig" with {'id': '1', 'form': form, 'fieldName': 'pieceJoint01', 'fileType': 'PDF'} %}
+								<div {{ stimulus_controller('common--dropzone', {
+									'id-suffix': '1',
+									'expected-prefix': 'Ordre de réparation_' ~ form.vars.value.numeroOr|default(''),
+									'expected-keywords': (form.vars.value.numeroDit|default('') ~ ',' ~ form.vars.value.numeroOr|default(''))|trim(',')
+								}) }}
+								data-action="
+									common--dropzone:fileSelected->pages--hf--atelier--dit--soumission-ors#onDropzoneFileSelected
+									common--dropzone:fileRemoved->pages--hf--atelier--dit--soumission-ors#onDropzoneFileRemoved
+								">
+									{% include "partials/_dropZoneFile.html.twig" with {'id': '1', 'form': form, 'fieldName': 'pieceJoint01', 'fileType': 'PDF'} %}
+								</div>
 							</div>
 							<div class="col-6 mb-3">
 								<label class="form-label small fw-bold">2. Devis à fusionner</label>
-								{% include "partials/_dropZoneFile.html.twig" with {'id': '2', 'form': form, 'fieldName': 'pieceJoint02', 'fileType': 'PDF'} %}
+								<div {{ stimulus_controller('common--dropzone', { 'id-suffix': '2' }) }}
+								data-action="
+									common--dropzone:fileSelected->pages--hf--atelier--dit--soumission-ors#onDropzoneFileSelected
+									common--dropzone:fileRemoved->pages--hf--atelier--dit--soumission-ors#onDropzoneFileRemoved
+								">
+									{% include "partials/_dropZoneFile.html.twig" with {'id': '2', 'form': form, 'fieldName': 'pieceJoint02', 'fileType': 'PDF'} %}
+								</div>
 							</div>
-
 						</div>
 						<div class="row">
 							<div class="col-6 mb-3">
 								<label class="form-label small fw-bold">3. BC ou autre</label>
-								{% include "partials/_dropZoneFile.html.twig" with {'id': '3', 'form': form, 'fieldName': 'pieceJoint03', 'fileType': 'PDF'} %}
+								<div {{ stimulus_controller('common--dropzone', { 'id-suffix': '3' }) }}
+								data-action="
+									common--dropzone:fileSelected->pages--hf--atelier--dit--soumission-ors#onDropzoneFileSelected
+									common--dropzone:fileRemoved->pages--hf--atelier--dit--soumission-ors#onDropzoneFileRemoved
+								">
+									{% include "partials/_dropZoneFile.html.twig" with {'id': '3', 'form': form, 'fieldName': 'pieceJoint03', 'fileType': 'PDF'} %}
+								</div>
 							</div>
 							<div class="col-6 mb-3">
 								<label class="form-label small fw-bold">4. Autre document</label>
-								{% include "partials/_dropZoneFileMultiple.html.twig" with {'id': '4', 'form': form, 'fieldName': 'pieceJoint04'} %}
+								<div {{ stimulus_controller('common--dropzone', { 'id-suffix': '4', 'multiple': true }) }}
+								data-action="
+									common--dropzone:filesSelected->pages--hf--atelier--dit--soumission-ors#onDropzoneFilesSelected
+									common--dropzone:fileRemoved->pages--hf--atelier--dit--soumission-ors#onDropzoneFileRemoved
+								">
+									{% include "partials/_dropZoneFileMultiple.html.twig" with {'id': '4', 'form': form, 'fieldName': 'pieceJoint04'} %}
+								</div>
 							</div>
 						</div>
-
 
 						<div class="mb-3">
 							{{ form_row(form.observation)}}
@@ -95,21 +123,31 @@
 			</div>
 
 			<div class="col-12 col-lg-7">
-				<div class="card shadow-sm h-100 d-none" data-pages--hf--atelier--dit--soumission-ors-target="pdfPreview">
+				<div id="pdf-preview-zone" class="card shadow-sm h-100 d-none" 
+					{{ stimulus_controller('common--pdf-preview') }}
+					data-common--pdf-preview-target="pdfPreview">
 					<div class="card-header bg-info text-white pb-0 border-bottom-0">
 						<div class="d-flex align-items-center mb-2 mt-1">
 							<i class="fas fa-eye me-2"></i>
 							<h5 class="card-title mb-0">Aperçu des documents</h5>
 						</div>
-						<ul
-							class="nav nav-tabs card-header-tabs m-0 border-0" data-pages--hf--atelier--dit--soumission-ors-target="navTabs"><!-- Onglets injectés via JS -->
+						<ul class="nav nav-tabs card-header-tabs m-0 border-0" 
+							data-common--pdf-preview-target="navTabs">
+							<!-- Onglets injectés via JS -->
 						</ul>
 					</div>
-					<div
-						class="card-body p-0 tab-content bg-white border-top border-info border-3" data-pages--hf--atelier--dit--soumission-ors-target="tabContent"><!-- Contenu des onglets injecté via JS -->
+					<div class="card-body p-0 tab-content bg-white border-top border-info border-3" 
+						data-common--pdf-preview-target="tabContent">
+						<!-- Contenu des onglets injecté via JS -->
 					</div>
 				</div>
-				<div class="h-100 d-flex align-items-center justify-content-center bg-light border rounded" data-pages--hf--atelier--dit--soumission-ors-target="placeholder">
+				<div class="h-100 d-flex align-items-center justify-content-center bg-light border rounded" 
+					data-common--pdf-preview-target="placeholder"
+					{# On lie le target placeholder au contrôleur pdf-preview même s'il est hors du div principal si besoin, 
+					   mais ici il est enfant de la même zone si on veut, 
+					   ou on peut déplacer le contrôleur plus haut si besoin. 
+					   Actuellement il est sur #pdf-preview-zone. #}
+				>
 					<div class="text-center text-muted p-5">
 						<i class="fas fa-file-pdf fa-4x mb-3"></i>
 						<p>Sélectionnez au moins un fichier pour afficher l'aperçu.</p>

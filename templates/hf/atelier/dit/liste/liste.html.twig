@@ -10,9 +10,13 @@
 {% endblock %}
 
 {% block content %}
-{% set mots_a_supprimer = ['Chef section', 'Chef de section', 'Responsable section', 'Chef d\'équipe'] %}
+	{% set mots_a_supprimer = ['Chef section', 'Chef de section', 'Responsable section', 'Chef d\'équipe'] %}
+
+
 <turbo-frame id="dit-list-frame" data-turbo-action="advance" {{ stimulus_controller('pages--hf--atelier--dit--dit-list') }}>
-<div class="sticky-header-titre" data-pages--hf--atelier--dit--dit-list-target="headerTitre">
+	{% include 'partials/flash_messages.html.twig' %}
+	<div class="sticky-header-titre" data-pages--hf--atelier--dit--dit-list-target="headerTitre">
+
 	<div class="container">
 
 

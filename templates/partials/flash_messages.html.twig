@@ -7,5 +7,8 @@
 {% endfor %}
 
 {% if flashMessages|length > 0 %}
-	<div data-controller="common--flash" data-common--flash-messages-value="{{ flashMessages|json_encode }}"></div>
+	<div data-controller="common--flash" 
+		 data-common--flash-messages-value="{{ flashMessages|json_encode }}"
+		 data-key="{{ date().timestamp }}"></div>
 {% endif %}
+

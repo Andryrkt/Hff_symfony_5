@@ -30,7 +30,10 @@ export class StimulusAutoloader {
             { name: 'pages--hf--atelier--dit--dit-list', import: () => import('@controllers/pages/hf/atelier/dit/dit_list_controller') },
             { name: 'pages--hf--atelier--dit--soumission-ors', import: () => import('@controllers/pages/hf/atelier/dit/soumission-ors_controller') },
             { name: 'common--dropzone', import: () => import('@controllers/common/dropzone_controller') },
+            { name: 'common--flash', import: () => import('@controllers/common/flash_controller') },
+            { name: 'common--pdf-preview', import: () => import('@controllers/common/pdf-preview_controller') },
         ];
+
 
         // Contrôleurs de page - chargés à la demande (lazy loading)
         const pageControllers = [

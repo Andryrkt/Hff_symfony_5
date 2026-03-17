@@ -19,8 +19,8 @@
 	</head>
 
 	<body>
-		{% include 'partials/flash_messages.html.twig' %}
 		<div class="main-content">
+
 			<div class="sticky-top main-header-sticky" id="app-main-header">
 				{% block nav %}
 					{% include 'partials/_navbar.html.twig' %}
@@ -32,8 +32,11 @@
 				{% endblock %}
 			</div>
 
-			<div class="content-body"> {% block bandeau %}{% endblock %}{% block content %}{% endblock %}
-				</div>
+			<div class="content-body"> 
+				{% include 'partials/flash_messages.html.twig' %}
+				{% block bandeau %}{% endblock %}{% block content %}{% endblock %}
+			</div>
+
 			</div>
 
 			{% include "partials/_loading_overlay.html.twig" %}
