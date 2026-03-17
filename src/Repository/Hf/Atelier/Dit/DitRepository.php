@@ -187,4 +187,16 @@ class DitRepository extends ServiceEntityRepository implements PaginatedReposito
         ;
     }
     /** DIT A ANNULER FIN */
+
+    public function updateStatutOr(string $numeroOr, string $statut): void
+    {
+        $qb = $this->createQueryBuilder('d');
+        $qb->update(Dit::class, 'd')
+            ->set('d.statutOr', ':statut')
+            ->where('d.numeroOr = :numeroOr')
+            ->setParameter('statut', $statut)
+            ->setParameter('numeroOr', $numeroOr);
+
+        $qb->getQuery()->execute();
+    }
 }

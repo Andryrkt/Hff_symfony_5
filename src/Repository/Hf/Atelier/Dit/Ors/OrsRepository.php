@@ -84,6 +84,10 @@ class OrsRepository extends ServiceEntityRepository
         return $this->TableauEnString($result);
     }
 
+    /**
+     * Récupère tous les OR avec leur ITV sous forme de string (numeroOr-numeroItv)
+     * @return string
+     */
     public function findAllOrsWithItvString(): string
     {
         $qb = $this->createQueryBuilder('o');

@@ -1,8 +1,10 @@
 ## Encore à faire:
 - le formulaire de recherche dans le Dit n'est pas encore en marche
-- le realiser par TANA ATE  ...
+- le realiser par TANA ATE  ... (qui permet de crée deux DIT en même temps)
 - affichage ou cache du bouton de soumission de document dans la liste DIT
 - création du controller pour DW
+- modal de la section afecter, modal du RI
+- modal du facture
 
 ## Déjà fait
 - création de l'entity (Dit.php)

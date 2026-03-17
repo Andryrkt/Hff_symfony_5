@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block content %}
-	{% set mots_a_supprimer = ['Chef section', 'Chef de section', 'Responsable section', 'Chef d\'équipe'] %}
+{% set mots_a_supprimer = ['Chef section', 'Chef de section', 'Responsable section', 'Chef d\'équipe'] %}
 
 
 <turbo-frame id="dit-list-frame" data-turbo-action="advance" {{ stimulus_controller('pages--hf--atelier--dit--dit-list') }}>
@@ -110,7 +110,7 @@
 							{{ item.sectionAffectee | remove_words(mots_a_supprimer)}}
 						</a>
 					</td>
-					<td>{{item.numeroDevisRattache}}</td>
+					<td>{{item.numeroDevisRattacher}}</td>
 					<td>{{ item.statutDevis}}</td>
 					<td id="or-container-{{ item.numeroDit }}" 
 						class="or-polling-container" 
@@ -126,7 +126,7 @@
 						{% endif %}
 					</td>
 
-					<td class="fw-bold ">{{ item.statutor}}</td>
+					<td class="fw-bold ">{{ item.statutOr}}</td>
 					<td style="text-align: right;">{{ item.montantTotalOR is not null ? item.montantTotalOR|number_format(2, ',', '.') : '' }}</td>
 					<td>{{ item.dateSoumissionOR is not null ? item.dateSoumissionOR|date('d/m/Y') : '' }}</td>
 

@@ -4,8 +4,11 @@ namespace App\Service\Hf\Atelier\Dit\Soumission\Ors;
 
 use App\Constants\Admin\Historisation\TypeDocumentConstants;
 use App\Constants\Admin\Historisation\TypeOperationConstants;
+use App\Constants\Hf\Atelier\Dit\Soumission\Ors\StatutOrConstant;
+use App\Dto\Hf\Atelier\Dit\Soumission\Ors\OrsDto;
 use App\Factory\Hf\Atelier\Dit\Soumission\Ors\OrsFactory;
 use App\Mapper\Hf\Atelier\Dit\Soumission\Ors\OrsMapper;
+use App\Repository\Hf\Atelier\Dit\DitRepository;
 use App\Repository\Hf\Atelier\Dit\Ors\OrsRepository;
 use App\Service\Historique_operation\HistoriqueOperationService;
 use Psr\Log\LoggerInterface;
@@ -19,6 +22,7 @@ class CreationHandler
     private OrsFactory $factory;
     private OrsRepository $orsRepository;
     private OrsDocumentManager $documentManager;
+    private DitRepository $ditRepository;
 
     public function __construct(
         OrsMapper $mapper,
@@ -26,7 +30,8 @@ class CreationHandler
         LoggerInterface $logger,
         OrsFactory $factory,
         OrsRepository $orsRepository,
-        OrsDocumentManager $documentManager
+        OrsDocumentManager $documentManager,
+        DitRepository $ditRepository
     ) {
         $this->mapper = $mapper;
         $this->historiqueOperationService = $historiqueOperationService;
@@ -34,6 +39,7 @@ class CreationHandler
         $this->factory = $factory;
         $this->orsRepository = $orsRepository;
         $this->documentManager = $documentManager;
+        $this->ditRepository = $ditRepository;
     }
 
     public function handel(
@@ -56,6 +62,9 @@ class CreationHandler
 
         // 4. Archivage vers Docuware
         $this->documentManager->archiveToDocuware($dto, $pdfService, $fileInfo['path'], $fileInfo['name']);
+
+        // 5. Modification du statut de l'OR
+        $this->updateStatutOr($dto);
 
         return $ors;
     }
@@ -82,6 +91,32 @@ class CreationHandler
             $this->historiqueOperationService->enregistrer(
                 (string) $numero,
                 TypeOperationConstants::TYPE_OPERATION_DB_SAVE_NAME,
+                TypeDocumentConstants::TYPE_DOCUMENT_OR_CODE,
+                $success,
+                $message
+            );
+        }
+    }
+
+    private function updateStatutOr(OrsDto $orsDto): void
+    {
+        $success = false;
+        $message = 'Modification du statut de l\'OR.';
+        $numero = $orsDto->numeroOr;
+
+        try {
+            $this->ditRepository->updateStatutOr($numero, StatutOrConstant::SOUMIS_A_VALIDATION);
+            $success = true;
+            $message = 'Modification du statut de l\'OR réussie.';
+            $this->logger->info($message, ['numero' => $numero]);
+        } catch (\Throwable $e) {
+            $message = 'Erreur lors de la modification du statut de l\'OR : ' . $e->getMessage();
+            $this->logger->error($message, ['numero' => $numero, 'exception' => $e]);
+            throw $e;
+        } finally {
+            $this->historiqueOperationService->enregistrer(
+                (string) $numero,
+                TypeOperationConstants::TYPE_OPERATION_MODIFICATION_NAME,
                 TypeDocumentConstants::TYPE_DOCUMENT_OR_CODE,
                 $success,
                 $message
