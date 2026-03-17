@@ -22,6 +22,19 @@ class OrsPdfService extends AbstractGeneratePdf
     }
 
     /**
+     * copie du PDF fusionner de l'OR dans DOCUWARE
+     *
+     * @param string $cheminVersDw
+     * @param string $filePathName
+     * 
+     * @return void
+     */
+    public function copyToDW(string $cheminVersDw, string $filePathName): void
+    {
+        $this->copyFile($filePathName, $cheminVersDw);
+    }
+
+    /**
      * Génère le PDF pour la soumission OR
      */
     public function GenererPdf(OrsDto $dto, string $nomAvecCheminFichier): void

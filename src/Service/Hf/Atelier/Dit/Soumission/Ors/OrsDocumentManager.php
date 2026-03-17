@@ -53,6 +53,35 @@ class OrsDocumentManager
         ];
     }
 
+    /**
+     * Archive le document vers Docuware
+     */
+    public function archiveToDocuware(OrsDto $orsDto, OrsPdfService $pdfService, string $finalPdfPath, string $finalPdfName): void
+    {
+        $docuwarePath = $this->params->get('docuware_directory') . '/OR/' . $finalPdfName;
+
+        $success = false;
+        $message = 'Copie vers Docuware.';
+        try {
+            $pdfService->copyToDW($docuwarePath, $finalPdfPath);
+            $success = true;
+            $message = 'Copie vers Docuware réussie.';
+            $this->logger->info($message, ['numero_ors' => $orsDto->numeroOr]);
+        } catch (\Exception $e) {
+            $message = 'Erreur lors de la copie vers Docuware : ' . $e->getMessage();
+            $this->logger->error($message, ['numero_ors' => $orsDto->numeroOr, 'exception' => $e]);
+            throw $e;
+        } finally {
+            $this->historiqueOperationService->enregistrer(
+                $orsDto->numeroOr,
+                TypeOperationConstants::TYPE_OPERATION_DW_COPY_NAME,
+                TypeDocumentConstants::TYPE_DOCUMENT_OR_CODE,
+                $success,
+                $message
+            );
+        }
+    }
+
     private function saveUploadedFiles(FormInterface $form, OrsDto $orsDto): array
     {
         $numero = $orsDto->numeroDit;

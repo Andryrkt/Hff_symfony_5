@@ -55,7 +55,7 @@ class CreationHandler
         $this->save($ors);
 
         // 4. Archivage vers Docuware
-        // $this->documentManager->archiveToDocuware($dit, $pdfService, $fileInfo['path'], $fileInfo['name']);
+        $this->documentManager->archiveToDocuware($dto, $pdfService, $fileInfo['path'], $fileInfo['name']);
 
         return $ors;
     }

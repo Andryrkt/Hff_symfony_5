@@ -2,7 +2,7 @@
 - soumission de l'OR s'il est rattaché à un DA
 - blockage de soumission de l'OR en avant , pendant et après => **OK**
 - modification du table dit pour le colone statut_or
-- envoye du fichier fusionner dans DW
+- envoye du fichier fusionner dans DW => **OK**
 - creation du test 
 - creation du migration de donnée
 - creation du suppretion des donnée du table ors
