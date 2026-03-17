@@ -46,13 +46,11 @@ class OrsComparaisonMapper
             // On prend le libellé de la version APRES, sinon AVANT
             $dto->libelleItv = ($orsAp ? $orsAp->getLibellelItv() : null) ?? ($orsAv ? $orsAv->getLibellelItv() : '');
 
-            // Utilisation de la map si disponible, sinon repli sur l'ancienne méthode
+            // Utilisation de la map si disponible, sinon null
             if (isset($datePlanningMap[$dto->itv])) {
                 $dto->datePlanning = $datePlanningMap[$dto->itv];
             } else {
-                // Si l'objet APRES existe, on prend son numéro OR, sinon celui de AVANT
-                $numeroOr = ($orsAp ? $orsAp->getNumeroOr() : ($orsAv ? $orsAv->getNumeroOr() : 0));
-                $dto->datePlanning = $numeroOr ? $this->datePlanning($numeroOr, $dto->itv) : null;
+                $dto->datePlanning = null;
             }
 
             // Données AVANT
@@ -71,10 +69,5 @@ class OrsComparaisonMapper
         }
 
         return $recap;
-    }
-
-    private function datePlanning(int $numeroOr, int $numeroItv): ?\DateTime
-    {
-        return $this->orsModel->getDatePlanning($numeroOr, $numeroItv);
     }
 }

@@ -6,14 +6,17 @@ use App\Constants\Hf\Atelier\Dit\ButtonsConstants;
 use App\Constants\Hf\Atelier\Dit\LegendeConstant;
 use App\Controller\Traits\PaginationAndSortingTrait;
 use App\Dto\Hf\Atelier\Dit\SearchDto;
+use App\Entity\Hf\Atelier\Dit\Soumission\Ors\Ors;
 use App\Form\Hf\Atelier\Dit\SearchType;
 use App\Form\Hf\Atelier\Dit\SoumissionDocumentAValidationType;
 use App\Mapper\Hf\Atelier\Dit\Mapper;
+use App\Service\Hf\Atelier\Dit\Soumission\Ors\OrsBlockingConditionService;
 use App\Repository\Hf\Atelier\Dit\DitRepository;
 use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -31,7 +34,8 @@ class ListeController extends AbstractController
         DitRepository $ditRepository,
         Mapper $ditMapper,
         SearchDto $searchDto,
-        ContextAwareBreadcrumbBuilder $breadcrumbBuilder
+        ContextAwareBreadcrumbBuilder $breadcrumbBuilder,
+        OrsBlockingConditionService $orsBlockingConditionService
     ) {
         // 1. gerer l'accés 
         $this->denyAccessUnlessGranted('ATELIER_DIT_VIEW');
@@ -48,7 +52,7 @@ class ListeController extends AbstractController
 
         // 4. Création et traitement du formulaire de soumission de document (pour la modal)
         $soumissionForm = $this->createForm(SoumissionDocumentAValidationType::class);
-        $response = $this->traitementFormulaireSoumissionDocumentAValidation($request, $soumissionForm);
+        $response = $this->traitementFormulaireSoumissionDocumentAValidation($request, $soumissionForm, $orsBlockingConditionService);
         if ($response) {
             return $response;
         }
@@ -87,8 +91,11 @@ class ListeController extends AbstractController
         }
     }
 
-    private function traitementFormulaireSoumissionDocumentAValidation(Request $request, FormInterface $soumissionForm): ?\Symfony\Component\HttpFoundation\Response
-    {
+    private function traitementFormulaireSoumissionDocumentAValidation(
+        Request $request,
+        FormInterface $soumissionForm,
+        OrsBlockingConditionService $orsBlockingConditionService
+    ): ?Response {
         $soumissionForm->handleRequest($request);
 
         if ($soumissionForm->isSubmitted() && $soumissionForm->isValid()) {
@@ -99,10 +106,13 @@ class ListeController extends AbstractController
 
             switch ($docDansDW) {
                 case 'OR':
-                    if (empty($numeroOr)) {
-                        $this->addFlash('danger', "Le numéro OR est manquant pour cette DIT. Impossible de soumettre l'OR.");
+                    $blockingError = $orsBlockingConditionService->checkBlockingConditionsDepuisListe($numeroDit, $numeroOr);
+
+                    if ($blockingError !== null) {
+                        $this->addFlash('danger', $blockingError);
                         return $this->redirectToRoute('hf_atelier_dit_liste_index', [], 303);
                     }
+
                     return $this->redirectToRoute("hf_atelier_dit_soumission_ors_index", ['numDit' => $numeroDit, 'numOr' => $numeroOr], 303);
 
                 case 'FACTURE':

@@ -27,7 +27,26 @@ class OrsModel
         try {
             $statement = "SELECT
                 sitv_numor as numero_or,
-                sitv_datdeb,
+                CASE 
+                    WHEN 
+                        (SELECT DATE(Min(ska_d_start)) FROM informix.ska, informix.skw WHERE ofh_id = sitv_numor AND ofs_id=sitv_interv AND skw.skw_id = ska.skw_id )  is Null 
+                    THEN DATE(sitv_datepla)  
+                    ELSE
+                        (SELECT DATE(Min(ska_d_start)) FROM informix.ska, informix.skw WHERE ofh_id = sitv_numor AND ofs_id=sitv_interv AND skw.skw_id = ska.skw_id ) 
+                END as date_planning,
+                CASE 
+			        WHEN NOT EXISTS (
+			            SELECT 1 
+			            FROM informix.ska
+			            JOIN informix.skw ON skw.skw_id = ska.skw_id
+			            WHERE skw.ofh_id = sav_itv.sitv_numor 
+			            AND skw.ofs_id = sav_itv.sitv_interv 
+			            AND ska.ska_d_start IS NOT NULL
+			        )
+			        OR sav_itv.sitv_datepla IS NOT NULL
+			        THEN 1
+			        ELSE 0
+			    END as date_planning_existe,
                 trim(seor_refdem) as numero_dit,
                 sitv_interv as numero_itv,
                 trim(sitv_comment) as libelle_itv,
@@ -40,6 +59,14 @@ class OrsModel
                 slor_qterea as qte_autre,
                 slor_pxnreel as prix_net,
                 seor_pos as position,
+                seor_lib as reference_client,
+                seor_numcli as numero_client,
+                CASE
+                    WHEN (select count(*) from informix.cli_bse INNER JOIN informix.cli_soc on csoc_numcli = cbse_numcli and csoc_soc = 'HF' where cbse_numcli =seor_numcli and cbse_numcli > 0) = 1 
+                    THEN 1 
+                    ELSE 0
+                END as numero_client_existe,
+                seor_nummat as id_materiel,
                 slor_succdeb as code_agence_debiteur,
                 slor_servdeb as code_service_debiteur
 
@@ -72,7 +99,13 @@ class OrsModel
 
             $statement = " SELECT
                 slor_numor as numero_or,
-                sitv_datdeb,
+                CASE 
+                    WHEN 
+                        (SELECT DATE(Min(ska_d_start)) FROM informix.ska, informix.skw WHERE ofh_id = sitv_numor AND ofs_id=sitv_interv AND skw.skw_id = ska.skw_id )  is Null 
+                    THEN DATE(sitv_datepla)  
+                    ELSE
+                        (SELECT DATE(Min(ska_d_start)) FROM informix.ska, informix.skw WHERE ofh_id = sitv_numor AND ofs_id=sitv_interv AND skw.skw_id = ska.skw_id ) 
+                END as date_planning,
                 trim(seor_refdem) as numero_dit,
                 sitv_interv as numero_itv,
                 trim(sitv_comment) as libelle_itv,
@@ -184,35 +217,35 @@ class OrsModel
      * @param int $numeroItv
      * @return \DateTime|null
      */
-    public function getDatePlanning(int $numeroOr, int $numeroItv): ?\DateTime
-    {
-        $this->databaseInformix->connect();
+    // public function getDatePlanning(int $numeroOr, int $numeroItv): ?\DateTime
+    // {
+    //     $this->databaseInformix->connect();
 
-        try {
-            $statement = "SELECT 
-                    CASE 
-                            WHEN 
-                                (SELECT DATE(Min(ska_d_start)) FROM informix.ska, informix.skw WHERE ofh_id = sitv_numor AND ofs_id=sitv_interv AND skw.skw_id = ska.skw_id )  is Null 
-                            THEN DATE(sitv_datepla)  
-                            ELSE
-                                (SELECT DATE(Min(ska_d_start)) FROM informix.ska, informix.skw WHERE ofh_id = sitv_numor AND ofs_id=sitv_interv AND skw.skw_id = ska.skw_id ) 
-                    END as date_planning
-                    FROM informix.sav_itv 
-                where sitv_numor = $numeroOr
-                and sitv_interv = $numeroItv
-            ";
+    //     try {
+    //         $statement = "SELECT 
+    //                 CASE 
+    //                         WHEN 
+    //                             (SELECT DATE(Min(ska_d_start)) FROM informix.ska, informix.skw WHERE ofh_id = sitv_numor AND ofs_id=sitv_interv AND skw.skw_id = ska.skw_id )  is Null 
+    //                         THEN DATE(sitv_datepla)  
+    //                         ELSE
+    //                             (SELECT DATE(Min(ska_d_start)) FROM informix.ska, informix.skw WHERE ofh_id = sitv_numor AND ofs_id=sitv_interv AND skw.skw_id = ska.skw_id ) 
+    //                 END as date_planning
+    //                 FROM informix.sav_itv 
+    //             where sitv_numor = $numeroOr
+    //             and sitv_interv = $numeroItv
+    //         ";
 
-            $result = $this->databaseInformix->executeQuery($statement);
-            $rows = $this->databaseInformix->fetchResults($result);
+    //         $result = $this->databaseInformix->executeQuery($statement);
+    //         $rows = $this->databaseInformix->fetchResults($result);
 
-            if (isset($rows[0]['date_planning']) && !empty($rows[0]['date_planning'])) {
-                return new \DateTime($rows[0]['date_planning']);
-            }
-            return null;
-        } finally {
-            $this->databaseInformix->close();
-        }
-    }
+    //         if (isset($rows[0]['date_planning']) && !empty($rows[0]['date_planning'])) {
+    //             return new \DateTime($rows[0]['date_planning']);
+    //         }
+    //         return null;
+    //     } finally {
+    //         $this->databaseInformix->close();
+    //     }
+    // }
 
     /**
      * Vérifie si la date de planning existe
@@ -220,12 +253,12 @@ class OrsModel
      * @param int $numeroOr
      * @return int 1 si la date de planning existe, 0 sinon
      */
-    public function getEstDatePlanningExiste(int $numeroOr): int
+    public function getEstDatePlanningExiste(int $numeroOr): array
     {
         $this->databaseInformix->connect();
 
         try {
-            $statement = "SELECT FIRST 1
+            $statement = "SELECT
                     --(SELECT DATE(Min(ska_d_start)) FROM informix.ska, informix.skw WHERE ofh_id = sitv_numor AND ofs_id=sitv_interv AND skw.skw_id = ska.skw_id ) as date_planning_1,
                     --sitv_datepla as date_planning_2,
                     CASE 
@@ -248,7 +281,7 @@ class OrsModel
             $result = $this->databaseInformix->executeQuery($statement);
             $rows = $this->databaseInformix->fetchResults($result);
 
-            return $rows[0]['date_planning'] ?? 0;
+            return $rows;
         } finally {
             $this->databaseInformix->close();
         }

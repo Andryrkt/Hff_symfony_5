@@ -43,9 +43,7 @@ class OrsParInterventionMapper
                 $dto = new OrsParInterventionDto();
                 $dto->numeroItv = $numItv;
                 $dto->libellelItv = (string) ($info['libelle_itv'] ?? '');
-                if (isset($info['sitv_datdeb']) && !empty($info['sitv_datdeb'])) {
-                    $dto->datePlanning = new \DateTime($info['sitv_datdeb']);
-                }
+                $dto->datePlanning = new \DateTime($info['date_planning']);
                 $dto->nombreLigneItv = 0;
                 $grouped[$numItv] = $dto;
             }
