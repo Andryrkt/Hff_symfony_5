@@ -106,12 +106,12 @@ class ListeController extends AbstractController
 
             switch ($docDansDW) {
                 case 'OR':
-                    $blockingError = $orsBlockingConditionService->checkBlockingConditionsDepuisListe($numeroDit, $numeroOr);
+                    // $blockingError = $orsBlockingConditionService->checkBlockingConditionsDepuisListe($numeroDit, $numeroOr);
 
-                    if ($blockingError !== null) {
-                        $this->addFlash('warning', $blockingError);
-                        return $this->redirectToRoute('hf_atelier_dit_liste_index', [], 303);
-                    }
+                    // if ($blockingError !== null) {
+                    //     $this->addFlash('warning', $blockingError);
+                    //     return $this->redirectToRoute('hf_atelier_dit_liste_index', [], 303);
+                    // }
 
                     return $this->redirectToRoute("hf_atelier_dit_soumission_ors_index", ['numDit' => $numeroDit, 'numOr' => $numeroOr], 303);
 

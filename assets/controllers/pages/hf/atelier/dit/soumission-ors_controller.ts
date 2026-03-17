@@ -24,10 +24,10 @@ export default class extends Controller {
      * Configurable via data-value si besoin d'aller plus loin.
      */
     private readonly fileTitles: Record<string, string> = {
-        '1': 'Document OR',
+        '1': 'OR à valider *',
         '2': 'Devis',
-        '3': 'BC ou autre',
-        '4': 'Autre document',
+        '3': 'BC ou autre document',
+        '4': 'Autres documents',
     };
 
     connect() {
