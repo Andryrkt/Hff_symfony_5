@@ -2,6 +2,7 @@
 
 namespace App\Factory\Hf\Rh\Dom;
 
+use App\Constants\Hf\Rh\Dom\SousTypeDomConstants;
 use App\Dto\Hf\Rh\Dom\FirstFormDto;
 use App\Entity\Admin\PersonnelUser\User;
 use App\Entity\Hf\Rh\Dom\SousTypeDocument;
@@ -33,7 +34,7 @@ class FirstFormDtoFactory
         $dto->agenceUser = $user->getAgenceUser()->getCode() . '-' . $user->getAgenceUser()->getNom();
         $dto->serviceUser = $user->getServiceUser()->getCode() . '-' . $user->getServiceUser()->getNom();
         $dto->typeMission = $this->em->getRepository(SousTypeDocument::class)
-            ->findOneBy(['codeSousType' => 'MISSION']);
+            ->findOneBy(['codeSousType' => SousTypeDomConstants::SOUS_TYPE_MISSION]);
 
         return $dto;
     }

@@ -1,0 +1,27 @@
+{% extends "base.html.twig" %}
+
+{% block title %}
+	Duplication DIT
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+{% endblock %}
+
+{% block content %}
+	<div class=" container mt-6 mb-4" data-controller="pages--hf--atelier--dit--dit-form" {% if materielData is not null %} data-pages--hf--atelier--dit--dit-form-materiel-data-value="{{ materielData|e('html_attr') }}" {% endif %}>
+		<div class="card">
+			<div class="card-body">
+				<div class="container">
+					{% include 'hf/atelier/dit/creation/_formulaire_creation.html.twig' with { isDuplication: true } %}
+				</div>
+			</div>
+		</div>
+
+		<div id="materielInfos"></div>
+	</div>
+{% endblock %}
+{% block javascripts %}
+	{{ parent() }}
+	{{ agence_service_data() }}
+{% endblock %}

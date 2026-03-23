@@ -17,6 +17,13 @@ security:
             providers: ['app_user_provider', 'ldap_user_provider']
 
   firewalls:
+    api:
+      pattern: ^/api
+      stateless: true
+      provider: chain_provider
+      custom_authenticator: App\Security\ApiJsonAuthenticator
+      jwt: ~
+
     main:
       lazy: true
       stateless: false
@@ -28,6 +35,8 @@ security:
         target: app_login
 
   access_control:
+    - { path: ^/api/login, roles: PUBLIC_ACCESS }
+    - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
     - { path: ^/admin, roles: ROLE_ADMIN }
     - { path: ^/login, roles: PUBLIC_ACCESS }
     - { path: ^/, roles: IS_AUTHENTICATED_FULLY }

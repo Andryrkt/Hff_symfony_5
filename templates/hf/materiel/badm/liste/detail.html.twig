@@ -1,0 +1,116 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détail BADM
+	{{dom.numeroBadm}}
+{% endblock %}
+
+{% import "macros/affiche.html.twig" as macroForm %}
+{% import "macros/form_macros.html.twig" as formMacro %}
+
+{% block content %}
+
+<div class="container mt-6 mb-4">
+
+		<div class="row">
+			<div class="col-12 col-md-11">
+				<h2 class="fw-bold " style="color:#0e4194;">Liste Bordereau d’Acquisition et de Mouvement Matériel</h2>
+			</div>
+		</div>
+
+
+		<div class="row">
+			<div class="col-12 col-md-3">
+				{{  macroForm.affichage('Date', secondFormDto.dateDemande | date('d/m/Y'))}}
+			</div>
+			<div class="col-12 col-md-3">{{  macroForm.affichage('N° BADM', secondFormDto.numBadm)}}</div>
+			<div class="codeMouvement">
+				<h3 id="codeMouvement">{{ macroForm.affichage('Type de Mouvement', secondFormDto.typeMouvement.description)}}</h3>
+			</div>
+		</div>
+
+		{# DEBUT Caractéristiques du matériel#}
+		<div class="row">{{ formMacro.sousTitre('Caractéristiques du matériel', {class: 'sousTitre'})}}</div>
+		<div class="row">
+			<div class="row">
+				<div class="col-12 col-md-6 col-lg-3">{{  macroForm.affichage('Désignation', secondFormDto.designation)}}</div>
+				<div class="col-12 col-md-6 col-lg-3">{{ macroForm.affichage('Id Matériel', secondFormDto.num_matricule)}}</div>
+				<div class="col-12 col-md-6 col-lg-3">{{ macroForm.affichage('N° Serie', secondFormDto.num_serie)}}</div>
+				<div class="col-12 col-md-6 col-lg-3">{{ macroForm.affichage('N° Parc', secondFormDto.num_parc)}}</div>
+			</div>
+			<div class="row">
+				<div class="col-12 col-md-6 col-lg-3">{{ macroForm.affichage('Groupe', secondFormDto.famille)}}</div>
+				<div class="col-12 col-md-6 col-lg-3">{{ macroForm.affichage('Constructeur', secondFormDto.constructeur)}}</div>
+				<div class="col-12 col-md-6 col-lg-3">{{ macroForm.affichage('Modele', secondFormDto.modele)}}</div>
+				<div class="col-12 col-md-6 col-lg-3">{{ macroForm.affichage('Année du Modele', secondFormDto.anneeDuModel)}}</div>
+			</div>
+			<div class="row d-flex">
+				<div class="col-12 col-md-6 col-lg-3">{{ macroForm.affichage('Affectation', secondFormDto.affectation)}}</div>
+				<div class="col-12 col-md-6 col-lg-3">{{ macroForm.affichage('Date d\'Achat', secondFormDto.dateAchat | date('d/m/Y'))}}</div>
+		</div>
+	</div>
+	{# FIN Caractéristiques du matériel#}
+
+	{# DEBUT Etat machine#}
+	<div class="row">{{ formMacro.sousTitre('Etat machine', {class: 'sousTitre'})}}</div>
+	<div class="row">
+		<div class="col-12 col-md-6">{{  macroForm.affichage('Heure Machine', secondFormDto.heure)}}</div>
+		<div class="col-12 col-md-6">{{ macroForm.affichage('Km Machine', secondFormDto.km)}}</div>
+	</div>
+	{# FIN Etat machine#}
+
+	{# DEBUT Agence et Service Emetteur#}
+	<div class="row">{{ formMacro.sousTitre('Agence et Service émetteur', {class: 'sousTitre'})}}</div>
+	<div class="row">
+		<div class="col-12 col-md-6 col-lg-4">{{  macroForm.affichage('Agence', secondFormDto.emetteur.agence.code ~ ' ' ~ secondFormDto.emetteur.agence.nom)}}</div>
+		<div class="col-12 col-md-6 col-lg-4">{{ macroForm.affichage('Service', secondFormDto.emetteur.service.code ~ ' ' ~  secondFormDto.emetteur.service.nom)}}</div>
+		<div class="col-12 col-md-6 col-lg-4">{{  macroForm.affichage('Casier', secondFormDto.emetteur.casier.nom)}}</div>
+	</div>
+	{# FIN Agence et Service Emetteur#}
+
+	{# DEBUT Agence et Service Destiantaire#}
+	<div class="row">{{ formMacro.sousTitre('Agence et Service destinataire', {class: 'sousTitre'})}}</div>
+	<div class="row">
+		<div class="col-12 col-md-6 col-lg-4">{{  macroForm.affichage('Agence', secondFormDto.destinataire.agence.code ~ ' ' ~  secondFormDto.destinataire.agence.nom)}}</div>
+		<div class="col-12 col-md-6 col-lg-4">{{ macroForm.affichage('Service', secondFormDto.destinataire.service.code ~ ' ' ~ secondFormDto.destinataire.service.nom)}}</div>
+		<div class="col-12 col-md-6 col-lg-4">{{  macroForm.affichage('Casier', secondFormDto.destiantaire.casier.nom)}}</div>
+	</div>
+	<div class="row"><div class="col-12">{{ macroForm.affichage('Motif', secondFormDto.motifMateriel) }}</div></div>
+	{# FIN Agence et Service Destiantaire#}
+
+	{# DEBUT ENTREE EN PARC#}
+	<div class="row">{{ formMacro.sousTitre('Entrée en parc', {class: 'sousTitre'})}}</div>
+	<div class="row">
+		<div class="col-12 col-md-6">{{ macroForm.affichage('Etat achat', secondFormDto.etatAchat)}}</div>
+		<div class="col-12 col-md-6">{{ macroForm.affichage('Date Mise en Location', secondFormDto.dateMiseLocation | date('d/m/Y'))}}</div>
+	</div>
+	{# FIN Agence et Service Destiantaire#}
+
+	{# DEBUT Bilan Financière#}
+	<div class="row">{{ formMacro.sousTitre('Valeur (MGA)', {class: 'sousTitre'})}}</div>
+	<div class="row">
+		<div class="col-12 col-md-6 col-lg-4">{{ macroForm.affichage('Coût d\'acquisition', secondFormDto.coutAcquisition |number_format(2,',', '.'))}}</div>
+				<div class="col-12 col-md-6 col-lg-4">{{  macroForm.affichage('Amortissement', secondFormDto.amortissement  |number_format(2,',', '.'))}}</div>
+				<div class="col-12 col-md-6 col-lg-4">{{ macroForm.affichage('VNC', secondFormDto.valeurNetComptable  |number_format(2,',', '.'))}}</div>
+			</div>
+			{# FIN Bilan Financière#}
+
+			<div class="row">{{ formMacro.sousTitre('Cession d’actif', {class: 'sousTitre'})}}</div>
+			<div class="row">
+				<div class="col-12 col-md-6 col-lg-4">{{ macroForm.affichage('Nom Client', secondFormDto.nomClient) }}</div>
+				<div class="col-12 col-md-6 col-lg-4">{{ macroForm.affichage('Modalité de paiement', secondFormDto.modalitePaiement) }}</div>
+				<div class="col-12 col-md-6 col-lg-4">{{ macroForm.affichage('Prix de Vente HT', secondFormDto.prixVenteHt |number_format(2,',', '.'))}}</div>
+			</div>
+
+
+			<div class="row">
+				<div class="col-12">{{ formMacro.sousTitre('Mise au rebut', {class: 'sousTitre'})}}</div>
+			</div>
+
+			<div class="row">{{ macroForm.affichage('Motif de mise au rebut', secondFormDto.motifMiseRebut)}}</div>
+
+			<div class="row">
+				<div class="col-12 col-md-6">{{ macroForm.affichage('Nom Image', secondFormDto.pieceJoint01)}}</div>
+				<div class="col-12 col-md-6">{{ macroForm.affichage('Nom fichier', secondFormDto.pieceJoint02)}}</div>
+			</div>
+		</div>
+{% endblock %}

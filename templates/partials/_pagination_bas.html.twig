@@ -25,10 +25,11 @@
 	}
 </style>
 
+{% set queryParams = app.request.query.all %}
 <ul class="pagination custom-pagination justify-content-center mt-3">
 	{% if currentPage > 1 %}
 		<li class="page-item">
-			<a href="?page={{ currentPage - 1 }}" class="page-link">Précédent</a>
+			<a href="{{ path(app.request.attributes.get('_route'), queryParams|merge({'page': currentPage - 1})) }}" class="page-link">Précédent</a>
 		</li>
 	{% endif %}
 
@@ -37,7 +38,7 @@
 
 	{% if start > 1 %}
 		<li class="page-item">
-			<a href="?page=1" class="page-link">1</a>
+			<a href="{{ path(app.request.attributes.get('_route'), queryParams|merge({'page': 1})) }}" class="page-link">1</a>
 		</li>
 		{% if start > 2 %}
 			<li class="page-item disabled">
@@ -48,7 +49,7 @@
 
 	{% for i in start..end %}
 		<li class="page-item {% if i == currentPage %}active{% endif %}">
-			<a href="?page={{ i }}" class="page-link">{{ i }}</a>
+			<a href="{{ path(app.request.attributes.get('_route'), queryParams|merge({'page': i})) }}" class="page-link">{{ i }}</a>
 		</li>
 	{% endfor %}
 
@@ -59,13 +60,13 @@
 			</li>
 		{% endif %}
 		<li class="page-item">
-			<a href="?page={{ totalPages }}" class="page-link">{{ totalPages }}</a>
+			<a href="{{ path(app.request.attributes.get('_route'), queryParams|merge({'page': totalPages})) }}" class="page-link">{{ totalPages }}</a>
 		</li>
 	{% endif %}
 
 	{% if currentPage < totalPages %}
 		<li class="page-item">
-			<a href="?page={{ currentPage + 1 }}" class="page-link">Suivant</a>
+			<a href="{{ path(app.request.attributes.get('_route'), queryParams|merge({'page': currentPage + 1})) }}" class="page-link">Suivant</a>
 		</li>
 	{% endif %}
 </ul>

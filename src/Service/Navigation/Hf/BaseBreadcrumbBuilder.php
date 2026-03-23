@@ -2,11 +2,36 @@
 
 namespace App\Service\Navigation\Hf;
 
-use App\Repository\Admin\ApplicationGroupe\VignetteRepository;
+use App\Service\Traits\ItSubmenuTrait;
+use App\Service\Traits\RhSubmenuTrait;
+use App\Service\Traits\HseSubmenuTrait;
+use App\Service\Traits\PolSubmenuTrait;
+use App\Service\Traits\ApproSubmenuTrait;
+use App\Service\Traits\ComptaSubmenuTrait;
+use App\Service\Traits\AtelierSubmenuTrait;
+use App\Service\Traits\EnergieSubmenuTrait;
+use App\Service\Traits\MagasinSubmenuTrait;
+use App\Service\Traits\MaterielSubmenuTrait;
+use App\Service\Traits\ReportingSubmenuTrait;
 use Symfony\Component\Security\Core\Security;
+use App\Service\Traits\DocumentationSubmenuTrait;
+use App\Repository\Admin\ApplicationGroupe\VignetteRepository;
 
 class BaseBreadcrumbBuilder
 {
+    use RhSubmenuTrait;
+    use ComptaSubmenuTrait;
+    use ReportingSubmenuTrait;
+    use EnergieSubmenuTrait;
+    use HseSubmenuTrait;
+    use MagasinSubmenuTrait;
+    use ApproSubmenuTrait;
+    use ItSubmenuTrait;
+    use PolSubmenuTrait;
+    use DocumentationSubmenuTrait;
+    use MaterielSubmenuTrait;
+    use AtelierSubmenuTrait;
+
     protected $vignetteRepository;
     protected $security;
 
@@ -47,450 +72,92 @@ class BaseBreadcrumbBuilder
         // Si l'utilisateur a accès, retourner le sous-menu complet
         return $submenu;
     }
-    protected function domSubmenu(): array
-    {
-        return [
-            ['label' => 'Nouvelle demande', 'route' => 'dom_first_form'],
-            ['label' => 'Consultation', 'route' => 'liste_dom_index']
-        ];
-    }
 
-    protected function mutationSubmenu(): array
-    {
-        return [
-            ['label' => 'Nouvelle demande', 'route' => '#'],
-            ['label' => 'Consultation', 'route' => '#']
-        ];
-    }
 
-    protected function congeSubmenu(): array
-    {
-        return [
-            ['label' => 'Nouvelle demande', 'route' => '#'],
-            ['label' => 'Consultation', 'route' => '#']
-        ];
-    }
-
-    protected function temporaireSubmenu(): array
-    {
-        return [
-            ['label' => 'Nouvelle demande', 'route' => '#'],
-            ['label' => 'Consultation', 'route' => '#']
-        ];
-    }
-
-    protected function rhSubmenu(): array
-    {
-        return  [
-            /** ======== Ordre de mission (DOM) ========== */
-            [
-                'label' => 'Ordre de Mission',
-                'route' => null, // C'est un conteneur de sous-menu
-                'submenu' => $this->domSubmenu()
-            ],
-            /** ======== Mutation ========== */
-            [
-                'label' => 'Mutation',
-                'route' => null,
-                'submenu' => $this->mutationSubmenu()
-            ],
-            /** ======== Congé ========== */
-            [
-                'label' => 'Congé',
-                'route' => null,
-                'submenu' => $this->congeSubmenu()
-            ],
-            /** ======== Temporaire ========== */
-            [
-                'label' => 'Temporaire',
-                'route' => null,
-                'submenu' => $this->temporaireSubmenu()
-            ]
-        ];
-    }
-
-    protected function comptaSubmenu(): array
-    {
-        return [
-            // ======== Cours de change ========== 
-            [
-                'label' => 'Cours de change',
-                'route' => '#'
-            ],
-            // ======== Demande de paiement ========== 
-            [
-                'label' => 'Demande de paiement',
-                'route' => null,
-                'submenu' => [
-                    ['label' => 'Nouvelle demande', 'route' => '#'],
-                    ['label' => 'Consultation', 'route' => '#']
-                ]
-            ],
-            // ======== Bon de caisse ========== 
-            [
-                'label' => 'Bon de caisse',
-                'route' => null,
-                'submenu' => [
-                    ['label' => 'Nouvelle demande', 'route' => '#'],
-                    ['label' => 'Consultation', 'route' => '#']
-                ]
-            ]
-        ];
-    }
-
-    protected function reportingSubmenu(): array
-    {
-        return [
-            // ======== Reporting Power BI ========== 
-            [
-                'label' => 'Reporting Power BI',
-                'route' => '#'
-            ],
-            // ======== Reporting Excel ========== 
-            [
-                'label' => 'Reporting Excel',
-                'route' => '#'
-            ]
-        ];
-    }
-
-    protected function documentationSubmenu(): array
-    {
-        return [
-            // ======== Annuaire ==========
-            [
-                'label' => 'Annuaire',
-                'route' => '#'
-            ],
-            // ======== Plan analytique Hff ========== 
-            [
-                'label' => 'Plan analytique Hff',
-                'route' => '#'
-            ],
-            // ======== Documentation interne ========== 
-            [
-                'label' => 'Documentation interne',
-                'route' => '#'
-            ],
-            // ======== Contrat ========== 
-            [
-                'label' => 'Contrat',
-                'route' => null,
-                'submenu' => [
-                    ['label' => 'Nouvelle contrat', 'route' => '#'],
-                    ['label' => 'Consultation', 'route' => '#']
-                ]
-            ]
-        ];
-    }
-
-    protected function materielSubmenu(): array
-    {
-        return [
-            // ======== Mouvemnet matériel ========== 
-            [
-                'label' => 'Mouvemnet matériel',
-                'route' => null,
-                'submenu' => [
-                    ['label' => 'Nouvelle demande', 'route' => '#'],
-                    ['label' => 'Consultation', 'route' => '#']
-                ]
-            ],
-            // ======== Casier ========== 
-            [
-                'label' => 'Casier',
-                'route' => null,
-                'submenu' => [
-                    ['label' => 'Nouvelle demande', 'route' => '#'],
-                    ['label' => 'Consultation', 'route' => '#']
-                ]
-            ],
-            // ======== Commandes matériel ========== 
-            [
-                'label' => 'Commandes matériel',
-                'route' => '#',
-            ],
-            // ======== Suivi administratif des matériels ========== 
-            [
-                'label' => 'Suivi administratif des matériels',
-                'route' => '#',
-            ],
-        ];
-    }
-
-    protected function atelierSubmenu(): array
-    {
-        return [
-            // ======== Demande d'intervention ========== 
-            [
-                'label' => 'Demande d\'intervention',
-                'route' => null,
-                'submenu' => [
-                    ['label' => 'Nouvelle demande', 'route' => '#'],
-                    ['label' => 'Consultation', 'route' => '#']
-                ]
-            ],
-            // ======== Glossaire OR ========== 
-            [
-                'label' => 'Glossaire OR',
-                'route' => '#',
-            ],
-            // ======== Glossaire OR ========== 
-            [
-                'label' => 'Glossaire OR',
-                'route' => '#',
-            ],
-            // ======== Planning  ========== 
-            [
-                'label' => 'Planning',
-                'route' => '#',
-            ],
-            // ======== Planning détaillé ========== 
-            [
-                'label' => 'Planning détaillé',
-                'route' => '#',
-            ],
-            // ======== Planning interne Atelier ========== 
-            [
-                'label' => 'Planning interne Atelier',
-                'route' => '#',
-            ],
-            // ======== Satisfaction client (Atelier excellence survey) ========== 
-            [
-                'label' => 'Satisfaction client (Atelier excellence survey)',
-                'route' => '#',
-            ]
-        ];
-    }
-
-    protected function magainSubmenu(): array
-    {
-        return [
-            // ======== OR ========== 
-            [
-                'label' => 'OR',
-                'route' => null,
-                'submenu' => [
-                    ['label' => 'Liste à traiter', 'route' => '#'],
-                    ['label' => 'Liste à livrer', 'route' => '#']
-                ]
-            ],
-            // ======== CIS ========== 
-            [
-                'label' => 'CIS',
-                'route' => null,
-                'submenu' => [
-                    ['label' => 'Liste à traiter', 'route' => '#'],
-                    ['label' => 'Liste à livrer', 'route' => '#']
-                ]
-            ],
-            // ======== INVENTAIRE ========== 
-            [
-                'label' => 'INVENTAIRE',
-                'route' => null,
-                'submenu' => [
-                    ['label' => 'Liste inventaire', 'route' => '#'],
-                    ['label' => 'Inventaire détaillé', 'route' => '#']
-                ]
-            ],
-            // ======== SORTIE DE PIECES ========== 
-            [
-                'label' => 'SORTIE DE PIECES',
-                'route' => null,
-                'submenu' => [
-                    ['label' => 'Nouvelle demande', 'route' => '#']
-                ]
-            ],
-            // ======== DEMATERIALISATION ========== 
-            [
-                'label' => 'OR',
-                'route' => null,
-                'submenu' => [
-                    ['label' => 'Devis', 'route' => '#'],
-                    ['label' => 'Commandes clients', 'route' => '#'],
-                    ['label' => 'Planning magasin', 'route' => '#']
-                ]
-            ],
-            // ======== Soumission commandes fournisseurs ========== 
-            [
-                'label' => 'Soumission commandes fournisseurs',
-                'route' => '#',
-            ],
-            // ======== Liste des non placées ========== 
-            [
-                'label' => 'Liste des non placées',
-                'route' => '#',
-            ]
-        ];
-    }
-
-    protected function approSubmenu(): array
-    {
-        return [
-            // ======== Nouvelle DA ========== 
-            [
-                'label' => 'Nouvelle DA',
-                'route' => '#',
-            ],
-            // ======== Consultation des DA ========== 
-            [
-                'label' => 'Consultation des DA',
-                'route' => '#',
-            ],
-            // ======== Liste des commandes fournisseurs ========== 
-            [
-                'label' => 'Liste des commandes fournisseurs',
-                'route' => '#',
-            ],
-        ];
-    }
-
-    protected function itSubmenu(): array
-    {
-        return [
-            // ======== Nouvelle demande ========== 
-            [
-                'label' => 'Nouvelle demande',
-                'route' => '#',
-            ],
-            // ======== Consultation ========== 
-            [
-                'label' => 'Consultation',
-                'route' => '#',
-            ],
-            // ======== Planning ========== 
-            [
-                'label' => 'Planning',
-                'route' => '#',
-            ],
-        ];
-    }
-
-    protected function polSubmenu(): array
-    {
-        return [
-            // ======== Nouvelle DLUB ========== 
-            [
-                'label' => 'Nouvelle DLUB',
-                'route' => '#',
-            ],
-            // ======== Consultation DLUB ========== 
-            [
-                'label' => 'Consultation DLUB',
-                'route' => '#',
-            ],
-            // ======== Liste des commandes fournisseur ========== 
-            [
-                'label' => 'Liste des commandes fournisseur',
-                'route' => '#',
-            ],
-            // ======== Pneumatiques ========== 
-            [
-                'label' => 'Pneumatiques',
-                'route' => '#',
-            ],
-        ];
-    }
-
-    protected function energieSubmenu(): array
-    {
-        return [
-            // ======== Rapport de production centrale ========== 
-            [
-                'label' => 'Rapport de production centrale',
-                'route' => '#',
-            ]
-        ];
-    }
-
-    protected function hseSubmenu(): array
-    {
-        return [
-            // ======== Rapport d'incident ========== 
-            [
-                'label' => 'Rapport d\'incident',
-                'route' => '#',
-            ],
-            // ======== Documentation ========== 
-            [
-                'label' => 'Documentation',
-                'route' => '#',
-            ]
-        ];
-    }
-
-    protected function accueilSubmenu(): array
+    protected function hfSubmenu(): array
     {
         return array_filter([
             /** =============== Documentation ===================== */
             [
                 'label' => 'documentation',
+                'icon' => 'fas fa-book',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('Documentation', $this->documentationSubmenu())
             ],
             /** ======== Reporting ========== */
             [
                 'label' => 'Reporting',
+                'icon' => 'fas fa-chart-line',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('Reporting', $this->reportingSubmenu())
             ],
             /** ======== Compta ========== */
             [
                 'label' => 'Compta',
+                'icon' => 'fas fa-file-invoice-dollar',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('Compta', $this->comptaSubmenu())
             ],
             /** ======== RH ========== */
             [
                 'label' => 'rh',
+                'icon' => 'fas fa-users',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('RH', $this->rhSubmenu())
             ],
             /** ======== Matériel ========== */
             [
                 'label' => 'Matériel',
+                'icon' => 'fas fa-truck-pickup',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('Matériel', $this->materielSubmenu())
             ],
             /** ======== Atelier ========== */
             [
                 'label' => 'Atelier',
+                'icon' => 'fas fa-tools',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('Atelier', $this->atelierSubmenu())
             ],
             /** ======== Magasin ========== */
             [
                 'label' => 'Magasin',
+                'icon' => 'fas fa-warehouse',
                 'route' => null, // C'est un conteneur de sous-menu
-                'submenu' => $this->filterSubmenuByPermissions('Magasin', $this->magainSubmenu())
+                'submenu' => $this->filterSubmenuByPermissions('Magasin', $this->magasinSubmenu())
             ],
             /** ======== Appro ========== */
             [
                 'label' => 'Appro',
+                'icon' => 'fas fa-shopping-basket',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('Appro', $this->approSubmenu())
             ],
             /** ======== IT ========== */
             [
                 'label' => 'IT',
+                'icon' => 'fas fa-laptop',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('IT', $this->itSubmenu())
             ],
             /** ======== POL ========== */
             [
                 'label' => 'POL',
+                'icon' => 'fas fa-gas-pump',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('POL', $this->polSubmenu())
             ],
             /** ======== Energie ========== */
             [
                 'label' => 'Energie',
+                'icon' => 'fas fa-bolt',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('Energie', $this->energieSubmenu())
             ],
             /** ======== HSE ========== */
             [
                 'label' => 'HSE',
+                'icon' => 'fas fa-hard-hat',
                 'route' => null, // C'est un conteneur de sous-menu
                 'submenu' => $this->filterSubmenuByPermissions('HSE', $this->hseSubmenu())
             ],

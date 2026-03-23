@@ -1,0 +1,57 @@
+PHPUnit 9.5.28 by Sebastian Bergmann and contributors.
+
+  Warning - The configuration file did not pass validation!
+  The following problems have been detected:
+
+  Line 37:
+  - Element 'extensions': Missing child element(s). Expected is ( extension ).
+
+  Test results may not be as expected.
+
+
+Testing App\Tests\Integration\Database\DatabaseConnectionTest
+.[41;37mF[0m                                                                  2 / 2 (100%)
+
+Time: 00:31.653, Memory: 72.00 MB
+
+There was 1 failure:
+
+1) App\Tests\Integration\Database\DatabaseConnectionTest::testSpecificRecordExists
+Erreur SQL : L'enregistrement id=82 n'a pas été trouvé (ce n'est pas forcément une erreur critique).
+
+D:\hff_symfony_5\tests\Integration\Database\DatabaseConnectionTest.php:74
+
+[37;41mFAILURES![0m
+[37;41mTests: 2[0m[37;41m, Assertions: 3[0m[37;41m, Failures: 1[0m[37;41m.[0m
+
+[41;37mRemaining self deprecation notices (1)[0m
+
+  1x: Method "Doctrine\Common\DataFixtures\FixtureInterface::load()" might add "void" as a native return type declaration in the future. Do the same in implementation "App\DataFixtures\Hf\Rh\dom\CategorieFixtures" now to avoid errors or add an explicit @return annotation to suppress this message.
+    1x in DatabaseConnectionTest::setUp from App\Tests\Integration\Database
+
+[41;37mRemaining direct deprecation notices (5)[0m
+
+  2x: The "url" connection parameter is deprecated. Please use Doctrine\DBAL\Tools\DsnParser to parse a database url before calling Doctrine\DBAL\DriverManager. (DriverManager.php:262 called by DriverManager.php:173, https://github.com/doctrine/dbal/pull/5843, package doctrine/dbal)
+    1x in DatabaseConnectionTest::testDatabaseConnection from App\Tests\Integration\Database
+    1x in DatabaseConnectionTest::testSpecificRecordExists from App\Tests\Integration\Database
+
+  2x: Not configuring a schema manager factory is deprecated. Use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory which is going to be the default in DBAL 4. (Connection.php:232 called by DriverManager.php:197, https://github.com/doctrine/dbal/issues/5812, package doctrine/dbal)
+    1x in DatabaseConnectionTest::testDatabaseConnection from App\Tests\Integration\Database
+    1x in DatabaseConnectionTest::testSpecificRecordExists from App\Tests\Integration\Database
+
+  1x: Public access to Connection::connect() is deprecated. (Connection.php:375 called by DatabaseConnectionTest.php:31, https://github.com/doctrine/dbal/issues/4966, package doctrine/dbal)
+    1x in DatabaseConnectionTest::testDatabaseConnection from App\Tests\Integration\Database
+
+[43;30mRemaining indirect deprecation notices (2)[0m
+
+  1x: Since symfony/framework-bundle 5.4: Not setting the "framework.messenger.reset_on_message" configuration option is deprecated, it will default to "true" in version 6.0.
+    1x in DatabaseConnectionTest::setUp from App\Tests\Integration\Database
+
+  1x: Since api-platform/core 2.7: The Doctrine annotation ApiPlatform\Core\Annotation\ApiResource is deprecated, use the PHP attribute ApiPlatform\Metadata\ApiResource instead.
+    1x in DatabaseConnectionTest::setUp from App\Tests\Integration\Database
+
+[41;37mOther deprecation notices (1)[0m
+
+  1x: In ORM 3.0, the AttributeDriver will report fields for the classes where they are declared. This may uncover invalid mapping configurations. To opt into the new mode also with the AnnotationDriver today, set the "reportFieldsWhereDeclared" constructor parameter to true. (AnnotationDriver.php:79 called by App_KernelTestDebugContainer.php:3735, https://github.com/doctrine/orm/pull/10455, package doctrine/orm)
+    1x in DatabaseConnectionTest::setUp from App\Tests\Integration\Database
+

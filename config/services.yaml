@@ -11,16 +11,21 @@ imports:
 parameters:
   app.timezone: 'Etc/GMT-3'
   env(LDAP_HOST): "192.168.0.1"
-  env(LDAP_SEARCH_DN): "%env(resolve:LDAP_SEARCH_DN)%"
-  env(LDAP_SEARCH_PASSWORD): "%env(resolve:LDAP_SEARCH_PASSWORD)%"
   documents_directory: '%kernel.project_dir%/public/uploads'
   docuware_directory: 'C:\DOCUWARE'
+  app.constructeurs.pieces_magasin: '%env(resolve:APP_CONSTRUCTEURS_PIECES_MAGASIN)%'
+  app.constructeurs.pieces_magasin_sans_cat: '%env(resolve:APP_CONSTRUCTEURS_PIECES_MAGASIN_SANS_CAT)%'
+  app.constructeurs.achat_locaux: '%env(resolve:APP_CONSTRUCTEURS_ACHAT_LOCAUX)%'
+  app.constructeurs.lub: '%env(resolve:APP_CONSTRUCTEURS_LUB)%'
+  app.constructeurs.pneumatique: '%env(resolve:APP_CONSTRUCTEURS_PNEUMATIQUE)%'
 
 services:
   # default configuration for services in *this* file
   _defaults:
     autowire: true # Automatically injects dependencies in your services.
     autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    bind:
+      $projectDir: '%kernel.project_dir%'
 
   # makes classes in src/ available to be used as services
   # this creates a service per class whose id is the fully-qualified class name
@@ -70,6 +75,16 @@ services:
       $searchDn: "%env(resolve:LDAP_SEARCH_DN)%"
       $searchPassword: "%env(resolve:LDAP_SEARCH_PASSWORD)%"
 
+  App\Security\ApiJsonAuthenticator:
+    arguments:
+      $ldap: '@Symfony\Component\Ldap\Ldap'
+      $userProvider: '@App\Security\LdapUserProvider'
+      $searchDn: "%env(resolve:LDAP_SEARCH_DN)%"
+      $searchPassword: "%env(resolve:LDAP_SEARCH_PASSWORD)%"
+      $baseDn: "DC=fraise,DC=hff,DC=mg"
+      $uidKey: "sAMAccountName"
+      $successHandler: '@App\Security\JwtAuthenticationSuccessHandler'
+
   # extension twig pour l'asset des images
   App\Twig\WebpackAssetExtension:
     tags: [ "twig.extension" ]
@@ -83,9 +98,7 @@ services:
     class: Parsedown
     public: true
 
-  App\Service\Hf\Rh\Dom\DomPdfService:
-    arguments:
-      $projectDir: '%kernel.project_dir%'
+
 
   App\Logger\UserProcessor:
     tags:
@@ -117,3 +130,7 @@ services:
   App\EventListener\CreatedByListener:
     tags:
       - { name: doctrine.event_listener, event: prePersist }
+
+  App\Controller\DocumentationController:
+    arguments:
+      $projectDir: '%kernel.project_dir%'

@@ -16,16 +16,13 @@
 }
 
 html {
-  height: 100%;
-  overflow-y: scroll;
+  scroll-behavior: smooth;
 }
 
 body {
-  overflow-x: hidden;
   background-color: #f8f9fa;
   font-family: "Noto Sans Nandinagari", sans-serif;
   font-size: 0.6875rem;
-  height: 100%;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -39,6 +36,18 @@ main {
   min-height: 90%;
   display: flex;
   flex-direction: column;
+}
+
+.main-header-sticky {
+  z-index: 1040; // Plus haut que les autres éléments collants
+  background-color: #f8f9fa !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+// Variables pour les décalages sticky (calculées dynamiquement via le contrôleur Stimulus)
+:root {
+  --header-main-offset: 0;
+  --table-header-offset: 150px;
 }
 
 .content {
@@ -207,14 +216,16 @@ label {
   padding: 0.5rem 1rem;
   display: flex;
   align-items: center;
-  color: #dee2e6; /* Couleur de texte claire pour le thème sombre */
+  color: #dee2e6;
+  /* Couleur de texte claire pour le thème sombre */
   border-radius: 0.25rem;
   transition: all 0.2s ease;
   margin: 0.15rem 0;
 }
 
 .dropdown-item:hover {
-  background-color: #fdc714 !important; /* Orange vif */
+  background-color: #fdc714 !important;
+  /* Orange vif */
   color: #000 !important;
   font-weight: bold;
   transform: translateX(3px);
@@ -229,9 +240,11 @@ label {
   0% {
     transform: translateX(0);
   }
+
   50% {
     transform: translateX(3px);
   }
+
   100% {
     transform: translateX(0);
   }
@@ -240,7 +253,8 @@ label {
 .dropdown-hover .dropdown-menu {
   display: none;
   position: absolute;
-  top: 100%; /* juste en dessous du lien */
+  top: 100%;
+  /* juste en dessous du lien */
   left: 0;
   z-index: 1000;
   background: white;

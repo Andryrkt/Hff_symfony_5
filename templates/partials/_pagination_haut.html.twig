@@ -1,16 +1,9 @@
+{% import "macros/actions.html.twig" as actions %}
+
 <div
 	class="d-flex justify-content-between">
 	{# Boutons d'actions #}
-	<div>
-		{% for button in buttons %}
-			<a href="{{ button.href == '#' ? '#' : path(button.href) }}" class="btn btn-sm {{ button.class }} text-white my-3 fw-bold" {% if button.tooltip %} data-bs-toggle="tooltip" title="{{ button.tooltip }}" {% endif %}>
-				{% if button.icon %}
-					<i class="{{ button.icon }}"></i>
-				{% endif %}
-				{{ button.text }}
-			</a>
-		{% endfor %}
-	</div>
+	{{ actions.action_buttons(buttons) }}
 
 	{# Informations de résultats #}
 	<div>
@@ -29,14 +22,17 @@
 	</div>
 
 	{# Sélecteur de limite de pagination #}
-	<div class="p-3">
-		<label for="limit-selector" class="form-label">Résultats par page :</label>
-		<select id="limit-selector" class="form-select form-select-sm" style="width: auto; display: inline-block;">
+	<div class="p-3 d-flex align-items-center">
+		<label for="limit-selector" class="form-label me-2 mb-0">Résultats par page :</label>
+		<select id="limit-selector" class="form-select form-select-sm" style="width: auto;">
 			<option value="10" {{ (queryParams.limit ?? 50) == 10 ? 'selected' : '' }}>10</option>
 			<option value="25" {{ (queryParams.limit ?? 50) == 25 ? 'selected' : '' }}>25</option>
 			<option value="50" {{ (queryParams.limit ?? 50) == 50 ? 'selected' : '' }}>50</option>
 			<option value="100" {{ (queryParams.limit ?? 50) == 100 ? 'selected' : '' }}>100</option>
 		</select>
+		<div id="limit-loading" class="ms-2 d-none">
+			<i class="fas fa-spinner fa-spin text-primary"></i>
+		</div>
 	</div>
 
 	{# Navigation de pagination #}
@@ -72,13 +68,3 @@
 		{% endif %}
 	</div>
 </div>
-
-
-<script>
-	document.getElementById('limit-selector').addEventListener('change', function () {
-const currentUrl = new URL(window.location.href);
-currentUrl.searchParams.set('limit', this.value);
-currentUrl.searchParams.set('page', '1'); // Reset to page 1 when changing limit
-window.location.href = currentUrl.toString();
-});
-</script>

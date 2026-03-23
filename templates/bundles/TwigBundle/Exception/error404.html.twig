@@ -7,7 +7,7 @@
 {% block nav %}{% endblock %}
 
 {% block stylesheets %}
-    {{ encore_entry_link_tags('app') }}
+	{{ encore_entry_link_tags('app') }}
 {% endblock %}
 
 
@@ -25,7 +25,7 @@
 			</div>
 			<h2>Page non trouvée</h2>
 			<p>La page que vous recherchez a peut-être été supprimée, renommée ou est temporairement indisponible.</p>
-			<a href="{{ path("app_home") }}">
+			<a href="{{ path("home_index") }}">
 				<i class="fas fa-arrow-left-long pe-2"></i>
 				Accueil
 			</a>
@@ -33,4 +33,4 @@
 	</div>
 {% endblock %}
 
-{% block javascript %}{% endblock %} 
+{% block javascript %}{% endblock %}

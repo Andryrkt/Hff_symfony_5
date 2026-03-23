@@ -8,18 +8,43 @@
 @use "components/sortable_header";
 @use "components/dropdown-grid";
 @use "components/breadcrumb";
+@use "components/spinner";
 @use "components/navbar_hover_dropdown";
 @use "components/custom-dropdown";
-@import "./pages/erreur/erreur.css";
-/* @import "./accueil.scss"; */
+@use "components/autocomplete";
+@use "components/table-sticky";
+@use "components/dropzone";
+@use "./pages/erreur/erreur.css";
+@use "./pages/dit_liste.scss";
+/* @use "./accueil.scss"; */
 
 /* ===== IMPORTS ===== */
 @import "~bootstrap/dist/css/bootstrap.min.css";
 @import "~tom-select/dist/css/tom-select.bootstrap5.css";
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Nandinagari&display=swap");
 
 .enteteAccordion {
   background-color: #fbbb01 !important;
   color: #212529 !important;
   font-size: 0.75rem !important;
 }
+
+turbo-frame[busy] {
+  opacity: 0.7;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+/* 
+@keyframes pulseBlur {
+  0%,
+  100% {
+    filter: blur(2px) grayscale(15%);
+    opacity: 0.85;
+  }
+
+  50% {
+    filter: blur(4px) grayscale(25%);
+    opacity: 0.75;
+  }
+}
+*/

@@ -65,7 +65,7 @@ class Service
     private $agences;
 
     /**
-     * @ORM\OneToMany(targetEntity=Dom::class, mappedBy="serviceDebiteur")
+     * @ORM\OneToMany(targetEntity="App\Entity\Hf\Rh\Dom\Dom", mappedBy="serviceDebiteur")
      */
     private $domServiceDebiteur;
 
@@ -202,7 +202,7 @@ class Service
         return $this->domServiceDebiteur;
     }
 
-    public function addDomServiceDebiteur(Dom $domServiceDebiteur): self
+    public function addDomServiceDebiteur(\App\Entity\Hf\Rh\Dom\Dom $domServiceDebiteur): self
     {
         if (!$this->domServiceDebiteur->contains($domServiceDebiteur)) {
             $this->domServiceDebiteur[] = $domServiceDebiteur;
@@ -212,7 +212,7 @@ class Service
         return $this;
     }
 
-    public function removeDomServiceDebiteur(Dom $domServiceDebiteur): self
+    public function removeDomServiceDebiteur(\App\Entity\Hf\Rh\Dom\Dom $domServiceDebiteur): self
     {
         if ($this->domServiceDebiteur->removeElement($domServiceDebiteur)) {
             // set the owning side to null (unless already changed)

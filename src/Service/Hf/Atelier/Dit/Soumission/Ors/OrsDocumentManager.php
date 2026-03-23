@@ -1,0 +1,162 @@
+<?php
+
+namespace App\Service\Hf\Atelier\Dit\Soumission\Ors;
+
+use App\Constants\Admin\Historisation\TypeDocumentConstants;
+use App\Constants\Admin\Historisation\TypeOperationConstants;
+use App\Dto\Hf\Atelier\Dit\Soumission\Ors\OrsDto;
+use App\Service\Hf\Atelier\Dit\Soumission\Ors\OrsGenerateFileNameService;
+use App\Service\Historique_operation\HistoriqueOperationService;
+use App\Service\Utils\Fichier\TraitementDeFichier;
+use App\Service\Utils\Fichier\UploderFileService;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
+
+class OrsDocumentManager
+{
+    private ParameterBagInterface $params;
+    private HistoriqueOperationService $historiqueOperationService;
+    private LoggerInterface $logger;
+
+
+    public function __construct(
+        ParameterBagInterface $params,
+        HistoriqueOperationService $historiqueOperationService,
+        LoggerInterface $ditCreationLogger
+    ) {
+        $this->params = $params;
+        $this->historiqueOperationService = $historiqueOperationService;
+        $this->logger = $ditCreationLogger;
+    }
+
+    /**
+     * Prépare tout le processus documentaire (Upload, PDF)
+     * Retourne les informations du fichier final pour un archivage ultérieur.
+     */
+    public function prepareDocuments(FormInterface $form, OrsPdfService $pdfService, OrsDto $dto): array
+    {
+        // 1. Sauvegarde des fichiers uploadés
+        [$uploadedFilesPaths, $uploadedFileNames, $finalPdfPath, $finalPdfName] = $this->saveUploadedFiles($form, $dto);
+
+        // 2. Génération du PDF principal (page de garde)
+        $pdfService->genererPDF($dto, $finalPdfPath);
+
+        // 3. Fusion des fichiers (PDF principal + pièces jointes)
+        $this->mergeFiles($dto, $uploadedFilesPaths, $finalPdfPath);
+
+        return [
+            'path' => $finalPdfPath,
+            'name' => $finalPdfName
+        ];
+    }
+
+    /**
+     * Archive le document vers Docuware
+     */
+    public function archiveToDocuware(OrsDto $orsDto, OrsPdfService $pdfService, string $finalPdfPath, string $finalPdfName): void
+    {
+        $docuwarePath = $this->params->get('docuware_directory') . '/OR/' . $finalPdfName;
+
+        $success = false;
+        $message = 'Copie vers Docuware.';
+        try {
+            $pdfService->copyToDW($docuwarePath, $finalPdfPath);
+            $success = true;
+            $message = 'Copie vers Docuware réussie.';
+            $this->logger->info($message, ['numero_ors' => $orsDto->numeroOr]);
+        } catch (\Exception $e) {
+            $message = 'Erreur lors de la copie vers Docuware : ' . $e->getMessage();
+            $this->logger->error($message, ['numero_ors' => $orsDto->numeroOr, 'exception' => $e]);
+            throw $e;
+        } finally {
+            $this->historiqueOperationService->enregistrer(
+                $orsDto->numeroOr,
+                TypeOperationConstants::TYPE_OPERATION_DW_COPY_NAME,
+                TypeDocumentConstants::TYPE_DOCUMENT_OR_CODE,
+                $success,
+                $message
+            );
+        }
+    }
+
+    private function saveUploadedFiles(FormInterface $form, OrsDto $orsDto): array
+    {
+        $numero = $orsDto->numeroDit;
+        $numeroOr = $orsDto->numeroOr;
+        $numeroVersion = $orsDto->numeroVersion;
+        $suffix = $orsDto->suffix;
+
+        $nameGenerator = new OrsGenerateFileNameService();
+        $mainPath = $this->params->get('documents_directory') . '/dit';
+        $uploader = new UploderFileService($mainPath, $nameGenerator);
+        $path = $mainPath . '/' . $numero . '/';
+
+        if (!is_dir($path)) {
+            mkdir($path, 0777, true);
+        }
+
+        $success = false;
+        $message = 'Upload des fichiers.';
+        $uploadedFilesPaths = [];
+        $uploadedFileNames = [];
+        try {
+            [$uploadedFilesPaths, $uploadedFileNames] = $uploader->getFichiers($form, [
+                'repertoire' => $path,
+                'generer_nom_callback' => function (UploadedFile $file, int $index) use ($nameGenerator, $numeroOr, $numeroVersion) {
+                    return $nameGenerator->generateFileUplodeName($file, $numeroOr, $numeroVersion, $index);
+                }
+            ]);
+            $success = true;
+            $message = 'Upload des fichiers réussi : ' . (empty($uploadedFileNames) ? 'aucun fichier' : implode(', ', $uploadedFileNames));
+            $this->logger->info($message, ['numero_or' => $numeroOr]);
+        } catch (\Throwable $e) {
+            $message = 'Erreur lors de l\'upload des fichiers : ' . $e->getMessage();
+            $this->logger->error($message, ['numero_or' => $numeroOr, 'exception' => $e]);
+            throw $e;
+        } finally {
+            $this->historiqueOperationService->enregistrer(
+                $numeroOr,
+                TypeOperationConstants::TYPE_OPERATION_FILE_UPLOAD_NAME,
+                TypeDocumentConstants::TYPE_DOCUMENT_OR_CODE,
+                $success,
+                $message
+            );
+        }
+
+        $finalPdfName = $nameGenerator->generateMainName($numeroOr, $numeroVersion, $suffix);
+        $finalPdfPath = $path . $finalPdfName;
+
+        return [$uploadedFilesPaths, $uploadedFileNames, $finalPdfPath, $finalPdfName];
+    }
+
+    private function mergeFiles(OrsDto $orsDto, array $uploadedFilesPaths, string $finalPdfPath): void
+    {
+        $success = false;
+        $message = 'Fusion des fichiers.';
+        $numeroOr = $orsDto->numeroOr;
+        try {
+            $fileProcessor = new TraitementDeFichier();
+            $filesToMerge = $fileProcessor->insertFileAtPosition($uploadedFilesPaths, $finalPdfPath, 0);
+
+            $fileProcessor->fusionFichers($filesToMerge, $finalPdfPath);
+            $success = true;
+            $message = 'Fusion des fichiers réussie.';
+            $this->logger->info($message, ['numero_or' => $numeroOr]);
+        } catch (\Exception $e) {
+            $message = 'Erreur lors de la fusion des fichiers : ' . $e->getMessage();
+            $this->logger->error($message, ['numero_or' => $numeroOr, 'exception' => $e]);
+            throw $e;
+        } finally {
+            $this->historiqueOperationService->enregistrer(
+                $numeroOr,
+                TypeOperationConstants::TYPE_OPERATION_FILE_MERGE_NAME,
+                TypeDocumentConstants::TYPE_DOCUMENT_OR_CODE,
+                $success,
+                $message
+            );
+        }
+    }
+}

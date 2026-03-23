@@ -1,0 +1,28 @@
+{# 
+    Partial: Légende des statuts
+    Variables acceptées:
+    - items (array): Liste d'objets {color: 'info', label: 'Mon texte', icon: 'fa-circle'}
+#}
+
+{% set default_items = [
+    {color: 'info', label: 'Partiellement dispo'},
+    {color: 'primary', label: 'Complet non livré'},
+    {color: 'warning', label: 'Partiellement livré'},
+    {color: 'success', label: 'Tout livré'}
+] %}
+
+{% set items = items|default(default_items) %}
+
+<div class="col-12 col-md-auto my-2 my-md-3">
+	<div class="d-flex flex-wrap align-items-center gap-2">
+		{% for item in items %}
+			<span class="d-flex align-items-center gap-1">
+				<i class="fa-solid {{ item.icon|default('fa-circle') }} text-{{ item.color }}"></i>
+				<small class="text-{{ item.color }}">{{ item.label }}</small>
+			</span>
+			{% if not loop.last %}
+				<span class="text-muted d-none d-md-inline">|</span>
+			{% endif %}
+		{% endfor %}
+	</div>
+</div>

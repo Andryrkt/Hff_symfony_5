@@ -13,10 +13,10 @@ class FirstFormDto implements ArrayAccess
     #[Assert\NotBlank]
     public $serviceUser;
     #[Assert\NotBlank]
-    public ?SousTypeDocument $typeMission = null;
+    public ?int $typeMissionId = null;
     #[Assert\Choice(['PERMANENT', 'TEMPORAIRE'])]
     public string $salarier = 'PERMANENT';
-    public $categorie;
+    public ?int $categorieId = null;
     public $matricule;
     public $matriculeNom;
     public ?string $cin = null;

@@ -16,14 +16,14 @@ class HomeBreadcrumbBuilder implements BreadcrumbBuilderInterface
 
     public function supports(string $context): bool
     {
-        return in_array($context, ['home', 'app_home']);
+        return in_array($context, ['home', 'home_index']);
     }
 
     public function build(array $parameters = []): array
     {
         return $this->breadcrumb
             ->clear()
-            ->add('Accueil', 'app_home')
+            ->add('Accueil', 'home_index')
             ->get();
     }
 }

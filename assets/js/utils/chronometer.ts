@@ -32,21 +32,21 @@ export class ChronometerManager {
     private updateChrono(): void {
         this.timeRemaining--;
 
-        // Calculer le pourcentage de progression
-        const progressPercentage = (this.timeRemaining / this.totalTime) * 100;
+        // Calculer la progression (pourcentage inversé pour stroke-dashoffset)
+        const circumference = 282.74;
+        const progressPercentage = (this.timeRemaining / this.totalTime);
+        const offset = circumference * (1 - progressPercentage);
 
         if (this.chronoProgress) {
-            this.chronoProgress.style.width = `${progressPercentage}%`;
+            this.chronoProgress.style.strokeDashoffset = offset.toString();
 
             // Logique des couleurs
             this.chronoProgress.classList.remove('warning', 'danger');
-            if (progressPercentage > 50) {
-                this.chronoProgress.style.backgroundColor = '#4caf50'; // Vert
-            } else if (progressPercentage > 20) {
-                this.chronoProgress.style.backgroundColor = '#ff9800'; // Orange
+            if (progressPercentage > 0.5) {
+                // Vert par défaut
+            } else if (progressPercentage > 0.2) {
                 this.chronoProgress.classList.add('warning');
             } else {
-                this.chronoProgress.style.backgroundColor = '#f44336'; // Rouge
                 this.chronoProgress.classList.add('danger');
             }
         }

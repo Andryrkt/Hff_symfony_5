@@ -2,7 +2,6 @@
 
 namespace App\Tests\Functional\Controller\Rh\Dom\Creation;
 
-use App\Tests\BaseTestCase;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use App\Entity\Admin\PersonnelUser\User;
 use App\Repository\Admin\PersonnelUser\UserRepository;
@@ -28,8 +27,18 @@ class DomFirstControllerTest extends WebTestCase
         $container = $this->client->getContainer();
         $userRepository = $container->get(UserRepository::class);
 
-        // Fallback: prendre le premier utilisateur de la base
-        $user = $userRepository->findOneBy([]);
+        // On recherche un utilisateur avec le rôle ADMIN pour s'assurer qu'il a les droits
+        $user = $userRepository->createQueryBuilder('u')
+            ->where('u.roles LIKE :role')
+            ->setParameter('role', '%"ROLE_ADMIN"%')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if (!$user) {
+            // Si aucun admin n'est trouvé, on prend le premier utilisateur, mais le test risque d'être skippé
+            $user = $userRepository->findOneBy([]);
+        }
 
         if (!$user) {
             throw new \RuntimeException('Aucun utilisateur trouvé en base de données.');
@@ -38,12 +47,20 @@ class DomFirstControllerTest extends WebTestCase
         return $user;
     }
 
+    /**
+     * Teste que l'accès au formulaire est refusé pour un utilisateur non authentifié.
+     * L'utilisateur doit être redirigé vers la page de connexion.
+     */
     public function testAccessDeniedAnonymous(): void
     {
         $this->client->request('GET', '/rh/ordre-de-mission/dom-first-form');
         self::assertResponseRedirects('/login');
     }
 
+    /**
+     * Teste l'affichage du premier formulaire pour un utilisateur authentifié et autorisé.
+     * Vérifie que la réponse est réussie et que le formulaire est bien présent dans la page.
+     */
     public function testDisplayFirstForm(): void
     {
         $user = $this->getAuthorizedUser();
@@ -61,6 +78,11 @@ class DomFirstControllerTest extends WebTestCase
         // self::assertSelectorTextContains('h3', 'Ordre de mission'); 
     }
 
+    /**
+     * Teste la soumission réussie du premier formulaire.
+     * Vérifie que l'utilisateur est redirigé vers le second formulaire
+     * et que les données du formulaire sont bien stockées en session.
+     */
     public function testSubmitFirstFormSuccessfully(): void
     {
         $user = $this->getAuthorizedUser();
@@ -76,9 +98,9 @@ class DomFirstControllerTest extends WebTestCase
 
         // Remplissage du formulaire
         $form['first_form[nom]'] = 'TestNom';
-        $form['first_form[prenoms]'] = 'TestPrenoms';
+        $form['first_form[prenom]'] = 'TestPrenom';
         $form['first_form[cin]'] = '123456789';
-        $form['first_form[salarier]'] = 'PERMANENT';
+        $form['first_form[salarier]'] = 'TEMPORAIRE';
 
         // Soumission
         $this->client->submit($form);
@@ -86,7 +108,7 @@ class DomFirstControllerTest extends WebTestCase
         self::assertResponseRedirects('/rh/ordre-de-mission/dom-second-form');
 
         // Vérification de la session
-        $session = self::getContainer()->get('session');
+        $session = $this->client->getContainer()->get('session');
         self::assertNotNull($session->get('dom_first_form_data'));
     }
 }

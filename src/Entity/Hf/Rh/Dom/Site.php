@@ -40,7 +40,7 @@ class Site
     private $indemnites;
 
     /**
-     * @ORM\OneToMany(targetEntity=Dom::class, mappedBy="siteId")
+     * @ORM\OneToMany(targetEntity="App\Entity\Hf\Rh\Dom\Dom", mappedBy="siteId")
      */
     private $doms;
 
@@ -98,14 +98,14 @@ class Site
     }
 
     /**
-     * @return Collection<int, Dom>
+     * @return Collection<int, \App\Entity\Hf\Rh\Dom\Dom>
      */
     public function getDoms(): Collection
     {
         return $this->doms;
     }
 
-    public function addDom(Dom $dom): self
+    public function addDom(\App\Entity\Hf\Rh\Dom\Dom $dom): self
     {
         if (!$this->doms->contains($dom)) {
             $this->doms[] = $dom;
@@ -115,7 +115,7 @@ class Site
         return $this;
     }
 
-    public function removeDom(Dom $dom): self
+    public function removeDom(\App\Entity\Hf\Rh\Dom\Dom $dom): self
     {
         if ($this->doms->removeElement($dom)) {
             // set the owning side to null (unless already changed)

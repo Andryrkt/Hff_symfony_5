@@ -1,97 +1,104 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Test de Connexion LDAP{% endblock %}
+{% block title %}Test de Connexion LDAP
+{% endblock %}
 
 {% block body %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-12">
-            <h1 class="mb-4">🔍 Test de Connexion LDAP</h1>
-            
-            {% if results.status == 'SUCCESS' %}
-                <div class="alert alert-success">
-                    <h4 class="alert-heading">✅ Test réussi !</h4>
-                    <p>{{ results.message }}</p>
-                </div>
-            {% else %}
-                <div class="alert alert-danger">
-                    <h4 class="alert-heading">❌ Test échoué</h4>
-                    <p><strong>Erreur :</strong> {{ results.error }}</p>
-                    <p><strong>Fichier :</strong> {{ results.file }}:{{ results.line }}</p>
-                </div>
-            {% endif %}
+	<div class="container mt-5">
+		<div class="row">
+			<div class="col-md-12">
+				<h1 class="mb-4">🔍 Test de Connexion LDAP</h1>
 
-            <div class="card">
-                <div class="card-header">
-                    <h5>📋 Variables d'environnement</h5>
-                </div>
-                <div class="card-body">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Variable</th>
-                                <th>Valeur</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for key, value in results.env_vars %}
-                                <tr>
-                                    <td><code>{{ key }}</code></td>
-                                    <td>
-                                        {% if key == 'LDAP_SEARCH_PASSWORD' %}
-                                            <span class="text-muted">{{ value }}</span>
-                                        {% else %}
-                                            <code>{{ value }}</code>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+				{% if results.status == 'SUCCESS' %}
+					<div class="alert alert-success">
+						<h4 class="alert-heading">✅ Test réussi !</h4>
+						<p>{{ results.message }}</p>
+					</div>
+				{% else %}
+					<div class="alert alert-danger">
+						<h4 class="alert-heading">❌ Test échoué</h4>
+						<p>
+							<strong>Erreur :</strong>
+							{{ results.error }}</p>
+						<p>
+							<strong>Fichier :</strong>
+							{{ results.file }}:{{ results.line }}</p>
+					</div>
+				{% endif %}
 
-            {% if results.status == 'SUCCESS' %}
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h5>🧪 Résultats des Tests</h5>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-group list-group-flush">
-                            {% if results.bind_test is defined %}
-                                <li class="list-group-item">
-                                    <span class="badge bg-success me-2">✓</span>
-                                    {{ results.bind_test }}
-                                </li>
-                            {% endif %}
-                            
-                            {% if results.search_test is defined %}
-                                <li class="list-group-item">
-                                    <span class="badge bg-success me-2">✓</span>
-                                    {{ results.search_test }}
-                                </li>
-                            {% endif %}
-                            
-                            {% if results.user_search_test is defined %}
-                                <li class="list-group-item">
-                                    <span class="badge bg-success me-2">✓</span>
-                                    {{ results.user_search_test }}
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </div>
-                </div>
-            {% endif %}
+				<div class="card">
+					<div class="card-header">
+						<h5>📋 Variables d'environnement</h5>
+					</div>
+					<div class="card-body">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th>Variable</th>
+									<th>Valeur</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for key, value in results.env_vars %}
+									<tr>
+										<td>
+											<code>{{ key }}</code>
+										</td>
+										<td>
+											{% if key == 'LDAP_SEARCH_PASSWORD' %}
+												<span class="text-muted">{{ value }}</span>
+											{% else %}
+												<code>{{ value }}</code>
+											{% endif %}
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
 
-            <div class="mt-4">
-                <a href="{{ path('app_home') }}" class="btn btn-primary">
-                    <i class="fas fa-home me-2"></i>Retour à l'accueil
-                </a>
-                <a href="{{ path('test_ldap_connection') }}" class="btn btn-secondary">
-                    <i class="fas fa-redo me-2"></i>Réexécuter le test
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %} 
+				{% if results.status == 'SUCCESS' %}
+					<div class="card mt-4">
+						<div class="card-header">
+							<h5>🧪 Résultats des Tests</h5>
+						</div>
+						<div class="card-body">
+							<ul class="list-group list-group-flush">
+								{% if results.bind_test is defined %}
+									<li class="list-group-item">
+										<span class="badge bg-success me-2">✓</span>
+										{{ results.bind_test }}
+									</li>
+								{% endif %}
+
+								{% if results.search_test is defined %}
+									<li class="list-group-item">
+										<span class="badge bg-success me-2">✓</span>
+										{{ results.search_test }}
+									</li>
+								{% endif %}
+
+								{% if results.user_search_test is defined %}
+									<li class="list-group-item">
+										<span class="badge bg-success me-2">✓</span>
+										{{ results.user_search_test }}
+									</li>
+								{% endif %}
+							</ul>
+						</div>
+					</div>
+				{% endif %}
+
+				<div class="mt-4">
+					<a href="{{ path('home_index') }}" class="btn btn-primary">
+						<i class="fas fa-home me-2"></i>Retour à l'accueil
+					</a>
+					<a href="{{ path('test_ldap_connection') }}" class="btn btn-secondary">
+						<i class="fas fa-redo me-2"></i>Réexécuter le test
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

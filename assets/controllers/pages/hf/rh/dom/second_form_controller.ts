@@ -2,7 +2,6 @@ import { Controller } from "@hotwired/stimulus";
 import numeral from 'numeral';
 import axios, { AxiosError } from 'axios';
 import '@styles/pages/secondForm.scss';
-import { initAgenceServiceHandlers } from '@utils/AgenceServiceManager';
 import { applyInputRestrictions, debounce } from '@utils/form_utils';
 import { FORM_CONSTANTS } from '@config/formConstants';
 
@@ -27,17 +26,12 @@ interface IndemniteForfaitaireResponse {
 
 export default class extends Controller {
     connect() {
-        this.initAgenceServiceHandlers();
         this.initDateValidation();
         this.initIndemniteForfaitaireUpdate();
         this.initInputValidation();
         this.initModeLabelUpdate();
         this.initTotalCalculations();
         this.initEmployeeFieldSwitching();
-    }
-
-    initAgenceServiceHandlers() {
-        initAgenceServiceHandlers();
     }
 
     // --- Utilitaires de validation ---

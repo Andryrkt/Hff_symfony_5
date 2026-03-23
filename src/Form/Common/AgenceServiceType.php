@@ -14,6 +14,8 @@ use App\Entity\Admin\AgenceService\Service;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use App\Form\DataTransformer\EntityToIdTransformer;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class AgenceServiceType extends AbstractType
 {
@@ -25,6 +27,35 @@ class AgenceServiceType extends AbstractType
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        if ($options['render_type'] === 'hidden') {
+            $this->buildHiddenForm($builder, $options);
+        } else {
+            $this->buildSelectForm($builder, $options);
+        }
+    }
+
+    private function buildHiddenForm(FormBuilderInterface $builder, array $options): void
+    {
+        $agenceTransformer = new EntityToIdTransformer($this->em, Agence::class);
+        $serviceTransformer = new EntityToIdTransformer($this->em, Service::class);
+
+        $builder
+            ->add(
+                $builder->create('agence', HiddenType::class, [
+                    'required' => $options['agence_required'],
+                    'attr' => ['class' => $options['agence_class'] ?? 'light-agence-input'],
+                ])->addModelTransformer($agenceTransformer)
+            )
+            ->add(
+                $builder->create('service', HiddenType::class, [
+                    'required' => $options['service_required'],
+                    'attr' => ['class' => $options['service_class'] ?? 'light-service-input'],
+                ])->addModelTransformer($serviceTransformer)
+            );
+    }
+
+    private function buildSelectForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('agence', EntityType::class, [
@@ -41,7 +72,8 @@ class AgenceServiceType extends AbstractType
                     return $agence->getCode() . ' ' . $agence->getNom();
                 },
                 'placeholder' => $options['agence_placeholder'],
-                'required' => $options['agence_required']
+                'required' => $options['agence_required'],
+                'disabled' => $options['disabled']
             ]);
 
         // Pré-set data
@@ -72,7 +104,8 @@ class AgenceServiceType extends AbstractType
             },
             'placeholder' => $options['service_placeholder'],
             'choices' => $services,
-            'required' => $options['service_required']
+            'required' => $options['service_required'],
+            'disabled' => $options['disabled']
         ]);
     }
 
@@ -101,13 +134,33 @@ class AgenceServiceType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'render_type' => 'select', // 'select' or 'hidden'
             'agence_label' => "Agence",
             'agence_placeholder' => '-- Choisir une agence--',
             'agence_required' => false,
             'service_label' => "Service",
             'service_placeholder' => '-- Choisir un service--',
             'service_required' => false,
-            'agence_codes' => []
+            'agence_codes' => [],
+            // Options for hidden mode
+            'agence_class' => null,
+            'service_class' => null,
+            'disabled' => false,
         ]);
+    }
+
+    public function finishView(\Symfony\Component\Form\FormView $view, FormInterface $form, array $options): void
+    {
+        if ($options['render_type'] === 'hidden') {
+            $this->addSelectedLabel($view->children['agence'], $form->get('agence')->getData());
+            $this->addSelectedLabel($view->children['service'], $form->get('service')->getData());
+        }
+    }
+
+    private function addSelectedLabel(\Symfony\Component\Form\FormView $view, $data): void
+    {
+        if (is_object($data) && method_exists($data, 'getCode') && method_exists($data, 'getNom')) {
+            $view->vars['selected_label'] = $data->getCode() . ' ' . $data->getNom();
+        }
     }
 }

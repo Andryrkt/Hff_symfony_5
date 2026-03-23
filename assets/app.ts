@@ -11,12 +11,15 @@ import { StimulusAutoloader } from "./utils/stimulus-autoloader";
 
 // Import des styles et bibliothèques
 import "bootstrap";
+import "@hotwired/turbo";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "@fortawesome/fontawesome-free/js/all.min.js";
 import "./styles/app.scss";
 import "select2";
 import "select2/dist/css/select2.css";
 import "select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css";
+import Swal from "sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
 
 // Import des utilitaires
 import { ChronometerManager } from "./js/utils/chronometer";
@@ -24,6 +27,8 @@ import { SessionManager } from "./js/utils/session";
 import { SubmenuManager } from "./js/utils/submenuManager";
 import { ToastManager } from "./js/utils/toast";
 import { CustomDropdown } from "./js/utils/customDropdown";
+import { initPagination } from "./js/utils/pagination";
+import { initAgenceServiceHandlers } from "./js/utils/AgenceServiceManager";
 
 // Import des styles supplémentaires
 import './styles/home.css';
@@ -36,6 +41,10 @@ class App {
 
     constructor() {
         this.application = Application.start();
+
+        // Rendre SweetAlert2 disponible globalement
+        window.Swal = Swal;
+
         this.init();
     }
 
@@ -72,10 +81,14 @@ class App {
      * Initialise les gestionnaires
      */
     private initManagers(): void {
-        new ChronometerManager().init();
-        new SessionManager().init();
+        const chronometer = new ChronometerManager();
+        chronometer.init();
+
+        new SessionManager().init(chronometer);
         new ToastManager().init();
         new SubmenuManager().init();
+        initPagination();
+        initAgenceServiceHandlers();
     }
 
     /**
@@ -137,6 +150,7 @@ declare global {
         appInstance: any;
         $: any;
         Turbo: any;
+        Swal: typeof import('sweetalert2').default;
     }
 }
 

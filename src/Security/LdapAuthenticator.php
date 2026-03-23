@@ -92,7 +92,7 @@ class LdapAuthenticator extends AbstractAuthenticator implements AuthenticationE
 
     public function onAuthenticationSuccess(Request $request, $token, string $firewallName): ?\Symfony\Component\HttpFoundation\Response
     {
-        return new RedirectResponse($this->router->generate('app_home'));
+        return new RedirectResponse($this->router->generate('home_index'));
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): \Symfony\Component\HttpFoundation\Response

@@ -1,0 +1,27 @@
+{% set fileType = fileType ?? 'PDF' %}
+{% set class = fileType == 'EXCEL' ? 'text-success' : 'text-warning' %}
+{% set bgColor = fileType == 'EXCEL' ? 'bg-success' : 'bg-warning' %}
+<div class="dropzone-container mt-3">
+	<i class="fa fa-cloud-upload {{ class }} fs-1 mb-3"></i>
+	<br>
+	Glissez et déposez votre fichier
+	<b>{{ fileType }}</b>
+	ici, ou cliquez pour sélectionner un fichier
+	<b>{{ fileType }}</b>.
+	<br>
+	<button type="button" id="upload-btn-{{ id }}" class="btn btn-dropzone border border-none mt-3 fw-bold {{ bgColor }}">Sélectionner un fichier</button>
+</div>
+
+{{ form_widget(form[fieldName], {'attr': {'style': 'position: absolute; left: -9999px; opacity: 0;'}}) }}
+{{ form_errors(form[fieldName]) }}
+
+<!-- Conteneur pour afficher le nom du fichier -->
+<div class="d-flex align-items-center justify-content-between mt-2">
+	<div>
+		<div class="file-name" id="file-name-{{ id }}"></div>
+		<div class="file-size text-muted small" id="file-size-{{ id }}"></div>
+	</div>
+	<button type="button" id="remove-btn-{{ id }}" class="btn btn-sm btn-outline-danger d-none" title="Supprimer le fichier">
+		<i class="fas fa-trash"></i>
+	</button>
+</div>

@@ -1,0 +1,28 @@
+<!-- Modal Soumission Document -->
+<div class="modal fade" id="soumissionDocModal" tabindex="-1" aria-labelledby="soumissionDocModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header bg-warning">
+				<h5 class="modal-title fw-bold" id="soumissionDocModalLabel">Soumission document à valider
+					<span id="modalNumDit" class="fw-bold fs-3" data-pages--hf--atelier--dit--dit-list-target="modalNumDit"></span>
+				</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body mb-2">
+				<div class="container">
+					{{ form_start(soumissionForm, {'attr': {'data-turbo-frame': '_top'}}) }}
+					{{ form_row(soumissionForm.docDansDW) }}
+					{{ form_widget(soumissionForm.numeroDit, {'id': 'hiddenNumDit', 'attr': {'data-pages--hf--atelier--dit--dit-list-target': 'hiddenNumDit'}}) }}
+					{{ form_widget(soumissionForm.numeroOr, {'id': 'hiddenNumOr', 'attr': {'data-pages--hf--atelier--dit--dit-list-target': 'hiddenNumOr'}}) }}
+
+					<div class="d-flex justify-content-end mt-3">
+						<button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Annuler</button>
+						{% import "macros/actions.html.twig" as actions %}
+						{{ actions.submit_button('Suivant', 'fas fa-arrow-right', 'btn-info', false) }}
+					</div>
+					{{ form_end(soumissionForm) }}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

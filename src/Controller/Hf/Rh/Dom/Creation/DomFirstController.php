@@ -2,16 +2,15 @@
 
 namespace App\Controller\Hf\Rh\Dom\Creation;
 
-use App\Dto\Hf\Rh\Dom\FirstFormDto;
-use App\Factory\Hf\Rh\Dom\FirstFormDtoFactory;
-use App\Form\Hf\Rh\Dom\FirstFormType;
-use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use App\Factory\Hf\Rh\Dom\FirstFormDtoFactory;
+use App\Form\Hf\Rh\Dom\creation\FirstFormType;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * @Route("/rh/ordre-de-mission")
@@ -61,14 +60,22 @@ class DomFirstController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->logger->info('Premier formulaire soumis et valide.');
-            // 1. recupération des données du formulaire
-            $data = $form->getData();
 
-            $this->logger->debug('Données du formulaire', ['data' => $data]);
+            // 1. Récupération des données du formulaire
+            $dto = $form->getData();
 
-            // 2. stocage des donner dans le session
+            // Manually set IDs from unmapped fields
+            $typeMission = $form->get('typeMission')->getData();
+            $categorie = $form->get('categorie')->getData();
+
+            $dto->typeMissionId = $typeMission ? $typeMission->getId() : null;
+            $dto->categorieId = $categorie ? $categorie->getId() : null;
+
+            $this->logger->debug('Données du formulaire', ['data' => $dto]);
+
+            // 2. Stockage des données dans la session
             $session = $request->getSession();
-            $session->set('dom_first_form_data', $data);
+            $session->set('dom_first_form_data', $dto);
 
             // 3. Redirection vers le second formulaire
             return $this->redirectToRoute('dom_second_form');

@@ -1,13 +1,14 @@
 {% extends "base.html.twig"%}
 
 {% block title %}
-	Erreur {{ status_code }}
+	Erreur
+	{{ status_code }}
 {% endblock %}
 
 {% block nav %}{% endblock %}
 
 {% block stylesheets %}
-    {{ encore_entry_link_tags('app') }}
+	{{ encore_entry_link_tags('app') }}
 {% endblock %}
 
 {% block breadCrumb %}{% endblock %}
@@ -42,7 +43,8 @@
 								<div class="p-2 bg-light rounded mt-2">
 									<strong>Fichier :</strong><br>
 									<small class="text-muted">{{ exception.file }}</small><br>
-									<strong>Ligne :</strong> {{ exception.line }}
+									<strong>Ligne :</strong>
+									{{ exception.line }}
 								</div>
 							</div>
 							<div class="col-lg-6 col-md-12">
@@ -68,7 +70,7 @@
 					<p class="mt-3">Notre équipe technique a été notifiée et s'efforce de résoudre le problème.</p>
 				{% endif %}
 			</p>
-			<a href="{{ path("app_home") }}">
+			<a href="{{ path("home_index") }}">
 				<i class="fas fa-arrow-left-long pe-2"></i>
 				Accueil
 			</a>

@@ -22,18 +22,18 @@ class LegacyDataFetcher
     }
 
     /**
-     * Récupère le code Statut depuis l'ancienne base - Statut_demande
+     * Récupère la description Statut depuis l'ancienne base - Statut_demande
      */
-    public function getStatutDemandeCode(int $id): ?string
+    public function getStatutDemandeDescription(int $id): ?string
     {
         try {
             $result = $this->legacyConnection->fetchAssociative(
-                'SELECT Code_Statut FROM Statut_demande WHERE ID_Statut_Demande = :id',
+                'SELECT Description FROM Statut_demande WHERE ID_Statut_Demande = :id',
                 ['id' => $id]
             );
-            return $result['Code_Statut'] ?? null;
+            return $result['Description'] ?? null;
         } catch (\Exception $e) {
-            $this->logger->error('Erreur récupération code statut', [
+            $this->logger->error('Erreur récupération description statut', [
                 'id' => $id,
                 'error' => $e->getMessage(),
             ]);
@@ -123,6 +123,27 @@ class LegacyDataFetcher
                 'id' => $id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Récupère le nom d'utilisateur de l'ancienne base - users
+     * ex: lanto
+     */
+    public function getUserName(int $id): ?string
+    {
+        try {
+            $result = $this->legacyConnection->fetchAssociative(
+                'SELECT nom_utilisateur FROM users WHERE id = :id',
+                ['id' => $id]
+            );
+            return $result['nom_utilisateur'] ?? null;
+        } catch (\Exception $e) {
+            $this->logger->error('Erreur récupération du nom d\'utilisateur', [
+                'id' => $id,
+                'error' => $e->getMessage(),
             ]);
             return null;
         }
