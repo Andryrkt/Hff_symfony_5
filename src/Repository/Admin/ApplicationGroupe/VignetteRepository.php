@@ -54,8 +54,8 @@ class VignetteRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('v')
             ->select('PARTIAL v.{id, nom, description}')
-            ->where('v.nom = :nom')
-            ->setParameter('nom', $nom)
+            ->where('TRIM(v.nom) = :nom')
+            ->setParameter('nom', trim($nom))
             ->getQuery()
             ->getOneOrNullResult();
     }

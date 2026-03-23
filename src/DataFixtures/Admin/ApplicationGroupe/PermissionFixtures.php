@@ -14,7 +14,7 @@ class PermissionFixtures extends Fixture implements DependentFixtureInterface, F
     {
         return ['prod'];
     }
-    public function getDependencies()
+    public function getDependencies(): array
     {
         return [
             VignetteFixtures::class,

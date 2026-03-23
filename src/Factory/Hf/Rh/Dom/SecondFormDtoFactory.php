@@ -164,12 +164,12 @@ class SecondFormDtoFactory
         $dto->pieceJoint01 = $dom->getPieceJoint01();
         $dto->pieceJoint02 = $dom->getPieceJoint02();
         $dto->numeroOrdreMission = $dom->getNumeroOrdreMission();
-        // $dto->mailUser = $user->getEmail();
+        $dto->mailUser = $user->getEmail();
 
         $dto->agenceUser = $agenceEmetteur ? ($agenceEmetteur->getCode() . ' ' . $agenceEmetteur->getNom()) : '';
         $dto->serviceUser = $serviceEmetteur ? ($serviceEmetteur->getCode() . ' ' . $serviceEmetteur->getNom()) : '';
 
-        // Passer les objets Entity pour le champ debiteur (le LightAgenceServiceType utilise EntityToIdTransformer)
+        // Passer les objets Entity pour le champ debiteur (le AgenceServiceType en mode hidden utilise EntityToIdTransformer)
         $dto->debiteur = ['agence' => $agenceDebiteur, 'service' => $serviceDebiteur];
 
         return $dto;

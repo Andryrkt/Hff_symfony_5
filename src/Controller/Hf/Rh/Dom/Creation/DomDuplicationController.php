@@ -2,18 +2,20 @@
 
 namespace App\Controller\Hf\Rh\Dom\Creation;
 
-use App\Form\Hf\Rh\Dom\SecondFormType;
+
+use App\Service\Hf\Rh\Dom\DomPdfService;
 use App\Repository\Hf\Rh\Dom\DomRepository;
+use Symfony\Component\HttpFoundation\Request;
 use App\Service\Admin\AgenceSerializerService;
 use App\Factory\Hf\Rh\Dom\SecondFormDtoFactory;
+use App\Form\Hf\Rh\Dom\creation\SecondFormType;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\Navigation\ContextAwareBreadcrumbBuilder;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 /**
  * @Route("/hf/rh/ordre-de-mission")
  */
-class DomDuplicationController extends AbstractController
+final class DomDuplicationController extends AbstractDomFormController
 {
     /**
      * @Route("/duplication/{numeroOrdreMission}", name="dom_duplication")
@@ -23,7 +25,9 @@ class DomDuplicationController extends AbstractController
         DomRepository $domRepository,
         SecondFormDtoFactory $secondFormDtoFactory,
         AgenceSerializerService $agenceSerializerService,
-        ContextAwareBreadcrumbBuilder $breadcrumbBuilder
+        ContextAwareBreadcrumbBuilder $breadcrumbBuilder,
+        DomPdfService $pdfService,
+        Request $request
     ) {
 
         // recuperation des données du numéro d'Ordre de mission
@@ -34,6 +38,9 @@ class DomDuplicationController extends AbstractController
 
         // Mesure: Création du formulaire Symfony
         $form = $this->createForm(SecondFormType::class, $secondFormDto);
+
+        // traitement du formulaire
+        $this->traitementFormulaire($request, $form, $pdfService);
 
         return $this->render('hf/rh/dom/creation/dom_duplication.html.twig', [
             'form' => $form->createView(),

@@ -1,0 +1,40 @@
+{% extends "base.html.twig" %}
+
+{% block title %}
+	Création BADM - Etape 1
+{% endblock %}
+
+{% block content %}
+	<div class="container mt-6 mb-4">
+		<div class="card">
+			<div class="card-body">
+				{{ form_start(form, {'attr': {'data-controller': 'badm-first-form'}})}}
+				<div class="row">
+					<div class="col-12 col-md-4">
+						{{ form_row(form.agenceUser)}}
+					</div>
+					<div class="col-12 col-md-4">
+						{{ form_row(form.serviceUser)}}
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-12 col-lg-8 col-md-6">
+						{{ form_row(form.typeMouvement, { 'attr': { 'data-badm-first-form-target': 'typeMouvement' }})}}
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-12 col-md-4" data-controller="number-only character-limiter" data-character-limiter-max-length-value="5">{{ form_row(form.idMateriel, { 'attr': { 'data-number-only-target': 'input', 'data-character-limiter-target': 'input', 'data-badm-first-form-target': 'idMateriel', 'data-action': 'input->number-only#filter input->character-limiter#limiterCaracteres input->badm-first-form#validateFields'}})}}</div>
+					<div class="col-12 col-md-4">{{ form_row(form.numParc, { 'attr': { 'data-badm-first-form-target': 'numParc', 'data-action': 'input->badm-first-form#validateFields'}})}}</div>
+					<div class="col-12 col-md-4">{{ form_row(form.numSerie, { 'attr': { 'data-badm-first-form-target': 'numSerie', 'data-action': 'input->badm-first-form#validateFields'}})}}</div>
+				</div>
+				<div class="row">
+					<div class="d-flex justify-content-end mt-2">
+						{% import "macros/actions.html.twig" as actions %}
+						{{ actions.submit_button('Suivant', 'fas fa-arrow-right', 'btn-info', false) }}
+					</div>
+				</div>
+				{{ form_end(form)}}
+			</div>
+		</div>
+	</div>
+{% endblock %}

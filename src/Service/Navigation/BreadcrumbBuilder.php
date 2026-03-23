@@ -16,7 +16,7 @@ class BreadcrumbBuilder
         $this->urlGenerator = $urlGenerator;
     }
 
-    public function add(string $label, ?string $route = null, array $params = [], array $submenu = []): self
+    public function add(string $label, ?string $route = null, array $params = [], array $submenu = [], ?string $icon = null): self
     {
         $url = null;
         if ($route === '#') {
@@ -28,6 +28,7 @@ class BreadcrumbBuilder
         $this->items[] = [
             'label' => $label,
             'url' => $url,
+            'icon' => $icon,
             'submenu' => $this->processSubmenu($submenu), // Traiter les sous-menus récursivement
         ];
 
@@ -40,6 +41,7 @@ class BreadcrumbBuilder
         foreach ($submenu as $item) {
             $route = $item['route'] ?? null;
             $params = $item['params'] ?? [];
+            $icon = $item['icon'] ?? null;
             $nestedSubmenu = $item['submenu'] ?? [];
 
             $url = null;
@@ -52,6 +54,7 @@ class BreadcrumbBuilder
             $processed[] = [
                 'label' => $item['label'],
                 'url' => $url,
+                'icon' => $icon,
                 'submenu' => $this->processSubmenu($nestedSubmenu), // Appel récursif
             ];
         }

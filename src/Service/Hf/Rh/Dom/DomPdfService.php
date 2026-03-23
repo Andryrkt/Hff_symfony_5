@@ -16,7 +16,7 @@ class DomPdfService extends AbstractGeneratePdf
     }
 
     /**
-     * copie la page de garde du BC magasin dans docuware
+     * copie la page de garde du DOM dans docuware
      *
      * @param string $cheminVersDw
      * @param string $filePathName

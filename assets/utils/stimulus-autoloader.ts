@@ -21,6 +21,12 @@ export class StimulusAutoloader {
             { name: 'navigation', import: () => import('@controllers/components/navigation_controller') },
             { name: 'clickable', import: () => import('@controllers/components/inline_edit_controller') },
             { name: 'tom-select', import: () => import('@controllers/components/tom_select_controller') },
+            { name: 'character-limiter', import: () => import('@controllers/components/character_limiter_controller') },
+            { name: 'number-only', import: () => import('@controllers/components/number_only_controller') },
+            { name: 'number-formatter', import: () => import('@controllers/components/number_formatter_controller') },
+            { name: 'form-confirmation', import: () => import('@controllers/components/form_confirmation_controller') },
+            { name: 'components--uppercase', import: () => import('@controllers/components/uppercase_controller') },
+            { name: 'file-validation', import: () => import('@controllers/components/file_validation_controller') },
         ];
 
         // Contrôleurs de page - chargés à la demande (lazy loading)
@@ -33,9 +39,21 @@ export class StimulusAutoloader {
             { name: 'second-form', import: () => import('@controllers/pages/hf/rh/dom/second_form_controller') },
             { name: 'dom-liste', import: () => import('@controllers/pages/hf/rh/dom/dom_liste_controller') },
 
+            // Casier
+            { name: 'casier-first-form', import: () => import('@controllers/pages/hf/materiel/casier/casier_first_form_controller') },
+            { name: 'pages--hf--materiel--casier--liste', import: () => import('@controllers/pages/hf/materiel/casier/liste_controller') },
+
+
             // Admin
             { name: 'user-roles', import: () => import('@controllers/pages/admin/user_roles_controller') },
             { name: 'user-access', import: () => import('@controllers/pages/admin/user_access_controller') },
+
+            // Handlers
+            { name: 'badm-second-form', import: () => import('@/controllers/pages/hf/materiel/badm/badm_second_form_controller') },
+            { name: 'badm-first-form', import: () => import('@controllers/pages/hf/materiel/badm/badm_first_form_controller') },
+
+            // DIT
+            { name: 'pages--hf--atelier--dit--dit-form', import: () => import('@controllers/pages/hf/atelier/dit/dit_form_controller') },
         ];
 
         let coreLoaded = 0;

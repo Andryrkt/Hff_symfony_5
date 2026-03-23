@@ -15,21 +15,7 @@
 
 
 		{% include "partials/_pagination_haut.html.twig" with {
-			buttons: [
-			{
-				href: 'dom_export_excel',
-				class: 'bg-success',
-				icon: 'fas fa-table',
-				text: 'Excel',
-				tooltip: 'Exporter en Excel'
-			},
-			{
-				href: 'dom_first_form',
-				class: 'bg-warning',
-				text: 'Nouvelle demande',
-				tooltip: 'Nouvelle demande'
-			}
-		],
+			buttons: buttons,
 			currentPage: paginationData['currentPage'],
 			totalPages: paginationData['lastPage'],
 			resultCount: paginationData['totalItems'],

@@ -45,11 +45,11 @@ class UserFixtures extends Fixture implements DependentFixtureInterface, Fixture
         // $manager->flush();
     }
 
-    public function getDependencies()
+    public function getDependencies(): array
     {
-        // return [
-        //     PersonnelFixtures::class,
-        //     PermissionFixtures::class
-        // ];
+        return [
+            PersonnelFixtures::class,
+            PermissionFixtures::class
+        ];
     }
 }

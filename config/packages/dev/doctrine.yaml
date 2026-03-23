@@ -5,8 +5,8 @@ when@dev:
             connections:
                 default:
                     # Active le logging SQL détaillé en dev
-                    logging: true
-                    profiling: true
-                    profiling_collect_backtrace: true
+                    logging: false
+                    profiling: false
+                    profiling_collect_backtrace: false
         orm:
             auto_generate_proxy_classes: true

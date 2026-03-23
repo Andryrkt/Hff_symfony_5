@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des Casiers - temporaire
+{% endblock %}
+
+{% import "macros/actions.html.twig" as actions %}
+
+{% block content %}
+	<div class="container">
+		{% include 'partials/flash_messages.html.twig' %}
+
+		{# Formulaire de recherche #}
+		{% include "hf/materiel/casier/liste/_formulaireRecherche.html.twig" with{
+			form : form
+		}%}
+		{# Boutons d'actions #}
+		{{ actions.action_buttons(buttons) }}
+	</div>
+
+
+	<div class="container" data-controller="pages--hf--materiel--casier--liste">
+		<table class="table   table-shadow shadow  rounded " style="text-align: center;">
+			<thead class="table-dark">
+				<tr>
+					<th>Statut</th>
+					<th>Agence rattaché</th>
+					<th>Casier</th>
+					<th>Date de création</th>
+					<th>Numero Casier</th>
+
+					{% if is_granted('ROLE_ADMIN') or is_granted('MATERIEL_CASIER_VALIDATION') %}
+						<th>Action</th>
+					{% endif %}
+				</tr>
+			</thead>
+			<tbody id="table-container">
+				{% for item in casiers %}
+					<tr>
+						<td>{{ item.statutDemande.description}}</td>
+						<td>{{item.agenceRattacher.code}}</td>
+						<td style="text-align:left">{{item.nom}}</td>
+						<td>{{item.dateCreation|date("d/m/Y")}}</td>
+						<td>{{item.numero}}</td>
+
+						{% if is_granted('ROLE_ADMIN') or is_granted('MATERIEL_CASIER_VALIDATION') %}
+							<td>
+								{% if item.isValid %}
+									<button class="btn btn-sm btn-success fw-bold mb-3" disabled>Déjà Validé</button>
+								{% else %}
+									<a href="#" class="btn btn-sm fw-bold mb-3" data-action="click->pages--hf--materiel--casier--liste#validate" data-casier-nom="{{ item.nom }}" data-validate-url="{{ path('api_casier_validate', {id: item.id}) }}" style="background-color: #0c5c0cff; color: white">
+										Validé
+									</a>
+								{% endif %}
+							</td>
+						{% endif %}
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+{% endblock %}

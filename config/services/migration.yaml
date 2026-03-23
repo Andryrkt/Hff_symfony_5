@@ -12,7 +12,7 @@ services:
     arguments:
       $logger: '@monolog.logger.migration_user'
 
-  App\Command\Migration\MigrateDomDataCommand:
+  App\Command\Migration\Hf\Rh\Dom\MigrateDomDataCommand:
     arguments:
       $legacyConnection: '@doctrine.dbal.legacy_connection'
       $mapper: '@App\Service\Migration\Hf\Rh\Dom\DomMigrationMapper'
@@ -20,7 +20,7 @@ services:
     tags:
       - { name: 'console.command' }
 
-  App\Command\Migration\MigratePersonnelDataCommand:
+  App\Command\Migration\Admin\PersonnelUser\MigratePersonnelDataCommand:
     arguments:
       $em: '@doctrine.orm.entity_manager'
       $legacyHffConnection: '@doctrine.dbal.legacy_hff_connection'
@@ -30,11 +30,18 @@ services:
     tags:
       - { name: 'console.command' }
 
-  App\Command\Migration\MigrateUserDataCommand:
+  App\Command\Migration\Admin\PersonnelUser\MigrateUserDataCommand:
     arguments:
       $em: '@doctrine.orm.entity_manager'
       $legacyFetcher: '@App\Service\Migration\Utils\LegacyDataFetcher'
       $mapper: '@App\Service\Migration\Admin\PersonnelUser\UserMigrationMapper'
       $migrationLogger: '@monolog.logger.migration_user'
+    tags:
+      - { name: 'console.command' }
+
+  App\Command\Migration\Hf\Materiel\Badm\MigrateBadmDataCommand:
+    arguments:
+      $legacyConnection: '@doctrine.dbal.legacy_connection'
+      # Mapper autowired via default
     tags:
       - { name: 'console.command' }

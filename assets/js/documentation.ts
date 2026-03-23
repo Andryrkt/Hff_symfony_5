@@ -22,6 +22,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 contentContainer.innerHTML = data.content;
                 titleContainer.textContent = data.title.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
+                // Trigger Syntax Highlighting
+                const win = window as any;
+                if (win.Prism) {
+                    win.Prism.highlightAll();
+                }
+
                 // Update active state in sidebar
                 sidebarLinks.forEach(l => l.classList.remove('active'));
                 // Find sidebar link corresponding to this page

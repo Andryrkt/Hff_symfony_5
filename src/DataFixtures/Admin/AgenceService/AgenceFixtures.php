@@ -30,13 +30,24 @@ class AgenceFixtures extends Fixture implements FixtureGroupInterface
             ['code' => 'C1', 'nom' => 'TRAVEL AIRWAYS', 'reference' => 'agence_travel_airways'],
         ];
 
+        $agenceRepo = $manager->getRepository(Agence::class);
+
         foreach ($agences as $agenceData) {
-            $agence = new Agence();
-            $agence->setCode($agenceData['code'])
-                ->setNom($agenceData['nom']);
+            $agence = $agenceRepo->findOneBy(['code' => $agenceData['code']]);
+
+            if (!$agence) {
+                $agence = new Agence();
+                $agence->setCode($agenceData['code']);
+            }
+
+            $agence->setNom($agenceData['nom']);
 
             $manager->persist($agence);
-            $this->addReference($agenceData['reference'], $agence);
+
+            // On ajoute la référence seulement si elle n'existe pas déjà pour éviter les conflits si on réutilise ce tableau
+            if (!$this->hasReference($agenceData['reference'])) {
+                $this->addReference($agenceData['reference'], $agence);
+            }
         }
 
         $manager->flush();

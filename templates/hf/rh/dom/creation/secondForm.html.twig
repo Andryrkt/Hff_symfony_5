@@ -14,7 +14,8 @@
 		{% include 'partials/flash_messages.html.twig' %}
 	</div>
 
-	<div class="container mt-6 mb-4" id="agence-service-data" data-agences="{{ agencesJson|e('html_attr') }}" data-controller="second-form">
+	<div class="container mt-6 mb-4" data-controller="second-form">
+		{{ agence_service_data() }}
 		<div class="card p-2">
 			<div class="card-body">
 				<div class="row">
@@ -28,9 +29,7 @@
 				{% include "hf/rh/dom/creation/_second_formulaire.html.twig" with {form : form} %}
 
 			</div>
-
 		</div>
-
 	</div>
 
 {% endblock %}

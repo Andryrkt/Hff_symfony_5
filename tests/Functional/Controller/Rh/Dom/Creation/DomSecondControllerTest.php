@@ -48,13 +48,13 @@ class DomSecondControllerTest extends WebTestCase
         if (!$personnel) {
             self::markTestSkipped('Test user has no associated Personnel.');
         }
-        
+
         // Fetch real entities from DB to get their IDs
         $typeMission = $this->em->getRepository(SousTypeDocument::class)->findOneBy(['codeSousType' => 'MISSION']);
         $categorie = $this->em->getRepository(Categorie::class)->findOneBy([]);
 
         if (!$typeMission || !$categorie) {
-             self::markTestSkipped('Base data (TypeMission, Categorie) not found for the test.');
+            self::markTestSkipped('Base data (TypeMission, Categorie) not found for the test.');
         }
 
         $firstFormDto = new FirstFormDto();
@@ -67,12 +67,12 @@ class DomSecondControllerTest extends WebTestCase
         $firstFormDto->cin = '1234567890'; // Fake CIN for test
         $firstFormDto->agenceUser = 'AGENCE TEST';
         $firstFormDto->serviceUser = 'SERVICE TEST';
-        
-        $token = new UsernamePasswordToken($testUser, 'main', $testUser->getRoles());
+
         $session = $this->client->getContainer()->get('session');
-        $session->set('_security_main', serialize($token));
         $session->set('dom_first_form_data', $firstFormDto);
         $session->save();
+
+        $this->client->loginUser($testUser);
 
         // 3. Access the second form
         $crawler = $this->client->request('GET', '/rh/ordre-de-mission/dom-second-form');
@@ -80,7 +80,7 @@ class DomSecondControllerTest extends WebTestCase
 
         // 4. Submit the form with valid data
         $form = $crawler->selectButton('Enregistrer')->form();
-        
+
         $formValues = [
             'second_form[motifDeplacement]' => 'Test motif de déplacement',
             'second_form[client]' => 'Test Client',
@@ -91,11 +91,11 @@ class DomSecondControllerTest extends WebTestCase
             'second_form[dateHeureMission][heureFin]' => '17:00',
             'second_form[nombreJour]' => '2',
         ];
-        
+
         $this->client->submit($form, $formValues);
 
         // 5. Assertions
-        self::assertResponseRedirects('/hf/rh/dom/liste'); 
+        self::assertResponseRedirects('/hf/rh/dom/liste');
         $crawler = $this->client->followRedirect();
 
         self::assertSelectorExists('.alert-success');
@@ -104,7 +104,7 @@ class DomSecondControllerTest extends WebTestCase
         $domRepository = static::getContainer()->get(DomRepository::class);
         $dom = $domRepository->findOneBy(['motifDeplacement' => 'Test motif de déplacement']);
         self::assertNotNull($dom);
-        
+
         // Clean up the created entity
         $this->em->remove($dom);
         $this->em->flush();

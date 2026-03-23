@@ -37,18 +37,18 @@ class EntityRelationMapper
      * Mappe la relation StatutDemande
      * Stratégie : ID → Code (via legacy DB)
      */
-    public function mapStatutDemande(array $oldData): ?StatutDemande
+    public function mapStatutDemande(array $oldData, string $codeApplication): ?StatutDemande
     {
         if (empty($oldData['ID_Statut_Demande'])) {
             return null;
         }
 
-        $codeStatut = $this->legacyDataFetcher->getStatutDemandeCode($oldData['ID_Statut_Demande']);
-        if ($codeStatut) {
+        $descriptionStatut = $this->legacyDataFetcher->getStatutDemandeDescription($oldData['ID_Statut_Demande']);
+        if ($descriptionStatut) {
             $statut = $this->em->getRepository(StatutDemande::class)
                 ->findOneBy([
-                    'codeApplication' => 'DOM',
-                    'codeStatut' => $codeStatut
+                    'codeApplication' => $codeApplication,
+                    'description' => $descriptionStatut
                 ]);
         }
 
@@ -56,12 +56,122 @@ class EntityRelationMapper
         if (!$statut) {
             $this->logger->warning('StatutDemande non trouvé', [
                 'ID_Statut_Demande' => $oldData['ID_Statut_Demande'],
-                'Code_Statut' => $oldData['Code_Statut'] ?? null,
+                'Description_Statut' => $descriptionStatut ?? null,
             ]);
         }
 
         return $statut;
     }
+
+
+
+    /**
+     * Mappe une Agence
+     * Stratégie : ID → Code (via legacy DB)
+     */
+    public function mapAgence(int $id): ?Agence
+    {
+        // Si pas trouvé, récupérer le code depuis l'ancienne base
+        $codeAgence = $this->legacyDataFetcher->getAgenceCode($id);
+        if ($codeAgence) {
+            $agence = $this->em->getRepository(Agence::class)
+                ->findOneBy(['code' => $codeAgence]);
+        }
+
+
+        if (!$agence) {
+            $this->logger->warning('Agence non trouvée', ['id' => $id]);
+        }
+
+        return $agence;
+    }
+
+    /**
+     * Mappe un Service
+     * Stratégie : ID → Code (via legacy DB)
+     */
+    public function mapService(int $id): ?Service
+    {
+
+        $codeService = $this->legacyDataFetcher->getServiceCode($id);
+
+        if ($codeService) {
+            $service = $this->em->getRepository(Service::class)
+                ->findOneBy(['code' => $codeService]);
+        }
+
+
+        if (!$service) {
+            $this->logger->warning('Service non trouvé', ['id' => $id]);
+        }
+
+        return $service;
+    }
+
+    /**
+     * Mappe un User par id
+     */
+    public function mapUserWithId(int $id): ?User
+    {
+        $username = $this->legacyDataFetcher->getUserName($id);
+        $user = $this->em->getRepository(User::class)
+            ->findOneBy(['username' => $username]);
+
+        if (!$user) {
+            $this->logger->warning('User non trouvé', ['id' => $id]);
+        }
+
+        return $user;
+    }
+
+    /**
+     * Mappe un User par username
+     */
+    public function mapUser(string $username): ?User
+    {
+        if (empty($username)) {
+            return null;
+        }
+
+        $user = $this->em->getRepository(User::class)
+            ->findOneBy(['username' => $username]);
+
+        if (!$user) {
+            $this->logger->warning('User non trouvé', ['username' => $username]);
+        }
+
+        return $user;
+    }
+
+    /**
+     * Mappe un agence service Irium
+     */
+    public function mapAgenceServiceIrium(int $id): ?AgenceServiceIrium
+    {
+        $agenceServiceIrium = null;
+        $codeAgenceService = $this->legacyDataFetcher->getCodeAgenceService($id);
+
+        if ($codeAgenceService) {
+            $agenceServiceIrium = $this->em->getRepository(AgenceServiceIrium::class)
+                ->findOneBy(['code' => $codeAgenceService]);
+        }
+
+        if (!$agenceServiceIrium) {
+            $this->logger->warning('agenceServiceIrium non trouvé', ['old_id' => $id]);
+        }
+
+        return $agenceServiceIrium;
+    }
+
+    public function mapFullName(int $matricule): ?string
+    {
+        return $this->legacyDataFetcher->getFullName($matricule) ? $this->legacyDataFetcher->getFullName($matricule)[0]['fullname'] : null;
+    }
+
+
+    /**========================================================
+     *  DEMANDE D'ORDRE DE MISSION DOM
+     *=======================================================*/
 
     /**
      * Mappe la relation SousTypeDocument
@@ -138,92 +248,5 @@ class EntityRelationMapper
         }
 
         return $categorie;
-    }
-
-    /**
-     * Mappe une Agence
-     * Stratégie : ID → Code (via legacy DB)
-     */
-    public function mapAgence(int $id): ?Agence
-    {
-        // Si pas trouvé, récupérer le code depuis l'ancienne base
-        $codeAgence = $this->legacyDataFetcher->getAgenceCode($id);
-        if ($codeAgence) {
-            $agence = $this->em->getRepository(Agence::class)
-                ->findOneBy(['code' => $codeAgence]);
-        }
-
-
-        if (!$agence) {
-            $this->logger->warning('Agence non trouvée', ['id' => $id]);
-        }
-
-        return $agence;
-    }
-
-    /**
-     * Mappe un Service
-     * Stratégie : ID → Code (via legacy DB)
-     */
-    public function mapService(int $id): ?Service
-    {
-
-        $codeService = $this->legacyDataFetcher->getServiceCode($id);
-
-        if ($codeService) {
-            $service = $this->em->getRepository(Service::class)
-                ->findOneBy(['code' => $codeService]);
-        }
-
-
-        if (!$service) {
-            $this->logger->warning('Service non trouvé', ['id' => $id]);
-        }
-
-        return $service;
-    }
-
-    /**
-     * Mappe un User par username
-     */
-    public function mapUser(string $username): ?User
-    {
-        if (empty($username)) {
-            return null;
-        }
-
-        $user = $this->em->getRepository(User::class)
-            ->findOneBy(['username' => $username]);
-
-        if (!$user) {
-            $this->logger->warning('User non trouvé', ['username' => $username]);
-        }
-
-        return $user;
-    }
-
-    /**
-     * Mappe un agence service Irium
-     */
-    public function mapAgenceServiceIrium(int $id): ?AgenceServiceIrium
-    {
-        $agenceServiceIrium = null;
-        $codeAgenceService = $this->legacyDataFetcher->getCodeAgenceService($id);
-
-        if ($codeAgenceService) {
-            $agenceServiceIrium = $this->em->getRepository(AgenceServiceIrium::class)
-                ->findOneBy(['code' => $codeAgenceService]);
-        }
-
-        if (!$agenceServiceIrium) {
-            $this->logger->warning('agenceServiceIrium non trouvé', ['old_id' => $id]);
-        }
-
-        return $agenceServiceIrium;
-    }
-
-    public function mapFullName(int $matricule): ?string
-    {
-        return $this->legacyDataFetcher->getFullName($matricule) ? $this->legacyDataFetcher->getFullName($matricule)[0]['fullname'] : null;
     }
 }

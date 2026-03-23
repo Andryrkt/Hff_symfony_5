@@ -6,26 +6,37 @@ use TCPDF;
 
 class AbstractGeneratePdf
 {
-
-    protected function copyFile(string $sourcePath, string $destinationPath): void
+    protected function copyFile(string $sourcePath, string $destinationPath): bool
     {
-        if (!file_exists($sourcePath)) {
-            throw new \Exception("Le fichier source n'existe pas : $sourcePath");
-        }
+        // Fonction interne pour tenter la copie
+        $attemptCopy = function ($attemptNumber) use ($sourcePath, $destinationPath) {
+            try {
+                if (!file_exists($sourcePath) || !copy($sourcePath, $destinationPath)) {
+                    return false;
+                }
 
-        // Créer le répertoire de destination s'il n'existe pas
-        $destinationDir = dirname($destinationPath);
-        if (!is_dir($destinationDir)) {
-            if (!mkdir($destinationDir, 0755, true)) {
-                throw new \Exception("Impossible de créer le répertoire : $destinationDir");
+                // Vérification rapide
+                return file_exists($destinationPath) && filesize($destinationPath) > 0;
+            } catch (\Exception $e) {
+                return false;
             }
+        };
+
+        // Première tentative
+        if ($attemptCopy(1)) {
+            echo "Fichier copié avec succès : $destinationPath\n";
+            return true;
         }
 
-        if (!copy($sourcePath, $destinationPath)) {
-            throw new \Exception("Impossible de copier le fichier : $sourcePath vers $destinationPath");
+        // Deuxième tentative après un court délai
+        usleep(50000); // 50ms
+        if ($attemptCopy(2)) {
+            echo "Fichier copié avec succès après retry : $destinationPath\n";
+            return true;
         }
 
-        echo "Fichier copié avec succès : $destinationPath\n";
+        error_log("Échec de copyFile après 2 tentatives : $sourcePath");
+        return false;
     }
 
 
@@ -167,5 +178,25 @@ class AbstractGeneratePdf
 
         // Move to the next line
         $pdf->Ln(6, true);
+    }
+
+    /**
+     * Génère un tableau HTML flexible et l'ajoute au PDF.
+     *
+     * @param TCPDF $pdf L'instance du PDF.
+     * @param array $headerConfig Configuration des en-têtes.
+     * @param array $rows Données du tableau.
+     * @param array $totals Ligne des totaux.
+     * @param array $options Options pour le générateur de tableau.
+     * @param boolean $expre Si vrai, n'affiche pas de message pour un tableau vide.
+     */
+    protected function addTable(TCPDF $pdf, array $headerConfig, array $rows, array $totals = [], array $options = [], bool $expre = false)
+    {
+        $tableGenerator = new PdfTableGeneratorFlexible();
+        $html = $tableGenerator
+            ->setOptions($options)
+            ->generateTable($headerConfig, $rows, $totals, $expre);
+
+        $pdf->writeHTML($html, true, false, true, false, '');
     }
 }

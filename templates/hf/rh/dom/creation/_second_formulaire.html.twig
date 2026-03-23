@@ -1,6 +1,6 @@
 {% import "macros/form_macros.html.twig" as formMacros %}
 
-{{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}})}}
+{{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'id': 'dom-second-form'}})}}
 
 <input type="hidden" id="typeMission" value="{{secondFormDto.typeMission.id}}">
 <input type="hidden" id="categorie" value="{{secondFormDto.categorie.id}}">
@@ -295,15 +295,10 @@
 </div>
 
 <div class="row">
-
-	<div class="mt-2 ">
-
+	<div class="d-flex justify-content-end mt-2">
 		{% import "macros/actions.html.twig" as actions %}
-
-		{{ actions.submit_button('Envoyer', 'fa fa-print', 'btn-info md-5') }}
-
+		{{ actions.submit_button('Enregistrer', 'fa fa-print', 'btn-warning', true, 'Confirmez-vous la création de cette demande d\'ordre de mission ?', 'Veuillez ne pas quitter la page pendant la création de la demande.', 'Création de la demande d\'ordre de mission') }}
 	</div>
-
 </div>
 
 

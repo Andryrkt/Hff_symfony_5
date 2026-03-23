@@ -4,6 +4,7 @@ namespace App\Controller\Hf\Rh\Dom\Liste;
 
 use App\Controller\Base\AbstractExcelExportController;
 use App\Dto\Hf\Rh\Dom\DomSearchDto;
+use App\Contract\Dto\SearchDtoInterface;
 use App\Service\Utils\Export\ExcelService;
 use App\Repository\Hf\Rh\Dom\DomRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -61,7 +62,7 @@ final class DomExportExcelController extends AbstractExcelExportController
      */
     public function getRows(): array
     {
-        $doms = $this->domRepository->findFilteredExcel($this->getDomSearchDto($this->session));
+        $doms = $this->domRepository->findFilteredExcel($this->getSearchDto($this->session));
         $data = [];
 
         foreach ($doms as $dom) {
@@ -90,13 +91,13 @@ final class DomExportExcelController extends AbstractExcelExportController
      */
     public function getFilename(): string
     {
-        return 'dom_export_' . date('Y-m-d');
+        return 'dom_export_' . date('Y-m-dH:i:s');
     }
 
     /**
-     * Récupère le DTO de recherche depuis la session
+     * {@inheritdoc}
      */
-    private function getDomSearchDto(SessionInterface $session): ?DomSearchDto
+    public function getSearchDto(SessionInterface $session): SearchDtoInterface
     {
         $domSearchDto = $session->get('dom_search_dto');
 
