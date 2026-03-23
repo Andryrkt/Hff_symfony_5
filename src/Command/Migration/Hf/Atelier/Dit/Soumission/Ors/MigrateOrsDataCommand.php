@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Command\Migration\Hf\Atelier\Dit;
+namespace App\Command\Migration\Hf\Atelier\Dit\Soumission\Ors;
 
-use App\Entity\Hf\Atelier\Dit\Dit;
-use App\Service\Migration\Hf\Atelier\Dit\DitMigrationMapper;
+use App\Entity\Hf\Atelier\Dit\Soumission\Ors\Ors;
+use App\Service\Migration\Hf\Atelier\Dit\Soumission\Ors\OrsMigrationMapper;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -14,20 +14,20 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class MigrateDitDataCommand extends Command
+class MigrateOrsDataCommand extends Command
 {
-    protected static $defaultName = 'app:migrate:dit-data';
-    protected static $defaultdescription = 'Migre les données DIT de l\'ancienne base vers la nouvelle structure';
+    protected static $defaultName = 'app:migrate:ors-data';
+    protected static $defaultdescription = 'Migre les données ORs de l\'ancienne base vers la nouvelle structure';
 
     private EntityManagerInterface $em;
     private Connection $legacyConnection;
-    private DitMigrationMapper $mapper;
+    private OrsMigrationMapper $mapper;
     private LoggerInterface $logger;
 
     public function __construct(
         EntityManagerInterface $em,
         Connection $legacyConnection,
-        DitMigrationMapper $mapper,
+        OrsMigrationMapper $mapper,
         LoggerInterface $migrationDomLogger
     ) {
         parent::__construct();
@@ -47,22 +47,21 @@ class MigrateDitDataCommand extends Command
             ->setHelp(
                 <<<'HELP'
 Cette commande migre les données de la table Demande_ordre_mission de l'ancienne base de données
-vers la nouvelle structure de l'entité Dit.
+vers la nouvelle structure de l'entité Ors.
 
 Exemples d'utilisation:
 
   # Test avec 10 enregistrements en mode dry-run
-  php bin/console app:migrate:dit-data --dry-run --limit=10
+  php bin/console app:migrate:ors-data --dry-run --limit=10
 
   # Migration complète avec lots de 50
-  php bin/console app:migrate:dit-data --batch-size=50
+  php bin/console app:migrate:ors-data --batch-size=50
 
   # Reprendre une migration à partir de l'enregistrement 1000
-  php bin/console app:migrate:dit-data --offset=1000
+  php bin/console app:migrate:ors-data --offset=1000
 HELP
             );
     }
-
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -122,23 +121,22 @@ HELP
                 $legacyRecords = $this->fetchLegacyRecords($currentBatchSize, $currentOffset);
 
                 foreach ($legacyRecords as $legacyData) {
-                    $stats['total']++;
 
                     try {
-                        $numeroDit = $legacyData['numero_demande_dit'] ?? null;
+                        $numeroOr = $legacyData['numeroOR'] ?? null;
                         // ID Legacy supposé pour le logging
                         $legacyId = $legacyData['id'] ?? 'unknown';
 
                         // Vérifie si déjà traité dans ce lot ou les précédents
-                        if ($numeroDit && isset($processedNumeros[$numeroDit])) {
+                        if ($numeroOr && isset($processedNumeros[$numeroOr])) {
                             $stats['skipped']++;
                             $skippedRecords[] = [
                                 'id' => $legacyId,
-                                'numero_dit' => $numeroDit,
+                                'numero_or' => $numeroOr,
                                 'reason' => 'Doublon dans le flux (batch)'
                             ];
-                            $this->logger->info('DIT doublon dans le flux (ignoré)', [
-                                'numero_dit' => $numeroDit,
+                            $this->logger->info('OR doublon dans le flux (ignoré)', [
+                                'numero_or' => $numeroOr,
                                 'old_id' => $legacyId,
                             ]);
                             $progressBar->advance();
@@ -146,21 +144,21 @@ HELP
                         }
 
                         // Vérifie si le DIT existe déjà (par numeroDit) dans la BDD
-                        if ($numeroDit) {
-                            $existingDit = $this->em->getRepository(Dit::class)->findOneBy([
-                                'numeroDit' => $numeroDit
+                        if ($numeroOr) {
+                            $existingDit = $this->em->getRepository(Ors::class)->findOneBy([
+                                'numeroOr' => $numeroOr
                             ]);
 
                             if ($existingDit) {
                                 $stats['skipped']++;
-                                $processedNumeros[$numeroDit] = true;
+                                $processedNumeros[$numeroOr] = true;
                                 $skippedRecords[] = [
                                     'id' => $legacyId,
-                                    'numero_dit' => $numeroDit,
+                                    'numero_or' => $numeroOr,
                                     'reason' => 'Existe déjà en BDD'
                                 ];
-                                $this->logger->info('DIT déjà existant (ignoré)', [
-                                    'numero_dit' => $numeroDit,
+                                $this->logger->info('OR déjà existant (ignoré)', [
+                                    'numero_or' => $numeroOr,
                                     'old_id' => $legacyId,
                                 ]);
                                 $progressBar->advance();
@@ -173,7 +171,7 @@ HELP
 
                         if ($dit === null) {
                             $stats['skipped']++;
-                            $this->logger->warning('Enregistrement DIT ignoré (mapping failed)', [
+                            $this->logger->warning('Enregistrement OR ignoré (mapping failed)', [
                                 'old_id' => $legacyId,
                             ]);
                             continue;
@@ -184,15 +182,15 @@ HELP
                             $this->em->persist($dit);
                         }
 
-                        if ($numeroDit) {
-                            $processedNumeros[$numeroDit] = true;
+                        if ($numeroOr) {
+                            $processedNumeros[$numeroOr] = true;
                         }
 
                         $stats['success']++;
                     } catch (\Exception $e) {
                         $stats['errors']++;
-                        $this->logger->error('Erreur lors de la migration d\'un enregistrement DIT', [
-                            'old_id' => $legacyData['ID_DIT'] ?? 'unknown',
+                        $this->logger->error('Erreur lors de la migration d\'un enregistrement OR', [
+                            'old_id' => $legacyData['ID_OR'] ?? 'unknown',
                             'error' => $e->getMessage(),
                             'trace' => $e->getTraceAsString(),
                         ]);
@@ -299,7 +297,7 @@ HELP
      */
     private function countLegacyRecords(?int $limit): int
     {
-        $sql = 'SELECT COUNT(*) as total FROM demande_intervention';
+        $sql = 'SELECT COUNT(*) as total FROM ors_soumis_a_validation';
 
         if ($limit !== null) {
             // Note: SQL Server ne supporte pas LIMIT directement
@@ -314,7 +312,7 @@ HELP
         // SQL Server offset syntax
         $sql = <<<SQL
             SELECT *
-            FROM demande_intervention
+            FROM ors_soumis_a_validation
             ORDER BY id
             OFFSET :offset ROWS
             FETCH NEXT :limit ROWS ONLY

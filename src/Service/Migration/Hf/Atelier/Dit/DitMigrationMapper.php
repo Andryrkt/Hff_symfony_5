@@ -35,7 +35,7 @@ class DitMigrationMapper
     }
 
     /**
-     * Mappe un enregistrement de l'ancien schéma vers une nouvelle entité Badm
+     * Mappe un enregistrement de l'ancien schéma vers une nouvelle entité Dit
      *
      * @param array $oldData Données de l'ancien schéma
      * @return Dit|null Nouvelle entité dit ou null en cas d'erreur

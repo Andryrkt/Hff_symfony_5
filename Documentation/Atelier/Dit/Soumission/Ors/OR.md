@@ -1,12 +1,11 @@
 ## Encore à faire:
 - soumission de l'OR s'il est rattaché à un DA
 - blockage de soumission de l'OR en avant , pendant et après => **OK**
-- modification du table dit pour le colone statut_or
+- modification du table dit pour le colone statut_or => **OK**
 - envoye du fichier fusionner dans DW => **OK**
 - creation du test 
-- creation du migration de donnée
-- creation du suppretion des donnée du table ors
-
+- creation du migration de donnée => **Encours**
+- creation du suppression des donnée du table ors
 
 ## BLOCAGE:
 ### Bloquer avant la soumission
